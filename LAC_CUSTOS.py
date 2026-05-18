@@ -71,7 +71,7 @@ JSON_VALIDATORS = {
     ],
 }
 
-IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
 
 # ─── UTILITAIRES ──────────────────────────────────────────────────────────────
@@ -261,3 +261,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
