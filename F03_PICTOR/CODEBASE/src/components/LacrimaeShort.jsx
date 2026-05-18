@@ -28,7 +28,9 @@ const { fontFamily: playfair }  = loadPlayfair();
 
 // ─── COMPOSANT PRINCIPAL ──────────────────────────────────────────────────────
 
-export const LacrimaeShort = ({ timing, config, images, audioSrc }) => {
+export const LacrimaeShort = ({ timing, config, images = [], audioSrc = null }) => {
+  // FIX CRITICAL: images et audioSrc ont des valeurs par défaut
+  // pour éviter les TypeError si les props ne sont pas passées par Root.jsx
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
@@ -46,8 +48,11 @@ export const LacrimaeShort = ({ timing, config, images, audioSrc }) => {
 
   // ── Sélection de l'image au frame courant ──────────────────────────────────
   const cutInterval = cfg.cut_interval_frames || 7;
-  const imgIdx = Math.floor(frame / cutInterval) % Math.max(images.length, 1);
-  const currentImage = images[imgIdx] || null;
+  // FIX: images.length sécurisé — images=[] par défaut évite le crash
+  const imgIdx = images.length > 0
+    ? Math.floor(frame / cutInterval) % images.length
+    : 0;
+  const currentImage = images.length > 0 ? images[imgIdx] : null;
 
   // ── Mot courant ────────────────────────────────────────────────────────────
   const currentWord = getCurrentWord(timing.words, frame);
@@ -81,7 +86,7 @@ export const LacrimaeShort = ({ timing, config, images, audioSrc }) => {
         }}
       />
 
-      {/* Film grain */}
+      {/* Film grain — animé frame par frame */}
       <GrainOverlay opacity={cfg.grain_overlay_opacity} frame={frame} />
 
       {/* Sous-titres */}
@@ -136,8 +141,11 @@ const ImageBackground = ({ src, filter, frame, cutInterval, imgIdx }) => {
 // ─── GRAIN OVERLAY ────────────────────────────────────────────────────────────
 
 const GrainOverlay = ({ opacity, frame }) => {
-  // Le grain est statique — un SVG feTurbulence embarqué
-  const svgGrain = `data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E`;
+  // FIX: grain animé — baseFrequency varie légèrement selon le frame
+  // pour un effet organique plutôt que figé
+  const baseFreq = (0.82 + (frame % 17) * 0.003).toFixed(4);
+  const numOctaves = 3 + (frame % 3);
+  const svgGrain = `data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='${baseFreq}' numOctaves='${numOctaves}' seed='${frame % 99}' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E`;
 
   return (
     <AbsoluteFill
