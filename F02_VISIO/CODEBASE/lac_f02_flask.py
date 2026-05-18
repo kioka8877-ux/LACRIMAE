@@ -8,9 +8,24 @@ Loi d'isolement : accès à F02/IN/ uniquement
 import json
 import os
 from pathlib import Path
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, after_this_request
 
 app = Flask(__name__)
+
+# ─── CORS (FIX: nécessaire pour Colab port-forwarding) ────────────────────────
+# Injecte Access-Control-Allow-Origin sur toutes les réponses
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    return response
+
+@app.route("/", methods=["OPTIONS"])
+@app.route("/<path:path>", methods=["OPTIONS"])
+def options_handler(path=""):
+    return "", 204
+
 
 # ─── CHEMINS ──────────────────────────────────────────────────────────────────
 # Configurés depuis le notebook
@@ -52,17 +67,23 @@ def serve_image(filename):
     img_path = IMAGES_DIR / filename
     if not img_path.exists():
         return "Image introuvable", 404
-    return send_file(str(img_path))
+    # FIX: passer Path directement (Flask ≥ 2.0), pas str()
+    return send_file(img_path)
 
 
 @app.route("/api/config", methods=["GET"])
 def get_config():
-    """Retourne le creative_config.json actuel (si existant)."""
+    """
+    Retourne le creative_config.json sauvegardé (si existant).
+    NOTE : la config par défaut retournée a validated_by_magos=False.
+           Pour passer LAC_CUSTOS check-out, il faut obligatoirement
+           avoir validé via POST /api/config depuis le viewer.
+    """
     config_path = OUT_DIR / "creative_config.json"
     if config_path.exists():
         with open(config_path, "r", encoding="utf-8") as f:
             return jsonify(json.load(f))
-    # Config par défaut
+    # Config par défaut — non validée, pour preview uniquement
     return jsonify(get_default_config())
 
 
@@ -119,7 +140,15 @@ def viewer():
     viewer_path = Path(__file__).parent / "lac_f02_viewer.html"
     if not viewer_path.exists():
         viewer_path = Path("/content/lac_f02_viewer.html")
-    return send_file(str(viewer_path))
+    # FIX: gestion d'erreur explicite si le fichier est introuvable
+    if not viewer_path.exists():
+        return (
+            "<h1>LACRIMAE VISIO</h1>"
+            "<p>Viewer HTML introuvable. Vérifiez que lac_f02_viewer.html "
+            "est bien copié dans le répertoire courant ou dans /content/.</p>",
+            404,
+        )
+    return send_file(viewer_path)
 
 
 # ─── CONFIG PAR DÉFAUT ────────────────────────────────────────────────────────
