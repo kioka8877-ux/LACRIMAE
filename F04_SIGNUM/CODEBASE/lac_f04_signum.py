@@ -7,6 +7,7 @@ Loi d'isolement : accès à F04/IN/ uniquement
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -15,6 +16,19 @@ from pathlib import Path
 # ─── CONFIGURATION ────────────────────────────────────────────────────────────
 
 TOLERANCE_FRAMES = 2   # Tolérance écart durée vidéo/audio (frames)
+
+
+# ─── VÉRIFICATION DÉPENDANCES ────────────────────────────────────────────────
+
+def check_dependencies() -> None:
+    """Vérifie que ffmpeg et ffprobe sont disponibles dans le PATH."""
+    for tool in ("ffmpeg", "ffprobe"):
+        if not shutil.which(tool):
+            raise RuntimeError(
+                f"[SIGNUM] {tool} introuvable dans le PATH. "
+                f"Installer avec : apt-get install -y ffmpeg"
+            )
+    print("[SIGNUM] FFmpeg et ffprobe détectés.")
 
 
 # ─── INSPECTION VIDÉO ────────────────────────────────────────────────────────
@@ -123,11 +137,12 @@ def finalize(
     ]
 
     print(f"\n[SIGNUM] Lancement FFmpeg...")
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    # FIX: capture_output=False pour streamer la progression en temps réel dans Colab
+    # stderr=subprocess.PIPE uniquement pour récupérer le code d'erreur final
+    result = subprocess.run(cmd, capture_output=False)
 
     if result.returncode != 0:
-        print(f"[SIGNUM] ERREUR FFmpeg :")
-        print(result.stderr)
+        print(f"[SIGNUM] ERREUR FFmpeg — code retour : {result.returncode}")
         return False
 
     # ── Vérification finale ──────────────────────────────────────────────────
@@ -150,6 +165,9 @@ def finalize(
 # ─── POINT D'ENTRÉE ───────────────────────────────────────────────────────────
 
 def main():
+    # FIX: vérifier ffmpeg/ffprobe disponibles avant de commencer
+    check_dependencies()
+
     base = Path("/content/drive/MyDrive/DRIVE_LACRIMAE")
 
     input_mp4    = str(base / "F04_SIGNUM" / "IN"  / "short_final.mp4")
