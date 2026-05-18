@@ -53,7 +53,7 @@ def get_images():
     """Liste les images disponibles dans IN/images/."""
     if not IMAGES_DIR.exists():
         return jsonify({"images": []})
-    exts = {".jpg", ".jpeg", ".png", ".webp"}
+    exts = {".jpg", ".jpeg", ".png"}
     images = sorted([
         f.name for f in IMAGES_DIR.iterdir()
         if f.suffix.lower() in exts
@@ -122,7 +122,7 @@ def status():
 
     nb_images = 0
     if IMAGES_DIR.exists():
-        exts = {".jpg", ".jpeg", ".png", ".webp"}
+        exts = {".jpg", ".jpeg", ".png"}
         nb_images = len([f for f in IMAGES_DIR.iterdir() if f.suffix.lower() in exts])
 
     return jsonify({
@@ -183,3 +183,4 @@ def start_server(port: int = 5000) -> None:
 
 if __name__ == "__main__":
     start_server()
+
