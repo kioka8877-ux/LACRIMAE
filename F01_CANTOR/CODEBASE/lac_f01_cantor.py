@@ -7,6 +7,7 @@ Loi d'isolement : accès à SHARED/audio_clean.mp3 uniquement
 
 import json
 import os
+import subprocess
 import sys
 import math
 from pathlib import Path
@@ -31,26 +32,52 @@ STRONG_WORDS = {
 
 # ─── TRANSCRIPTION ────────────────────────────────────────────────────────────
 
-def transcribe(audio_path: str, model_size: str = "medium") -> dict:
+def transcribe(audio_path: str, model_size: str = "medium", model_language: str = "fr") -> dict:
     """
     Transcrit l'audio via faster-whisper.
     Retourne le timing JSON complet.
+
+    Args:
+        audio_path     : chemin vers le fichier audio
+        model_size     : taille du modèle Whisper ('tiny','base','small','medium','large-v3')
+        model_language : code langue ISO (ex: 'fr', 'en', 'es'). None = détection auto.
     """
     try:
         from faster_whisper import WhisperModel
     except ImportError:
         print("[CANTOR] Installation de faster-whisper...")
-        os.system("pip install faster-whisper -q")
+        # FIX: utiliser subprocess.check_call pour détecter les erreurs d'installation
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", "faster-whisper", "-q"],
+            stderr=subprocess.DEVNULL,
+        )
         from faster_whisper import WhisperModel
 
-    print(f"[CANTOR] Chargement du modèle Whisper '{model_size}'...")
-    model = WhisperModel(model_size, device="cuda", compute_type="float16")
+    # FIX: détection dynamique CUDA → fallback CPU automatique
+    try:
+        import torch
+        if torch.cuda.is_available():
+            device = "cuda"
+            compute_type = "float16"
+            print("[CANTOR] GPU CUDA détecté — mode float16.")
+        else:
+            device = "cpu"
+            compute_type = "int8"
+            print("[CANTOR] Pas de GPU détecté — mode CPU int8 (plus lent).")
+    except ImportError:
+        # torch non disponible — on tente cuda, faster-whisper gérera le fallback
+        device = "auto"
+        compute_type = "int8"
+        print("[CANTOR] torch non disponible — device=auto.")
+
+    print(f"[CANTOR] Chargement du modèle Whisper '{model_size}' ({device})...")
+    model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
     print(f"[CANTOR] Transcription de : {audio_path}")
     segments, info = model.transcribe(
         audio_path,
         word_timestamps=True,
-        language="fr",
+        language=model_language,          # FIX: paramétrable, None = auto-detect
         beam_size=5,
         vad_filter=True,
         vad_parameters={"min_silence_duration_ms": 300},
