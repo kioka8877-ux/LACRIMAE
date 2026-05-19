@@ -9,9 +9,9 @@
 | Frégate | Nom | Statut | Date Scellage |
 |---------|-----|--------|---------------|
 | F01 | CANTOR | 🟢 SCELLÉE | 2026-05-19 |
-| F02 | VISIO | 🔵 EN TEST | — |
-| F03 | PICTOR | 🟡 EN FORGE | — |
-| F04 | SIGNUM | 🟡 EN FORGE | — |
+| F02 | VISIO | 🟢 SCELLÉE | 2026-05-19 |
+| F03 | PICTOR | 🟢 SCELLÉE | 2026-05-19 |
+| F04 | SIGNUM | 🔵 EN TEST | — |
 | — | LAC_CUSTOS | 🟢 SCELLÉE | 2026-05-19 |
 
 **Légende :** ⚪ En attente | 🟡 En forge | 🔵 En test | 🟢 SCELLÉE | 🔴 BLOQUÉE
@@ -29,15 +29,21 @@
 | 2026-05-19 | F01 | TEST PROD | Transcription Whisper medium — 26 mots, 8.59s, GPU T4 | ✅ |
 | 2026-05-19 | F01 | TEST PROD | CUSTOS check-out F01 validé — timing.json 4068 octets | ✅ |
 | 2026-05-19 | F01 | SCELLAGE | **F01 CANTOR SCELLÉE** — Transit F01→F02 autorisé | ✅ |
+| 2026-05-19 | F02 | TEST PROD | creative_config.json validé — 30fps, 1080x1920, Cinzel+Playfair | ✅ |
+| 2026-05-19 | F02 | SCELLAGE | **F02 VISIO SCELLÉE** — Transit F02→F03 autorisé | ✅ |
+| 2026-05-19 | F03 | TEST PROD | Patch staticFile Remotion — assets binaires corrigés | ✅ |
+| 2026-05-19 | F03 | TEST PROD | Rendu Remotion 258/258 frames — short_final.mp4 65.3 Mo | ✅ |
+| 2026-05-19 | F03 | TEST PROD | CUSTOS check-out F03 validé — Transit F03→F04 autorisé | ✅ |
+| 2026-05-19 | F03 | SCELLAGE | **F03 PICTOR SCELLÉE** — Ad Victoriam | ✅ |
 
 ---
 
 ## COMPTEUR DE GUERRE
 
 ```
-Forge des Frégates : [███░░░░░░░] 1/4 Frégates Scellées — F01 CANTOR ✓
+Forge des Frégates : [███████░░░] 3/4 Frégates Scellées — F01 ✓ F02 ✓ F03 ✓
 LAC_CUSTOS         : [██████████] SCELLÉE ✓
-Fleet Seal         : [░░░░░░░░░░] En attente — Test E2E en cours
+Fleet Seal         : [░░░░░░░░░░] En attente — F04 SIGNUM en test
 Objectif           : Fleet Seal Certificate + 1er Short rendu
 ```
 
@@ -52,13 +58,13 @@ Objectif           : Fleet Seal Certificate + 1er Short rendu
 [F01 CANTOR] ──► timing.json                            🟢 SCELLÉE
          │
          ▼
-[F02 VISIO] ──► creative_config.json                    🔵 EN TEST
+[F02 VISIO] ──► creative_config.json                    🟢 SCELLÉE
          │
          ▼
-[F03 PICTOR] ──► short_final.mp4                        🟡 EN FORGE
+[F03 PICTOR] ──► short_final.mp4                        🟢 SCELLÉE
          │
          ▼
-[F04 SIGNUM] ──► short_master.mp4                       🟡 EN FORGE
+[F04 SIGNUM] ──► short_master.mp4                       🔵 EN TEST
 ```
 
 ---
@@ -84,44 +90,57 @@ IN/audio_clean.mp3  →  OUT/timing.json  ✅
 
 ---
 
-## FRÉGATE F02 — VISIO 🔵 EN TEST
+## FRÉGATE F02 — VISIO 🟢 SCELLÉE
 
 ### Composants Forgés
-- 🔵 `LAC_F02.ipynb` — Notebook Colab (8 étapes)
-- 🔵 `lac_f02_flask.py` — Flask 6 endpoints REST
-- 🔵 `lac_f02_viewer.html` — Viewer HTML (timeline, phone preview, sliders)
+- ✅ `LAC_F02.ipynb` — Notebook Colab (8 étapes)
+- ✅ `lac_f02_flask.py` — Flask 6 endpoints REST
+- ✅ `lac_f02_viewer.html` — Viewer HTML (timeline, phone preview, sliders)
+- ✅ `README_DEV.md`
+
+### Résultats Test Production
+- creative_config.json : 30fps, 1080x1920, Cinzel + Playfair Display
+- cut_interval_frames : 7 | grain_overlay_opacity : 0.30
+- CUSTOS check-out : ✅ VALIDÉ
+
+### Inputs / Outputs
+```
+IN/timing.json + IN/images/  →  OUT/creative_config.json  ✅
+```
+
+---
+
+## FRÉGATE F03 — PICTOR 🟢 SCELLÉE
+
+### Composants Forgés
+- ✅ `LAC_F03.ipynb` — Notebook Colab (10 étapes + patch staticFile)
+- ✅ `src/index.jsx` — Entry point Remotion
+- ✅ `src/Root.jsx` — Composition template
+- ✅ `src/components/LacrimaeShort.jsx` — Composant principal
+- ✅ `src/package.json` — Dépendances npm
+- ✅ `README_DEV.md`
+
+### Résultats Test Production
+- 258 frames rendues @ 30fps — Remotion v4.0.463
+- Sortie : short_final.mp4 — 65.3 Mo — 1080x1920
+- Codec : h264 / AAC
+- Patch appliqué : assets binaires → staticFile() + dossier public/
+- Frame la plus lente : Frame 88 (1222ms)
+- CUSTOS check-out : ✅ VALIDÉ — 65325374 octets
+
+### Inputs / Outputs
+```
+IN/ (timing + config + audio + images)  →  OUT/short_final.mp4  ✅
+```
+
+---
+
+## FRÉGATE F04 — SIGNUM 🔵 EN TEST
+
+### Composants Forgés
+- 🔵 `LAC_F04.ipynb` — Notebook Colab (8 étapes + download)
+- 🔵 `lac_f04_signum.py` — FFmpeg remux + vérif durée + métadonnées + faststart
 - 🔵 `README_DEV.md`
-
-### Inputs / Outputs
-```
-IN/timing.json + IN/images/  →  OUT/creative_config.json
-```
-
----
-
-## FRÉGATE F03 — PICTOR 🟡 EN FORGE
-
-### Composants Forgés
-- 🟡 `LAC_F03.ipynb` — Notebook Colab (10 étapes + checkpoint reprise)
-- 🟡 `src/index.jsx` — Entry point Remotion
-- 🟡 `src/Root.jsx` — Composition template
-- 🟡 `src/components/LacrimaeShort.jsx` — Composant principal
-- 🟡 `src/package.json` — Dépendances npm
-- 🟡 `README_DEV.md`
-
-### Inputs / Outputs
-```
-IN/ (timing + config + audio + images)  →  OUT/short_final.mp4
-```
-
----
-
-## FRÉGATE F04 — SIGNUM 🟡 EN FORGE
-
-### Composants Forgés
-- 🟡 `LAC_F04.ipynb` — Notebook Colab (8 étapes + download)
-- 🟡 `lac_f04_signum.py` — FFmpeg remux + vérif durée + métadonnées + faststart
-- 🟡 `README_DEV.md`
 
 ### Inputs / Outputs
 ```
@@ -147,8 +166,12 @@ Codebase complète forgée :
 - Prochaine étape : tests sur Colab avec audio et images réels
 
 ### 2026-05-19 — Test de Production V1
-F01 CANTOR scellée. Premier transit autorisé.
+F01, F02, F03 scellées. Trois frégates validées en un seul jour.
+- Patch staticFile appliqué sur F03 (assets binaires webpack)
 - .webp retiré de toutes les frégates (jpg/jpeg/png uniquement)
+- short_final.mp4 : 65.3 Mo, 258 frames, h264/AAC, 1080x1920
+- F04 SIGNUM : en test — Fleet Seal imminent.
+- Que l'Empereur protège son output.
 
 ---
 
