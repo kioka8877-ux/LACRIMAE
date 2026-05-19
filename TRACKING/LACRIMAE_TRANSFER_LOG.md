@@ -17,7 +17,8 @@
 
 | # | Date | Croisade | Source | Destination | Fichiers | Custos Out | Custos In | Statut |
 |---|------|----------|--------|-------------|----------|------------|-----------|--------|
-| — | — | — | — | — | — | — | — | ⬜ En attente |
+| 1 | 2026-05-19 | FORGE ALPHA | F01 OUT | F02 IN | `timing.json` | ✅ | — | 🔵 En transit |
+| 2 | 2026-05-19 | FORGE ALPHA | SHARED | F02 IN | `images/*.jpg/png` | — | — | 🔵 En transit |
 
 ---
 
@@ -26,8 +27,8 @@
 | De → Vers | Fichiers transférés | Format |
 |-----------|---------------------|--------|
 | SHARED → F01 | `audio_clean.mp3` | .mp3 |
-| SHARED → F02 | `images/*.jpg` | .jpg |
-| SHARED → F03 | `audio_clean.mp3`, `images/*.jpg` | .mp3, .jpg |
+| SHARED → F02 | `images/*.jpg/png` | .jpg .png |
+| SHARED → F03 | `audio_clean.mp3`, `images/*.jpg/png` | .mp3, .jpg .png |
 | F01 → F02 | `timing.json` | .json |
 | F01 → F03 | `timing.json` | .json |
 | F01 → F04 | `timing.json` | .json |
@@ -60,24 +61,16 @@ F04 SIGNUM ──► short_master.mp4 ──────────────
 
 ```json
 {
-  "audio_duration_s": 42.5,
-  "total_frames": 1275,
+  "audio_duration_s": 8.5914,
+  "total_frames": 258,
   "fps": 30,
   "words": [
     {
-      "word": "L'amour",
-      "start_s": 1.24,
-      "end_s": 1.67,
-      "start_frame": 37,
-      "end_frame": 50,
-      "is_strong": false
-    },
-    {
-      "word": "silence",
-      "start_s": 2.10,
-      "end_s": 2.80,
-      "start_frame": 63,
-      "end_frame": 84,
+      "word": "night",
+      "start_s": 7.45,
+      "end_s": 7.63,
+      "start_frame": 223,
+      "end_frame": 229,
       "is_strong": true
     }
   ]
