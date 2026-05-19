@@ -17,8 +17,13 @@
 
 | # | Date | Croisade | Source | Destination | Fichiers | Custos Out | Custos In | Statut |
 |---|------|----------|--------|-------------|----------|------------|-----------|--------|
-| 1 | 2026-05-19 | FORGE ALPHA | F01 OUT | F02 IN | `timing.json` | ✅ | — | 🔵 En transit |
-| 2 | 2026-05-19 | FORGE ALPHA | SHARED | F02 IN | `images/*.jpg/png` | — | — | 🔵 En transit |
+| 1 | 2026-05-19 | FORGE ALPHA | F01 OUT | F02 IN | `timing.json` | ✅ | ✅ | 🟢 SCELLÉ |
+| 2 | 2026-05-19 | FORGE ALPHA | SHARED | F02 IN | `images/*.jpg/png` | — | ✅ | 🟢 SCELLÉ |
+| 3 | 2026-05-19 | FORGE ALPHA | F01 OUT | F03 IN | `timing.json` | ✅ | ✅ | 🟢 SCELLÉ |
+| 4 | 2026-05-19 | FORGE ALPHA | F02 OUT | F03 IN | `creative_config.json` | ✅ | ✅ | 🟢 SCELLÉ |
+| 5 | 2026-05-19 | FORGE ALPHA | SHARED | F03 IN | `audio_clean.mp3`, `images/` | — | ✅ | 🟢 SCELLÉ |
+| 6 | 2026-05-19 | FORGE ALPHA | F03 OUT | F04 IN | `short_final.mp4` (65.3 Mo) | ✅ | — | 🔵 En transit |
+| 7 | 2026-05-19 | FORGE ALPHA | F01 OUT | F04 IN | `timing.json` | ✅ | — | 🔵 En transit |
 
 ---
 
