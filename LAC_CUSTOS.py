@@ -1,7 +1,10 @@
 """
-LAC_CUSTOS — Gardien de la Flotte LACRIMAE
+LAC_CUSTOS — Gardien de la Flotte LACRIMAE (branche dev)
 Mission : Validation inter-frégates — vérifie l'intégrité des inputs/outputs
           avant et après chaque transit manuel.
+
+Pipeline dev : F00 INGEST → F01 SELECT → F02 FORMAT → F03 PREVIEW
+               → F04 RENDER → F05 CAMOUFLAGE → F06 LUTHER
 
 LOIS :
   - stdlib Python uniquement (pas de dépendances externes)
@@ -22,56 +25,81 @@ from pathlib import Path
 
 # ─── CONFIGURATION ────────────────────────────────────────────────────────────
 
-DEFAULT_DRIVE_BASE = "/content/drive/MyDrive/DRIVE_LACRIMAE"
+DEFAULT_DRIVE_BASE = "/content/drive/MyDrive/DRIVE_LACRIMAE_DEV"
 
 # Manifeste des fichiers attendus par frégate
 MANIFEST = {
+    "F00": {
+        "check-out": {
+            "OUT": ["video_source.mp4", "d00_manifest.json"],
+        },
+        "check-in": {},
+    },
     "F01": {
         "check-out": {
-            "OUT": ["timing.json"],
+            "OUT": ["cutlist.json"],
         },
         "check-in": {
-            "IN": ["audio_clean.mp3"],
+            "IN": ["video_source.mp4"],
         },
     },
     "F02": {
         "check-out": {
-            "OUT": ["creative_config.json"],
+            "OUT": ["f02_manifest.json", "codex.json"],
+            "OUT/clips": [],
         },
         "check-in": {
-            "IN": ["timing.json"],
-            "IN/images": [],  # dossier doit exister avec au moins 1 image
+            "IN": ["video_source.mp4", "cutlist.json"],
         },
     },
     "F03": {
         "check-out": {
-            "OUT": ["short_final.mp4"],
+            "OUT": ["codex.json"],
         },
         "check-in": {
-            "IN": ["timing.json", "creative_config.json", "audio_clean.mp3"],
-            "IN/images": [],
+            "IN": ["codex.json"],
+            "IN/clips": [],
         },
     },
     "F04": {
         "check-out": {
-            "OUT": ["short_master.mp4"],
+            "OUT": ["video_finale.mp4"],
         },
         "check-in": {
-            "IN": ["short_final.mp4", "timing.json"],
+            "IN": ["codex.json"],
+            "IN/clips": [],
+        },
+    },
+    "F05": {
+        "check-out": {
+            "OUT": ["youtube_final.mp4"],
+        },
+        "check-in": {
+            "IN": ["video_finale.mp4"],
+        },
+    },
+    "F06": {
+        "check-out": {
+            "OUT": ["clean_final.mp4"],
+        },
+        "check-in": {
+            "IN": ["youtube_final.mp4"],
         },
     },
 }
 
 # Validateurs de contenu JSON par fichier
 JSON_VALIDATORS = {
-    "timing.json": ["audio_duration_s", "total_frames", "fps", "words"],
-    "creative_config.json": [
-        "fps", "resolution", "cut_interval_frames", "font_main",
-        "font_strong", "grain_overlay_opacity", "validated_by_magos"
+    "d00_manifest.json": ["source_type", "source", "output", "meta"],
+    "cutlist.json": ["sequences", "video_duration_sec", "requested_sequences"],
+    "f02_manifest.json": ["profile", "clips_count", "clips"],
+    "codex.json": [
+        "version", "video", "text_overlays", "logo", "brutal_cut_interval_frames",
+        "volume", "validated_by_magos"
     ],
 }
 
-IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
+MEDIA_EXTENSIONS = {".jpg", ".jpeg", ".png", ".mp4", ".webm"}
 
 
 # ─── UTILITAIRES ──────────────────────────────────────────────────────────────
@@ -106,7 +134,7 @@ def check_json_content(path: Path) -> bool:
     """Valide le contenu JSON d'un fichier selon son manifeste."""
     filename = path.name
     if filename not in JSON_VALIDATORS:
-        return True  # Pas de règle de contenu → skip
+        return True
 
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -121,45 +149,53 @@ def check_json_content(path: Path) -> bool:
         log_err(f"{filename} — Clés manquantes : {missing}")
         return False
 
-    # Vérifications spécifiques timing.json
-    if filename == "timing.json":
-        if not isinstance(data.get("words"), list):
-            log_err("timing.json — 'words' doit être une liste")
+    # Vérifications spécifiques cutlist.json
+    if filename == "cutlist.json":
+        if not isinstance(data.get("sequences"), list) or len(data["sequences"]) == 0:
+            log_err("cutlist.json — 'sequences' doit être une liste non vide")
             return False
-        if len(data["words"]) == 0:
-            log_err("timing.json — 'words' est vide")
-            return False
-        if data.get("fps") != 30:
-            log_warn(f"timing.json — fps={data.get('fps')} (attendu 30)")
-        log_ok(f"timing.json — {len(data['words'])} mots, {data['audio_duration_s']}s")
+        log_ok(f"cutlist.json — {len(data['sequences'])} séquence(s)")
 
-    # Vérifications spécifiques creative_config.json
-    if filename == "creative_config.json":
-        if not data.get("validated_by_magos"):
-            log_err("creative_config.json — 'validated_by_magos' doit être true")
+    # Vérifications spécifiques f02_manifest.json
+    if filename == "f02_manifest.json":
+        if data.get("clips_count") != len(data.get("clips", [])):
+            log_err("f02_manifest.json — clips_count incohérent")
             return False
-        log_ok(f"creative_config.json — validé par le Magos")
+        log_ok(f"f02_manifest.json — {data['clips_count']} clip(s), "
+               f"profil={data.get('profile')}")
+
+    # Vérifications spécifiques codex.json
+    if filename == "codex.json":
+        if not data.get("validated_by_magos"):
+            log_err("codex.json — 'validated_by_magos' doit être true "
+                    "(validation obligatoire via la preview F03)")
+            return False
+        if data.get("volume", 1.0) < 0:
+            log_err("codex.json — volume invalide")
+            return False
+        log_ok(f"codex.json — validé par le Magos, "
+               f"coup brutal={data.get('brutal_cut_interval_frames')} frames")
 
     return True
 
 
-def check_images_dir(path: Path) -> bool:
-    """Vérifie qu'un dossier contient au moins 1 image valide."""
+def check_dir_non_empty(path: Path) -> bool:
+    """Vérifie qu'un dossier contient au moins 1 fichier média."""
     if not path.exists() or not path.is_dir():
-        log_err(f"Dossier images introuvable : {path}")
+        log_err(f"Dossier introuvable : {path}")
         return False
-    images = [f for f in path.iterdir() if f.suffix.lower() in IMAGE_EXTENSIONS]
-    if len(images) == 0:
-        log_err(f"Dossier images vide : {path}")
+    files = [f for f in path.iterdir() if f.suffix.lower() in MEDIA_EXTENSIONS]
+    if len(files) == 0:
+        log_err(f"Dossier vide : {path}")
         return False
-    log_ok(f"images/ — {len(images)} image(s) trouvée(s)")
+    log_ok(f"{path.name}/ — {len(files)} fichier(s) média")
     return True
 
 
 def check_mp4_non_empty(path: Path) -> bool:
     """Vérifie qu'un fichier .mp4 a une taille plausible (> 100Ko)."""
     if not path.exists():
-        return False  # Déjà signalé par check_file_exists
+        return False
     size = path.stat().st_size
     if size < 100_000:
         log_warn(f"{path.name} — taille suspecte ({size} octets < 100Ko)")
@@ -170,10 +206,6 @@ def check_mp4_non_empty(path: Path) -> bool:
 # ─── VALIDATION PRINCIPALE ────────────────────────────────────────────────────
 
 def run_custos(frigate: str, mode: str, drive_base: Path) -> bool:
-    """
-    Lance la validation pour une frégate et un mode donnés.
-    Retourne True si tout est OK.
-    """
     if frigate not in MANIFEST:
         print(f"[CUSTOS] Frégate inconnue : {frigate}")
         return False
@@ -182,10 +214,13 @@ def run_custos(frigate: str, mode: str, drive_base: Path) -> bool:
         return False
 
     frigate_dirs = {
-        "F01": drive_base / "F01_CANTOR",
-        "F02": drive_base / "F02_VISIO",
-        "F03": drive_base / "F03_PICTOR",
-        "F04": drive_base / "F04_SIGNUM",
+        "F00": drive_base / "F00_INGEST",
+        "F01": drive_base / "F01_SELECT",
+        "F02": drive_base / "F02_FORMAT",
+        "F03": drive_base / "F03_PREVIEW",
+        "F04": drive_base / "F04_RENDER",
+        "F05": drive_base / "F05_CAMOUFLAGE",
+        "F06": drive_base / "F06_LUTHER",
     }
 
     frigate_base = frigate_dirs[frigate]
@@ -198,13 +233,12 @@ def run_custos(frigate: str, mode: str, drive_base: Path) -> bool:
     for folder_rel, files in rules.items():
         folder_path = frigate_base / folder_rel
 
-        # Cas dossier images (liste vide = check existence + images)
-        if folder_rel.endswith("/images") or folder_rel == "IN/images":
-            ok = check_images_dir(folder_path)
+        # Cas dossier (liste vide = check existence + contenu)
+        if not files:
+            ok = check_dir_non_empty(folder_path)
             all_ok = all_ok and ok
             continue
 
-        # Vérification de chaque fichier
         for filename in files:
             file_path = folder_path / filename
             ok = check_file_exists(file_path)
@@ -233,10 +267,11 @@ def run_custos(frigate: str, mode: str, drive_base: Path) -> bool:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="LAC_CUSTOS — Gardien de la Flotte LACRIMAE"
+        description="LAC_CUSTOS — Gardien de la Flotte LACRIMAE (dev)"
     )
     parser.add_argument(
-        "--frigate", required=True, choices=["F01", "F02", "F03", "F04"],
+        "--frigate", required=True,
+        choices=["F00", "F01", "F02", "F03", "F04", "F05", "F06"],
         help="Frégate à valider"
     )
     parser.add_argument(
@@ -261,4 +296,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

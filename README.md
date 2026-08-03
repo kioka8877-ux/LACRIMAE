@@ -1,160 +1,108 @@
-# LACRIMAE
+# LACRIMAE — branche `dev`
 > *"For the Angel's Tears shall become gold."*
 
-**Outil d'automatisation de Shorts YouTube / TikTok — Style Premium Poétique**
-Architecture en Frégates | Google Colab + Drive | Coût opérationnel : 0$
+**Machine à memes 9:16 automatisée** — transforme une vidéo longue en clips viraux.
+Branche de transformation du pipeline LACRIMAE original (visible sur `main`).
+Pipeline héritier : F00-F02 nouveaux, F03-F06 pillés d'OMNIS-WATCH (monteur qui
+marche déjà en production).
 
 ---
 
-## Concept
-
-LACRIMAE est une machine de production de contenu vidéo vertical (1080x1920) entièrement automatisée, conçue pour tourner sur Google Colab (GPU T4 gratuit) avec stockage sur Google Drive. L'objectif : générer 10+ vidéos par jour au format "citations / poésie premium" avec sous-titres synchronisés, fast match cut et esthétique cinématographique luxe.
-
-Nommé d'après les **Larmes de l'Ange** — les larmes de Sanguinius, Primarque des Blood Angels, forgé en arme et en beauté.
-
----
-
-## Architecture de la Flotte
+## Pipeline dev
 
 ```
-[audio_clean.mp3 + images/]  ← Fournis par le Magos dans SHARED/
+[video longue + logos] ← fournis par le Magos dans SHARED/IN
          │
          ▼
-[F01 CANTOR] ──► timing.json                    (Whisper — transcription mot par mot)
+[F00 INGEST]  ──► video_source.mp4 + d00_manifest.json      (yt-dlp ou fichier local)
          │
          ▼
-[F02 VISIO] ──► creative_config.json            (Viewer HTML — preview & validation)
+[F01 SELECT]  ──► cutlist.json                               (modèle de vision OpenRouter —
+         │                                                   regarde la vidéo comme un humain,
+         │                                                   N séquences de 3-10s, ZÉRO transcript)
          │
          ▼
-[F03 PICTOR] ──► short_final.mp4                (Remotion — rendu frame par frame)
+[F02 FORMAT]  ──► clips/clip_XXX.mp4 9:16 + codex.json       (profil blur-pad OU reframe)
          │
          ▼
-[F04 SIGNUM] ──► short_master.mp4               (FFmpeg — finalisation & métadonnées)
+[F03 PREVIEW] ──► codex.json validé                           (Vite + @remotion/player :
+         │                                                   presets, titre statique, logo,
+         │                                                   volume, coup brutal, validation)
+         │
+         ▼
+[F04 RENDER]  ──► video_finale.mp4                            (Remotion — logo + titre + clip)
+         │
+         ▼
+[F05 CAMOUFLAGE] ──► youtube_final.mp4                        (métadonnées + loudnorm -14 LUFS)
+         │
+         ▼
+[F06 LUTHER]  ──► clean_final.mp4                             (stream copy — empreinte zéro)
 ```
-
----
 
 ## Frégates
 
 | Frégate | Nom | Mission | Technologie |
 |---------|-----|---------|-------------|
-| F01 | **CANTOR** | Transcription audio → timing JSON | faster-whisper |
-| F02 | **VISIO** | Viewer interactif preview | Flask + HTML + Port Colab |
-| F03 | **PICTOR** | Rendu vidéo frame par frame | Remotion (React) |
-| F04 | **SIGNUM** | Assemblage final MP4 | FFmpeg |
-| — | **LAC_CUSTOS** | Validation inter-frégates | Python stdlib only |
+| F00 | INGEST | Collecte de la vidéo longue (URL YouTube ou fichier) | yt-dlp / FFmpeg |
+| F01 | SELECT | Sélection des séquences par vision (comme un humain) | OpenRouter vision |
+| F02 | FORMAT | Découpe + 9:16 (blur-pad optimisé ou reframe) + template codex | FFmpeg |
+| F03 | PREVIEW | Aperçu temps réel, presets, titre, logo, volume, validation | Vite + @remotion/player |
+| F04 | RENDER | Rendu final logo + titre statique + coup brutal 3s | Remotion |
+| F05 | CAMOUFLAGE | Wipe métadonnées + loudnorm | FFmpeg |
+| F06 | LUTHER | Effacement empreinte numérique (stream copy) | FFmpeg |
+| — | LAC_CUSTOS | Validation inter-frégates | Python stdlib |
 
----
+## Choix de conception (dev)
 
-## Lois de la Flotte — Les Rites du Sang
+- **PAS de transcript** : la sélection se fait par un modèle de vision (OpenRouter),
+  adapté aux vidéos sans sous-titres (stars, foot, extraits).
+- **PAS de reframe par défaut** : blur-pad (duplique + flou) — la vidéo nette
+  remplit la largeur, le fond est flouté/assombri/désaturé. Le profil `reframe`
+  (crop central) existe en alternative.
+- **PAS de SFX, PAS de sous-titres** : le titre est un texte statique (fade-in)
+  positionné dans la zone safe (bandes floues), couleur et font au choix.
+- **Coup brutal** : flash/impact toutes les 3s (90 frames) — réglable, 0 = désactivé.
+- **Audio** : uniquement un réglage de volume (le Magos ajoute l'audio sur YouTube).
 
-1. **LOI D'ISOLEMENT** — Chaque frégate est une île. Aucun accès croisé aux données.
-2. **RITE DE VALIDATION** — LAC_CUSTOS obligatoire avant chaque transit.
-3. **GRATUITÉ ABSOLUE** — 0€ de coût opérationnel. Colab T4 + Drive uniquement.
-4. **CHECKPOINT SACRÉ** — F03 PICTOR est toujours récupérable après interruption Colab.
-5. **TRANSIT MANUEL** — Le Magos déplace les fichiers. Jamais les scripts.
-6. **DURÉE PAR L'AUDIO** — La durée de la vidéo finale est dictée par l'audio fourni.
+## Rites du Sang
 
----
+1. **LOI D'ISOLEMENT** — chaque frégate lit son `IN/`, écrit son `OUT/`.
+2. **RITE DE VALIDATION** — `LAC_CUSTOS.py` obligatoire avant chaque transit.
+3. **TRANSIT MANUEL** — le Magos déplace les fichiers, jamais les scripts.
+4. **PRÉVIEW AVANT RENDU** — aucun rendu sans `validated_by_magos: true` dans codex.json.
+5. **DURÉE PAR LA CUTLIST** — la durée des clips est dictée par F01 (3-10s par séquence).
 
 ## Structure Drive
 
 ```
-DRIVE_LACRIMAE/
-│
-├── SHARED/
-│   ├── audio_clean.mp3          ← Audio voix propre (fourni par le Magos)
-│   └── images/
-│       ├── img_01.jpg           ← 9:16 ou 1:1 (bandes noires si 1:1)
-│       └── img_02.jpg ...
-│
-├── F01_CANTOR/
-│   ├── CODEBASE/
-│   │   ├── LAC_F01.ipynb
-│   │   ├── lac_f01_cantor.py
-│   │   └── README_DEV.md
-│   └── OUT/
-│       └── timing.json
-│
-├── F02_VISIO/
-│   ├── CODEBASE/
-│   │   ├── LAC_F02.ipynb
-│   │   ├── lac_f02_flask.py
-│   │   ├── lac_f02_viewer.html
-│   │   └── README_DEV.md
-│   └── OUT/
-│       └── creative_config.json
-│
-├── F03_PICTOR/
-│   ├── CODEBASE/
-│   │   ├── LAC_F03.ipynb
-│   │   ├── src/                 ← Template Remotion (React)
-│   │   └── README_DEV.md
-│   └── OUT/
-│       └── short_final.mp4
-│
-├── F04_SIGNUM/
-│   ├── CODEBASE/
-│   │   ├── LAC_F04.ipynb
-│   │   ├── lac_f04_signum.py
-│   │   └── README_DEV.md
-│   └── OUT/
-│       └── short_master.mp4
-│
+DRIVE_LACRIMAE_DEV/
+├── SHARED/IN/          ← video longue + logos/
+├── F00_INGEST/         IN→OUT
+├── F01_SELECT/         IN→OUT (cutlist.json, frames/)
+├── F02_FORMAT/         IN→OUT (clips/, codex.json)
+├── F03_PREVIEW/        IN→OUT (codex.json validé)
+├── F04_RENDER/         IN→OUT (video_finale.mp4)
+├── F05_CAMOUFLAGE/     IN→OUT (youtube_final.mp4)
+├── F06_LUTHER/         IN→OUT (clean_final.mp4)
 ├── LAC_CUSTOS.py
-│
 └── TRACKING/
-    ├── LACRIMAE_CAMPAIGN_LOG.md
-    └── LACRIMAE_TRANSFER_LOG.md
 ```
 
----
-
-## Spécifications Vidéo
-
-| Paramètre | Valeur |
-|-----------|--------|
-| Résolution | 1080 x 1920 (9:16 vertical) |
-| Framerate | 30 fps |
-| Durée | = durée de l'audio fourni (automatique) |
-| Format sortie | MP4 H.264 |
-| Images 9:16 | Plein cadre |
-| Images 1:1 | Centré, bandes noires latérales |
-| Fast Cut | 6 à 8 frames par image (~0.2-0.27s) |
-| Sous-titres | Synchronisés mot par mot via timing.json |
-
----
-
-## Esthétique Visuelle
-
-- **Typographie** : Cinzel (corps) + Playfair Display Italic (mots forts) — via @remotion/google-fonts
-- **Film Grain** : Overlay vidéo `mix-blend-mode: screen` opacité 0.3
-- **Colorimétrie** : Filtres CSS `contrast(1.2) brightness(0.9) sepia(0.15)` — tons chauds, sombres
-- **Animations** : Fade-in par mot, micro-zoom `scale(1.02)` à l'apparition
-
----
-
-## Démarrage Rapide
+## Démarrage rapide
 
 ```
-1. Monter Drive dans Colab
-2. Copier SHARED/ avec ton audio + images
-3. Ouvrir F01_CANTOR/CODEBASE/LAC_F01.ipynb → Lancer
-4. Valider avec LAC_CUSTOS.py --frigate F01 --mode check-out
-5. Copier F01/OUT/ → F02/IN/
-6. Ouvrir F02_VISIO → Prévisualiser, ajuster, valider
-7. ... (suivre le registre des transferts)
-8. Récupérer short_master.mp4 dans F04/OUT/
+1. Déposer la vidéo longue + logos dans SHARED/IN/
+2. F00 : python lac_f00_ingest.py --file ... --output F00_INGEST/OUT/
+3. F01 : python lac_f01_select.py --input F01_SELECT/IN/ --output F01_SELECT/OUT/ \
+         --sequences 2 --oracle          (clé ORACLE_API_KEY requise)
+4. LAC_CUSTOS --frigate F01 --mode check-out
+5. F02 : python lac_f02_format.py --input F02_FORMAT/IN/ --output F02_FORMAT/OUT/ \
+         --profile blur-pad
+6. F03 : npm install + déposer clip + codex.json dans public/ → npm run dev → valider
+7. F04 : npm install → npm run render
+8. F05 → F06 : python lac_f05_camouflage.py ... ; python lac_f06_luther.py ...
+9. Récupérer clean_final.mp4 dans F06/OUT/
 ```
-
----
-
-## Tracking
-
-- [Carnet de Campagne](./TRACKING/LACRIMAE_CAMPAIGN_LOG.md)
-- [Registre des Transferts](./TRACKING/LACRIMAE_TRANSFER_LOG.md)
-
----
 
 > *LACRIMAE — Né des larmes de Sanguinius, forgé en or.*
 > *Ad Victoriam.*
