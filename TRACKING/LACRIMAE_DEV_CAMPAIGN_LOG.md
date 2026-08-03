@@ -28,6 +28,8 @@
 | 2026-08-03 | F04 | FORGE | RENDER pillé d'OMNIS beta F03A_REMOTION — **logo + titre + coup brutal + Audio intégrés, codexData = template F02, Root aligné** | 🔵 à tester |
 | 2026-08-03 | F05 | FORGE | rapport → `rapport_f05.html` | ✅ |
 | 2026-08-03 | FLOTTE | DEV | **Commit `0291931` + push `origin/dev`** | ✅ |
+| 2026-08-03 | RUBICON | DOCTRINE | **LAC_RUN.py orchestrateur (Exécuteur) + 4 portes + ledger** — CUSTOS gardien à chaque output, greffes brief→oracle F01 / titre+preset→codex F02, fallback ffprobe F00, UTF-8 Windows | ✅ commit `c5ba23a` |
+| 2026-08-03 | RUBICON | GHA | **GitHub Actions — `lacrimae_orchestrator.yml`** (pattern OMNIS delta : un run par gate G1-G5/CLOSE, workflow_dispatch, transits par artifacts + `_tools/download_artifact.py`, ledger commité `TRACKING/LACRIMAE_LEDGER.json`, codex éditable via UI GitHub, sync codexData.js avant render) | ✅ à tester |
 | 2026-08-03 | CUSTOS | FORGE | Manifeste 7 frégates + validations JSON (cutlist, codex, manifest) | ✅ |
 
 ## DÉCISIONS DE FORGE
@@ -42,8 +44,7 @@
 
 ## PROCHAINES ÉTAPES
 
-- [ ] Tester F00→F01 sur une vraie vidéo (clé OpenRouter vision)
-- [ ] Tester F02 blur-pad (comparer netteté centre vs test précédent)
-- [ ] Valider F03/F04 : logo + titre + coup brutal sur un clip réel
-- [ ] Chaîne complète jusqu'à clean_final.mp4
-- [ ] Décider l'infra (Colab / GitHub Actions / local)
+- [ ] Configurer secrets GitHub : `ORACLE_API_KEY` (+ vars `ORACLE_MODEL`/`ORACLE_BASE_URL`)
+- [ ] Commiter `SHARED/IN/logos/logo.png`
+- [ ] Run G1 → G5 sur une vraie vidéo (YouTube ou fichier)
+- [ ] Valider le flux complet jusqu'à `lac-clean` (clean_final.mp4)

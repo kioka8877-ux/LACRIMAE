@@ -1,0 +1,414 @@
+# LACRIMAE Orchestrator — Rubicon sur GitHub Actions
+# Pattern OMNIS_WATCH delta : un run par gate, le Champion déclenche depuis l'UI
+# Actions (workflow_dispatch), l'opérateur n'intervient qu'aux portes.
+#
+# Portes (inputs gate) :
+#   G1  BRIEF + INGEST     — le Champion fournit url/titre/sujet/vibe/params
+#   G2  ORACLE             — F01 sélectionne les séquences (vision OpenRouter)
+#                            → cutlist.json commitée (éditable via l'UI GitHub)
+#   G3  FORMAT             — F02 blur-pad/reframe → codex.json commité
+#                            (Porte III : éditer codex.json dans F03_PREVIEW/IN)
+#   G4  RENDER             — F04 Remotion (lit le codex validé du repo)
+#   G5  CAMOUFLAGE + LUTHER — F05 puis F06 → clean_final.mp4
+#   CLOSE                  — ferme la production (ledger)
+#
+# Secrets requis : ORACLE_API_KEY (secret), ORACLE_MODEL/ORACLE_BASE_URL (vars)
+
+name: LACRIMAE Orchestrator
+
+on:
+  workflow_dispatch:
+    inputs:
+      gate:
+        description: 'Porte (G1|G2|G3|G4|G5|CLOSE)'
+        required: true
+        default: 'G1'
+      url:
+        description: 'URL YouTube (G1 only)'
+        required: false
+      title:
+        description: 'Titre de la production (G1 only)'
+        required: false
+      sujet:
+        description: 'Sujet / brief oracle (G1 only)'
+        required: false
+      vibe:
+        description: 'Vibe / tonalité (G1 only)'
+        required: false
+      sequences:
+        description: 'Nombre de séquences 1-10 (G1 only)'
+        required: false
+        default: '2'
+      min_dur:
+        description: 'Durée min par séquence en secondes (G1 only)'
+        required: false
+        default: '3'
+      max_dur:
+        description: 'Durée max par séquence en secondes (G1 only)'
+        required: false
+        default: '10'
+      profile:
+        description: 'Profil F02 (blur-pad|reframe) (G1 only)'
+        required: false
+        default: 'blur-pad'
+      preset:
+        description: 'Preset couleurs codex (G1 only)'
+        required: false
+        default: 'punchy'
+      model:
+        description: 'Modèle vision OpenRouter (override)'
+        required: false
+
+permissions:
+  contents: write
+  actions: read
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  WORKFLOW_FILE: lacrimae_orchestrator.yml
+  BRANCH: dev
+
+jobs:
+  orchestrator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install requests yt-dlp -q
+
+      # ───────────────────────── G1 : BRIEF + INGEST ─────────────────────────
+
+      - name: G1 - Ecrire le brief
+        if: github.event.inputs.gate == 'G1'
+        env:
+          URL: ${{ github.event.inputs.url }}
+          TITLE: ${{ github.event.inputs.title }}
+          SUJET: ${{ github.event.inputs.sujet }}
+          VIBE: ${{ github.event.inputs.vibe }}
+          SEQUENCES: ${{ github.event.inputs.sequences }}
+          MIN_DUR: ${{ github.event.inputs.min_dur }}
+          MAX_DUR: ${{ github.event.inputs.max_dur }}
+          PROFILE: ${{ github.event.inputs.profile }}
+          PRESET: ${{ github.event.inputs.preset }}
+          MODEL: ${{ github.event.inputs.model }}
+        run: |
+          mkdir -p TRACKING
+          jq -n \
+            --arg url "$URL" \
+            --arg title "$TITLE" \
+            --arg sujet "$SUJET" \
+            --arg vibe "$VIBE" \
+            --arg seq "$SEQUENCES" \
+            --arg min "$MIN_DUR" \
+            --arg max "$MAX_DUR" \
+            --arg profile "$PROFILE" \
+            --arg preset "$PRESET" \
+            --arg model "$MODEL" \
+            '{source: $url, title: $title, sujet: $sujet, vibe: $vibe,
+              sequences: ($seq|tonumber), min_dur: ($min|tonumber),
+              max_dur: ($max|tonumber), profile: $profile, preset: $preset,
+              model: $model}' > TRACKING/LACRIMAE_BRIEF.json
+          cat TRACKING/LACRIMAE_BRIEF.json
+
+      - name: G1 - Ingest
+        if: github.event.inputs.gate == 'G1'
+        env:
+          URL: ${{ github.event.inputs.url }}
+        run: |
+          cd F00_INGEST/CODEBASE
+          if [ -n "$URL" ]; then
+            python3 lac_f00_ingest.py --url "$URL" --output ../OUT/
+          elif [ -f "../IN/video_source.mp4" ]; then
+            python3 lac_f00_ingest.py --file "../IN/video_source.mp4" --output ../OUT/
+          else
+            echo "ERREUR: ni URL ni F00_INGEST/IN/video_source.mp4"
+            exit 1
+          fi
+
+      - name: G1 - Gardien F00
+        if: github.event.inputs.gate == 'G1'
+        run: python3 LAC_CUSTOS.py --frigate F00 --mode check-out --drive-base .
+
+      - name: G1 - Upload video
+        if: github.event.inputs.gate == 'G1'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lac-video
+          path: F00_INGEST/OUT/
+
+      - name: G1 - Ledger + commit
+        if: github.event.inputs.gate == 'G1'
+        run: |
+          python3 _tools/update_ledger.py G1
+          git config user.name "lacrimae-orchestrator"
+          git config user.email "orchestrator@lacrimae"
+          git add TRACKING/LACRIMAE_BRIEF.json TRACKING/LACRIMAE_LEDGER.json
+          if git diff --cached --quiet; then
+            echo "No change"
+          else
+            git commit -m "ledger: gate G1 [skip ci]"
+            git push
+          fi
+          echo "PORTE II: vérifie/édite F02_FORMAT/IN/cutlist.json (après G2), puis relance avec gate G2"
+
+      # ──────────────────────────── G2 : ORACLE ──────────────────────────────
+
+      - name: G2 - Download video
+        if: github.event.inputs.gate == 'G2'
+        run: |
+          mkdir -p F01_SELECT/IN
+          python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F01_SELECT/IN/ "$BRANCH"
+
+      - name: G2 - Oracle (vision)
+        if: github.event.inputs.gate == 'G2'
+        env:
+          ORACLE_API_KEY: ${{ secrets.ORACLE_API_KEY }}
+          ORACLE_MODEL: ${{ vars.ORACLE_MODEL }}
+          ORACLE_BASE_URL: ${{ vars.ORACLE_BASE_URL }}
+          SEQUENCES: ${{ github.event.inputs.sequences }}
+          MIN_DUR: ${{ github.event.inputs.min_dur }}
+          MAX_DUR: ${{ github.event.inputs.max_dur }}
+          MODEL: ${{ github.event.inputs.model }}
+        run: |
+          cd F01_SELECT/CODEBASE
+          BRIEF_TXT=$(python3 -c "
+import json
+b = json.load(open('../../TRACKING/LACRIMAE_BRIEF.json'))
+print(' | '.join([v for v in (b.get('sujet',''), b.get('vibe',''), b.get('title','')) if v]))")
+          MODEL_ARG=""
+          if [ -n "$MODEL" ]; then MODEL_ARG="--model $MODEL"; fi
+          python3 lac_f01_select.py --oracle \
+            --input ../IN/ --output ../OUT/ \
+            --sequences "$SEQUENCES" --min-dur "$MIN_DUR" --max-dur "$MAX_DUR" \
+            --brief "$BRIEF_TXT" $MODEL_ARG
+
+      - name: G2 - Gardien F01
+        if: github.event.inputs.gate == 'G2'
+        run: python3 LAC_CUSTOS.py --frigate F01 --mode check-out --drive-base .
+
+      - name: G2 - Commit cutlist (éditable par le Champion)
+        if: github.event.inputs.gate == 'G2'
+        run: |
+          mkdir -p F02_FORMAT/IN
+          cp F01_SELECT/OUT/cutlist.json F02_FORMAT/IN/cutlist.json
+          python3 _tools/update_ledger.py G2
+          git config user.name "lacrimae-orchestrator"
+          git config user.email "orchestrator@lacrimae"
+          git add F02_FORMAT/IN/cutlist.json TRACKING/LACRIMAE_LEDGER.json
+          git commit -m "ledger: gate G2 — cutlist [skip ci]" || echo "No change"
+          git push
+          echo "PORTE II FRANCHIE. Si besoin: édite F02_FORMAT/IN/cutlist.json dans l'UI GitHub"
+
+      - name: G2 - Upload cutlist
+        if: github.event.inputs.gate == 'G2'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lac-cutlist
+          path: F01_SELECT/OUT/cutlist.json
+
+      # ──────────────────────────── G3 : FORMAT ──────────────────────────────
+
+      - name: G3 - Download video
+        if: github.event.inputs.gate == 'G3'
+        run: |
+          mkdir -p F02_FORMAT/IN
+          python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F02_FORMAT/IN/ "$BRANCH"
+
+      - name: G3 - Format (blur-pad/reframe)
+        if: github.event.inputs.gate == 'G3'
+        run: |
+          cd F02_FORMAT/CODEBASE
+          PROFILE=$(python3 -c "import json; print(json.load(open('../../TRACKING/LACRIMAE_BRIEF.json')).get('profile','blur-pad'))")
+          PRESET=$(python3 -c "import json; print(json.load(open('../../TRACKING/LACRIMAE_BRIEF.json')).get('preset','punchy'))")
+          TITLE=$(python3 -c "import json; print(json.load(open('../../TRACKING/LACRIMAE_BRIEF.json')).get('title',''))")
+          python3 lac_f02_format.py --input ../IN/ --output ../OUT/ \
+            --profile "$PROFILE" --preset "$PRESET" --title "$TITLE"
+
+      - name: G3 - Gardien F02
+        if: github.event.inputs.gate == 'G3'
+        run: python3 LAC_CUSTOS.py --frigate F02 --mode check-out --drive-base .
+
+      - name: G3 - Commit codex + manifest (éditable par le Champion)
+        if: github.event.inputs.gate == 'G3'
+        run: |
+          mkdir -p F03_PREVIEW/IN F04_RENDER/IN
+          cp F02_FORMAT/OUT/codex.json F03_PREVIEW/IN/codex.json
+          cp F02_FORMAT/OUT/f02_manifest.json F03_PREVIEW/IN/f02_manifest.json
+          cp F02_FORMAT/OUT/codex.json F04_RENDER/IN/codex.json
+          cp F02_FORMAT/OUT/f02_manifest.json F04_RENDER/IN/f02_manifest.json
+          python3 _tools/update_ledger.py G3
+          git config user.name "lacrimae-orchestrator"
+          git config user.email "orchestrator@lacrimae"
+          git add F03_PREVIEW/IN/ F04_RENDER/IN/ TRACKING/LACRIMAE_LEDGER.json
+          git commit -m "ledger: gate G3 — codex [skip ci]" || echo "No change"
+          git push
+          echo "PORTE III: édite F03_PREVIEW/IN/codex.json (titre, volume, validated_by_magos: true)"
+
+      - name: G3 - Upload clips
+        if: github.event.inputs.gate == 'G3'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lac-clips
+          path: F02_FORMAT/OUT/clips/
+
+      # ──────────────────────────── G4 : RENDER ──────────────────────────────
+
+      - name: G4 - Download clips
+        if: github.event.inputs.gate == 'G4'
+        run: |
+          mkdir -p F04_RENDER/CODEBASE/public F04_RENDER/IN/clips
+          python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-clips F04_RENDER/CODEBASE/public/ "$BRANCH"
+          cp F04_RENDER/CODEBASE/public/*.mp4 F04_RENDER/IN/clips/
+
+      - name: G4 - Copy codex validé + logo
+        if: github.event.inputs.gate == 'G4'
+        run: |
+          cp F03_PREVIEW/IN/codex.json F04_RENDER/IN/codex.json
+          cp F03_PREVIEW/IN/codex.json F04_RENDER/CODEBASE/public/codex.json
+          if [ -f SHARED/IN/logos/logo.png ]; then
+            cp SHARED/IN/logos/logo.png F04_RENDER/CODEBASE/public/logo.png
+          fi
+
+      - name: G4 - Gardien F04 (check-in)
+        if: github.event.inputs.gate == 'G4'
+        run: python3 LAC_CUSTOS.py --frigate F04 --mode check-in --drive-base .
+
+      - name: G4 - Setup Node
+        if: github.event.inputs.gate == 'G4'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: G4 - Install dependencies
+        if: github.event.inputs.gate == 'G4'
+        run: |
+          cd F04_RENDER/CODEBASE
+          npm install
+
+      - name: G4 - Sync codexData.js depuis le codex validé
+        if: github.event.inputs.gate == 'G4'
+        run: |
+          cd F04_RENDER/CODEBASE
+          python3 - <<'EOF'
+import json
+codex = json.load(open('public/codex.json', encoding='utf-8'))
+with open('src/codexData.js', 'w', encoding='utf-8') as f:
+    f.write('export const codex = ' + json.dumps(codex, ensure_ascii=False, indent=2) + ';\n')
+print('codexData.js synchronisé depuis public/codex.json')
+EOF
+
+      - name: G4 - Render Remotion
+        if: github.event.inputs.gate == 'G4'
+        run: |
+          cd F04_RENDER/CODEBASE
+          FPS=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['fps'])")
+          FRAMES=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['total_frames'])")
+          WIDTH=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['width'])")
+          HEIGHT=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['height'])")
+          echo "Rendu: ${FRAMES} frames, ${FPS}fps, ${WIDTH}x${HEIGHT}"
+          npx remotion render src/index.jsx OmniComposition \
+            ../OUT/video_finale.mp4 \
+            --codec h264 \
+            --image-format jpeg \
+            --concurrency 1
+
+      - name: G4 - Gardien F04 (check-out)
+        if: github.event.inputs.gate == 'G4'
+        run: python3 LAC_CUSTOS.py --frigate F04 --mode check-out --drive-base .
+
+      - name: G4 - Upload video finale
+        if: github.event.inputs.gate == 'G4'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lac-video-finale
+          path: F04_RENDER/OUT/
+
+      - name: G4 - Ledger
+        if: github.event.inputs.gate == 'G4'
+        run: |
+          python3 _tools/update_ledger.py G4
+          git config user.name "lacrimae-orchestrator"
+          git config user.email "orchestrator@lacrimae"
+          git add TRACKING/LACRIMAE_LEDGER.json
+          git commit -m "ledger: gate G4 — render [skip ci]" || echo "No change"
+          git push
+          echo "PORTE IV: télécharge l'artifact lac-video-finale, vérifie, puis gate G5"
+
+      # ───────────────────── G5 : CAMOUFLAGE + LUTHER ────────────────────────
+
+      - name: G5 - Download video finale
+        if: github.event.inputs.gate == 'G5'
+        run: |
+          mkdir -p F05_CAMOUFLAGE/IN
+          python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video-finale F05_CAMOUFLAGE/IN/ "$BRANCH"
+
+      - name: G5 - Camouflage
+        if: github.event.inputs.gate == 'G5'
+        run: |
+          cd F05_CAMOUFLAGE/CODEBASE
+          python3 lac_f05_camouflage.py --input ../IN/ --output ../OUT/
+
+      - name: G5 - Gardien F05
+        if: github.event.inputs.gate == 'G5'
+        run: python3 LAC_CUSTOS.py --frigate F05 --mode check-out --drive-base .
+
+      - name: G5 - Upload youtube_final
+        if: github.event.inputs.gate == 'G5'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lac-youtube
+          path: F05_CAMOUFLAGE/OUT/
+
+      - name: G5 - Luther
+        if: github.event.inputs.gate == 'G5'
+        run: |
+          mkdir -p F06_LUTHER/IN
+          cp F05_CAMOUFLAGE/OUT/youtube_final.mp4 F06_LUTHER/IN/youtube_final.mp4
+          cd F06_LUTHER/CODEBASE
+          python3 lac_f06_luther.py --input ../IN/ --output ../OUT/
+
+      - name: G5 - Gardien F06
+        if: github.event.inputs.gate == 'G5'
+        run: python3 LAC_CUSTOS.py --frigate F06 --mode check-out --drive-base .
+
+      - name: G5 - Upload clean_final
+        if: github.event.inputs.gate == 'G5'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lac-clean
+          path: F06_LUTHER/OUT/
+
+      - name: G5 - Ledger
+        if: github.event.inputs.gate == 'G5'
+        run: |
+          python3 _tools/update_ledger.py G5
+          git config user.name "lacrimae-orchestrator"
+          git config user.email "orchestrator@lacrimae"
+          git add TRACKING/LACRIMAE_LEDGER.json
+          git commit -m "ledger: gate G5 — production complète [skip ci]" || echo "No change"
+          git push
+          echo "ARTEFACT FINAL: télécharge lac-clean (clean_final.mp4)"
+
+      # ──────────────────────────── CLOSE ────────────────────────────────────
+
+      - name: CLOSE - Fermeture
+        if: github.event.inputs.gate == 'CLOSE'
+        run: |
+          python3 _tools/update_ledger.py CLOSE
+          git config user.name "lacrimae-orchestrator"
+          git config user.email "orchestrator@lacrimae"
+          git add TRACKING/LACRIMAE_LEDGER.json
+          git commit -m "ledger: gate CLOSE [skip ci]" || echo "No change"
+          git push
+          echo "Production fermée."

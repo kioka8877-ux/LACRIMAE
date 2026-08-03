@@ -67,41 +67,59 @@ marche déjà en production).
 ## Rites du Sang
 
 1. **LOI D'ISOLEMENT** — chaque frégate lit son `IN/`, écrit son `OUT/`.
-2. **RITE DE VALIDATION** — `LAC_CUSTOS.py` obligatoire avant chaque transit.
-3. **TRANSIT MANUEL** — le Magos déplace les fichiers, jamais les scripts.
+2. **RITE DE VALIDATION** — `LAC_CUSTOS.py` obligatoire après chaque output (automatique dans GHA et LAC_RUN).
+3. **TRANSIT** — par l'orchestrateur (`LAC_RUN.py` local ou GitHub Actions), jamais à la main.
 4. **PRÉVIEW AVANT RENDU** — aucun rendu sans `validated_by_magos: true` dans codex.json.
 5. **DURÉE PAR LA CUTLIST** — la durée des clips est dictée par F01 (3-10s par séquence).
+6. **PORTES** — l'opérateur n'intervient qu'aux 4 portes : I Brief, II Cutlist, III Montage, IV Publication.
 
-## Structure Drive
+## GitHub Actions (production)
 
-```
-DRIVE_LACRIMAE_DEV/
-├── SHARED/IN/          ← video longue + logos/
-├── F00_INGEST/         IN→OUT
-├── F01_SELECT/         IN→OUT (cutlist.json, frames/)
-├── F02_FORMAT/         IN→OUT (clips/, codex.json)
-├── F03_PREVIEW/        IN→OUT (codex.json validé)
-├── F04_RENDER/         IN→OUT (video_finale.mp4)
-├── F05_CAMOUFLAGE/     IN→OUT (youtube_final.mp4)
-├── F06_LUTHER/         IN→OUT (clean_final.mp4)
-├── LAC_CUSTOS.py
-└── TRACKING/
-```
+Le pipeline tourne sur GitHub Actions, comme OMNIS-WATCH : **un run par porte**,
+déclenché depuis l'onglet **Actions → LACRIMAE Orchestrator → Run workflow**.
 
-## Démarrage rapide
+| Porte | Input `gate` | Ce qui s'exécute | Intervention du Champion |
+|-------|--------------|------------------|--------------------------|
+| G1 | BRIEF + INGEST | F00 (yt-dlp) | Fournit url/titre/sujet/vibe/params dans l'UI |
+| G2 | ORACLE | F01 vision → cutlist.json | Vérifie/édite `F02_FORMAT/IN/cutlist.json` (UI GitHub) |
+| G3 | FORMAT | F02 blur-pad/reframe → codex.json | Édite `F03_PREVIEW/IN/codex.json` (titre, volume, `validated_by_magos: true`) |
+| G4 | RENDER | F04 Remotion → video_finale.mp4 | Télécharge l'artifact `lac-video-finale` |
+| G5 | CAMOUFLAGE + LUTHER | F05 → F06 → clean_final.mp4 | Télécharge l'artifact `lac-clean` |
+| CLOSE | Fermeture | Ledger final | — |
+
+**Secrets/vars à configurer** (Settings → Secrets and variables) :
+- `ORACLE_API_KEY` (secret) — clé OpenRouter pour F01
+- `ORACLE_MODEL` (var, optionnel) — ex. `google/gemini-2.0-flash-exp:free`
+- `ORACLE_BASE_URL` (var, optionnel) — défaut OpenRouter
+
+**Prérequis** : `SHARED/IN/logos/logo.png` (logo calque permanent) commité dans le repo.
+
+**Le gardien tourne à chaque sortie** : `LAC_CUSTOS.py` est appelé après chaque
+frégate — aucun artefact ne transite sans verdict.
+
+## Démarrage rapide (local)
 
 ```
 1. Déposer la vidéo longue + logos dans SHARED/IN/
-2. F00 : python lac_f00_ingest.py --file ... --output F00_INGEST/OUT/
-3. F01 : python lac_f01_select.py --input F01_SELECT/IN/ --output F01_SELECT/OUT/ \
+2. LAC_RUN.py init --source "URL|fichier" --title "..." --sujet "..." --vibe "..."
+3. LAC_RUN.py run        → F00 seule, puis s'arrête à la Porte II
+4. LAC_RUN.py gate --cutlist | --codex | --publish
+5. LAC_RUN.py run        → exécute jusqu'à la prochaine porte
+6. LAC_RUN.py status     → état du ledger (portes + frégates)
+```
+
+Ou en manuel frégate par frégate :
+```
+1. F00 : python lac_f00_ingest.py --file ... --output F00_INGEST/OUT/
+2. F01 : python lac_f01_select.py --input F01_SELECT/IN/ --output F01_SELECT/OUT/ \
          --sequences 2 --oracle          (clé ORACLE_API_KEY requise)
-4. LAC_CUSTOS --frigate F01 --mode check-out
-5. F02 : python lac_f02_format.py --input F02_FORMAT/IN/ --output F02_FORMAT/OUT/ \
+3. LAC_CUSTOS --frigate F01 --mode check-out
+4. F02 : python lac_f02_format.py --input F02_FORMAT/IN/ --output F02_FORMAT/OUT/ \
          --profile blur-pad
-6. F03 : npm install + déposer clip + codex.json dans public/ → npm run dev → valider
-7. F04 : npm install → npm run render
-8. F05 → F06 : python lac_f05_camouflage.py ... ; python lac_f06_luther.py ...
-9. Récupérer clean_final.mp4 dans F06/OUT/
+5. F03 : npm install + déposer clip + codex.json dans public/ → npm run dev → valider
+6. F04 : npm install → npm run render
+7. F05 → F06 : python lac_f05_camouflage.py ... ; python lac_f06_luther.py ...
+8. Récupérer clean_final.mp4 dans F06/OUT/
 ```
 
 > *LACRIMAE — Né des larmes de Sanguinius, forgé en or.*
