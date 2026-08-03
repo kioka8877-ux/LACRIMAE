@@ -21,3 +21,7 @@ SHARED/OUT/
 
 # Ledger de production (état volatile — la mémoire nomade du run en cours)
 TRACKING/LEDGER_DEV.json
+
+# Cache Python
+__pycache__/
+*.pyc
