@@ -1,0 +1,23 @@
+# Artefacts de production (générés par les frégates / l'orchestrateur)
+F00_INGEST/IN/
+F00_INGEST/OUT/
+F01_SELECT/IN/
+F01_SELECT/OUT/
+F02_FORMAT/IN/
+F02_FORMAT/OUT/
+F03_PREVIEW/IN/
+F03_PREVIEW/OUT/
+F03_PREVIEW/CODEBASE/public/
+F03_PREVIEW/CODEBASE/node_modules/
+F04_RENDER/IN/
+F04_RENDER/OUT/
+F04_RENDER/CODEBASE/public/
+F04_RENDER/CODEBASE/node_modules/
+F05_CAMOUFLAGE/IN/
+F05_CAMOUFLAGE/OUT/
+F06_LUTHER/IN/
+F06_LUTHER/OUT/
+SHARED/OUT/
+
+# Ledger de production (état volatile — la mémoire nomade du run en cours)
+TRACKING/LEDGER_DEV.json

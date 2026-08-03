@@ -130,13 +130,18 @@ def frames_to_data_uris(frames, max_frames=MAX_FRAMES):
 
 # ─── PROMPT ORACLE ───────────────────────────────────────────────────────────
 
-def build_prompt(meta, nb_sequences, min_dur, max_dur):
+def build_prompt(meta, nb_sequences, min_dur, max_dur, brief=None):
+    brief_block = ""
+    if brief:
+        brief_block = f"""
+BRIEF DU CHAMPION (priorité absolue — sélectionne en fonction de ça) :
+{brief}
+"""
     return f"""# MISSION F01 - SELECTEUR DE SEQUENCES (VISION)
 
 Tu regardes des frames échantillonnées d'une vidéo longue, comme un humain qui
 la visionne. Tu dois sélectionner les {nb_sequences} MEILLEURES séquences pour
-des Shorts YouTube 9:16.
-
+des Shorts YouTube 9:16.{brief_block}
 CONTRAINTES :
 - Exactement {nb_sequences} séquences (ni plus, ni moins)
 - Chaque séquence dure entre {min_dur}s et {max_dur}s
@@ -244,7 +249,7 @@ def validate_cutlist(cutlist, meta, nb_sequences, min_dur, max_dur):
 
 # ─── MODES ───────────────────────────────────────────────────────────────────
 
-def run_prepare(input_dir, output_dir, nb_sequences, min_dur, max_dur):
+def run_prepare(input_dir, output_dir, nb_sequences, min_dur, max_dur, brief=None):
     section("F01 PREPARE — Extraction des frames + prompt")
     video_path = input_dir / INPUT_VIDEO
     if not video_path.exists():
@@ -252,7 +257,7 @@ def run_prepare(input_dir, output_dir, nb_sequences, min_dur, max_dur):
         sys.exit(1)
     meta = probe_video(video_path)
     frames = extract_frames(video_path, output_dir / FRAMES_DIR)
-    prompt = build_prompt(meta, nb_sequences, min_dur, max_dur)
+    prompt = build_prompt(meta, nb_sequences, min_dur, max_dur, brief)
     prompt_path = output_dir / "oracle_prompt.txt"
     prompt_path.write_text(prompt, encoding="utf-8")
     log_ok(f"Prompt écrit : {prompt_path}")
@@ -261,7 +266,7 @@ def run_prepare(input_dir, output_dir, nb_sequences, min_dur, max_dur):
     return frames, meta
 
 
-def run_oracle(input_dir, output_dir, nb_sequences, min_dur, max_dur, model=None):
+def run_oracle(input_dir, output_dir, nb_sequences, min_dur, max_dur, model=None, brief=None):
     section("F01 ORACLE — Sélection par vision")
     api_key = os.environ.get("ORACLE_API_KEY") or os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
@@ -271,10 +276,10 @@ def run_oracle(input_dir, output_dir, nb_sequences, min_dur, max_dur, model=None
     if not model:
         model = os.environ.get("ORACLE_MODEL", "google/gemini-2.0-flash-exp:free")
 
-    frames, meta = run_prepare(input_dir, output_dir, nb_sequences, min_dur, max_dur)
+    frames, meta = run_prepare(input_dir, output_dir, nb_sequences, min_dur, max_dur, brief)
     uris = frames_to_data_uris(frames)
     log_info(f"Appel modèle vision : {model} ({len(uris)} frames)")
-    cutlist = call_vision_oracle(build_prompt(meta, nb_sequences, min_dur, max_dur),
+    cutlist = call_vision_oracle(build_prompt(meta, nb_sequences, min_dur, max_dur, brief),
                                  uris, api_key, model, base_url)
     if cutlist is None:
         log_fail("Oracle en échec après 3 tentatives")
@@ -330,6 +335,7 @@ def main():
     parser.add_argument("--min-dur", type=float, default=3.0, help="Durée min par séquence (défaut 3)")
     parser.add_argument("--max-dur", type=float, default=10.0, help="Durée max par séquence (défaut 10)")
     parser.add_argument("--model", default=None, help="Modèle vision OpenRouter (override)")
+    parser.add_argument("--brief", default=None, help="Brief du Champion (sujet/vibe/titre)")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--prepare", action="store_true", help="Extrait frames + prompt sans API")
     group.add_argument("--oracle", action="store_true", help="Mode complet : frames + appel vision + validation")
@@ -341,9 +347,9 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     if args.prepare:
-        run_prepare(input_dir, output_dir, args.sequences, args.min_dur, args.max_dur)
+        run_prepare(input_dir, output_dir, args.sequences, args.min_dur, args.max_dur, args.brief)
     elif args.oracle:
-        run_oracle(input_dir, output_dir, args.sequences, args.min_dur, args.max_dur, args.model)
+        run_oracle(input_dir, output_dir, args.sequences, args.min_dur, args.max_dur, args.model, args.brief)
     elif args.validate:
         run_validate(input_dir, output_dir, args.validate, args.sequences, args.min_dur, args.max_dur)
 

@@ -32,12 +32,22 @@ def section(title):
 
 
 def probe_video(path):
-    """Retourne les metadonnees de la video via ffprobe."""
+    """Retourne les metadonnees de la video via ffprobe.
+    Fallback : si ffprobe est absent (environnement sans ffmpeg), retourne
+    des metadonnees minimales pour ne pas bloquer la chaine (Chemin B)."""
     cmd = [
         "ffprobe", "-v", "quiet", "-print_format", "json",
         "-show_format", "-show_streams", str(path)
     ]
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+    except FileNotFoundError:
+        log_info("ffprobe introuvable — metadonnees minimales (environnement sans ffmpeg)")
+        return {
+            "duration_seconds": 0.0, "fps": 0, "width": 0, "height": 0,
+            "codec": "unknown", "bitrate": 0,
+            "size_bytes": Path(path).stat().st_size,
+        }
     if result.returncode != 0:
         raise RuntimeError(f"ffprobe failed: {result.stderr}")
     data = json.loads(result.stdout)

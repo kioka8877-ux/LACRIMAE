@@ -180,8 +180,9 @@ def extract_clip(video_path, start_sec, end_sec, profile, src_info, out_path):
 
 # ─── CODEX TEMPLATE ──────────────────────────────────────────────────────────
 
-def write_starter_codex(clips, fps, out_path):
+def write_starter_codex(clips, fps, out_path, title="", preset="punchy"):
     """Template de départ : titre statique + logo + presets + volume + coup brutal."""
+    preset = preset if preset in COLOR_PRESETS else "punchy"
     codex = {
         "version": "3.0",
         "pipeline": "LACRIMAE_DEV",
@@ -195,7 +196,7 @@ def write_starter_codex(clips, fps, out_path):
         "text_overlays": [
             {
                 "id": "title_00",
-                "content": "",
+                "content": title,
                 "start_frame": 0,
                 "end_frame": clips[0]["total_frames"],
                 "animation": "fade_in",
@@ -220,8 +221,8 @@ def write_starter_codex(clips, fps, out_path):
         },
         "brutal_cut_interval_frames": 90,
         "volume": 1.0,
-        "color_preset": "punchy",
-        "color_css_filter": COLOR_PRESETS["punchy"],
+        "color_preset": preset,
+        "color_css_filter": COLOR_PRESETS[preset],
         "enhance_4k": False,
         "sharpening": 0,
         "denoising": 0,
@@ -246,6 +247,9 @@ def main():
     parser.add_argument("--output", required=True, help="Dossier OUT/")
     parser.add_argument("--profile", default="blur-pad", choices=["blur-pad", "reframe"],
                         help="Profil de formatage (défaut blur-pad)")
+    parser.add_argument("--title", default="", help="Titre de la production (brief du Champion)")
+    parser.add_argument("--preset", default="punchy", choices=list(COLOR_PRESETS.keys()),
+                        help="Preset de couleurs du codex (défaut punchy)")
     args = parser.parse_args()
 
     input_dir = Path(args.input)
@@ -309,7 +313,7 @@ def main():
     )
     log_ok(f"{OUTPUT_MANIFEST} écrit")
 
-    write_starter_codex(results, FPS_TARGET, output_dir / OUTPUT_CODEX)
+    write_starter_codex(results, FPS_TARGET, output_dir / OUTPUT_CODEX, args.title, args.preset)
 
     print()
     print("═" * 52)
