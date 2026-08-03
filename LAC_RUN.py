@@ -213,18 +213,42 @@ def transit_f03(ledger):
 
 
 def transit_f04(ledger):
+    """Copie tous les *_finale.mp4 → F05/IN."""
     f04, f05 = FRIGATE_PATHS["F04"], FRIGATE_PATHS["F05"]
-    return copy_artefact(f04 / "OUT" / "video_finale.mp4", f05 / "IN" / "video_finale.mp4")
+    finals = list((f04 / "OUT").glob("*_finale.mp4"))
+    if not finals:
+        log_err("Aucun *_finale.mp4 dans F04/OUT")
+        return False
+    ok = True
+    for f in finals:
+        ok = copy_artefact(f, f05 / "IN" / f.name) and ok
+    return ok
 
 
 def transit_f05(ledger):
+    """Copie tous les *_youtube.mp4 → F06/IN."""
     f05, f06 = FRIGATE_PATHS["F05"], FRIGATE_PATHS["F06"]
-    return copy_artefact(f05 / "OUT" / "youtube_final.mp4", f06 / "IN" / "youtube_final.mp4")
+    vids = list((f05 / "OUT").glob("*_youtube.mp4"))
+    if not vids:
+        log_err("Aucun *_youtube.mp4 dans F05/OUT")
+        return False
+    ok = True
+    for f in vids:
+        ok = copy_artefact(f, f06 / "IN" / f.name) and ok
+    return ok
 
 
 def transit_f06(ledger):
+    """Copie tous les *_clean.mp4 → SHARED/OUT."""
     f06 = FRIGATE_PATHS["F06"]
-    return copy_artefact(f06 / "OUT" / "clean_final.mp4", SHARED_OUT / "clean_final.mp4")
+    vids = list((f06 / "OUT").glob("*_clean.mp4"))
+    if not vids:
+        log_err("Aucun *_clean.mp4 dans F06/OUT")
+        return False
+    ok = True
+    for f in vids:
+        ok = copy_artefact(f, SHARED_OUT / f.name) and ok
+    return ok
 
 
 TRANSITS = {
@@ -285,7 +309,28 @@ def run_f02(ledger):
 
 def run_f04(ledger):
     f04 = FRIGATE_PATHS["F04"]
-    return run_cli(["npm", "run", "render"], cwd=str(f04 / "CODEBASE"))
+    codebase = f04 / "CODEBASE"
+    # Sync codexData.js depuis le codex validé (multi-clips) — Root.jsx importe statiquement
+    codex_path = f04 / "IN" / "codex.json"
+    if not codex_path.exists():
+        log_err(f"codex.json introuvable : {codex_path}")
+        return False
+    import json as _json
+    data = _json.loads(codex_path.read_text(encoding="utf-8"))
+    (codebase / "src" / "codexData.js").write_text(
+        "export const codex = " + _json.dumps(data, ensure_ascii=False, indent=2) + ";\n",
+        encoding="utf-8")
+    clips = data.get("clips") or [data]
+    ids = [(c.get("id") or c["video"]["source"].replace(".mp4", "")) for c in clips]
+    (f04 / "OUT").mkdir(parents=True, exist_ok=True)
+    for cid in ids:
+        log_ok(f"Render : {cid}")
+        if not run_cli(
+            ["npm", "run", "render", "--", cid, f"../OUT/{cid}_finale.mp4",
+             "--codec", "h264", "--image-format", "jpeg", "--concurrency", "1"],
+            cwd=str(codebase)):
+            return False
+    return True
 
 
 def run_f05(ledger):

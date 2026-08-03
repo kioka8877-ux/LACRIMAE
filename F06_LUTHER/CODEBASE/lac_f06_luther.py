@@ -119,81 +119,83 @@ def normalize_timestamp(path: str, date_str: str):
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="F05 LUTHER — Effacement empreinte")
-    parser.add_argument("--input",  required=True, help="Dossier IN/ (contenant youtube_final.mp4)")
-    parser.add_argument("--output", required=True, help="Dossier OUT/ (recevra clean_final.mp4)")
+    parser = argparse.ArgumentParser(description="F06 LUTHER — Effacement empreinte (multi-clips)")
+    parser.add_argument("--input",  required=True, help="Dossier IN/ (contient les *_youtube.mp4)")
+    parser.add_argument("--output", required=True, help="Dossier OUT/ (recevra les *_clean.mp4)")
     parser.add_argument("--date",   default=date.today().isoformat(), help="Date production YYYY-MM-DD")
     args = parser.parse_args()
 
-    input_path  = Path(args.input)  / INPUT_FILE
-    output_dir  = Path(args.output)
-    output_path = output_dir / OUTPUT_FILE
+    input_dir  = Path(args.input)
+    output_dir = Path(args.output)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     print()
     print("═" * 50)
-    print("  F05 LUTHER — Effacement en cours")
+    print("  F06 LUTHER — Effacement en cours")
     print("═" * 50)
 
-    # ── Vérification source ──────────────────────────────────────────────────
+    # ── Multi-clips : tous les vidéos de IN/ ─────────────────────────────────
     section("Vérification source")
-    if not input_path.exists():
-        log_fail(f"Fichier source introuvable : {input_path}")
+    input_files = sorted(input_dir.glob("*.mp4"))
+    if not input_files:
+        log_fail(f"Aucun .mp4 dans {input_dir}")
         sys.exit(1)
-    size_mb = input_path.stat().st_size / 1_000_000
-    log_ok(f"{INPUT_FILE} — {size_mb:.1f} MB")
+    log_ok(f"{len(input_files)} clip(s) trouvé(s) dans IN/")
 
-    # ── Audit pre-strip ──────────────────────────────────────────────────────
-    section("Audit pré-strip")
-    pre_data = probe(str(input_path))
-    pre_tags = extract_tags(pre_data)
-    if pre_tags:
-        log_warn(f"{len(pre_tags)} tag(s) détecté(s) :")
-        for k, v in pre_tags.items():
-            print(f"         {k} = {v!r}")
-    else:
-        log_info("Aucun tag détecté en source")
-    suspicious_pre = has_suspicious_tags(pre_tags)
-    if suspicious_pre:
-        log_warn(f"Tags suspects à effacer : {suspicious_pre}")
+    for input_path in input_files:
+        clip_name = input_path.stem
+        output_path = output_dir / f"{clip_name}_clean.mp4"
+        section(f"Luther : {clip_name}")
 
-    # ── Strip ────────────────────────────────────────────────────────────────
-    section("Strip métadonnées")
-    output_dir.mkdir(parents=True, exist_ok=True)
-    if not strip(str(input_path), str(output_path)):
-        sys.exit(1)
-    log_ok("Strip terminé")
+        size_mb = input_path.stat().st_size / 1_000_000
+        log_ok(f"{input_path.name} — {size_mb:.1f} MB")
 
-    # ── Normalisation timestamp ──────────────────────────────────────────────
-    section("Normalisation timestamp")
-    normalize_timestamp(str(output_path), args.date)
+        # ── Audit pre-strip ──────────────────────────────────────────────────
+        pre_data = probe(str(input_path))
+        pre_tags = extract_tags(pre_data)
+        if pre_tags:
+            log_warn(f"{len(pre_tags)} tag(s) détecté(s) :")
+            for k, v in pre_tags.items():
+                print(f"         {k} = {v!r}")
+        else:
+            log_info("Aucun tag détecté en source")
+        suspicious_pre = has_suspicious_tags(pre_tags)
+        if suspicious_pre:
+            log_warn(f"Tags suspects à effacer : {suspicious_pre}")
 
-    # ── Audit post-strip ─────────────────────────────────────────────────────
-    section("Audit post-strip")
-    post_data = probe(str(output_path))
-    post_tags = extract_tags(post_data)
-    suspicious_post = has_suspicious_tags(post_tags)
+        # ── Strip ────────────────────────────────────────────────────────────
+        if not strip(str(input_path), str(output_path)):
+            sys.exit(1)
+        log_ok("Strip terminé")
 
-    if post_tags:
-        log_warn(f"{len(post_tags)} tag(s) résiduel(s) :")
-        for k, v in post_tags.items():
-            print(f"         {k} = {v!r}")
-    else:
-        log_ok("Aucun tag résiduel — empreinte zéro")
+        # ── Normalisation timestamp ──────────────────────────────────────────
+        normalize_timestamp(str(output_path), args.date)
 
-    if suspicious_post:
-        log_fail(f"Tags suspects résiduels : {suspicious_post}")
-        sys.exit(1)
+        # ── Audit post-strip ─────────────────────────────────────────────────
+        post_data = probe(str(output_path))
+        post_tags = extract_tags(post_data)
+        suspicious_post = has_suspicious_tags(post_tags)
 
-    # ── Intégrité sortie ─────────────────────────────────────────────────────
-    section("Intégrité")
-    out_size = output_path.stat().st_size / 1_000_000
-    log_ok(f"{OUTPUT_FILE} — {out_size:.1f} MB")
+        if post_tags:
+            log_warn(f"{len(post_tags)} tag(s) résiduel(s) :")
+            for k, v in post_tags.items():
+                print(f"         {k} = {v!r}")
+        else:
+            log_ok("Aucun tag résiduel — empreinte zéro")
 
-    for s in post_data.get("streams", []):
-        if s["codec_type"] == "video":
-            log_ok(f"Vidéo : {s.get('codec_name')} {s.get('width')}×{s.get('height')}")
-        elif s["codec_type"] == "audio":
-            log_ok(f"Audio : {s.get('codec_name')} {s.get('sample_rate')}Hz")
+        if suspicious_post:
+            log_fail(f"Tags suspects résiduels : {suspicious_post}")
+            sys.exit(1)
+
+        # ── Intégrité sortie ─────────────────────────────────────────────────
+        out_size = output_path.stat().st_size / 1_000_000
+        log_ok(f"{output_path.name} — {out_size:.1f} MB")
+
+        for s in post_data.get("streams", []):
+            if s["codec_type"] == "video":
+                log_ok(f"Vidéo : {s.get('codec_name')} {s.get('width')}×{s.get('height')}")
+            elif s["codec_type"] == "audio":
+                log_ok(f"Audio : {s.get('codec_name')} {s.get('sample_rate')}Hz")
 
     print()
     print("═" * 50)

@@ -133,15 +133,37 @@ def run_camouflage(input_path, output_path):
 
 # ── Rapport HTML ────────────────────────────────────────────────────────────
 
-def generate_rapport(output_dir, info_pre, info_post, suspicious_pre, suspicious_post):
-    """Genere un rapport HTML de QA."""
+def generate_rapport(output_dir, results):
+    """Genere un rapport HTML de QA multi-clips (une section par clip)."""
     rapport_path = os.path.join(output_dir, RAPPORT_HTML)
+
+    def table_rows(info, suspicious):
+        return f"""<tr><td>Codec video</td><td>{info.get('video_codec', 'N/A')}</td></tr>
+<tr><td>Resolution</td><td>{info.get('width', 0)}x{info.get('height', 0)}</td></tr>
+<tr><td>Duree</td><td>{info.get('duration', 0):.2f}s</td></tr>
+<tr><td>Taille</td><td>{info.get('size_mb', 0):.1f} MB</td></tr>
+<tr><td>Codec audio</td><td>{info.get('audio_codec', 'N/A')}</td></tr>
+<tr><td>Tags suspects</td><td class="{'fail' if suspicious else 'ok'}">{', '.join(suspicious) if suspicious else 'AUCUN'}</td></tr>"""
+
+    clips_html = ""
+    for r in results:
+        clips_html += f"""
+<h2>Clip : {r['name']}</h2>
+<h3>Avant camouflage</h3>
+<table><tr><th>Parametre</th><th>Valeur</th></tr>{table_rows(r['info_pre'], r['suspicious_pre'])}</table>
+<h3>Apres camouflage</h3>
+<table><tr><th>Parametre</th><th>Valeur</th></tr>{table_rows(r['info_post'], r['suspicious_post'])}
+<tr><td>Loudnorm</td><td>-14 LUFS (YouTube standard)</td></tr>
+<tr><td>+faststart</td><td class="ok">OUI</td></tr></table>
+<p class="{'ok' if not r['suspicious_post'] else 'fail'}">
+{'QA PASS — pret pour YouTube' if not r['suspicious_post'] else 'QA FAIL — tags suspects restants'}
+</p>"""
 
     html = f"""<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>F04 Camouflage — Rapport QA</title>
+<title>F05 Camouflage — Rapport QA</title>
 <style>
 body {{ font-family: monospace; background: #1a1a2e; color: #eee; padding: 20px; }}
 h1 {{ color: #e94560; }}
@@ -155,37 +177,9 @@ th {{ background: #0f3460; }}
 </style>
 </head>
 <body>
-<h1>F04 CAMOUFLAGE — Rapport QA</h1>
+<h1>F05 CAMOUFLAGE — Rapport QA ({len(results)} clip(s))</h1>
 <p>Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-
-<h2>Avant camouflage</h2>
-<table>
-<tr><th>Parametre</th><th>Valeur</th></tr>
-<tr><td>Codec video</td><td>{info_pre.get('video_codec', 'N/A')}</td></tr>
-<tr><td>Resolution</td><td>{info_pre.get('width', 0)}x{info_pre.get('height', 0)}</td></tr>
-<tr><td>Duree</td><td>{info_pre.get('duration', 0):.2f}s</td></tr>
-<tr><td>Taille</td><td>{info_pre.get('size_mb', 0):.1f} MB</td></tr>
-<tr><td>Codec audio</td><td>{info_pre.get('audio_codec', 'N/A')}</td></tr>
-<tr><td>Tags suspects</td><td class="{'fail' if suspicious_pre else 'ok'}">{', '.join(suspicious_pre) if suspicious_pre else 'AUCUN'}</td></tr>
-</table>
-
-<h2>Apres camouflage</h2>
-<table>
-<tr><th>Parametre</th><th>Valeur</th></tr>
-<tr><td>Codec video</td><td>{info_post.get('video_codec', 'N/A')}</td></tr>
-<tr><td>Resolution</td><td>{info_post.get('width', 0)}x{info_post.get('height', 0)}</td></tr>
-<tr><td>Duree</td><td>{info_post.get('duration', 0):.2f}s</td></tr>
-<tr><td>Taille</td><td>{info_post.get('size_mb', 0):.1f} MB</td></tr>
-<tr><td>Codec audio</td><td>{info_post.get('audio_codec', 'N/A')}</td></tr>
-<tr><td>Loudnorm</td><td>-14 LUFS (YouTube standard)</td></tr>
-<tr><td>Tags suspects</td><td class="{'fail' if suspicious_post else 'ok'}">{', '.join(suspicious_post) if suspicious_post else 'AUCUN'}</td></tr>
-<tr><td>+faststart</td><td class="ok">OUI</td></tr>
-</table>
-
-<h2>Verdict</h2>
-<p class="{'ok' if not suspicious_post else 'fail'}">
-{'QA PASS — Video prete pour YouTube' if not suspicious_post else 'QA FAIL — Tags suspects restants'}
-</p>
+{clips_html}
 </body>
 </html>"""
 
@@ -198,75 +192,76 @@ th {{ background: #0f3460; }}
 
 def main():
     parser = argparse.ArgumentParser(
-        description="F04 CAMOUFLAGE — Nettoyage + Loudnorm"
+        description="F05 CAMOUFLAGE — Nettoyage + Loudnorm (multi-clips)"
     )
-    parser.add_argument("--input", required=True, help="Dossier IN/")
-    parser.add_argument("--output", required=True, help="Dossier OUT/")
+    parser.add_argument("--input", required=True, help="Dossier IN/ (contient les *_finale.mp4)")
+    parser.add_argument("--output", required=True, help="Dossier OUT/ (recevra les *_youtube.mp4)")
 
     args = parser.parse_args()
 
     input_dir = Path(args.input)
     output_dir = Path(args.output)
-    input_path = input_dir / INPUT_VIDEO
-    output_path = output_dir / OUTPUT_VIDEO
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    # ── Verifications ──
+    # ── Multi-clips : tous les vidéos de IN/ ──
     section("Verification des entrees")
-
-    if not input_path.exists():
-        log_fail(f"Video introuvable: {input_path}")
+    input_files = sorted(input_dir.glob("*.mp4"))
+    if not input_files:
+        log_fail(f"Aucun .mp4 dans {input_dir}")
         sys.exit(1)
-    log_ok(f"Video: {input_path}")
+    log_ok(f"{len(input_files)} clip(s) trouvé(s) dans IN/")
 
-    if not output_dir.exists():
-        output_dir.mkdir(parents=True, exist_ok=True)
+    results = []
+    for input_path in input_files:
+        clip_name = input_path.stem
+        output_path = output_dir / f"{clip_name}_youtube.mp4"
+        section(f"Camouflage : {clip_name}")
 
-    # ── Probe avant ──
-    section("Analyse avant camouflage")
-    info_pre = probe_video(input_path)
-    log_ok(f"Source: {info_pre['width']}x{info_pre['height']}, "
-           f"{info_pre['duration']:.1f}s, {info_pre['size_mb']:.1f} MB, "
-           f"codec={info_pre.get('video_codec', '?')}")
+        info_pre = probe_video(input_path)
+        log_ok(f"Source: {info_pre['width']}x{info_pre['height']}, "
+               f"{info_pre['duration']:.1f}s, {info_pre['size_mb']:.1f} MB, "
+               f"codec={info_pre.get('video_codec', '?')}")
 
-    suspicious_pre = check_suspicious_tags(info_pre.get("tags", {}))
-    if suspicious_pre:
-        log_warn(f"Tags suspects avant: {suspicious_pre}")
-    else:
-        log_ok("Aucun tag suspect avant camouflage")
+        suspicious_pre = check_suspicious_tags(info_pre.get("tags", {}))
+        if suspicious_pre:
+            log_warn(f"Tags suspects avant: {suspicious_pre}")
+        else:
+            log_ok("Aucun tag suspect avant camouflage")
 
-    # ── Camouflage ──
-    section("Application du camouflage")
-    run_camouflage(input_path, output_path)
+        run_camouflage(input_path, output_path)
 
-    # ── Probe apres ──
-    section("Analyse apres camouflage")
-    info_post = probe_video(output_path)
-    log_ok(f"Sortie: {info_post['width']}x{info_post['height']}, "
-           f"{info_post['duration']:.1f}s, {info_post['size_mb']:.1f} MB, "
-           f"codec={info_post.get('video_codec', '?')}")
+        info_post = probe_video(output_path)
+        log_ok(f"Sortie: {info_post['width']}x{info_post['height']}, "
+               f"{info_post['duration']:.1f}s, {info_post['size_mb']:.1f} MB, "
+               f"codec={info_post.get('video_codec', '?')}")
 
-    suspicious_post = check_suspicious_tags(info_post.get("tags", {}))
-    if suspicious_post:
-        log_warn(f"Tags suspects apres: {suspicious_post}")
-    else:
-        log_ok("Aucun tag suspect apres camouflage")
+        suspicious_post = check_suspicious_tags(info_post.get("tags", {}))
+        if suspicious_post:
+            log_warn(f"Tags suspects apres: {suspicious_post}")
+        else:
+            log_ok("Aucun tag suspect apres camouflage")
+
+        results.append({
+            "name": clip_name,
+            "info_pre": info_pre,
+            "info_post": info_post,
+            "suspicious_pre": suspicious_pre,
+            "suspicious_post": suspicious_post,
+        })
 
     # ── Rapport ──
     section("Rapport QA")
-    generate_rapport(output_dir, info_pre, info_post, suspicious_pre, suspicious_post)
+    generate_rapport(output_dir, results)
 
     # ── Resume ──
     print()
     print("═" * 52)
-    print(" F04 CAMOUFLAGE — MISSION ACCOMPLIE")
-    print(f" Fichier   : {OUTPUT_VIDEO}")
-    print(f" Codec     : {info_post.get('video_codec', '?')} + {info_post.get('audio_codec', '?')}")
-    print(f" Taille    : {info_post['size_mb']:.1f} MB")
-    print(f" Duree     : {info_post['duration']:.1f}s")
-    print(f" Loudnorm  : -14 LUFS")
+    print(" F05 CAMOUFLAGE — MISSION ACCOMPLIE")
+    for r in results:
+        qa_status = "PASS" if not r["suspicious_post"] else "FAIL"
+        print(f"  {r['name']}_youtube.mp4  {r['info_post']['size_mb']:.1f} MB  "
+              f"{r['info_post']['duration']:.1f}s  QA: {qa_status}")
     print(f" Rapport   : {RAPPORT_HTML}")
-    qa_status = "PASS" if not suspicious_post else "FAIL"
-    print(f" QA        : {qa_status}")
     print("═" * 52)
     print()
 

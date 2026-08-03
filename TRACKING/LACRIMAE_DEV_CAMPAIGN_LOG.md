@@ -30,6 +30,7 @@
 | 2026-08-03 | FLOTTE | DEV | **Commit `0291931` + push `origin/dev`** | ✅ |
 | 2026-08-03 | RUBICON | DOCTRINE | **LAC_RUN.py orchestrateur (Exécuteur) + 4 portes + ledger** — CUSTOS gardien à chaque output, greffes brief→oracle F01 / titre+preset→codex F02, fallback ffprobe F00, UTF-8 Windows | ✅ commit `c5ba23a` |
 | 2026-08-03 | RUBICON | GHA | **GitHub Actions — `lacrimae_orchestrator.yml`** (pattern OMNIS delta : un run par gate G1-G5/CLOSE, workflow_dispatch, transits par artifacts + `_tools/download_artifact.py`, ledger commité `TRACKING/LACRIMAE_LEDGER.json`, codex éditable via UI GitHub, sync codexData.js avant render) | ✅ à tester |
+| 2026-08-03 | FLOTTE | MULTI-CLIPS | **Codex multi-clips (jusqu'à 5 Shorts par vidéo longue)** — un block de réglages par clip (titre/volume/couleurs), Root.jsx = 1 Composition par clip, F04 rend N `clip_00X_finale.mp4`, F05/F06 bouclent sur les N clips, CUSTOS patterns `*.mp4`, preview F03 sur clip 1, LAC_RUN transits multi-fichiers | ✅ à tester |
 | 2026-08-03 | CUSTOS | FORGE | Manifeste 7 frégates + validations JSON (cutlist, codex, manifest) | ✅ |
 
 ## DÉCISIONS DE FORGE

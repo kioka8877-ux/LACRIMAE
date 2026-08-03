@@ -181,60 +181,68 @@ def extract_clip(video_path, start_sec, end_sec, profile, src_info, out_path):
 # ─── CODEX TEMPLATE ──────────────────────────────────────────────────────────
 
 def write_starter_codex(clips, fps, out_path, title="", preset="punchy"):
-    """Template de départ : titre statique + logo + presets + volume + coup brutal."""
+    """Codex multi-clips : un block de réglages PAR clip (titre, volume, couleurs).
+    Jusqu'à N clips par vidéo longue — chaque clip est rendu séparément par F04."""
     preset = preset if preset in COLOR_PRESETS else "punchy"
+
+    def clip_block(clip):
+        return {
+            "id": clip["output"].split("/")[-1].replace(".mp4", ""),
+            "video": {
+                "source": clip["output"].split("/")[-1],
+                "fps": fps,
+                "total_frames": clip["total_frames"],
+                "width": TARGET_WIDTH,
+                "height": TARGET_HEIGHT,
+            },
+            "text_overlays": [
+                {
+                    "id": "title_00",
+                    "content": title,
+                    "start_frame": 0,
+                    "end_frame": clip["total_frames"],
+                    "animation": "fade_in",
+                    "font": "Impact, Arial Black, sans-serif",
+                    "size": 96,
+                    "color": "#FFFFFF",
+                    "stroke_color": "#000000",
+                    "stroke_width": 4,
+                    "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
+                    "position": "top",
+                    "letter_spacing": "0em",
+                    "glow_intensity": 0,
+                    "depth_3d": 0,
+                }
+            ],
+            "zoom_keyframes": [],
+            "logo": {
+                "src": "logo.png",
+                "width_pct": 25,
+                "position": "top_left",
+                "opacity": 1.0,
+            },
+            "brutal_cut_interval_frames": 90,
+            "volume": 1.0,
+            "color_preset": preset,
+            "color_css_filter": COLOR_PRESETS[preset],
+            "enhance_4k": False,
+            "sharpening": 0,
+            "denoising": 0,
+            "vignette": 0.25,
+            "grain_intensity": 0.15,
+            "slowmo_start_frame": 0,
+            "slowmo_speed": 1.0,
+            "shake_power": 0,
+        }
+
     codex = {
         "version": "3.0",
         "pipeline": "LACRIMAE_DEV",
-        "video": {
-            "source": "clip_001.mp4",
-            "fps": fps,
-            "total_frames": clips[0]["total_frames"],
-            "width": TARGET_WIDTH,
-            "height": TARGET_HEIGHT,
-        },
-        "text_overlays": [
-            {
-                "id": "title_00",
-                "content": title,
-                "start_frame": 0,
-                "end_frame": clips[0]["total_frames"],
-                "animation": "fade_in",
-                "font": "Impact, Arial Black, sans-serif",
-                "size": 96,
-                "color": "#FFFFFF",
-                "stroke_color": "#000000",
-                "stroke_width": 4,
-                "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-                "position": "top",
-                "letter_spacing": "0em",
-                "glow_intensity": 0,
-                "depth_3d": 0,
-            }
-        ],
-        "zoom_keyframes": [],
-        "logo": {
-            "src": "logo.png",
-            "width_pct": 25,
-            "position": "top_left",
-            "opacity": 1.0,
-        },
-        "brutal_cut_interval_frames": 90,
-        "volume": 1.0,
-        "color_preset": preset,
-        "color_css_filter": COLOR_PRESETS[preset],
-        "enhance_4k": False,
-        "sharpening": 0,
-        "denoising": 0,
-        "vignette": 0.25,
-        "grain_intensity": 0.15,
-        "slowmo_start_frame": 0,
-        "slowmo_speed": 1.0,
-        "shake_power": 0,
         "validated_by_magos": False,
+        "clips": [clip_block(c) for c in clips],
     }
     out_path.write_text(json.dumps(codex, ensure_ascii=False, indent=2), encoding="utf-8")
-    log_ok(f"Template codex.json écrit : {out_path}")
+    log_ok(f"Template codex.json écrit ({len(clips)} clip(s)) : {out_path}")
 
 
 # ─── MAIN ────────────────────────────────────────────────────────────────────

@@ -70,7 +70,7 @@ MANIFEST = {
     },
     "F04": {
         "check-out": {
-            "OUT": ["video_finale.mp4"],
+            "OUT": ["codex.json", "*.mp4"],
         },
         "check-in": {
             "IN": ["codex.json"],
@@ -79,18 +79,18 @@ MANIFEST = {
     },
     "F05": {
         "check-out": {
-            "OUT": ["youtube_final.mp4"],
+            "OUT": ["*.mp4", "rapport_f05.html"],
         },
         "check-in": {
-            "IN": ["video_finale.mp4"],
+            "IN": ["*.mp4"],
         },
     },
     "F06": {
         "check-out": {
-            "OUT": ["clean_final.mp4"],
+            "OUT": ["*.mp4"],
         },
         "check-in": {
-            "IN": ["youtube_final.mp4"],
+            "IN": ["*.mp4"],
         },
     },
 }
@@ -101,8 +101,7 @@ JSON_VALIDATORS = {
     "cutlist.json": ["sequences", "video_duration_sec", "requested_sequences"],
     "f02_manifest.json": ["profile", "clips_count", "clips"],
     "codex.json": [
-        "version", "video", "text_overlays", "logo", "brutal_cut_interval_frames",
-        "volume", "validated_by_magos"
+        "version", "pipeline", "clips", "validated_by_magos"
     ],
 }
 
@@ -171,17 +170,24 @@ def check_json_content(path: Path) -> bool:
         log_ok(f"f02_manifest.json — {data['clips_count']} clip(s), "
                f"profil={data.get('profile')}")
 
-    # Vérifications spécifiques codex.json
+    # Vérifications spécifiques codex.json (multi-clips)
     if filename == "codex.json":
+        clips = data.get("clips", [])
+        if not isinstance(clips, list) or len(clips) == 0:
+            log_err("codex.json — 'clips' doit être une liste non vide")
+            return False
         if not data.get("validated_by_magos"):
             log_err("codex.json — 'validated_by_magos' doit être true "
-                    "(validation obligatoire via la preview F03)")
+                    "(validation obligatoire via la porte III / preview F03)")
             return False
-        if data.get("volume", 1.0) < 0:
-            log_err("codex.json — volume invalide")
-            return False
-        log_ok(f"codex.json — validé par le Magos, "
-               f"coup brutal={data.get('brutal_cut_interval_frames')} frames")
+        for clip in clips:
+            if clip.get("volume", 1.0) < 0:
+                log_err(f"codex.json — volume invalide sur {clip.get('id', '?')}")
+                return False
+            if not clip.get("video", {}).get("source"):
+                log_err(f"codex.json — video.source manquant sur {clip.get('id', '?')}")
+                return False
+        log_ok(f"codex.json — {len(clips)} clip(s), validé par le Magos")
 
     return True
 
@@ -247,6 +253,21 @@ def run_custos(frigate: str, mode: str, drive_base: Path) -> bool:
             continue
 
         for filename in files:
+            if "*" in filename:
+                # Pattern multi-clips : au moins un fichier non vide dans le dossier
+                matches = list(folder_path.glob(filename)) if folder_path.exists() else []
+                if not matches:
+                    log_err(f"{folder_path.name}/{filename} — AUCUN fichier trouvé")
+                    all_ok = False
+                    continue
+                mp4_ok = True
+                for m in matches:
+                    if not check_mp4_non_empty(m):
+                        mp4_ok = False
+                log_ok(f"{folder_path.name}/ — {len(matches)} fichier(s) ({filename})")
+                all_ok = all_ok and mp4_ok
+                continue
+
             file_path = folder_path / filename
             ok = check_file_exists(file_path)
             all_ok = all_ok and ok

@@ -78,13 +78,17 @@ marche déjà en production).
 Le pipeline tourne sur GitHub Actions, comme OMNIS-WATCH : **un run par porte**,
 déclenché depuis l'onglet **Actions → LACRIMAE Orchestrator → Run workflow**.
 
+**Multi-clips** : une seule vidéo longue produit jusqu'à **5 Shorts** par run —
+le codex.json contient un block de réglages PAR clip (titre, volume, couleurs,
+coup brutal). F04 rend une composition par clip, F05/F06 traitent les N clips.
+
 | Porte | Input `gate` | Ce qui s'exécute | Intervention du Champion |
 |-------|--------------|------------------|--------------------------|
 | G1 | BRIEF + INGEST | F00 (yt-dlp) | Fournit url/titre/sujet/vibe/params dans l'UI |
-| G2 | ORACLE | F01 vision → cutlist.json | Vérifie/édite `F02_FORMAT/IN/cutlist.json` (UI GitHub) |
-| G3 | FORMAT | F02 blur-pad/reframe → codex.json | Édite `F03_PREVIEW/IN/codex.json` (titre, volume, `validated_by_magos: true`) |
-| G4 | RENDER | F04 Remotion → video_finale.mp4 | Télécharge l'artifact `lac-video-finale` |
-| G5 | CAMOUFLAGE + LUTHER | F05 → F06 → clean_final.mp4 | Télécharge l'artifact `lac-clean` |
+| G2 | ORACLE | F01 vision → cutlist.json (N séquences) | Vérifie/édite `F02_FORMAT/IN/cutlist.json` (UI GitHub) |
+| G3 | FORMAT | F02 blur-pad/reframe → codex multi-clips | Édite `F03_PREVIEW/IN/codex.json` (titre/volume/couleurs de chaque clip + `validated_by_magos: true`) |
+| G4 | RENDER | F04 Remotion → 1 rendu par clip (`clip_00X_finale.mp4`) | Télécharge l'artifact `lac-video-finale` |
+| G5 | CAMOUFLAGE + LUTHER | F05 → F06 → `clip_00X_clean.mp4` (N clips) | Télécharge l'artifact `lac-clean` |
 | CLOSE | Fermeture | Ledger final | — |
 
 **Secrets/vars à configurer** (Settings → Secrets and variables) :

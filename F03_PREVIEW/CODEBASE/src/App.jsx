@@ -17,6 +17,7 @@ import { OmniComposition } from './preview/OmniComposition';
 
 export default function App() {
   const [codex, setCodex] = useState(null);
+  const [fullCodex, setFullCodex] = useState(null);
   const [videoSrc, setVideoSrc] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,7 +26,7 @@ export default function App() {
   const [selectedText, setSelectedText] = useState(0);
   const playerRef = useRef(null);
 
-  // Charger le codex.json et la vidéo au montage
+  // Charger le codex.json (multi-clips) et la vidéo au montage
   useEffect(() => {
     async function loadAssets() {
       try {
@@ -33,9 +34,12 @@ export default function App() {
         if (!codexResp.ok) {
           throw new Error('codex.json non trouvé dans public/');
         }
-        const codexData = await codexResp.json();
-        setCodex(codexData);
-        setVideoSrc(codexData.video?.source ? './' + codexData.video.source : './clip_001.mp4');
+        const full = await codexResp.json();
+        // Preview du premier clip (les autres clips se règlent dans le JSON)
+        const clipCodex = full.clips?.[0] || full;
+        setFullCodex(full);
+        setCodex(clipCodex);
+        setVideoSrc(clipCodex.video?.source ? './' + clipCodex.video.source : './clip_001.mp4');
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -103,7 +107,13 @@ export default function App() {
   };
 
   const exportCodex = () => {
-    const finalCodex = validated ? { ...codex, validated_by_magos: true } : codex;
+    // Réintègre le clip édité dans le codex multi-clips + flag de validation
+    const merged = fullCodex
+      ? { ...fullCodex, clips: [codex, ...(fullCodex.clips || []).slice(1)] }
+      : codex;
+    const finalCodex = validated
+      ? { ...merged, validated_by_magos: true }
+      : merged;
     const blob = new Blob([JSON.stringify(finalCodex, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

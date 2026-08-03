@@ -308,20 +308,26 @@ with open('src/codexData.js', 'w', encoding='utf-8') as f:
 print('codexData.js synchronisé depuis public/codex.json')
 EOF
 
-      - name: G4 - Render Remotion
+      - name: G4 - Render Remotion (un rendu par clip)
         if: github.event.inputs.gate == 'G4'
         run: |
           cd F04_RENDER/CODEBASE
-          FPS=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['fps'])")
-          FRAMES=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['total_frames'])")
-          WIDTH=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['width'])")
-          HEIGHT=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['height'])")
-          echo "Rendu: ${FRAMES} frames, ${FPS}fps, ${WIDTH}x${HEIGHT}"
-          npx remotion render src/index.jsx OmniComposition \
-            ../OUT/video_finale.mp4 \
-            --codec h264 \
-            --image-format jpeg \
-            --concurrency 1
+          CLIP_IDS=$(python3 -c "
+import json
+c = json.load(open('public/codex.json', encoding='utf-8'))
+clips = c.get('clips') or [c]
+for clip in clips:
+    print(clip.get('id') or clip['video']['source'].replace('.mp4',''))")
+          mkdir -p ../OUT
+          for CID in $CLIP_IDS; do
+            echo "═══ Rendu: $CID ═══"
+            npx remotion render src/index.jsx "$CID" \
+              "../OUT/${CID}_finale.mp4" \
+              --codec h264 \
+              --image-format jpeg \
+              --concurrency 1
+          done
+          ls -la ../OUT/
 
       - name: G4 - Gardien F04 (check-out)
         if: github.event.inputs.gate == 'G4'
@@ -374,7 +380,7 @@ EOF
         if: github.event.inputs.gate == 'G5'
         run: |
           mkdir -p F06_LUTHER/IN
-          cp F05_CAMOUFLAGE/OUT/youtube_final.mp4 F06_LUTHER/IN/youtube_final.mp4
+          cp F05_CAMOUFLAGE/OUT/*.mp4 F06_LUTHER/IN/
           cd F06_LUTHER/CODEBASE
           python3 lac_f06_luther.py --input ../IN/ --output ../OUT/
 
