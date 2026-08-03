@@ -24,9 +24,10 @@
 | 2026-08-03 | F00 | FORGE | INGEST pillé d'OMNIS delta F00 — yt-dlp/fichier | ✅ |
 | 2026-08-03 | F01 | FORGE | SELECT vision OpenRouter — ZÉRO transcript (stars/foot) | 🔵 à tester |
 | 2026-08-03 | F02 | FORGE | FORMAT blur-pad optimisé (160px→boxblur→upscale) + reframe + template codex | 🔵 à tester |
-| 2026-08-03 | F03 | FORGE | PREVIEW pillée d'OMNIS beta F02_PREVIEW — adaptations logo/coup/volume à confirmer | 🔵 à tester |
-| 2026-08-03 | F04 | FORGE | RENDER pillé d'OMNIS beta F03A_REMOTION — logo + titre + coup brutal à confirmer | 🔵 à tester |
-| 2026-08-03 | F05/F06 | FORGE | CAMOUFLAGE + LUTHER pillés (omnis_f04/f05) — I/O renommés | 🔵 à tester |
+| 2026-08-03 | F03 | FORGE | PREVIEW pillée d'OMNIS beta F02_PREVIEW — **logo + coup brutal + volume intégrés (OmniComposition + App.jsx)** | 🔵 à tester |
+| 2026-08-03 | F04 | FORGE | RENDER pillé d'OMNIS beta F03A_REMOTION — **logo + titre + coup brutal + Audio intégrés, codexData = template F02, Root aligné** | 🔵 à tester |
+| 2026-08-03 | F05 | FORGE | rapport → `rapport_f05.html` | ✅ |
+| 2026-08-03 | FLOTTE | DEV | **Commit `0291931` + push `origin/dev`** | ✅ |
 | 2026-08-03 | CUSTOS | FORGE | Manifeste 7 frégates + validations JSON (cutlist, codex, manifest) | ✅ |
 
 ## DÉCISIONS DE FORGE
