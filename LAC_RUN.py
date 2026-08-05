@@ -330,6 +330,9 @@ def run_f04(ledger):
              "--codec", "h264", "--image-format", "jpeg", "--concurrency", "1"],
             cwd=str(codebase)):
             return False
+    # CUSTOS F04 check-out exige OUT/codex.json — y déposer le codex validé
+    (f04 / "OUT" / "codex.json").write_text(
+        _json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     return True
 
 

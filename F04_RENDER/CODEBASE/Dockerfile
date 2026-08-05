@@ -41,5 +41,6 @@ COPY . .
 # Creer le dossier OUT
 RUN mkdir -p OUT
 
-# Commande par defaut: rendu Remotion
-CMD ["npx", "remotion", "render", "src/index.jsx", "OmniComposition", "OUT/video_finale.mp4", "--codec", "h264", "--image-format", "jpeg"]
+# Commande par defaut: rendu du premier clip (codex multi-clips — la composition
+# porte l'id du clip, plus de composition globale "OmniComposition")
+CMD ["sh", "-c", "CID=$(node -e 'const c=require(\"./public/codex.json\");const clips=c.clips||[c];console.log(clips[0].id||\"clip_001\")' 2>/dev/null || echo clip_001); npx remotion render src/index.jsx \"$CID\" OUT/video_finale.mp4 --codec h264 --image-format jpeg"]

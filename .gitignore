@@ -3,13 +3,10 @@ F00_INGEST/IN/
 F00_INGEST/OUT/
 F01_SELECT/IN/
 F01_SELECT/OUT/
-F02_FORMAT/IN/
 F02_FORMAT/OUT/
-F03_PREVIEW/IN/
 F03_PREVIEW/OUT/
 F03_PREVIEW/CODEBASE/public/
 F03_PREVIEW/CODEBASE/node_modules/
-F04_RENDER/IN/
 F04_RENDER/OUT/
 F04_RENDER/CODEBASE/public/
 F04_RENDER/CODEBASE/node_modules/
@@ -18,6 +15,11 @@ F05_CAMOUFLAGE/OUT/
 F06_LUTHER/IN/
 F06_LUTHER/OUT/
 SHARED/OUT/
+
+# Médias volumineux transitant par les IN/ commités (cutlist/codex/manifest restent trackés)
+F02_FORMAT/IN/video_source.mp4
+F03_PREVIEW/IN/clips/
+F04_RENDER/IN/clips/
 
 # Ledger de production (état volatile — la mémoire nomade du run en cours)
 TRACKING/LEDGER_DEV.json

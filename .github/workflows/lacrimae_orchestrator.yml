@@ -182,10 +182,12 @@ jobs:
           MODEL: ${{ github.event.inputs.model }}
         run: |
           cd F01_SELECT/CODEBASE
-          BRIEF_TXT=$(python3 -c "
-import json
-b = json.load(open('../../TRACKING/LACRIMAE_BRIEF.json'))
-print(' | '.join([v for v in (b.get('sujet',''), b.get('vibe',''), b.get('title','')) if v]))")
+          BRIEF_TXT=$(python3 - <<'PYEOF'
+          import json
+          b = json.load(open('../../TRACKING/LACRIMAE_BRIEF.json'))
+          print(' | '.join([v for v in (b.get('sujet',''), b.get('vibe',''), b.get('title','')) if v]))
+          PYEOF
+          )
           MODEL_ARG=""
           if [ -n "$MODEL" ]; then MODEL_ARG="--model $MODEL"; fi
           python3 lac_f01_select.py --oracle \
@@ -300,24 +302,26 @@ print(' | '.join([v for v in (b.get('sujet',''), b.get('vibe',''), b.get('title'
         if: github.event.inputs.gate == 'G4'
         run: |
           cd F04_RENDER/CODEBASE
-          python3 - <<'EOF'
-import json
-codex = json.load(open('public/codex.json', encoding='utf-8'))
-with open('src/codexData.js', 'w', encoding='utf-8') as f:
-    f.write('export const codex = ' + json.dumps(codex, ensure_ascii=False, indent=2) + ';\n')
-print('codexData.js synchronisé depuis public/codex.json')
-EOF
+          python3 - <<'PYEOF'
+          import json
+          codex = json.load(open('public/codex.json', encoding='utf-8'))
+          with open('src/codexData.js', 'w', encoding='utf-8') as f:
+              f.write('export const codex = ' + json.dumps(codex, ensure_ascii=False, indent=2) + ';\n')
+          print('codexData.js synchronisé depuis public/codex.json')
+          PYEOF
 
       - name: G4 - Render Remotion (un rendu par clip)
         if: github.event.inputs.gate == 'G4'
         run: |
           cd F04_RENDER/CODEBASE
-          CLIP_IDS=$(python3 -c "
-import json
-c = json.load(open('public/codex.json', encoding='utf-8'))
-clips = c.get('clips') or [c]
-for clip in clips:
-    print(clip.get('id') or clip['video']['source'].replace('.mp4',''))")
+          CLIP_IDS=$(python3 - <<'PYEOF'
+          import json
+          c = json.load(open('public/codex.json', encoding='utf-8'))
+          clips = c.get('clips') or [c]
+          for clip in clips:
+              print(clip.get('id') or clip['video']['source'].replace('.mp4',''))
+          PYEOF
+          )
           mkdir -p ../OUT
           for CID in $CLIP_IDS; do
             echo "═══ Rendu: $CID ═══"
@@ -327,6 +331,8 @@ for clip in clips:
               --image-format jpeg \
               --concurrency 1
           done
+          # CUSTOS F04 check-out exige OUT/codex.json (avec le codex validé)
+          cp public/codex.json ../OUT/codex.json
           ls -la ../OUT/
 
       - name: G4 - Gardien F04 (check-out)
