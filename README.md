@@ -120,23 +120,25 @@ dans le pack : la vidéo et les PNG.
 ```
 1. (UNE FOIS POUR TOUTES) déposer tes fonds : SHARED/IN/backgrounds/*.png
    et ton logo transparent de campagne : SHARED/IN/logos/logo.png
-2. Déposer la vidéo à couper : BRIDGE_PERTURABO/IN/video_source.mp4
-   (ou la passer en --video)
-3. python LAC_RUN.py forge [--pack-filter SANDOVAL] [--video ...]
+2. Déposer la vidéo à couper DIRECTEMENT dans SHARED/IN/ :
+   SHARED/IN/video_source.mp4  (pas de sous-dossier videos/ — gitignorée,
+   max ~200 Mo ; repli ancien emplacement BRIDGE_PERTURABO/IN/ conservé)
+3. python LAC_RUN.py forge [--pack-filter SANDOVAL]
    → l'Oracle récupère le pack, Gate 1 (pack + cuts + assets) → cutlist + codex v4
 4. python LAC_RUN.py run       → F02 profil background (découpe seule)
 5. Preview F03 : choisir le fond PNG (menu déroulant), ajuster, valider → gate --codex
 6. python LAC_RUN.py run       → F04 → F05 → F06 → clean_final.mp4
 ```
 
-En GHA : `gate G2` avec `mode: forge` suffit — le pack est auto-récupéré, les
-PNG viennent de `SHARED/IN/` (commités une fois pour toutes) et la vidéo de
+En GHA : `gate G1` (ingère `SHARED/IN/video_source.mp4` s'il n'y a pas d'URL)
+puis `gate G2` avec `mode: forge` suffit — le pack est auto-récupéré, les PNG
+viennent de `SHARED/IN/` (commités une fois pour toutes) et la vidéo de
 l'artifact G1.
 
 ## Démarrage rapide (local)
 
 ```
-1. Déposer la vidéo longue + logos dans SHARED/IN/
+1. Déposer la vidéo longue dans SHARED/IN/video_source.mp4 + logos dans SHARED/IN/logos/
 2. LAC_RUN.py init --source "URL|fichier" --title "..." --sujet "..." --vibe "..."
 3. LAC_RUN.py run        → F00 seule, puis s'arrête à la Porte II
 4. LAC_RUN.py gate --cutlist | --codex | --publish

@@ -8,7 +8,7 @@ forge CLIPPING de Perturabo, sans intervention du Champion. Il ne prend QUE le
 production_pack_*.json du dossier EXPORT — RIEN D'AUTRE.
 
   PAS dans le pack → fourni par l'opérateur :
-    - la VIDÉO à découper  (déposée localement)
+    - la VIDÉO à découper  (SHARED/IN/video_source.mp4 — directement dans IN)
     - les PNG fonds        (faits une fois pour toutes → SHARED/IN/backgrounds/)
     - le LOGO              (campagne → SHARED/IN/logos/logo.png)
 
@@ -42,7 +42,8 @@ Usage:
                              [--dry-run]
 
 Assets opérateur (PAS dans Perturabo) :
-    - vidéo  : BRIDGE_PERTURABO/IN/video_source.mp4 (ou --video)
+    - vidéo  : SHARED/IN/video_source.mp4 (directement dans IN) — ou --video,
+               repli BRIDGE_PERTURABO/IN/video_source.mp4
     - fonds  : SHARED/IN/backgrounds/*.png  (une fois pour toutes)
     - logo   : SHARED/IN/logos/logo.png
 
@@ -63,10 +64,16 @@ ROOT = Path(__file__).resolve().parent.parent.parent  # racine LACRIMAE
 BRIDGE_BASE = ROOT / "BRIDGE_PERTURABO"
 BRIDGE_IN = BRIDGE_BASE / "IN"
 BRIDGE_OUT = BRIDGE_BASE / "OUT"
-# Dossier partagé des PNG (faits une fois pour toutes par l'opérateur) —
-# transité vers les frégates preview (F03) et rendu (F04) à chaque forge.
-SHARED_BACKGROUNDS_DIR = ROOT / "SHARED" / "IN" / "backgrounds"
-SHARED_LOGOS_DIR = ROOT / "SHARED" / "IN" / "logos"
+# Dossier partagé IN — l'opérateur dépose ici les assets qui ne sont PAS dans
+# le pack Perturabo :
+#   SHARED/IN/video_source.mp4  — la vidéo à découper (directement dans IN,
+#                                  pas de sous-dossier videos/)
+#   SHARED/IN/backgrounds/*.png — fonds (faits une fois pour toutes)
+#   SHARED/IN/logos/logo.png    — logo de campagne (optionnel)
+SHARED_IN_DIR = ROOT / "SHARED" / "IN"
+SHARED_VIDEO_SOURCE = SHARED_IN_DIR / "video_source.mp4"
+SHARED_BACKGROUNDS_DIR = SHARED_IN_DIR / "backgrounds"
+SHARED_LOGOS_DIR = SHARED_IN_DIR / "logos"
 LOGO_FILENAME = "logo.png"
 
 FRIGATES = {
@@ -260,7 +267,8 @@ def check_assets(video_path, shared_backgrounds, logo_path) -> list:
     Retourne les manquants."""
     missing = []
     if not video_path.exists():
-        missing.append(f"VIDÉO manquante : {video_path} (déposée par l'opérateur)")
+        missing.append(f"VIDÉO manquante : {video_path} "
+                       f"(déposée par l'opérateur dans SHARED/IN/)")
     # Fonds PNG partagés : le mode logo de Perturabo interdit le blur → fond requis
     if not shared_backgrounds:
         missing.append(f"FONDS PNG manquants : {SHARED_BACKGROUNDS_DIR} "
@@ -467,10 +475,16 @@ def main():
            f"{len(pack.get('videos', []))} vidéo(s)")
 
     # 2. Assets OPÉRATEUR (jamais dans Perturabo) :
-    #    - vidéo  : BRIDGE_PERTURABO/IN/video_source.mp4 (ou --video)
+    #    - vidéo  : SHARED/IN/video_source.mp4 (directement dans IN) — ou
+    #               --video / repli BRIDGE_PERTURABO/IN/video_source.mp4
     #    - fonds  : SHARED/IN/backgrounds/*.png  (une fois pour toutes)
     #    - logo   : SHARED/IN/logos/logo.png
-    video_path = Path(args.video) if args.video else (BRIDGE_IN / "video_source.mp4")
+    if args.video:
+        video_path = Path(args.video)
+    elif SHARED_VIDEO_SOURCE.exists():
+        video_path = SHARED_VIDEO_SOURCE
+    else:
+        video_path = BRIDGE_IN / "video_source.mp4"
     shared_backgrounds = sorted(SHARED_BACKGROUNDS_DIR.glob("*.png")) if SHARED_BACKGROUNDS_DIR.exists() else []
     logo_path = SHARED_LOGOS_DIR / LOGO_FILENAME
     if not logo_path.exists():
@@ -482,7 +496,7 @@ def main():
             log_err(m)
         print("\n  ══ GATE 1 : ✗ ÉCHOUÉ — assets opérateur manquants ══")
         print("  Le bridge ne prend QUE le pack depuis Perturabo. Fournis :")
-        print(f"    - vidéo → {BRIDGE_IN / 'video_source.mp4'}")
+        print(f"    - vidéo → {SHARED_VIDEO_SOURCE} (directement dans SHARED/IN)")
         print(f"    - fonds → {SHARED_BACKGROUNDS_DIR}/ (PNG, une fois pour toutes)")
         print(f"    - logo  → {SHARED_LOGOS_DIR / LOGO_FILENAME} (optionnel)")
         sys.exit(1)

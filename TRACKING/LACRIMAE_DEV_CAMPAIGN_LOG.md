@@ -42,6 +42,7 @@
 | 2026-08-05 | RUBICON | PAGES | **Preview F03 publiée sur GitHub Pages** — workflow `preview_pages.yml` (build Vite + deploy Pages, déclencheurs : manuel / workflow_run après l'orchestrateur / push sur IN+SHARED+src), clip preview tracké `F03_PREVIEW/IN/clips/clip_001.mp4` (négation gitignore — le SEUL clip de la preview), transit_f02 le copie automatiquement, public/ régénéré à chaque build (codex IN + clip + fonds + logo + manifest) | ✅ config — deploy à activer (Settings → Pages → GitHub Actions) |
 | 2026-08-06 | RUBICON | PAGES | Pages **activé** par le Champion (Source = GitHub Actions, build_type workflow, URL `https://kioka8877-ux.github.io/LACRIMAE/`) — 1er run push échoué (Pages pas encore activé), 2e run échoué (protection env `github-pages` : seul `main` autorisé) → **`dev` ajouté aux branches autorisées** via API (policies : main + dev), workflow passé en `npm ci` (lockfile commité) | ✅ prêt — reste à lancer le workflow |
 | 2026-08-06 | RUBICON | ASSETS | **Fonds PNG importés depuis CRUSADER** (gamma/F03_SIGISMUND/CODEBASE/public, repo public) vers `SHARED/IN/backgrounds/` — 7 fonds : bg_grid_dark, bg_paper_crumpled, bg_paper_new, bg_papyrus_old, bg_solid_blue, custom_storm_001, custom_storm_002 (~12 Mo, PNG vérifiés) — menu déroulant « FOND » de la preview alimenté, déploiement Pages déclenché au push | ✅ |
+| 2026-08-06 | RUBICON | ASSETS | **La vidéo source se dépose DIRECTEMENT dans `SHARED/IN/`** (pas de sous-dossier `videos/`) — `SHARED/IN/video_source.mp4` : bridge lit ce chemin par défaut (repli `BRIDGE_PERTURABO/IN/` conservé), G1 Ingest accepte la vidéo depuis `SHARED/IN/`, gitignorée (média volumineux max ~200 Mo), `SHARED/IN/README.md` créé + README backgrounds mis à jour | ✅ commit + push |
 
 ## DÉCISIONS DE FORGE
 
@@ -57,6 +58,6 @@
 ## PROCHAINES ÉTAPES (test réel)
 
 - [ ] **Mode libre** : configurer secret GitHub `ORACLE_API_KEY` (+ vars `ORACLE_MODEL`/`ORACLE_BASE_URL`), commiter `SHARED/IN/logos/logo.png`, run G1 → G5
-- [ ] **Mode forge** : déposer les PNG une fois pour toutes (`SHARED/IN/backgrounds/` + `SHARED/IN/logos/logo.png`), la vidéo via G1, puis run G2 (mode=forge) — **l'Oracle va chercher le pack SEUL dans PERTURABO/EXPORT** → G5
+- [ ] **Mode forge** : déposer les PNG une fois pour toutes (`SHARED/IN/backgrounds/` + `SHARED/IN/logos/logo.png`), la vidéo **dans `SHARED/IN/video_source.mp4`** (directement dans IN), puis run G2 (mode=forge) — **l'Oracle va chercher le pack SEUL dans PERTURABO/EXPORT** → G5
 - [ ] Valider le flux complet jusqu'à `lac-clean` (clean_final.mp4)
 - [x] **Preview en ligne** : Pages activé (Source = GitHub Actions) + branche `dev` autorisée sur l'environnement `github-pages` — **reste** : lancer le workflow "LACRIMAE Preview Pages" (manuel, ou auto au prochain push PNG/clip) — URL : `https://kioka8877-ux.github.io/LACRIMAE/`

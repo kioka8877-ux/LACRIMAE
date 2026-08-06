@@ -20,6 +20,9 @@ SHARED/OUT/
 
 # Médias volumineux transitant par les IN/ commités (cutlist/codex/manifest restent trackés)
 F02_FORMAT/IN/video_source.mp4
+# SHARED/IN : la vidéo source de l'opérateur est déposée DIRECTEMENT dans IN
+# (pas de sous-dossier videos/) — jamais commitée (volumineuse, max ~200 Mo).
+SHARED/IN/video_source.mp4
 # F03_PREVIEW/IN/clips : seul clip_001.mp4 est tracke (le clip 9:16 de la preview
 # F03, leger) — il alimente la preview GitHub Pages. Les autres restent ignores.
 F03_PREVIEW/IN/clips/*

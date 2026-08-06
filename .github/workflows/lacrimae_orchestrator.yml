@@ -139,10 +139,12 @@ jobs:
           cd F00_INGEST/CODEBASE
           if [ -n "$URL" ]; then
             python3 lac_f00_ingest.py --url "$URL" --output ../OUT/
+          elif [ -f "../../SHARED/IN/video_source.mp4" ]; then
+            python3 lac_f00_ingest.py --file "../../SHARED/IN/video_source.mp4" --output ../OUT/
           elif [ -f "../IN/video_source.mp4" ]; then
             python3 lac_f00_ingest.py --file "../IN/video_source.mp4" --output ../OUT/
           else
-            echo "ERREUR: ni URL ni F00_INGEST/IN/video_source.mp4"
+            echo "ERREUR: ni URL ni SHARED/IN/video_source.mp4 ni F00_INGEST/IN/video_source.mp4"
             exit 1
           fi
 
