@@ -326,8 +326,15 @@ def run_custos(frigate: str, mode: str, drive_base: Path) -> bool:
 
             if ok and filename.endswith(".json"):
                 # Le codex du BRIDGE (template forge) n'exige PAS la validation
-                # du Magos — elle arrive à la porte III (preview F03)
-                require_validation = not (frigate == "BRIDGE" and filename == "codex.json")
+                # du Magos — elle arrive à la porte III (preview F03). Même
+                # chose au check-out de F02 : le codex sorti par FORMAT est un
+                # template pré-Porte III ; la vraie garde est au check-in de
+                # F04 (codex validé requis avant le render).
+                require_validation = not (
+                    filename == "codex.json"
+                    and (frigate == "BRIDGE"
+                         or (frigate == "F02" and mode == "check-out"))
+                )
                 ok_json = check_json_content(file_path, require_validation=require_validation)
                 all_ok = all_ok and ok_json
 
