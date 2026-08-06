@@ -2,12 +2,6 @@
   "version": "4.0",
   "pipeline": "LACRIMAE_DEV",
   "mode": "forge",
-  "forge": {
-    "pack_id": "LOGO-TS01_SANDOVAL-SIEGE-LOGO-20260804T174153-SA_VIDEO",
-    "siege_id": "SIEGE-LOGO-20260804T174153",
-    "pack_mode": "logo",
-    "campaign_id": null
-  },
   "session": {
     "background": {
       "image": "bg_grid_dark.png",
@@ -45,13 +39,12 @@
   "clips": [
     {
       "id": "clip_001",
-      "angle_id": "A01",
       "video": {
         "source": "clip_001.mp4",
         "fps": 30,
         "total_frames": 900,
-        "width": 1080,
-        "height": 1920
+        "width": 1920,
+        "height": 1080
       },
       "texts": {
         "mode": "title+paragraph",
@@ -81,7 +74,7 @@
       ],
       "zoom_keyframes": [],
       "logo": null,
-      "brutal_cut_interval_frames": 0,
+      "brutal_cut_interval_frames": 90,
       "volume": 1.0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
@@ -89,13 +82,12 @@
     },
     {
       "id": "clip_002",
-      "angle_id": "A02",
       "video": {
         "source": "clip_002.mp4",
         "fps": 30,
         "total_frames": 900,
-        "width": 1080,
-        "height": 1920
+        "width": 1920,
+        "height": 1080
       },
       "texts": {
         "mode": "title+paragraph",
@@ -125,7 +117,7 @@
       ],
       "zoom_keyframes": [],
       "logo": null,
-      "brutal_cut_interval_frames": 0,
+      "brutal_cut_interval_frames": 90,
       "volume": 1.0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
@@ -133,13 +125,12 @@
     },
     {
       "id": "clip_003",
-      "angle_id": "A03",
       "video": {
         "source": "clip_003.mp4",
         "fps": 30,
         "total_frames": 900,
-        "width": 1080,
-        "height": 1920
+        "width": 1920,
+        "height": 1080
       },
       "texts": {
         "mode": "title+paragraph",
@@ -169,7 +160,7 @@
       ],
       "zoom_keyframes": [],
       "logo": null,
-      "brutal_cut_interval_frames": 0,
+      "brutal_cut_interval_frames": 90,
       "volume": 1.0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
@@ -177,13 +168,12 @@
     },
     {
       "id": "clip_004",
-      "angle_id": "A04",
       "video": {
         "source": "clip_004.mp4",
         "fps": 30,
         "total_frames": 900,
-        "width": 1080,
-        "height": 1920
+        "width": 1920,
+        "height": 1080
       },
       "texts": {
         "mode": "title+paragraph",
@@ -213,7 +203,7 @@
       ],
       "zoom_keyframes": [],
       "logo": null,
-      "brutal_cut_interval_frames": 0,
+      "brutal_cut_interval_frames": 90,
       "volume": 1.0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
@@ -221,13 +211,12 @@
     },
     {
       "id": "clip_005",
-      "angle_id": "A05",
       "video": {
         "source": "clip_005.mp4",
         "fps": 30,
         "total_frames": 900,
-        "width": 1080,
-        "height": 1920
+        "width": 1920,
+        "height": 1080
       },
       "texts": {
         "mode": "title+paragraph",
@@ -257,11 +246,17 @@
       ],
       "zoom_keyframes": [],
       "logo": null,
-      "brutal_cut_interval_frames": 0,
+      "brutal_cut_interval_frames": 90,
       "volume": 1.0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
       "shake_power": 0
     }
-  ]
+  ],
+  "forge": {
+    "pack_id": "LOGO-TS01_SANDOVAL-SIEGE-LOGO-20260804T174153-SA_VIDEO",
+    "siege_id": "SIEGE-LOGO-20260804T174153",
+    "pack_mode": "logo",
+    "campaign_id": null
+  }
 }

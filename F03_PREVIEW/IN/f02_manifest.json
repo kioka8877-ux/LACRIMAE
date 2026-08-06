@@ -1,0 +1,66 @@
+{
+  "profile": "background",
+  "clips_count": 5,
+  "clips": [
+    {
+      "index": 1,
+      "start_sec": 0.0,
+      "end_sec": 30.0,
+      "duration_sec": 30.0,
+      "reason": "[A01] Kicked in front of his band",
+      "output": "clips/clip_001.mp4",
+      "total_frames": 900,
+      "width": 1920,
+      "height": 1080,
+      "size_mb": 11.34
+    },
+    {
+      "index": 2,
+      "start_sec": 37.5,
+      "end_sec": 67.5,
+      "duration_sec": 30.0,
+      "reason": "[A02] 4 words that broke him",
+      "output": "clips/clip_002.mp4",
+      "total_frames": 900,
+      "width": 1920,
+      "height": 1080,
+      "size_mb": 9.41
+    },
+    {
+      "index": 3,
+      "start_sec": 75.0,
+      "end_sec": 105.0,
+      "duration_sec": 30.0,
+      "reason": "[A03] She threatened the Ariana Madix treatment",
+      "output": "clips/clip_003.mp4",
+      "total_frames": 900,
+      "width": 1920,
+      "height": 1080,
+      "size_mb": 7.42
+    },
+    {
+      "index": 4,
+      "start_sec": 112.5,
+      "end_sec": 142.5,
+      "duration_sec": 30.0,
+      "reason": "[A04] Restraining order vs her AND dad",
+      "output": "clips/clip_004.mp4",
+      "total_frames": 900,
+      "width": 1920,
+      "height": 1080,
+      "size_mb": 13.1
+    },
+    {
+      "index": 5,
+      "start_sec": 150.0,
+      "end_sec": 180.0,
+      "duration_sec": 30.0,
+      "reason": "[A05] Her one sentence response changes everything",
+      "output": "clips/clip_005.mp4",
+      "total_frames": 900,
+      "width": 1920,
+      "height": 1080,
+      "size_mb": 8.19
+    }
+  ]
+}

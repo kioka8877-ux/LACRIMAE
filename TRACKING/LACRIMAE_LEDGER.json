@@ -1,10 +1,11 @@
 {
   "pipeline": "LACRIMAE_DEV",
   "fregates": {
-    "F01": "2026-08-06T15:05:55Z"
+    "F01": "2026-08-06T15:05:55Z",
+    "F02": "2026-08-06T15:21:42Z"
   },
-  "fregate_actuelle": "F01",
-  "derniere_mise_a_jour": "2026-08-06T15:05:55Z",
+  "fregate_actuelle": "F02",
+  "derniere_mise_a_jour": "2026-08-06T15:21:42Z",
   "brief": {
     "source": "SHARED/IN/video_source.mp4",
     "title": "SANDOVAL — SIEGE LOGO",
