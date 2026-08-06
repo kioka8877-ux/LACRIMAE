@@ -349,19 +349,25 @@ jobs:
         if: github.event.inputs.gate == 'G3'
         run: python3 LAC_CUSTOS.py --frigate F02 --mode check-out --drive-base .
 
-      - name: G3 - Commit codex + manifest (éditable par le Champion)
+      - name: G3 - Commit codex + manifest + clips (éditable par le Champion)
         if: github.event.inputs.gate == 'G3'
         run: |
-          mkdir -p F03_PREVIEW/IN F04_RENDER/IN
+          mkdir -p F03_PREVIEW/IN F03_PREVIEW/IN/clips F04_RENDER/IN
           cp F02_FORMAT/OUT/codex.json F03_PREVIEW/IN/codex.json
           cp F02_FORMAT/OUT/f02_manifest.json F03_PREVIEW/IN/f02_manifest.json
           cp F02_FORMAT/OUT/codex.json F04_RENDER/IN/codex.json
           cp F02_FORMAT/OUT/f02_manifest.json F04_RENDER/IN/f02_manifest.json
+          # clip_001 → preview F03 (le clip tracké qui alimente GitHub Pages)
+          if [ -f F02_FORMAT/OUT/clips/clip_001.mp4 ]; then
+            cp F02_FORMAT/OUT/clips/clip_001.mp4 F03_PREVIEW/IN/clips/clip_001.mp4
+          fi
           python3 _tools/update_ledger.py G3
           git config user.name "lacrimae-orchestrator"
           git config user.email "orchestrator@lacrimae"
-          git add F03_PREVIEW/IN/ F04_RENDER/IN/ TRACKING/LACRIMAE_LEDGER.json
-          git commit -m "ledger: gate G3 — codex [skip ci]" || echo "No change"
+          # Les clips découpés (F02_FORMAT/OUT/clips/*.mp4) SONT commités —
+          # tout est poussé sur GitHub et visible/validable par l'opérateur.
+          git add F03_PREVIEW/IN/ F04_RENDER/IN/ F02_FORMAT/OUT/clips/ TRACKING/LACRIMAE_LEDGER.json
+          git commit -m "ledger: gate G3 — codex + clips [skip ci]" || echo "No change"
           git push
           echo "PORTE III: édite F03_PREVIEW/IN/codex.json (titre, volume, validated_by_magos: true)"
 
