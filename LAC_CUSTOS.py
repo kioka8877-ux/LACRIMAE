@@ -222,7 +222,7 @@ def check_json_content(path: Path, require_validation: bool = True) -> bool:
         status = "validé par le Magos" if require_validation else "template (validation à la porte III)"
         log_ok(f"codex.json — {len(clips)} clip(s), {status}")
 
-    # Vérifications spécifiques production_pack.json (forge Perturabo — Gate 1)
+    # Vérifications spécifiques production_pack.json (forge Perturabo — Contrôle 1)
     if filename == "production_pack.json":
         videos = data.get("videos", [])
         if not isinstance(videos, list) or len(videos) == 0:

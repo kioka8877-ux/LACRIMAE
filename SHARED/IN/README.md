@@ -19,7 +19,7 @@ SHARED/IN/video_source.mp4
 ```
 
 - Nom exact attendu : `video_source.mp4`
-- Le bridge (mode forge) et la porte G1 du workflow la lisent d'ici automatiquement
+- Le bridge (mode forge) et la frégate F00 du workflow la lisent d'ici automatiquement
 - Elle est **gitignorée** : tu peux la déposer sans risquer de la commiter
 
 ### Grosse vidéo (> 100 Mo → jusqu'à ~1 Go) — GitHub Releases
@@ -29,7 +29,7 @@ Et les **artifacts GitHub Actions sont limités à 500 Mo de stockage total**
 (plan gratuit) — la vidéo ne doit JAMAIS y transiter. La vidéo se dépose donc
 comme asset d'une **GitHub Release** (2 Go max par fichier, illimité, gratuit
 sur repo public) et **chaque porte du workflow la re-télécharge depuis la
-release** (G1, G2, G3 — jamais via artifact).
+release** (F00, F01, F02 — jamais via artifact).
 
 ```
 # Depuis la racine du repo, gh connecté :
@@ -37,11 +37,11 @@ sh _tools/lac_release_video.sh /chemin/vers/ta_video.mp4 [tag]
 ```
 
 - L'asset est nommé automatiquement `video_source.mp4`
-- Les portes G1/G2/G3 téléchargent depuis la release (dernière release par
+- Les frégates F00/F01/F02 téléchargent depuis la release (dernière release par
   défaut, ou tag précis via l'input `release_tag`)
 - Tag réutilisable : relance le script pour remplacer la vidéo (`--clobber`)
 - Une vidéo < 100 Mo peut aussi être déposée dans `SHARED/IN/` ou passer par
-  l'URL G1 (yt-dlp)
+  l'URL F00 (yt-dlp)
 
 ## Ce qui ne va PAS ici
 

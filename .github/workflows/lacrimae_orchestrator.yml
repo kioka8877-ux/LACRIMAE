@@ -1,16 +1,17 @@
 # LACRIMAE Orchestrator — Rubicon sur GitHub Actions
-# Pattern OMNIS_WATCH delta : un run par gate, le Champion déclenche depuis l'UI
-# Actions (workflow_dispatch), l'opérateur n'intervient qu'aux portes.
+# DOCTRINE : l'Oracle (exécuteur) fait tourner les FRÉGATES, le Champion valide
+# aux PORTES. Un run GHA = UNE FRÉGATE. Le Champion n'intervient qu'aux
+# 4 portes : I Brief, II Cutlist, III Montage, IV Publication.
 #
-# Portes (inputs gate) :
-#   G1  BRIEF + INGEST     — le Champion fournit url/titre/sujet/vibe/params
-#   G2  ORACLE             — F01 sélectionne les séquences (vision OpenRouter)
-#                            → cutlist.json commitée (éditable via l'UI GitHub)
-#   G3  FORMAT             — F02 blur-pad/reframe → codex.json commité
-#                            (Porte III : éditer codex.json dans F03_PREVIEW/IN)
-#   G4  RENDER             — F04 Remotion (lit le codex validé du repo)
-#   G5  CAMOUFLAGE + LUTHER — F05 puis F06 → clean_final.mp4
-#   CLOSE                  — ferme la production (ledger)
+# Frégates (input fregate) :
+#   F00  INGEST      — brief + yt-dlp → video_source.mp4 (Porte I)
+#   F01  SELECT      — libre : vision OpenRouter → cutlist · forge : BRIDGE
+#                      auto-récupère le pack PERTURABO/EXPORT → cutlist (Porte II)
+#   F02  FORMAT      — blur-pad/reframe/background → codex.json + clips (Porte III)
+#   F04  RENDER      — Remotion, 1 rendu par clip → clip_00X_finale.mp4
+#   F05  CAMOUFLAGE  — métadonnées + loudnorm → clip_00X_youtube.mp4 (Porte IV)
+#   F06  LUTHER      — stream copy → clip_00X_clean.mp4
+#   CLOSE            — ferme la production (ledger)
 #
 # Secrets requis : ORACLE_API_KEY (secret), ORACLE_MODEL/ORACLE_BASE_URL (vars)
 
@@ -19,36 +20,36 @@ name: LACRIMAE Orchestrator
 on:
   workflow_dispatch:
     inputs:
-      gate:
-        description: 'Porte (G1|G2|G3|G4|G5|CLOSE)'
+      fregate:
+        description: 'Frégate à exécuter (F00|F01|F02|F04|F05|F06|CLOSE)'
         required: true
-        default: 'G1'
+        default: 'F00'
       url:
-        description: 'URL YouTube (G1 only)'
+        description: 'URL YouTube (F00 only)'
         required: false
       title:
-        description: 'Titre de la production (G1 only)'
+        description: 'Titre de la production (F00 only)'
         required: false
       sujet:
-        description: 'Sujet / brief oracle (G1 only)'
+        description: 'Sujet / brief oracle (F00 only)'
         required: false
       vibe:
-        description: 'Vibe / tonalité (G1 only)'
+        description: 'Vibe / tonalité (F00 only)'
         required: false
       sequences:
-        description: 'Nombre de séquences 1-10 (G1 only)'
+        description: 'Nombre de séquences 1-10 (F00 only)'
         required: false
         default: '2'
       min_dur:
-        description: 'Durée min par séquence en secondes (G1 only)'
+        description: 'Durée min par séquence en secondes (F00 only)'
         required: false
         default: '3'
       max_dur:
-        description: 'Durée max par séquence en secondes (G1 only)'
+        description: 'Durée max par séquence en secondes (F00 only)'
         required: false
         default: '10'
       profile:
-        description: 'Profil F02 (blur-pad|reframe|background) (G1 only)'
+        description: 'Profil F02 (blur-pad|reframe|background) (F00 only)'
         required: false
         default: 'blur-pad'
       pack_path:
@@ -58,10 +59,10 @@ on:
         description: 'Filtre du pack auto-récupéré (forge only, substring du nom, ex: SANDOVAL)'
         required: false
       release_tag:
-        description: 'Tag de la Release contenant video_source.mp4 (G1 only, optionnel — défaut: dernière release)'
+        description: 'Tag de la Release contenant video_source.mp4 (optionnel — défaut: dernière release)'
         required: false
       preset:
-        description: 'Preset couleurs codex (G1 only)'
+        description: 'Preset couleurs codex (F00 only)'
         required: false
         default: 'punchy'
       model:
@@ -100,10 +101,10 @@ jobs:
           sudo apt-get update && sudo apt-get install -y ffmpeg
           pip install requests yt-dlp -q
 
-      # ───────────────────────── G1 : BRIEF + INGEST ─────────────────────────
+      # ─────────────────────── F00 : BRIEF + INGEST ────────────────────────
 
-      - name: G1 - Ecrire le brief
-        if: github.event.inputs.gate == 'G1'
+      - name: F00 - Ecrire le brief (Porte I)
+        if: github.event.inputs.fregate == 'F00'
         env:
           URL: ${{ github.event.inputs.url }}
           TITLE: ${{ github.event.inputs.title }}
@@ -134,8 +135,8 @@ jobs:
               model: $model}' > TRACKING/LACRIMAE_BRIEF.json
           cat TRACKING/LACRIMAE_BRIEF.json
 
-      - name: G1 - Ingest
-        if: github.event.inputs.gate == 'G1'
+      - name: F00 - Ingest
+        if: github.event.inputs.fregate == 'F00'
         env:
           URL: ${{ github.event.inputs.url }}
           RELEASE_TAG: ${{ github.event.inputs.release_tag }}
@@ -149,7 +150,7 @@ jobs:
             python3 lac_f00_ingest.py --file "../IN/video_source.mp4" --output ../OUT/
           else
             # Vidéo > 100 Mo : uploadée par l'opérateur comme asset d'une GitHub
-            # Release (_tools/lac_release_video.sh) — G1 la télécharge ici.
+            # Release (_tools/lac_release_video.sh) — F00 la télécharge ici.
             REL_ARG=""
             if [ -n "$RELEASE_TAG" ]; then REL_ARG="$RELEASE_TAG"; fi
             echo "  [→] Aucune vidéo locale — recherche dans les GitHub Releases…"
@@ -162,59 +163,59 @@ jobs:
             fi
           fi
 
-      - name: G1 - Gardien F00
-        if: github.event.inputs.gate == 'G1'
+      - name: F00 - Gardien CUSTOS
+        if: github.event.inputs.fregate == 'F00'
         run: python3 LAC_CUSTOS.py --frigate F00 --mode check-out --drive-base .
 
-      # G1 - Upload vidéo : SEULEMENT si la vidéo est petite (< 400 Mo).
+      # F00 - Upload vidéo : SEULEMENT si la vidéo est petite (< 400 Mo).
       # Les artifacts GHA sont limités (500 Mo de stockage total / repo en
       # plan gratuit, rétention 90 j). Une vidéo > 100 Mo vit dans la Release
-      # GitHub (2 Go/asset, illimité, gratuit sur repo public) : les portes
-      # G2/G3 la re-téléchargent depuis la Release, PAS depuis l'artifact.
-      - name: G1 - Check video size
-        if: github.event.inputs.gate == 'G1'
+      # GitHub (2 Go/asset, illimité, gratuit sur repo public) : les frégates
+      # F01/F02 la re-téléchargent depuis la Release, PAS depuis l'artifact.
+      - name: F00 - Check video size
+        if: github.event.inputs.fregate == 'F00'
         id: vidsize
         run: |
           SIZE=$(stat -c%s F00_INGEST/OUT/video_source.mp4)
           echo "size=$SIZE" >> "$GITHUB_OUTPUT"
           echo "  [→] Vidéo ingérée : $(( SIZE / 1000000 )) Mo"
 
-      - name: G1 - Upload video (petit, < 400 Mo)
-        if: github.event.inputs.gate == 'G1' && fromJson(steps.vidsize.outputs.size) < 400000000
+      - name: F00 - Upload video (petit, < 400 Mo)
+        if: github.event.inputs.fregate == 'F00' && fromJson(steps.vidsize.outputs.size) < 400000000
         uses: actions/upload-artifact@v4
         with:
           name: lac-video
           path: F00_INGEST/OUT/
 
-      - name: G1 - Ledger + commit
-        if: github.event.inputs.gate == 'G1'
+      - name: F00 - Ledger + commit
+        if: github.event.inputs.fregate == 'F00'
         run: |
-          python3 _tools/update_ledger.py G1
+          python3 _tools/update_ledger.py F00
           git config user.name "lacrimae-orchestrator"
           git config user.email "orchestrator@lacrimae"
           git add TRACKING/LACRIMAE_BRIEF.json TRACKING/LACRIMAE_LEDGER.json
           if git diff --cached --quiet; then
             echo "No change"
           else
-            git commit -m "ledger: gate G1 [skip ci]"
+            git commit -m "ledger: fregate F00 [skip ci]"
             git push
           fi
-          echo "PORTE II: vérifie/édite F02_FORMAT/IN/cutlist.json (après G2), puis relance avec gate G2"
+          echo "PORTE I: brief validé. Prochaine frégate: F01"
 
-      # ──────────────────────────── G2 : ORACLE ou FORGE ──────────────────────
+      # ─────────────────── F01 : SELECT (libre) ou FORGE (bridge) ───────────
 
-      # G2 - Vidéo : d'abord la Release GitHub (2 Go/asset, illimité, gratuit
+      # F01 - Vidéo : d'abord la Release GitHub (2 Go/asset, illimité, gratuit
       # repo public — gère les vidéos > 100 Mo), sinon repli sur l'artifact
       # lac-video (vidéos petites / mode libre sans release).
-      - name: G2 - Download video
-        if: github.event.inputs.gate == 'G2'
+      - name: F01 - Download video
+        if: github.event.inputs.fregate == 'F01'
         env:
           RELEASE_TAG: ${{ github.event.inputs.release_tag }}
         run: |
           mkdir -p F01_SELECT/IN F02_FORMAT/IN
           REL_ARG=""
           if [ -n "$RELEASE_TAG" ]; then REL_ARG="$RELEASE_TAG"; fi
-          echo "  [→] G2 : recherche de la vidéo dans les GitHub Releases…"
+          echo "  [→] F01 : recherche de la vidéo dans les GitHub Releases…"
           if python3 _tools/download_release_video.py F02_FORMAT/IN/ $REL_ARG; then
             echo "  [✓] Vidéo depuis la Release"
           else
@@ -227,11 +228,11 @@ jobs:
 
       # Mode FORGE : l'ORACLE va chercher le pack SEUL dans PERTURABO/EXPORT
       # (production_pack_*.json). Le bridge ne prend RIEN d'autre : la vidéo
-      # vient de l'artifact G1, les fonds de SHARED/IN/backgrounds/ (faits une
-      # fois pour toutes) et le logo de SHARED/IN/logos/logo.png.
+      # vient de la Release/artifact, les fonds de SHARED/IN/backgrounds/ (faits
+      # une fois pour toutes) et le logo de SHARED/IN/logos/logo.png.
       # F01 (vision) est SAUTÉE — les cuts viennent du pack Perturabo.
-      - name: G2 - Forge bridge (Gate 1)
-        if: github.event.inputs.gate == 'G2' && github.event.inputs.mode == 'forge'
+      - name: F01 - Forge bridge (Contrôle du pack)
+        if: github.event.inputs.fregate == 'F01' && github.event.inputs.mode == 'forge'
         env:
           PACK: ${{ github.event.inputs.pack_path }}
           PACK_FILTER: ${{ github.event.inputs.pack_filter }}
@@ -246,8 +247,8 @@ jobs:
           mkdir -p F02_FORMAT/IN
           cp BRIDGE_PERTURABO/OUT/cutlist.json F02_FORMAT/IN/cutlist.json
 
-      - name: G2 - Oracle (vision) — mode libre
-        if: github.event.inputs.gate == 'G2' && github.event.inputs.mode != 'forge'
+      - name: F01 - Oracle (vision) — mode libre
+        if: github.event.inputs.fregate == 'F01' && github.event.inputs.mode != 'forge'
         env:
           ORACLE_API_KEY: ${{ secrets.ORACLE_API_KEY }}
           ORACLE_MODEL: ${{ vars.ORACLE_MODEL }}
@@ -272,8 +273,8 @@ jobs:
             --brief "$BRIEF_TXT" $MODEL_ARG
           cp ../OUT/cutlist.json ../../F02_FORMAT/IN/cutlist.json
 
-      - name: G2 - Gardien F01/BRIDGE
-        if: github.event.inputs.gate == 'G2'
+      - name: F01 - Gardien CUSTOS
+        if: github.event.inputs.fregate == 'F01'
         run: |
           if [ "${{ github.event.inputs.mode }}" == "forge" ]; then
             python3 LAC_CUSTOS.py --frigate BRIDGE --mode check-out --drive-base .
@@ -281,43 +282,43 @@ jobs:
             python3 LAC_CUSTOS.py --frigate F01 --mode check-out --drive-base .
           fi
 
-      - name: G2 - Commit cutlist (éditable par le Champion)
-        if: github.event.inputs.gate == 'G2'
+      - name: F01 - Commit cutlist (éditable par le Champion)
+        if: github.event.inputs.fregate == 'F01'
         run: |
-          python3 _tools/update_ledger.py G2
+          python3 _tools/update_ledger.py F01
           git config user.name "lacrimae-orchestrator"
           git config user.email "orchestrator@lacrimae"
           # En mode forge : le codex bridge (session + textes du pack) + le pack
-          # auto-récupéré sont commités pour survivre jusqu'à G3 (run séparé —
+          # auto-récupéré sont commités pour survivre jusqu'à F02 (run séparé —
           # le workspace ne persiste pas)
           if [ "${{ github.event.inputs.mode }}" == "forge" ]; then
             git add F02_FORMAT/IN/cutlist.json BRIDGE_PERTURABO/OUT/ BRIDGE_PERTURABO/IN/production_pack.json BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json TRACKING/LACRIMAE_LEDGER.json
           else
             git add F02_FORMAT/IN/cutlist.json TRACKING/LACRIMAE_LEDGER.json
           fi
-          git commit -m "ledger: gate G2 — cutlist [skip ci]" || echo "No change"
+          git commit -m "ledger: fregate F01 — cutlist [skip ci]" || echo "No change"
           git push
-          echo "PORTE II FRANCHIE. Si besoin: édite F02_FORMAT/IN/cutlist.json dans l'UI GitHub"
+          echo "PORTE II: vérifie/édite F02_FORMAT/IN/cutlist.json dans l'UI GitHub, puis frégate F02"
 
-      - name: G2 - Upload cutlist
-        if: github.event.inputs.gate == 'G2'
+      - name: F01 - Upload cutlist
+        if: github.event.inputs.fregate == 'F01'
         uses: actions/upload-artifact@v4
         with:
           name: lac-cutlist
           path: F02_FORMAT/IN/cutlist.json
 
-      # ──────────────────────────── G3 : FORMAT ──────────────────────────────
+      # ─────────────────────────── F02 : FORMAT ─────────────────────────────
 
-      # G3 - Vidéo : même logique que G2 — Release GitHub d'abord, artifact en repli.
-      - name: G3 - Download video
-        if: github.event.inputs.gate == 'G3'
+      # F02 - Vidéo : même logique que F01 — Release GitHub d'abord, artifact en repli.
+      - name: F02 - Download video
+        if: github.event.inputs.fregate == 'F02'
         env:
           RELEASE_TAG: ${{ github.event.inputs.release_tag }}
         run: |
           mkdir -p F02_FORMAT/IN
           REL_ARG=""
           if [ -n "$RELEASE_TAG" ]; then REL_ARG="$RELEASE_TAG"; fi
-          echo "  [→] G3 : recherche de la vidéo dans les GitHub Releases…"
+          echo "  [→] F02 : recherche de la vidéo dans les GitHub Releases…"
           if python3 _tools/download_release_video.py F02_FORMAT/IN/ $REL_ARG; then
             echo "  [✓] Vidéo depuis la Release"
           else
@@ -325,8 +326,8 @@ jobs:
             python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F02_FORMAT/IN/ "$BRANCH"
           fi
 
-      - name: G3 - Format (blur-pad/reframe/background)
-        if: github.event.inputs.gate == 'G3'
+      - name: F02 - Format (blur-pad/reframe/background)
+        if: github.event.inputs.fregate == 'F02'
         env:
           MODE: ${{ github.event.inputs.mode }}
         run: |
@@ -345,12 +346,12 @@ jobs:
           python3 lac_f02_format.py --input ../IN/ --output ../OUT/ \
             --profile "$PROFILE" --preset "$PRESET" --title "$TITLE" $MODE_ARG $FORGE_CODEX_ARG
 
-      - name: G3 - Gardien F02
-        if: github.event.inputs.gate == 'G3'
+      - name: F02 - Gardien CUSTOS
+        if: github.event.inputs.fregate == 'F02'
         run: python3 LAC_CUSTOS.py --frigate F02 --mode check-out --drive-base .
 
-      - name: G3 - Commit codex + manifest + clips (éditable par le Champion)
-        if: github.event.inputs.gate == 'G3'
+      - name: F02 - Commit codex + manifest + clips (éditable par le Champion)
+        if: github.event.inputs.fregate == 'F02'
         run: |
           mkdir -p F03_PREVIEW/IN F03_PREVIEW/IN/clips F04_RENDER/IN
           cp F02_FORMAT/OUT/codex.json F03_PREVIEW/IN/codex.json
@@ -361,34 +362,34 @@ jobs:
           if [ -f F02_FORMAT/OUT/clips/clip_001.mp4 ]; then
             cp F02_FORMAT/OUT/clips/clip_001.mp4 F03_PREVIEW/IN/clips/clip_001.mp4
           fi
-          python3 _tools/update_ledger.py G3
+          python3 _tools/update_ledger.py F02
           git config user.name "lacrimae-orchestrator"
           git config user.email "orchestrator@lacrimae"
           # Les clips découpés (F02_FORMAT/OUT/clips/*.mp4) SONT commités —
           # tout est poussé sur GitHub et visible/validable par l'opérateur.
           git add F03_PREVIEW/IN/ F04_RENDER/IN/ F02_FORMAT/OUT/clips/ TRACKING/LACRIMAE_LEDGER.json
-          git commit -m "ledger: gate G3 — codex + clips [skip ci]" || echo "No change"
+          git commit -m "ledger: fregate F02 — codex + clips [skip ci]" || echo "No change"
           git push
-          echo "PORTE III: édite F03_PREVIEW/IN/codex.json (titre, volume, validated_by_magos: true)"
+          echo "PORTE III: édite F03_PREVIEW/IN/codex.json (titre, volume, validated_by_magos: true), puis frégate F04"
 
-      - name: G3 - Upload clips
-        if: github.event.inputs.gate == 'G3'
+      - name: F02 - Upload clips
+        if: github.event.inputs.fregate == 'F02'
         uses: actions/upload-artifact@v4
         with:
           name: lac-clips
           path: F02_FORMAT/OUT/clips/
 
-      # ──────────────────────────── G4 : RENDER ──────────────────────────────
+      # ─────────────────────────── F04 : RENDER ─────────────────────────────
 
-      - name: G4 - Download clips
-        if: github.event.inputs.gate == 'G4'
+      - name: F04 - Download clips
+        if: github.event.inputs.fregate == 'F04'
         run: |
           mkdir -p F04_RENDER/CODEBASE/public F04_RENDER/IN/clips
           python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-clips F04_RENDER/CODEBASE/public/ "$BRANCH"
           cp F04_RENDER/CODEBASE/public/*.mp4 F04_RENDER/IN/clips/
 
-      - name: G4 - Copy codex validé + logo + fond PNG
-        if: github.event.inputs.gate == 'G4'
+      - name: F04 - Copy codex validé + logo + fond PNG
+        if: github.event.inputs.fregate == 'F04'
         run: |
           cp F03_PREVIEW/IN/codex.json F04_RENDER/IN/codex.json
           cp F03_PREVIEW/IN/codex.json F04_RENDER/CODEBASE/public/codex.json
@@ -411,24 +412,24 @@ jobs:
             fi
           fi
 
-      - name: G4 - Gardien F04 (check-in)
-        if: github.event.inputs.gate == 'G4'
+      - name: F04 - Gardien CUSTOS (check-in)
+        if: github.event.inputs.fregate == 'F04'
         run: python3 LAC_CUSTOS.py --frigate F04 --mode check-in --drive-base .
 
-      - name: G4 - Setup Node
-        if: github.event.inputs.gate == 'G4'
+      - name: F04 - Setup Node
+        if: github.event.inputs.fregate == 'F04'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: G4 - Install dependencies
-        if: github.event.inputs.gate == 'G4'
+      - name: F04 - Install dependencies
+        if: github.event.inputs.fregate == 'F04'
         run: |
           cd F04_RENDER/CODEBASE
           npm install
 
-      - name: G4 - Sync codexData.js depuis le codex validé
-        if: github.event.inputs.gate == 'G4'
+      - name: F04 - Sync codexData.js depuis le codex validé
+        if: github.event.inputs.fregate == 'F04'
         run: |
           cd F04_RENDER/CODEBASE
           python3 - <<'PYEOF'
@@ -439,8 +440,8 @@ jobs:
           print('codexData.js synchronisé depuis public/codex.json')
           PYEOF
 
-      - name: G4 - Render Remotion (un rendu par clip)
-        if: github.event.inputs.gate == 'G4'
+      - name: F04 - Render Remotion (un rendu par clip)
+        if: github.event.inputs.fregate == 'F04'
         run: |
           cd F04_RENDER/CODEBASE
           CLIP_IDS=$(python3 - <<'PYEOF'
@@ -464,92 +465,109 @@ jobs:
           cp public/codex.json ../OUT/codex.json
           ls -la ../OUT/
 
-      - name: G4 - Gardien F04 (check-out)
-        if: github.event.inputs.gate == 'G4'
+      - name: F04 - Gardien CUSTOS (check-out)
+        if: github.event.inputs.fregate == 'F04'
         run: python3 LAC_CUSTOS.py --frigate F04 --mode check-out --drive-base .
 
-      - name: G4 - Upload video finale
-        if: github.event.inputs.gate == 'G4'
+      - name: F04 - Upload video finale
+        if: github.event.inputs.fregate == 'F04'
         uses: actions/upload-artifact@v4
         with:
           name: lac-video-finale
           path: F04_RENDER/OUT/
 
-      - name: G4 - Ledger
-        if: github.event.inputs.gate == 'G4'
+      - name: F04 - Ledger
+        if: github.event.inputs.fregate == 'F04'
         run: |
-          python3 _tools/update_ledger.py G4
+          python3 _tools/update_ledger.py F04
           git config user.name "lacrimae-orchestrator"
           git config user.email "orchestrator@lacrimae"
           git add TRACKING/LACRIMAE_LEDGER.json
-          git commit -m "ledger: gate G4 — render [skip ci]" || echo "No change"
+          git commit -m "ledger: fregate F04 — render [skip ci]" || echo "No change"
           git push
-          echo "PORTE IV: télécharge l'artifact lac-video-finale, vérifie, puis gate G5"
+          echo "Prochaine frégate: F05 (camouflage)"
 
-      # ───────────────────── G5 : CAMOUFLAGE + LUTHER ────────────────────────
+      # ─────────────────────── F05 : CAMOUFLAGE ─────────────────────────────
 
-      - name: G5 - Download video finale
-        if: github.event.inputs.gate == 'G5'
+      - name: F05 - Download video finale
+        if: github.event.inputs.fregate == 'F05'
         run: |
           mkdir -p F05_CAMOUFLAGE/IN
           python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video-finale F05_CAMOUFLAGE/IN/ "$BRANCH"
 
-      - name: G5 - Camouflage
-        if: github.event.inputs.gate == 'G5'
+      - name: F05 - Camouflage
+        if: github.event.inputs.fregate == 'F05'
         run: |
           cd F05_CAMOUFLAGE/CODEBASE
           python3 lac_f05_camouflage.py --input ../IN/ --output ../OUT/
 
-      - name: G5 - Gardien F05
-        if: github.event.inputs.gate == 'G5'
+      - name: F05 - Gardien CUSTOS
+        if: github.event.inputs.fregate == 'F05'
         run: python3 LAC_CUSTOS.py --frigate F05 --mode check-out --drive-base .
 
-      - name: G5 - Upload youtube_final
-        if: github.event.inputs.gate == 'G5'
+      - name: F05 - Upload youtube_final
+        if: github.event.inputs.fregate == 'F05'
         uses: actions/upload-artifact@v4
         with:
           name: lac-youtube
           path: F05_CAMOUFLAGE/OUT/
 
-      - name: G5 - Luther
-        if: github.event.inputs.gate == 'G5'
+      - name: F05 - Ledger
+        if: github.event.inputs.fregate == 'F05'
+        run: |
+          python3 _tools/update_ledger.py F05
+          git config user.name "lacrimae-orchestrator"
+          git config user.email "orchestrator@lacrimae"
+          git add TRACKING/LACRIMAE_LEDGER.json
+          git commit -m "ledger: fregate F05 — camouflage [skip ci]" || echo "No change"
+          git push
+          echo "PORTE IV: télécharge l'artifact lac-youtube, vérifie, puis frégate F06"
+
+      # ─────────────────────────── F06 : LUTHER ─────────────────────────────
+
+      - name: F06 - Download youtube_final
+        if: github.event.inputs.fregate == 'F06'
         run: |
           mkdir -p F06_LUTHER/IN
-          cp F05_CAMOUFLAGE/OUT/*.mp4 F06_LUTHER/IN/
+          python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-youtube F06_LUTHER/IN/ "$BRANCH"
+
+      - name: F06 - Luther
+        if: github.event.inputs.fregate == 'F06'
+        run: |
           cd F06_LUTHER/CODEBASE
           python3 lac_f06_luther.py --input ../IN/ --output ../OUT/
 
-      - name: G5 - Gardien F06
-        if: github.event.inputs.gate == 'G5'
+      - name: F06 - Gardien CUSTOS
+        if: github.event.inputs.fregate == 'F06'
         run: python3 LAC_CUSTOS.py --frigate F06 --mode check-out --drive-base .
 
-      - name: G5 - Upload clean_final
-        if: github.event.inputs.gate == 'G5'
+      - name: F06 - Upload clean_final
+        if: github.event.inputs.fregate == 'F06'
         uses: actions/upload-artifact@v4
         with:
           name: lac-clean
           path: F06_LUTHER/OUT/
 
-      - name: G5 - Ledger
-        if: github.event.inputs.gate == 'G5'
+      - name: F06 - Ledger
+        if: github.event.inputs.fregate == 'F06'
         run: |
-          python3 _tools/update_ledger.py G5
+          python3 _tools/update_ledger.py F06
           git config user.name "lacrimae-orchestrator"
           git config user.email "orchestrator@lacrimae"
           git add TRACKING/LACRIMAE_LEDGER.json
-          git commit -m "ledger: gate G5 — production complète [skip ci]" || echo "No change"
+          git commit -m "ledger: fregate F06 — production complète [skip ci]" || echo "No change"
           git push
-          echo "ARTEFACT FINAL: télécharge lac-clean (clean_final.mp4)"
+          echo "ARTEFACT FINAL: télécharge lac-clean (clip_00X_clean.mp4)"
 
-      # ──────────────────────────── CLOSE ────────────────────────────────────
+      # ──────────────────────────── CLOSE ───────────────────────────────────
 
       - name: CLOSE - Fermeture
-        if: github.event.inputs.gate == 'CLOSE'
+        if: github.event.inputs.fregate == 'CLOSE'
         run: |
           python3 _tools/update_ledger.py CLOSE
           git config user.name "lacrimae-orchestrator"
           git config user.email "orchestrator@lacrimae"
           git add TRACKING/LACRIMAE_LEDGER.json
-          git commit -m "ledger: gate CLOSE [skip ci]" || echo "No change"
+          git commit -m "ledger: fregate CLOSE [skip ci]" || echo "No change"
           git push
           echo "Production fermée."

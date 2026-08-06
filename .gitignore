@@ -40,7 +40,7 @@ __pycache__/
 
 # Mode forge — IN/ et OUT/ du bridge sont commités par le flux GHA :
 #  - IN/  : l'opérateur commite production_pack.json + fond.png + logo.png
-#  - OUT/ : le workflow commite cutlist.json + codex.json à G2 (persistance
-#           inter-run jusqu'à G3). Seuls les gros médias sont ignorés.
+#  - OUT/ : le workflow commite cutlist.json + codex.json à F01 (persistance
+#           inter-run jusqu'à F02). Seuls les gros médias sont ignorés.
 BRIDGE_PERTURABO/IN/video_source.mp4
 BRIDGE_PERTURABO/IN/*.mp4

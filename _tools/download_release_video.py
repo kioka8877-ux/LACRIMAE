@@ -8,7 +8,7 @@ commitées dans git (limite GitHub : 100 Mo par fichier via push, 25 Mo via le
 web). L'opérateur les upload donc comme asset d'une GitHub Release (2 Go max
 par fichier, gratuit sur repo public) via _tools/lac_release_video.sh.
 
-Usage (exécuté par G1 du workflow, depuis la racine du repo) :
+Usage (exécuté par la frégate F00 du workflow, depuis la racine du repo) :
     python3 _tools/download_release_video.py <dest_dir> [tag]
 
     dest_dir : où écrire video_source.mp4 (ex: F00_INGEST/IN/)
@@ -27,7 +27,7 @@ ASSET_NAME = "video_source.mp4"
 
 
 def gh_api(url: str) -> dict:
-    headers = {"User-Agent": "LACRIMAE-G1", "Accept": "application/vnd.github+json"}
+    headers = {"User-Agent": "LACRIMAE-F00", "Accept": "application/vnd.github+json"}
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     if token:
         headers["Authorization"] = f"Bearer {token}"
@@ -79,7 +79,7 @@ def main() -> int:
 
     print(f"  [→] Téléchargement de {ASSET_NAME} depuis {REPO}…")
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "LACRIMAE-G1"})
+        req = urllib.request.Request(url, headers={"User-Agent": "LACRIMAE-F00"})
         with urllib.request.urlopen(req, timeout=1800) as resp, open(dest, "wb") as f:
             total = 0
             while True:

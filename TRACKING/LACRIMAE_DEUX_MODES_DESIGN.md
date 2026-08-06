@@ -69,7 +69,7 @@ Repris de `gamma/F03_SIGISMUND/CODEBASE/src/components/Background.jsx` :
    stdlib). Il ne prend RIEN d'autre (ni zip, ni vidéo, ni PNG).
    --pack-filter optionnel (substring du nom) ; défaut : pack dont le nom
    reflète le mode (logo).
-2. CONTRÔLE CUSTOS (Gate 1 = v1) :
+2. CONTRÔLE CUSTOS (Contrôle 1 = v1) :
      - schéma cohérent + cut validés présents
      - vidéo locale déposée par l'opérateur (BRIDGE_PERTURABO/IN/ ou --video)
      - fonds PNG partagés présents (SHARED/IN/backgrounds/ — faits 1× pour toutes)
@@ -92,15 +92,15 @@ Repris de `gamma/F03_SIGISMUND/CODEBASE/src/components/Background.jsx` :
 | **1** | Réordonner `OmniComposition.jsx` en 6 calques + Background façon CRUSADER + presets global sur toute la scène | F03 + F04 `src/components/OmniComposition.jsx` (la même) | 🟢 FORGÉE |
 | **2** | Preview F03 "tout ajustable" : contrôles taille/position par calque, mode texte titre / titre+paragraphe | F03 `src/App.jsx` | 🟢 FORGÉE |
 | **3** | F02 : nouveau profil `--profile background` (découpe seule) — blur-pad/reframe intacts | `lac_f02_format.py` | 🟢 FORGÉE |
-| **4** | Bridge forge : LAC_BRIDGE + Gate 1 CUSTOS + mapping pack→codex | `BRIDGE_PERTURABO/CODEBASE/lac_bridge_forge.py` + LAC_RUN + GHA | 🟢 FORGÉE |
+| **4** | Bridge forge : LAC_BRIDGE + Contrôle 1 CUSTOS + mapping pack→codex | `BRIDGE_PERTURABO/CODEBASE/lac_bridge_forge.py` + LAC_RUN + GHA | 🟢 FORGÉE |
 | **5** | Validation : CUSTOS codex forge + test sur pack réel (Sandoval) | CUSTOS + tests | 🔵 TESTÉ (pack réel) |
 
 **Verifications passées (2026-08-05)** : `py_compile` sur les 4 scripts Python ✅ ·
 YAML workflow OK ✅ · esbuild JSX F03+F04 ✅ · bridge testé avec le pack réel
 Sandoval (5 vidéos, cuts validés, mapping title/paragraph/on_screen_text) ✅ ·
 CUSTOS codex forge v4.0 (session + 5 clips) ✅ · **3 bugs bloquants corrigés**
-(GHA `--forge-codex` au lieu de `--texts` cassé + persistance bridge G2→G3 + re-transit
-fond/logo à G4 ; F02 préserve la session du bridge ; `str(clip index)` pour les textes
+(GHA `--forge-codex` au lieu de `--texts` cassé + persistance bridge F01→F02 + re-transit
+fond/logo à F04 ; F02 préserve la session du bridge ; `str(clip index)` pour les textes
 par clip ; CUSTOS BRIDGE sans exigence de validation pré-Porte III ; `pack_mode` au
 bridge) — flux forge complet retesté sur pack synthétique 2 vidéos ✅ ·
 **ORACLE AUTONOME** : `LAC_RUN.py forge` sans `--pack` → le bridge va chercher le

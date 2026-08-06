@@ -84,21 +84,24 @@ marche déjà en production).
 
 ## GitHub Actions (production)
 
-Le pipeline tourne sur GitHub Actions, comme OMNIS-WATCH : **un run par porte**,
+Le pipeline tourne sur GitHub Actions, comme OMNIS-WATCH : **un run par frégate**
 déclenché depuis l'onglet **Actions → LACRIMAE Orchestrator → Run workflow**.
+L'Oracle exécute la frégate choisie ; le Champion valide aux **4 portes**
+(I BRIEF · II CUTLIST · III MONTAGE · IV PUBLICATION).
 
 **Multi-clips** : une seule vidéo longue produit jusqu'à **5 Shorts** par run —
 le codex.json contient un block de réglages PAR clip (titre, volume, couleurs,
 coup brutal). F04 rend une composition par clip, F05/F06 traitent les N clips.
 
-| Porte | Input `gate` | Ce qui s'exécute | Intervention du Champion |
-|-------|--------------|------------------|--------------------------|
-| G1 | BRIEF + INGEST | F00 (yt-dlp) | Fournit url/titre/sujet/vibe/params dans l'UI |
-| G2 | ORACLE | libre : F01 vision → cutlist · forge : BRIDGE **auto-récupère** le pack PERTURABO/EXPORT → cutlist | Vérifie/édite `F02_FORMAT/IN/cutlist.json` (UI GitHub) |
-| G3 | FORMAT | F02 blur-pad/reframe → codex multi-clips | Édite `F03_PREVIEW/IN/codex.json` (titre/volume/couleurs de chaque clip + `validated_by_magos: true`) |
-| G4 | RENDER | F04 Remotion → 1 rendu par clip (`clip_00X_finale.mp4`) | Télécharge l'artifact `lac-video-finale` |
-| G5 | CAMOUFLAGE + LUTHER | F05 → F06 → `clip_00X_clean.mp4` (N clips) | Télécharge l'artifact `lac-clean` |
-| CLOSE | Fermeture | Ledger final | — |
+| Porte | Input `fregate` | Ce qui s'exécute | Intervention du Champion |
+|-------|-----------------|------------------|--------------------------|
+| I | F00 | BRIEF + INGEST (yt-dlp) | Fournit url/titre/sujet/vibe/params dans l'UI (Porte I BRIEF) |
+| II | F01 | libre : F01 vision → cutlist · forge : BRIDGE **auto-récupère** le pack PERTURABO/EXPORT → cutlist | Vérifie/édite `F02_FORMAT/IN/cutlist.json` (UI GitHub, Porte II) |
+| III | F02 | FORMAT blur-pad/reframe → codex multi-clips | Édite `F03_PREVIEW/IN/codex.json` (titre/volume/couleurs de chaque clip + `validated_by_magos: true`, Porte III) |
+| III (suite) | F04 | RENDER Remotion → 1 rendu par clip (`clip_00X_finale.mp4`) | Télécharge l'artifact `lac-video-finale` |
+| IV | F05 | CAMOUFLAGE → `clip_00X_youtube.mp4` (N clips) | Télécharge `lac-youtube`, vérifie le camouflage (Porte IV) |
+| IV (suite) | F06 | LUTHER → `clip_00X_clean.mp4` (N clips) | Télécharge l'artifact `lac-clean` |
+| — | CLOSE | Fermeture | Ledger final |
 
 **Secrets/vars à configurer** (Settings → Secrets and variables) :
 - `ORACLE_API_KEY` (secret) — clé OpenRouter pour F01
@@ -124,20 +127,20 @@ dans le pack : la vidéo et les PNG.
    - < 100 Mo : SHARED/IN/video_source.mp4 (directement dans IN, gitignorée)
    - > 100 Mo : `sh _tools/lac_release_video.sh <video.mp4> [tag]` → la vidéo
      devient un asset de GitHub Release (2 Go max, illimité, gratuit) — chaque
-     porte (G1/G2/G3) la télécharge depuis la release. **Jamais via artifact**
+     frégate (F00/F01/F02) la télécharge depuis la release. **Jamais via artifact**
      (quota artifacts GHA = 500 Mo total en plan gratuit)
-3. Si ta vidéo ne couvre pas les cuts du pack : python3 _tools/make_pack_sa_video.py (cree BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json, cuts recalibres/textes conserves) ; en GHA : gate G2 avec mode=forge et pack_path=BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json — sinon : python LAC_RUN.py forge [--pack-filter SANDOVAL]
-   → l'Oracle récupère le pack, Gate 1 (pack + cuts + assets) → cutlist + codex v4
+3. Si ta vidéo ne couvre pas les cuts du pack : python3 _tools/make_pack_sa_video.py (cree BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json, cuts recalibres/textes conserves) ; en GHA : frégate F01 avec mode=forge et pack_path=BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json — sinon : python LAC_RUN.py forge [--pack-filter SANDOVAL]
+   → l'Oracle récupère le pack, Contrôle 1 (pack + cuts + assets) → cutlist + codex v4
 4. python LAC_RUN.py run       → F02 profil background (découpe seule)
 5. Preview F03 : choisir le fond PNG (menu déroulant), ajuster, valider → gate --codex
 6. python LAC_RUN.py run       → F04 → F05 → F06 → clean_final.mp4
 ```
 
-En GHA : `gate G1` (ingère la vidéo : URL → SHARED/IN/video_source.mp4 →
-Release GitHub, dans cet ordre) puis `gate G2` avec `mode: forge` suffit — le
+En GHA : frégate `F00` (ingère la vidéo : URL → SHARED/IN/video_source.mp4 →
+Release GitHub, dans cet ordre) puis frégate `F01` avec `mode: forge` suffit — le
 pack est auto-récupéré, les PNG viennent de `SHARED/IN/` (commités une fois
-pour toutes) et la vidéo est re-téléchargée depuis la Release à chaque porte
-(G2/G3 : Release d'abord, artifact en repli pour les vidéos < 400 Mo).
+pour toutes) et la vidéo est re-téléchargée depuis la Release à chaque frégate
+(F01/F02 : Release d'abord, artifact en repli pour les vidéos < 400 Mo).
 
 ## Démarrage rapide (local)
 

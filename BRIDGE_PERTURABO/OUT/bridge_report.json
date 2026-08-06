@@ -2,7 +2,7 @@
   "pack_id": "LOGO-TS01_SANDOVAL-SIEGE-LOGO-20260804T174153-SA_VIDEO",
   "mode": "logo",
   "videos_count": 5,
-  "gate1": "validated",
+  "controle1": "validated",
   "profile_f02": "background",
   "background": "bg_grid_dark.png",
   "backgrounds_available": [
@@ -28,7 +28,7 @@
         "end_sec": 30.0,
         "duration_sec": 30.0,
         "cut_source": "recut_video_operateur",
-        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 0.0-30.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Ouverture du scandale : visage + reaction la plus dense en emotion. VALIDE par le Warsmith (Gate 4)."
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 0.0-30.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Ouverture du scandale : visage + reaction la plus dense en emotion. VALIDE par le Warsmith (Porte IV)."
       }
     },
     {
@@ -39,7 +39,7 @@
         "end_sec": 67.5,
         "duration_sec": 30.0,
         "cut_source": "recut_video_operateur",
-        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 37.5-67.5s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Moment de bascule du recit (accusation/insultes). VALIDE par le Warsmith (Gate 4)."
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 37.5-67.5s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Moment de bascule du recit (accusation/insultes). VALIDE par le Warsmith (Porte IV)."
       }
     },
     {
@@ -50,7 +50,7 @@
         "end_sec": 105.0,
         "duration_sec": 30.0,
         "cut_source": "recut_video_operateur",
-        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 75.0-105.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Menace / escalade (leverage sur Tom). VALIDE par le Warsmith (Gate 4)."
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 75.0-105.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Menace / escalade (leverage sur Tom). VALIDE par le Warsmith (Porte IV)."
       }
     },
     {
@@ -61,7 +61,7 @@
         "end_sec": 142.5,
         "duration_sec": 30.0,
         "cut_source": "recut_video_operateur",
-        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 112.5-142.5s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Consequences legales (ordonnance, tribunal). VALIDE par le Warsmith (Gate 4)."
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 112.5-142.5s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Consequences legales (ordonnance, tribunal). VALIDE par le Warsmith (Porte IV)."
       }
     },
     {
@@ -72,7 +72,7 @@
         "end_sec": 180.0,
         "duration_sec": 30.0,
         "cut_source": "recut_video_operateur",
-        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 150.0-180.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Chute / retournement (deni de l'autre partie). VALIDE par le Warsmith (Gate 4)."
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 150.0-180.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Chute / retournement (deni de l'autre partie). VALIDE par le Warsmith (Porte IV)."
       }
     }
   ]

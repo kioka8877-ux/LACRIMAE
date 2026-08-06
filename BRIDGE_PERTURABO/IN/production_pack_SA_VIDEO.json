@@ -101,7 +101,7 @@
         "end_sec": 30.0,
         "duration_sec": 30.0,
         "cut_source": "recut_video_operateur",
-        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 0.0-30.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Ouverture du scandale : visage + reaction la plus dense en emotion. VALIDE par le Warsmith (Gate 4)."
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 0.0-30.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Ouverture du scandale : visage + reaction la plus dense en emotion. VALIDE par le Warsmith (Porte IV)."
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
       "on_screen_text": "SHE KICKED HIM IN FRONT OF HIS BAND"
@@ -128,7 +128,7 @@
         "end_sec": 67.5,
         "duration_sec": 30.0,
         "cut_source": "recut_video_operateur",
-        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 37.5-67.5s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Moment de bascule du recit (accusation/insultes). VALIDE par le Warsmith (Gate 4)."
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 37.5-67.5s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Moment de bascule du recit (accusation/insultes). VALIDE par le Warsmith (Porte IV)."
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
       "on_screen_text": "THE WORDS THAT BROKE HIM"
@@ -155,7 +155,7 @@
         "end_sec": 105.0,
         "duration_sec": 30.0,
         "cut_source": "recut_video_operateur",
-        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 75.0-105.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Menace / escalade (leverage sur Tom). VALIDE par le Warsmith (Gate 4)."
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 75.0-105.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Menace / escalade (leverage sur Tom). VALIDE par le Warsmith (Porte IV)."
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
       "on_screen_text": "'I'LL GET THE ARIANA TREATMENT'"
@@ -182,7 +182,7 @@
         "end_sec": 142.5,
         "duration_sec": 30.0,
         "cut_source": "recut_video_operateur",
-        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 112.5-142.5s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Consequences legales (ordonnance, tribunal). VALIDE par le Warsmith (Gate 4)."
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 112.5-142.5s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Consequences legales (ordonnance, tribunal). VALIDE par le Warsmith (Porte IV)."
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
       "on_screen_text": "HER AND HER DAD — BOTH NAMED"
@@ -209,7 +209,7 @@
         "end_sec": 180.0,
         "duration_sec": 30.0,
         "cut_source": "recut_video_operateur",
-        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 150.0-180.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Chute / retournement (deni de l'autre partie). VALIDE par le Warsmith (Gate 4)."
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 150.0-180.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Chute / retournement (deni de l'autre partie). VALIDE par le Warsmith (Porte IV)."
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
       "on_screen_text": "HER SIDE OF THE STORY"

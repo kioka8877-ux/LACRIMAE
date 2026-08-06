@@ -6,7 +6,7 @@
 # POURQUOI : git refuse les fichiers > 100 Mo (push) / > 25 Mo (web GitHub).
 # La vidéo source (~200 Mo → 1 Go) se dépose donc dans une Release :
 #   https://github.com/kioka8877-ux/LACRIMAE/releases
-# La porte G1 du workflow la télécharge automatiquement (asset video_source.mp4).
+# La frégate F00 du workflow la télécharge automatiquement (asset video_source.mp4).
 #
 # Usage (depuis la racine du repo, gh connecté au repo) :
 #   sh _tools/lac_release_video.sh /chemin/video.mp4 [tag]
@@ -28,7 +28,7 @@ fi
 SIZE_MB=$(du -m "$VIDEO" | cut -f1)
 echo "  [→] $VIDEO ($SIZE_MB Mo) → release '$TAG' de $REPO"
 
-# L'asset doit s'appeler exactement video_source.mp4 pour G1.
+# L'asset doit s'appeler exactement video_source.mp4 pour F00.
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 cp "$VIDEO" "$TMP_DIR/video_source.mp4"
@@ -42,8 +42,8 @@ else
   gh release create "$TAG" "$TMP_DIR/video_source.mp4" \
     --repo "$REPO" \
     --title "LACRIMAE — vidéo source ($TAG)" \
-    --notes "Vidéo source opérateur pour le pipeline (asset: video_source.mp4). G1 la télécharge automatiquement."
+    --notes "Vidéo source opérateur pour le pipeline (asset: video_source.mp4). F00 la télécharge automatiquement."
 fi
 
 echo "  [✓] Vidéo en ligne : https://github.com/$REPO/releases/tag/$TAG"
-echo "  [✓] Lance maintenant la porte G1 (sans URL) : elle récupérera la vidéo depuis cette release."
+echo "  [✓] Lance maintenant la frégate F00 (sans URL) : elle récupérera la vidéo depuis cette release."

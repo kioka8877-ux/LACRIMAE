@@ -17,7 +17,7 @@ Flux :
      défaut, GITHUB_TOKEN supporté), télécharge le production_pack_*.json le
      plus récent (ou filtré par --pack-filter) → BRIDGE_PERTURABO/IN/.
   2. Contrôle (CUSTOS) : schéma du pack + cuts validés + présence de la vidéo
-     locale, des fonds partagés et du logo → GATE 1 (notre v1).
+     locale, des fonds partagés et du logo → CONTRÔLE 1 (notre v1).
   3. Mapping pack → artefacts LACRIMAE :
        videos[].cut.start_sec/end_sec → F02_FORMAT/IN/cutlist.json
        videos[].title / viral_paragraph / on_screen_text → texts par clip
@@ -104,7 +104,7 @@ PERTURABO_BRANCH = "main"
 def log_ok(msg): print(f"  [✓] {msg}")
 def log_err(msg): print(f"  [✗] {msg}")
 def log_warn(msg): print(f"  [!] {msg}")
-def log_gate(msg): print(f"\n  ╔══ PORTE ══ {msg} ══╗")
+def log_controle(msg): print(f"\n  ╔══ CONTRÔLE ══ {msg} ══╗")
 
 
 def section(title):
@@ -185,7 +185,7 @@ def fetch_pack_from_perturabo(repo=PERTURABO_REPO, export_path=PERTURABO_EXPORT_
     return pack_dest
 
 
-# ─── GATE 1 : validation du pack ─────────────────────────────────────────────
+# ─── CONTRÔLE 1 : validation du pack ─────────────────────────────────────────
 
 def validate_pack(pack: dict) -> list:
     """Retourne la liste des erreurs (vide = pack OK). Accepte le pack EXPORT
@@ -261,10 +261,10 @@ def pack_to_texts(pack: dict) -> dict:
     return texts_map
 
 
-# ─── GATE 1 : vérification des assets OPÉRATEUR ──────────────────────────────
+# ─── CONTRÔLE 1 : vérification des assets OPÉRATEUR ──────────────────────────
 
 def check_assets(video_path, shared_backgrounds, logo_path) -> list:
-    """Vérifie la présence des assets fournis par l'opérateur (Gate 1).
+    """Vérifie la présence des assets fournis par l'opérateur (Contrôle 1).
     Retourne les manquants."""
     missing = []
     if not video_path.exists():
@@ -296,8 +296,8 @@ def check_cuts_within_duration(pack: dict, video_path) -> list:
     Retourne les erreurs (vide = OK).
 
     Pourquoi : sans ce contrôle, un cut au-delà de la durée produit un clip VIDE
-    à G3 (ffmpeg -ss 200 sur une vidéo de 182s) — l'opérateur découvrirait le
-    problème hors porte. La garde bloque à GATE 1 avec un message clair : la
+    à F02 (ffmpeg -ss 200 sur une vidéo de 182s) — l'opérateur découvrirait le
+    problème hors porte. La garde bloque au CONTRÔLE 1 avec un message clair : la
     vidéo fournie ne correspond pas au pack (clip_source_ref)."""
     errors = []
     duration = probe_video_duration(video_path)
@@ -485,7 +485,7 @@ def main():
     args = parser.parse_args()
 
     section("LAC_BRIDGE_FORGE — import du pack Perturabo")
-    log_gate("GATE 1 — CONTRÔLE DU PACK")
+    log_controle("CONTRÔLE 1 — VALIDATION DU PACK")
 
     # 0. Pack : local fourni OU auto-récupéré depuis PERTURABO/EXPORT (Oracle)
     if args.pack:
@@ -506,7 +506,7 @@ def main():
     if errors:
         for e in errors:
             log_err(e)
-        print("\n  ══ GATE 1 : ✗ ÉCHOUÉ — corriger le pack ══")
+        print("\n  ══ CONTRÔLE 1 : ✗ ÉCHOUÉ — corriger le pack ══")
         sys.exit(1)
     log_ok(f"Pack valide : {pack.get('pack_id', '?')} | mode={pack.get('mode', '?')} | "
            f"{len(pack.get('videos', []))} vidéo(s)")
@@ -531,7 +531,7 @@ def main():
     if missing:
         for m in missing:
             log_err(m)
-        print("\n  ══ GATE 1 : ✗ ÉCHOUÉ — assets opérateur manquants ══")
+        print("\n  ══ CONTRÔLE 1 : ✗ ÉCHOUÉ — assets opérateur manquants ══")
         print("  Le bridge ne prend QUE le pack depuis Perturabo. Fournis :")
         print(f"    - vidéo → {SHARED_VIDEO_SOURCE} (directement dans SHARED/IN)")
         print(f"    - fonds → {SHARED_BACKGROUNDS_DIR}/ (PNG, une fois pour toutes)")
@@ -539,12 +539,12 @@ def main():
         sys.exit(1)
 
     # Garde durée : TOUS les cuts du pack doivent être dans la vidéo fournie.
-    # (Sinon G3 produirait des clips vides — l'opérateur n'agit qu'aux portes.)
+    # (Sinon F02 produirait des clips vides — l'opérateur n'agit qu'aux portes.)
     cut_errors = check_cuts_within_duration(pack, video_path)
     if cut_errors:
         for e in cut_errors:
             log_err(e)
-        print("\n  ══ GATE 1 : ✗ ÉCHOUÉ — vidéo incompatible avec les cuts du pack ══")
+        print("\n  ══ CONTRÔLE 1 : ✗ ÉCHOUÉ — vidéo incompatible avec les cuts du pack ══")
         print("  Le pack référence une source précise (clip_source_ref) — la vidéo")
         print("  fournie doit la couvrir intégralement. Remplace-la dans la release :")
         print("    sh _tools/lac_release_video.sh <bonne_video.mp4> [tag]")
@@ -553,7 +553,7 @@ def main():
     log_ok(f"Assets opérateur : vidéo ✓ | {len(shared_backgrounds)} fond(s) "
            f"(défaut {background_name}) ✓ | logo {'✓' if logo_path else '— (sans logo)'}")
 
-    print("\n  ══ GATE 1 : ✓ VALIDÉ — pack + assets prêts ══")
+    print("\n  ══ CONTRÔLE 1 : ✓ VALIDÉ — pack + assets prêts ══")
 
     if args.dry_run:
         print("\n[DRY-RUN] Plan :")
@@ -592,7 +592,7 @@ def main():
         "pack_id": pack.get("pack_id"),
         "mode": pack.get("mode"),
         "videos_count": len(pack.get("videos", [])),
-        "gate1": "validated",
+        "controle1": "validated",
         "profile_f02": "background",
         "background": background_name,
         "backgrounds_available": [b.name for b in shared_backgrounds],

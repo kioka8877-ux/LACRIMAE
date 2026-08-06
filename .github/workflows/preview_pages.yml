@@ -2,7 +2,7 @@
 # Déploie la preview de montage (Porte III) sur https://kioka8877-ux.github.io/LACRIMAE/
 #
 # Sources de vérité (trackées dans le repo) :
-#   F03_PREVIEW/IN/codex.json          — codex (session + clips) [commité à G3 / manuel]
+#   F03_PREVIEW/IN/codex.json          — codex (session + clips) [commité à F02 / manuel]
 #   F03_PREVIEW/IN/clips/clip_001.mp4  — le clip coupé 9:16 (le SEUL chargé par la preview)
 #   SHARED/IN/backgrounds/*.png        — fonds PNG (faits une fois pour toutes)
 #   SHARED/IN/logos/logo.png           — logo campagne (optionnel)
@@ -11,7 +11,7 @@
 # Déclencheurs :
 #   - workflow_dispatch : déploiement manuel (ex. après validation du codex)
 #   - workflow_run      : après chaque run de l'orchestrateur — si le run a produit
-#                         l'artifact lac-clips (G3), le clip frais est pris en priorité
+#                         l'artifact lac-clips (F02), le clip frais est pris en priorité
 #   - push              : à chaque commit de codex / clip / fonds / logo / code preview
 #
 # ⚠️ Prérequis (une seule fois) : Settings → Pages → Source = "GitHub Actions"
@@ -54,7 +54,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Récupérer les clips du run orchestrateur (si run G3)
+      - name: Récupérer les clips du run orchestrateur (si run F02)
         if: github.event_name == 'workflow_run'
         continue-on-error: true
         uses: actions/download-artifact@v4

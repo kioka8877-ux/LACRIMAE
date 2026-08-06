@@ -21,7 +21,7 @@ Usage :
                           [--profile blur-pad|reframe|background] [--preset punchy]
   python LAC_RUN.py forge [--pack <production_pack.json>] [--pack-filter SANDOVAL]
                           [--video ...] [--dry-run]
-                          # MODE FORGE (Gate 1) — sans --pack, l'ORACLE va chercher
+                          # MODE FORGE (Contrôle 1) — sans --pack, l'ORACLE va chercher
                           # le pack SEUL dans PERTURABO/EXPORT ; vidéo + PNG = à toi
   python LAC_RUN.py run                     # exécute jusqu'à la prochaine porte
   python LAC_RUN.py gate --cutlist|--codex|--publish
@@ -298,7 +298,7 @@ def run_f00(ledger):
 
 
 def run_bridge(ledger):
-    """Mode forge : exécute le bridge LAC_BRIDGE_FORGE (Gate 1).
+    """Mode forge : exécute le bridge LAC_BRIDGE_FORGE (Contrôle 1).
     L'ORACLE est AUTONOME : sans --pack, le bridge va chercher le pack SEUL
     dans PERTURABO/EXPORT (production_pack_*.json) — rien d'autre."""
     brief = ledger["brief"] or {}
@@ -449,7 +449,7 @@ def cmd_init(args):
 
 def cmd_forge(args):
     """Mode forge — l'ORACLE va chercher le pack Perturabo (EXPORT/) tout seul,
-    valide la Gate 1 (pack + vidéo + fond + logo), écrit cutlist + codex v4.0
+    valide le Contrôle 1 (pack + vidéo + fond + logo), écrit cutlist + codex v4.0
     forge et transite vers F02/F03/F04. Sans --pack : auto-récupération."""
     ledger = load_ledger()
     ledger["brief"] = {
@@ -487,7 +487,7 @@ def cmd_forge(args):
         sys.exit(1)
     mark(ledger, "BRIDGE", "done", custos="check-out")
     save_ledger(ledger)
-    log_ok("BRIDGE scellé — Gate 1 franchie (pack validé, artefacts transités)")
+    log_ok("BRIDGE scellé — Contrôle 1 validé (pack validé, artefacts transités)")
     log_gate("II — valide la cutlist puis : LAC_RUN.py gate --cutlist (mode forge)")
 
 
@@ -646,7 +646,7 @@ def main():
     p_init.add_argument("--logo", default=None, help="Forge : logo transparent campagne")
     p_init.add_argument("--dry-run", action="store_true", help="Forge : plan sans écrire")
 
-    p_forge = sub.add_parser("forge", help="Mode forge — lancer le bridge Perturabo (Gate 1)")
+    p_forge = sub.add_parser("forge", help="Mode forge — lancer le bridge Perturabo (Contrôle 1)")
     p_forge.add_argument("--pack", default=None,
                          help="Chemin production_pack.json — SI ABSENT, l'Oracle va le "
                               "chercher SEUL dans PERTURABO/EXPORT")
