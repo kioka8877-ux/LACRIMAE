@@ -48,9 +48,15 @@ on:
         required: false
         default: '10'
       profile:
-        description: 'Profil F02 (blur-pad|reframe) (G1 only)'
+        description: 'Profil F02 (blur-pad|reframe|background) (G1 only)'
         required: false
         default: 'blur-pad'
+      pack_path:
+        description: 'Pack local optionnel (forge only) — SI ABSENT, l''Oracle va chercher le pack SEUL dans PERTURABO/EXPORT'
+        required: false
+      pack_filter:
+        description: 'Filtre du pack auto-récupéré (forge only, substring du nom, ex: SANDOVAL)'
+        required: false
       preset:
         description: 'Preset couleurs codex (G1 only)'
         required: false
@@ -58,6 +64,10 @@ on:
       model:
         description: 'Modèle vision OpenRouter (override)'
         required: false
+      mode:
+        description: 'Mode pipeline (libre|forge)'
+        required: false
+        default: 'libre'
 
 permissions:
   contents: write
@@ -162,16 +172,40 @@ jobs:
           fi
           echo "PORTE II: vérifie/édite F02_FORMAT/IN/cutlist.json (après G2), puis relance avec gate G2"
 
-      # ──────────────────────────── G2 : ORACLE ──────────────────────────────
+      # ──────────────────────────── G2 : ORACLE ou FORGE ──────────────────────
 
       - name: G2 - Download video
         if: github.event.inputs.gate == 'G2'
         run: |
-          mkdir -p F01_SELECT/IN
-          python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F01_SELECT/IN/ "$BRANCH"
+          mkdir -p F01_SELECT/IN F02_FORMAT/IN
+          python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F02_FORMAT/IN/ "$BRANCH"
+          if [ "${{ github.event.inputs.mode }}" == "libre" ]; then
+            cp F02_FORMAT/IN/video_source.mp4 F01_SELECT/IN/video_source.mp4
+          fi
 
-      - name: G2 - Oracle (vision)
-        if: github.event.inputs.gate == 'G2'
+      # Mode FORGE : l'ORACLE va chercher le pack SEUL dans PERTURABO/EXPORT
+      # (production_pack_*.json). Le bridge ne prend RIEN d'autre : la vidéo
+      # vient de l'artifact G1, les fonds de SHARED/IN/backgrounds/ (faits une
+      # fois pour toutes) et le logo de SHARED/IN/logos/logo.png.
+      # F01 (vision) est SAUTÉE — les cuts viennent du pack Perturabo.
+      - name: G2 - Forge bridge (Gate 1)
+        if: github.event.inputs.gate == 'G2' && github.event.inputs.mode == 'forge'
+        env:
+          PACK: ${{ github.event.inputs.pack_path }}
+          PACK_FILTER: ${{ github.event.inputs.pack_filter }}
+        run: |
+          PACK_ARG=""
+          if [ -n "$PACK" ]; then PACK_ARG="--pack $PACK"; fi
+          PACK_FILTER_ARG=""
+          if [ -n "$PACK_FILTER" ]; then PACK_FILTER_ARG="--pack-filter $PACK_FILTER"; fi
+          python3 BRIDGE_PERTURABO/CODEBASE/lac_bridge_forge.py \
+            $PACK_ARG $PACK_FILTER_ARG \
+            --video F02_FORMAT/IN/video_source.mp4
+          mkdir -p F02_FORMAT/IN
+          cp BRIDGE_PERTURABO/OUT/cutlist.json F02_FORMAT/IN/cutlist.json
+
+      - name: G2 - Oracle (vision) — mode libre
+        if: github.event.inputs.gate == 'G2' && github.event.inputs.mode != 'forge'
         env:
           ORACLE_API_KEY: ${{ secrets.ORACLE_API_KEY }}
           ORACLE_MODEL: ${{ vars.ORACLE_MODEL }}
@@ -194,20 +228,31 @@ jobs:
             --input ../IN/ --output ../OUT/ \
             --sequences "$SEQUENCES" --min-dur "$MIN_DUR" --max-dur "$MAX_DUR" \
             --brief "$BRIEF_TXT" $MODEL_ARG
+          cp ../OUT/cutlist.json ../../F02_FORMAT/IN/cutlist.json
 
-      - name: G2 - Gardien F01
+      - name: G2 - Gardien F01/BRIDGE
         if: github.event.inputs.gate == 'G2'
-        run: python3 LAC_CUSTOS.py --frigate F01 --mode check-out --drive-base .
+        run: |
+          if [ "${{ github.event.inputs.mode }}" == "forge" ]; then
+            python3 LAC_CUSTOS.py --frigate BRIDGE --mode check-out --drive-base .
+          else
+            python3 LAC_CUSTOS.py --frigate F01 --mode check-out --drive-base .
+          fi
 
       - name: G2 - Commit cutlist (éditable par le Champion)
         if: github.event.inputs.gate == 'G2'
         run: |
-          mkdir -p F02_FORMAT/IN
-          cp F01_SELECT/OUT/cutlist.json F02_FORMAT/IN/cutlist.json
           python3 _tools/update_ledger.py G2
           git config user.name "lacrimae-orchestrator"
           git config user.email "orchestrator@lacrimae"
-          git add F02_FORMAT/IN/cutlist.json TRACKING/LACRIMAE_LEDGER.json
+          # En mode forge : le codex bridge (session + textes du pack) + le pack
+          # auto-récupéré sont commités pour survivre jusqu'à G3 (run séparé —
+          # le workspace ne persiste pas)
+          if [ "${{ github.event.inputs.mode }}" == "forge" ]; then
+            git add F02_FORMAT/IN/cutlist.json BRIDGE_PERTURABO/OUT/ BRIDGE_PERTURABO/IN/production_pack.json TRACKING/LACRIMAE_LEDGER.json
+          else
+            git add F02_FORMAT/IN/cutlist.json TRACKING/LACRIMAE_LEDGER.json
+          fi
           git commit -m "ledger: gate G2 — cutlist [skip ci]" || echo "No change"
           git push
           echo "PORTE II FRANCHIE. Si besoin: édite F02_FORMAT/IN/cutlist.json dans l'UI GitHub"
@@ -217,7 +262,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lac-cutlist
-          path: F01_SELECT/OUT/cutlist.json
+          path: F02_FORMAT/IN/cutlist.json
 
       # ──────────────────────────── G3 : FORMAT ──────────────────────────────
 
@@ -227,15 +272,25 @@ jobs:
           mkdir -p F02_FORMAT/IN
           python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F02_FORMAT/IN/ "$BRANCH"
 
-      - name: G3 - Format (blur-pad/reframe)
+      - name: G3 - Format (blur-pad/reframe/background)
         if: github.event.inputs.gate == 'G3'
+        env:
+          MODE: ${{ github.event.inputs.mode }}
         run: |
           cd F02_FORMAT/CODEBASE
           PROFILE=$(python3 -c "import json; print(json.load(open('../../TRACKING/LACRIMAE_BRIEF.json')).get('profile','blur-pad'))")
           PRESET=$(python3 -c "import json; print(json.load(open('../../TRACKING/LACRIMAE_BRIEF.json')).get('preset','punchy'))")
           TITLE=$(python3 -c "import json; print(json.load(open('../../TRACKING/LACRIMAE_BRIEF.json')).get('title',''))")
+          MODE_ARG=""
+          FORGE_CODEX_ARG=""
+          if [ "$MODE" == "forge" ] && [ -f "../../BRIDGE_PERTURABO/OUT/codex.json" ]; then
+            MODE_ARG="--mode forge"
+            # F02 lit le codex bridge : préserve la session (fond PNG/logo) et
+            # reprend les textes par clip du pack — pas de quoting JSON en shell
+            FORGE_CODEX_ARG="--forge-codex ../../BRIDGE_PERTURABO/OUT/codex.json"
+          fi
           python3 lac_f02_format.py --input ../IN/ --output ../OUT/ \
-            --profile "$PROFILE" --preset "$PRESET" --title "$TITLE"
+            --profile "$PROFILE" --preset "$PRESET" --title "$TITLE" $MODE_ARG $FORGE_CODEX_ARG
 
       - name: G3 - Gardien F02
         if: github.event.inputs.gate == 'G3'
@@ -273,13 +328,28 @@ jobs:
           python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-clips F04_RENDER/CODEBASE/public/ "$BRANCH"
           cp F04_RENDER/CODEBASE/public/*.mp4 F04_RENDER/IN/clips/
 
-      - name: G4 - Copy codex validé + logo
+      - name: G4 - Copy codex validé + logo + fond PNG
         if: github.event.inputs.gate == 'G4'
         run: |
           cp F03_PREVIEW/IN/codex.json F04_RENDER/IN/codex.json
           cp F03_PREVIEW/IN/codex.json F04_RENDER/CODEBASE/public/codex.json
           if [ -f SHARED/IN/logos/logo.png ]; then
             cp SHARED/IN/logos/logo.png F04_RENDER/CODEBASE/public/logo.png
+          fi
+          # Mode forge : les PNG partagés (SHARED/IN/backgrounds/ + logos/, faits
+          # une fois pour toutes par l'opérateur) sont re-transités vers public/
+          # des F03+F04 (public/ est gitignoré) + manifest.json (menu déroulant)
+          if [ "${{ github.event.inputs.mode }}" == "forge" ]; then
+            mkdir -p F04_RENDER/CODEBASE/public/backgrounds F03_PREVIEW/CODEBASE/public/backgrounds
+            if compgen -G "SHARED/IN/backgrounds/*.png" > /dev/null; then
+              cp SHARED/IN/backgrounds/*.png F04_RENDER/CODEBASE/public/backgrounds/
+              cp SHARED/IN/backgrounds/*.png F03_PREVIEW/CODEBASE/public/backgrounds/
+              python3 -c "import json,pathlib; files=sorted(p.name for p in pathlib.Path('SHARED/IN/backgrounds').glob('*.png')); [ (pathlib.Path(d)/'manifest.json').write_text(json.dumps({'files':files}), encoding='utf-8') for d in ('F04_RENDER/CODEBASE/public/backgrounds','F03_PREVIEW/CODEBASE/public/backgrounds') ]"
+            fi
+            if [ -f SHARED/IN/logos/logo.png ]; then
+              cp SHARED/IN/logos/logo.png F04_RENDER/CODEBASE/public/logo.png
+              cp SHARED/IN/logos/logo.png F03_PREVIEW/CODEBASE/public/logo.png
+            fi
           fi
 
       - name: G4 - Gardien F04 (check-in)

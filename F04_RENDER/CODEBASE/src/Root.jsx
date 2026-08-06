@@ -4,9 +4,12 @@ import { OmniComposition } from './components/OmniComposition';
 import { codex } from './codexData';
 
 // Codex multi-clips : une Composition par clip — jusqu'à N Shorts par vidéo longue.
-// Chaque clip porte son propre block de réglages (titre, volume, couleurs...).
+// Chaque clip porte son propre block de contenu (titre, paragraphe, cut) ;
+// le bloc `session` (style global : fond, logo, textes, presets) est partagé
+// par TOUS les clips de la session (v4.0).
 export const Root = () => {
   const clips = codex.clips && codex.clips.length > 0 ? codex.clips : [codex];
+  const session = codex.session || {};
 
   return (
     <>
@@ -26,6 +29,7 @@ export const Root = () => {
             height={height}
             props={{
               codex: clip,
+              session,
             }}
           />
         );

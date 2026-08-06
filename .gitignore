@@ -6,9 +6,11 @@ F01_SELECT/OUT/
 F02_FORMAT/OUT/
 F03_PREVIEW/OUT/
 F03_PREVIEW/CODEBASE/public/
+F03_PREVIEW/CODEBASE/dist/
 F03_PREVIEW/CODEBASE/node_modules/
 F04_RENDER/OUT/
 F04_RENDER/CODEBASE/public/
+F04_RENDER/CODEBASE/dist/
 F04_RENDER/CODEBASE/node_modules/
 F05_CAMOUFLAGE/IN/
 F05_CAMOUFLAGE/OUT/
@@ -18,7 +20,10 @@ SHARED/OUT/
 
 # Médias volumineux transitant par les IN/ commités (cutlist/codex/manifest restent trackés)
 F02_FORMAT/IN/video_source.mp4
-F03_PREVIEW/IN/clips/
+# F03_PREVIEW/IN/clips : seul clip_001.mp4 est tracke (le clip 9:16 de la preview
+# F03, leger) — il alimente la preview GitHub Pages. Les autres restent ignores.
+F03_PREVIEW/IN/clips/*
+!F03_PREVIEW/IN/clips/clip_001.mp4
 F04_RENDER/IN/clips/
 
 # Ledger de production (état volatile — la mémoire nomade du run en cours)
@@ -27,3 +32,10 @@ TRACKING/LEDGER_DEV.json
 # Cache Python
 __pycache__/
 *.pyc
+
+# Mode forge — IN/ et OUT/ du bridge sont commités par le flux GHA :
+#  - IN/  : l'opérateur commite production_pack.json + fond.png + logo.png
+#  - OUT/ : le workflow commite cutlist.json + codex.json à G2 (persistance
+#           inter-run jusqu'à G3). Seuls les gros médias sont ignorés.
+BRIDGE_PERTURABO/IN/video_source.mp4
+BRIDGE_PERTURABO/IN/*.mp4

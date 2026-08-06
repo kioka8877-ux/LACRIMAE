@@ -18,7 +18,11 @@ PORTES :
 Usage :
   python LAC_RUN.py init  --source <url|file> --title "..." --sujet "..." [--vibe "..."]
                           [--sequences 2] [--min-dur 3] [--max-dur 10]
-                          [--profile blur-pad] [--preset punchy]
+                          [--profile blur-pad|reframe|background] [--preset punchy]
+  python LAC_RUN.py forge [--pack <production_pack.json>] [--pack-filter SANDOVAL]
+                          [--video ...] [--dry-run]
+                          # MODE FORGE (Gate 1) — sans --pack, l'ORACLE va chercher
+                          # le pack SEUL dans PERTURABO/EXPORT ; vidéo + PNG = à toi
   python LAC_RUN.py run                     # exécute jusqu'à la prochaine porte
   python LAC_RUN.py gate --cutlist|--codex|--publish
   python LAC_RUN.py status
@@ -48,8 +52,12 @@ LOGO_SOURCE = ROOT / "SHARED" / "IN" / "logos" / "logo.png"
 DEFAULT_MODEL = os.environ.get("ORACLE_MODEL", "google/gemini-2.0-flash-exp:free")
 
 # Chaîne d'exécution : F03 n'a pas de script — c'est la porte III (preview manuelle)
-RUN_ORDER = ["F00", "F01", "F02", "F04", "F05", "F06"]
-GATE_AFTER = {"F01": "gate2_cutlist", "F02": "gate3_codex", "F05": "gate4_publish"}
+# Mode libre : F00 → F01 → F02 → F04 → F05 → F06 (F01 = vision OpenRouter)
+# Mode forge : BRIDGE → F02 → F04 → F05 → F06 (F01 SAUTÉE — cuts du pack Perturabo)
+RUN_ORDER_LIBRE = ["F00", "F01", "F02", "F04", "F05", "F06"]
+RUN_ORDER_FORGE = ["BRIDGE", "F02", "F04", "F05", "F06"]
+GATE_AFTER = {"F01": "gate2_cutlist", "F02": "gate3_codex", "F05": "gate4_publish",
+              "BRIDGE": "gate2_cutlist"}
 
 FRIGATE_PATHS = {
     "F00": ROOT / "F00_INGEST",
@@ -59,6 +67,7 @@ FRIGATE_PATHS = {
     "F04": ROOT / "F04_RENDER",
     "F05": ROOT / "F05_CAMOUFLAGE",
     "F06": ROOT / "F06_LUTHER",
+    "BRIDGE": ROOT / "BRIDGE_PERTURABO",
 }
 
 
@@ -85,7 +94,7 @@ def empty_ledger():
         },
         "frigates": {
             f: {"status": "pending", "at": None, "custos": None}
-            for f in ["F00", "F01", "F02", "F03", "F04", "F05", "F06"]
+            for f in ["BRIDGE", "F00", "F01", "F02", "F03", "F04", "F05", "F06"]
         },
     }
 
@@ -159,6 +168,17 @@ def copy_artefact(src: Path, dst: Path) -> bool:
 
 # ─── TRANSITS (copies inter-frégates) ────────────────────────────────────────
 
+def transit_bridge(ledger):
+    """BRIDGE → F02/IN : la cutlist + la vidéo transitent par F02.
+    (Le bridge écrit déjà directement dans F02/IN + F03/F04 public.)"""
+    bridge = FRIGATE_PATHS["BRIDGE"]
+    f02 = FRIGATE_PATHS["F02"]
+    return all([
+        copy_artefact(bridge / "OUT" / "cutlist.json", f02 / "IN" / "cutlist.json"),
+        copy_artefact(bridge / "OUT" / "codex.json", f02 / "OUT" / "codex.json"),
+    ])
+
+
 def transit_f00(ledger):
     f00, f01, f02 = FRIGATE_PATHS["F00"], FRIGATE_PATHS["F01"], FRIGATE_PATHS["F02"]
     video = f00 / "OUT" / "video_source.mp4"
@@ -190,6 +210,11 @@ def transit_f02(ledger):
         if LOGO_SOURCE.exists():
             ok = copy_artefact(LOGO_SOURCE, target / "CODEBASE" / "public" / "logo.png") and ok
     return ok
+    # Clip 001 (le SEUL charge par la preview F03) : copie vers le dossier tracke
+    # IN/clips/ pour que la preview GitHub Pages puisse le servir.
+    clip001 = next((c for c in clips if c.name == "clip_001.mp4"), None)
+    if clip001 is not None:
+        ok = copy_artefact(clip001, FRIGATE_PATHS["F03"] / "IN" / "clips" / "clip_001.mp4") and ok
 
 
 def transit_f03(ledger):
@@ -252,6 +277,7 @@ def transit_f06(ledger):
 
 
 TRANSITS = {
+    "BRIDGE": transit_bridge,
     "F00": transit_f00, "F01": transit_f01, "F02": transit_f02,
     "F03": transit_f03, "F04": transit_f04, "F05": transit_f05, "F06": transit_f06,
 }
@@ -268,6 +294,32 @@ def run_f00(ledger):
         cmd += ["--url", brief["source"]]
     else:
         cmd += ["--file", brief["source"]]
+    return run_cli(cmd)
+
+
+def run_bridge(ledger):
+    """Mode forge : exécute le bridge LAC_BRIDGE_FORGE (Gate 1).
+    L'ORACLE est AUTONOME : sans --pack, le bridge va chercher le pack SEUL
+    dans PERTURABO/EXPORT (production_pack_*.json) — rien d'autre."""
+    brief = ledger["brief"] or {}
+    bridge = FRIGATE_PATHS["BRIDGE"]
+    script = bridge / "CODEBASE" / "lac_bridge_forge.py"
+    cmd = [sys.executable, str(script)]
+    if brief.get("source"):
+        cmd += ["--pack", brief["source"]]
+    if brief.get("pack_filter"):
+        cmd += ["--pack-filter", brief["pack_filter"]]
+    if brief.get("video"):
+        cmd += ["--video", brief["video"]]
+    if brief.get("background"):
+        cmd += ["--background", brief["background"]]
+    if brief.get("logo"):
+        cmd += ["--logo", brief["logo"]]
+    # pack_mode = mode du pack (logo|libre) — PAS le mode pipeline (forge)
+    if brief.get("pack_mode"):
+        cmd += ["--mode", brief["pack_mode"]]
+    if brief.get("dry_run"):
+        cmd += ["--dry-run"]
     return run_cli(cmd)
 
 
@@ -304,6 +356,14 @@ def run_f02(ledger):
     ]
     if brief.get("title"):
         cmd += ["--title", brief["title"]]
+    cmd += ["--mode", brief.get("mode", "libre")]
+    # Mode forge : F02 lit le codex bridge (session + textes par clip) pour
+    # préserver le fond PNG/logo/presets du bridge et les textes du pack
+    if brief.get("mode") == "forge":
+        bridge_codex = FRIGATE_PATHS["BRIDGE"] / "OUT" / "codex.json"
+        if bridge_codex.exists():
+            cmd += ["--forge-codex", str(bridge_codex)]
+            log_ok(f"Forge : codex bridge passé à F02 ({bridge_codex})")
     return run_cli(cmd)
 
 
@@ -350,7 +410,7 @@ def run_f06(ledger):
     return run_cli(cmd)
 
 
-RUNNERS = {"F00": run_f00, "F01": run_f01, "F02": run_f02, "F04": run_f04, "F05": run_f05, "F06": run_f06}
+RUNNERS = {"BRIDGE": run_bridge, "F00": run_f00, "F01": run_f01, "F02": run_f02, "F04": run_f04, "F05": run_f05, "F06": run_f06}
 
 
 # ─── COMMANDES ───────────────────────────────────────────────────────────────
@@ -361,6 +421,7 @@ def cmd_init(args):
         log_err("--source requis (URL YouTube ou chemin fichier local)")
         sys.exit(1)
     ledger["brief"] = {
+        "mode": args.mode,
         "source": args.source,
         "source_type": "youtube" if args.source.startswith("http") else "file",
         "title": args.title or "",
@@ -372,6 +433,11 @@ def cmd_init(args):
         "profile": args.profile,
         "preset": args.preset,
         "model": args.model,
+        "video": args.video,
+        "background": args.background,
+        "logo": args.logo,
+        "pack_mode": None,
+        "dry_run": args.dry_run,
     }
     sign_gate(ledger, "gate1_brief")
     save_ledger(ledger)
@@ -381,21 +447,72 @@ def cmd_init(args):
     log_gate("II CUTLIST — LAC_RUN.py run puis gate --cutlist")
 
 
+def cmd_forge(args):
+    """Mode forge — l'ORACLE va chercher le pack Perturabo (EXPORT/) tout seul,
+    valide la Gate 1 (pack + vidéo + fond + logo), écrit cutlist + codex v4.0
+    forge et transite vers F02/F03/F04. Sans --pack : auto-récupération."""
+    ledger = load_ledger()
+    ledger["brief"] = {
+        "mode": "forge",
+        "source": args.pack,          # pack local optionnel (sinon auto-fetch EXPORT/)
+        "source_type": "forge_pack",
+        "pack_filter": args.pack_filter,
+        "title": "",
+        "sujet": "",
+        "vibe": "",
+        "profile": "background",     # forge : découpe seule, pas de blur
+        "preset": "punchy",
+        "sequences": 0,
+        "min_dur": 0,
+        "max_dur": 0,
+        "model": None,
+        "video": args.video,
+        "background": args.background,
+        "logo": args.logo,
+        "pack_mode": args.mode,
+        "dry_run": args.dry_run,
+    }
+    sign_gate(ledger, "gate1_brief")
+    save_ledger(ledger)
+
+    section("MODE FORGE PERTURABO — GATE 1 (bridge)")
+    if not run_bridge(ledger):
+        log_err("BRIDGE a échoué — corrige (assets manquants ? pack invalide ?) puis relance")
+        sys.exit(1)
+    if not custos("BRIDGE", "check-out"):
+        log_err("BRIDGE : verdict CUSTOS négatif")
+        sys.exit(1)
+    if not transit_bridge(ledger):
+        log_err("BRIDGE : transit échoué")
+        sys.exit(1)
+    mark(ledger, "BRIDGE", "done", custos="check-out")
+    save_ledger(ledger)
+    log_ok("BRIDGE scellé — Gate 1 franchie (pack validé, artefacts transités)")
+    log_gate("II — valide la cutlist puis : LAC_RUN.py gate --cutlist (mode forge)")
+
+
 def cmd_gate(args):
     ledger = load_ledger()
     if ledger["brief"] is None:
         log_err("Pas de brief — lance d'abord : LAC_RUN.py init ...")
         sys.exit(1)
+    is_forge = (ledger["brief"] or {}).get("mode") == "forge"
     if args.cutlist:
         section("PORTE II — CUTLIST")
-        if not custos("F01", "check-out"):
+        # Mode forge : la cutlist vient du pack (BRIDGE), pas de F01 (vision sautée)
+        src_frigate = "BRIDGE" if is_forge else "F01"
+        if not custos(src_frigate, "check-out"):
             sys.exit(1)
-        if not transit_f01(ledger):
-            sys.exit(1)
+        if is_forge:
+            if not transit_bridge(ledger):
+                sys.exit(1)
+        else:
+            if not transit_f01(ledger):
+                sys.exit(1)
         if not custos("F02", "check-in"):
             sys.exit(1)
         sign_gate(ledger, "gate2_cutlist")
-        mark(ledger, "F01", "validated", custos="check-out")
+        mark(ledger, src_frigate, "validated", custos="check-out")
         save_ledger(ledger)
         log_gate("III MONTAGE — LAC_RUN.py run (F02) puis preview F03, gate --codex")
     elif args.codex:
@@ -427,10 +544,14 @@ def cmd_run(args):
         log_gate("I BRIEF")
         log_err("Porte I ouverte — écris le brief :")
         log_err('  python LAC_RUN.py init --source "URL|fichier" --title "..." --sujet "..."')
+        log_err('  OU en mode forge : python LAC_RUN.py init --mode forge --source <production_pack.json>')
         sys.exit(1)
 
-    for frigate in RUN_ORDER:
-        if ledger["frigates"][frigate]["status"] in ("done", "validated"):
+    is_forge = (ledger["brief"] or {}).get("mode") == "forge"
+    run_order = RUN_ORDER_FORGE if is_forge else RUN_ORDER_LIBRE
+
+    for frigate in run_order:
+        if ledger["frigates"].get(frigate, {}).get("status") in ("done", "validated"):
             continue
         gate_after = GATE_AFTER.get(frigate)
         if gate_after and gate_open(ledger, gate_after):
@@ -478,7 +599,7 @@ def cmd_status(args):
         label = gate.upper().replace("_", " ")
         print(f"  {'✓' if g['signed'] else '○'} {label}" + (f"  ({g['at']})" if g['signed'] else ""))
     print()
-    for frigate in ["F00", "F01", "F02", "F03", "F04", "F05", "F06"]:
+    for frigate in ["BRIDGE", "F00", "F01", "F02", "F03", "F04", "F05", "F06"]:
         f = ledger["frigates"][frigate]
         state = {"pending": "◦ en attente", "done": "✓ scellée", "validated": "✓ validée"}.get(
             f["status"], f["status"])
@@ -514,9 +635,30 @@ def main():
     p_init.add_argument("--sequences", type=int, default=2)
     p_init.add_argument("--min-dur", type=float, default=3.0)
     p_init.add_argument("--max-dur", type=float, default=10.0)
-    p_init.add_argument("--profile", default="blur-pad", choices=["blur-pad", "reframe"])
+    p_init.add_argument("--mode", default="libre", choices=["libre", "forge"],
+                        help="libre (F01 vision) ou forge (pack Perturabo, F01 sautée)")
+    p_init.add_argument("--profile", default="blur-pad",
+                        choices=["blur-pad", "reframe", "background"])
     p_init.add_argument("--preset", default="punchy")
     p_init.add_argument("--model", default=None, help="Modèle vision OpenRouter (override)")
+    p_init.add_argument("--video", default=None, help="Forge : vidéo locale déposée")
+    p_init.add_argument("--background", default=None, help="Forge : fond PNG fourni")
+    p_init.add_argument("--logo", default=None, help="Forge : logo transparent campagne")
+    p_init.add_argument("--dry-run", action="store_true", help="Forge : plan sans écrire")
+
+    p_forge = sub.add_parser("forge", help="Mode forge — lancer le bridge Perturabo (Gate 1)")
+    p_forge.add_argument("--pack", default=None,
+                         help="Chemin production_pack.json — SI ABSENT, l'Oracle va le "
+                              "chercher SEUL dans PERTURABO/EXPORT")
+    p_forge.add_argument("--pack-filter", default=None,
+                         help="Filtre du pack à auto-récupérer (substring du nom, ex: SANDOVAL)")
+    p_forge.add_argument("--video", default=None, help="Vidéo locale déposée")
+    p_forge.add_argument("--background", default=None, help="Fond PNG fourni")
+    p_forge.add_argument("--logo", default=None, help="Logo transparent campagne")
+    p_forge.add_argument("--mode", default="logo", choices=["logo", "libre"],
+                        help="Mode du pack (défaut logo)")
+    p_forge.add_argument("--dry-run", action="store_true")
+    p_forge.set_defaults(func=cmd_forge)
 
     p_run = sub.add_parser("run", help="Exécuter jusqu'à la prochaine porte")
     p_run.set_defaults(func=cmd_run)
@@ -537,6 +679,8 @@ def main():
     args = parser.parse_args()
     if args.command == "init":
         cmd_init(args)
+    elif args.command == "forge":
+        cmd_forge(args)
     else:
         args.func(args)
 

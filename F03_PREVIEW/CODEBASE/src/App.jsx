@@ -3,43 +3,54 @@ import { Player } from '@remotion/player';
 import { OmniComposition } from './preview/OmniComposition';
 
 /**
- * App — F03 PREVIEW
+ * App — F03 PREVIEW (v4.0 — session + clips)
  *
- * Charge le codex.json et le clip 9:16 depuis public/,
+ * Charge le codex.json (bloc session + clips) et le clip 9:16 depuis public/,
  * rend la composition en temps réel via @remotion/player.
  *
- * L'opérateur peut :
- *  - Cliquer Play pour voir le résultat exact
- *  - Modifier le titre, les couleurs, les effets
- *  - Régler le volume et le coup brutal
- *  - Exporter le codex modifié (validated_by_magos: true)
+ * L'opérateur ajuste la SESSION (style global appliqué aux N clips) :
+ *  - Fond : menu déroulant des PNG déposés dans public/backgrounds/ (dossier
+ *    dédié, comme CRUSADER) ou couleur unie + échelle
+ *  - Logo : taille (pas déplaçable — le pack impose le placement)
+ *  - Textes : mode titre seul / titre+paragraphe (titre haut, paragraphe bas)
+ *  - Presets : couleurs, 4K, netteté, grain, vignette, volume, coup brutal
+ *  - Export codex.json validé (validated_by_magos: true)
  */
 
 export default function App() {
-  const [codex, setCodex] = useState(null);
-  const [fullCodex, setFullCodex] = useState(null);
+  const [codex, setCodex] = useState(null);        // codex complet (session + clips)
+  const [clip, setClip] = useState(null);          // clip en cours d'édition
+  const [session, setSession] = useState(null);    // session (style global)
   const [videoSrc, setVideoSrc] = useState('');
+  const [backgrounds, setBackgrounds] = useState([]); // liste des fonds PNG
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [validated, setValidated] = useState(false);
   const [activeTab, setActiveTab] = useState('text');
-  const [selectedText, setSelectedText] = useState(0);
   const playerRef = useRef(null);
 
-  // Charger le codex.json (multi-clips) et la vidéo au montage
+  // Charger le codex.json (v4 : session + clips), la vidéo et les fonds
   useEffect(() => {
     async function loadAssets() {
       try {
         const codexResp = await fetch('./codex.json');
-        if (!codexResp.ok) {
-          throw new Error('codex.json non trouvé dans public/');
-        }
+        if (!codexResp.ok) throw new Error('codex.json non trouvé dans public/');
         const full = await codexResp.json();
-        // Preview du premier clip (les autres clips se règlent dans le JSON)
-        const clipCodex = full.clips?.[0] || full;
-        setFullCodex(full);
-        setCodex(clipCodex);
-        setVideoSrc(clipCodex.video?.source ? './' + clipCodex.video.source : './clip_001.mp4');
+        const clipFirst = full.clips?.[0] || full;
+        setCodex(full);
+        setClip(clipFirst);
+        setSession(full.session || {});
+        setVideoSrc(clipFirst.video?.source ? './' + clipFirst.video.source : './clip_001.mp4');
+        // Liste des fonds PNG (écrite par le transit F02 / bridge)
+        try {
+          const bgResp = await fetch('./backgrounds/manifest.json');
+          if (bgResp.ok) {
+            const bg = await bgResp.json();
+            setBackgrounds(Array.isArray(bg) ? bg : (bg.files || []));
+          }
+        } catch (e) {
+          setBackgrounds([]); // pas de dossier fonds — menu vide
+        }
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -49,17 +60,15 @@ export default function App() {
     loadAssets();
   }, []);
 
-  // Écran de chargement
   if (loading) {
     return (
       <div style={styles.loading}>
         <div style={{ fontSize: '24px', marginBottom: '10px' }}>⏳ Chargement...</div>
-        <div style={{ fontSize: '14px', color: '#666' }}>Lecture du codex.json et de la vidéo</div>
+        <div style={{ fontSize: '14px', color: '#666' }}>Lecture du codex.json, du clip et des fonds</div>
       </div>
     );
   }
 
-  // Écran d'erreur
   if (error) {
     return (
       <div style={styles.loading}>
@@ -67,53 +76,44 @@ export default function App() {
         <div style={{ fontSize: '14px', color: '#888' }}>{error}</div>
         <div style={{ marginTop: '20px', fontSize: '13px', color: '#666', textAlign: 'left' }}>
           <strong>Setup requis:</strong>
-          <br />
-          1. Placez <code>codex.json</code> dans <code>public/</code>
-          <br />
-          2. Placez <code>clip_001.mp4</code> dans <code>public/</code>
-          <br />
-          3. Lancez <code>npm run build</code>
+          <br />1. Placez <code>codex.json</code> dans <code>public/</code>
+          <br />2. Placez <code>clip_001.mp4</code> dans <code>public/</code>
+          <br />3. Placez vos fonds PNG dans <code>public/backgrounds/</code>
+          <br />4. Lancez <code>npm run dev</code>
         </div>
       </div>
     );
   }
 
-  // Données du codex
-  const fps = codex.video?.fps || 30;
-  const totalFrames = codex.video?.total_frames || 300;
-  const vidWidth = codex.video?.width || 1080;
-  const vidHeight = codex.video?.height || 1920;
-  const textCount = codex.text_overlays?.length || 0;
+  const fps = clip.video?.fps || 30;
+  const totalFrames = clip.video?.total_frames || 300;
+  const vidWidth = clip.video?.width || 1080;
+  const vidHeight = clip.video?.height || 1920;
 
-  // Helpers pour modifier le codex
-  const updateTextOverlay = (index, key, value) => {
-    const newCodex = { ...codex };
-    newCodex.text_overlays = [...(newCodex.text_overlays || [])];
-    newCodex.text_overlays[index] = { ...newCodex.text_overlays[index], [key]: value };
-    setCodex(newCodex);
+  // ── Helpers session ──
+  const updateSession = (section, key, value) => {
+    const newSession = {
+      ...session,
+      [section]: { ...(session[section] || {}), [key]: value },
+    };
+    setSession(newSession);
   };
-
-  const updateCodexField = (key, value) => {
-    setCodex({ ...codex, [key]: value });
-  };
-
-  const applyToAll = (key, value) => {
-    const newCodex = { ...codex };
-    newCodex.text_overlays = (newCodex.text_overlays || []).map((o) => ({
-      ...o,
-      [key]: value,
-    }));
-    setCodex(newCodex);
-  };
+  const updateClip = (key, value) => setClip({ ...clip, [key]: value });
+  const updateTexts = (key, value) => setClip({ ...clip, texts: { ...(clip.texts || {}), [key]: value } });
+  const updateSessionTextsStyle = (key, value) =>
+    updateSession('texts_style', key, value);
+  const updatePreset = (key, value) => updateSession('presets', key, value);
 
   const exportCodex = () => {
-    // Réintègre le clip édité dans le codex multi-clips + flag de validation
-    const merged = fullCodex
-      ? { ...fullCodex, clips: [codex, ...(fullCodex.clips || []).slice(1)] }
-      : codex;
-    const finalCodex = validated
-      ? { ...merged, validated_by_magos: true }
-      : merged;
+    // Réintègre le clip édité + la session dans le codex multi-clips
+    const merged = {
+      ...(codex || {}),
+      session,
+      clips: codex?.clips
+        ? [clip, ...(codex.clips || []).slice(1)]
+        : [clip],
+    };
+    const finalCodex = validated ? { ...merged, validated_by_magos: true } : merged;
     const blob = new Blob([JSON.stringify(finalCodex, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -123,39 +123,39 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
-  const currentOverlay = codex.text_overlays?.[selectedText];
+  const texts = clip.texts || {};
+  const textMode = texts.mode || (texts.title ? 'title' : 'none');
+  const presets = session.presets || {};
+  const background = session.background || {};
 
   return (
     <div style={styles.app}>
       {/* Header */}
       <div style={styles.header}>
         <div style={{ fontSize: '18px', fontWeight: 900, letterSpacing: '0.05em' }}>
-          LACRIMAE — F03 Preview
+          LACRIMAE — F03 Preview <span style={{ fontSize: 12, color: '#00ff88' }}>v4 session</span>
         </div>
         <div style={{ fontSize: '13px', color: '#888' }}>
-          📝 {textCount} texte{textCount > 1 ? 's' : ''}
+          🖼 {background.image ? background.image : background.color || 'fond'}
           {'  |  '}
-          🎨 {codex.color_preset || 'punchy'}
+          📝 {textMode}
           {'  |  '}
-          🔊 {(codex.volume ?? 1) * 100}%
+          🎨 {presets.color_preset || 'punchy'}
           {'  |  '}
-          🔪{' '}
-          {codex.brutal_cut_interval_frames
-            ? (codex.brutal_cut_interval_frames / fps).toFixed(1) + 's'
-            : 'off'}
+          🔊 {Math.round((clip.volume ?? 1) * 100)}%
           {'  |  '}
           ⏱️ {(totalFrames / fps).toFixed(1)}s
         </div>
       </div>
 
-      {/* Main layout: player + panels */}
+      {/* Main layout */}
       <div style={styles.mainLayout}>
-        {/* Player (centered, compact) */}
+        {/* Player */}
         <div style={styles.playerContainer}>
           <Player
             ref={playerRef}
             component={OmniComposition}
-            inputProps={{ codex, videoSrc }}
+            inputProps={{ codex: clip, videoSrc, session }}
             durationInFrames={totalFrames}
             fps={fps}
             compositionWidth={vidWidth}
@@ -175,207 +175,232 @@ export default function App() {
 
         {/* Right panel */}
         <div style={styles.panel}>
-          {/* Tabs */}
           <div style={styles.tabs}>
-            <button
-              style={activeTab === 'text' ? styles.tabActive : styles.tab}
-              onClick={() => setActiveTab('text')}
-            >
+            <button style={activeTab === 'text' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('text')}>
               📝 Texte
             </button>
-            <button
-              style={activeTab === 'effects' ? styles.tabActive : styles.tab}
-              onClick={() => setActiveTab('effects')}
-            >
+            <button style={activeTab === 'fond' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('fond')}>
+              🖼 Fond & Logo
+            </button>
+            <button style={activeTab === 'effects' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('effects')}>
               🎨 Effets
             </button>
-            <button
-              style={activeTab === 'sharp' ? styles.tabActive : styles.tab}
-              onClick={() => setActiveTab('sharp')}
-            >
+            <button style={activeTab === 'sharp' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('sharp')}>
               🔍 Netteté
             </button>
           </div>
 
-          {/* Text panel */}
-          {activeTab === 'text' && currentOverlay && (
+          {/* ══════════ TEXTE : mode titre / titre+paragraphe ══════════ */}
+          {activeTab === 'text' && (
             <div style={styles.panelContent}>
-              {/* Text selector */}
-              <div style={styles.textSelector}>
-                {(codex.text_overlays || []).map((o, i) => (
-                  <button
-                    key={i}
-                    style={selectedText === i ? styles.textBtnActive : styles.textBtn}
-                    onClick={() => setSelectedText(i)}
-                  >
-                    {i + 1}. {(o.content || '').substring(0, 20)}
-                  </button>
-                ))}
-              </div>
+              <label style={styles.label}>Mode texte</label>
+              <select
+                style={styles.select}
+                value={textMode}
+                onChange={(e) => updateTexts('mode', e.target.value)}
+              >
+                <option value="title">Titre seul</option>
+                <option value="title+paragraph">Titre + paragraphe</option>
+                <option value="none">Aucun texte</option>
+              </select>
 
-              {/* Content */}
-              <label style={styles.label}>Contenu</label>
+              <label style={styles.label}>Titre (haut)</label>
               <input
                 style={styles.input}
                 type="text"
-                value={currentOverlay.content || ''}
-                onChange={(e) => updateTextOverlay(selectedText, 'content', e.target.value)}
+                value={texts.title || ''}
+                onChange={(e) => updateTexts('title', e.target.value)}
               />
-
-              {/* Animation */}
-              <label style={styles.label}>Animation</label>
-              <select
-                style={styles.select}
-                value={currentOverlay.animation || 'word_by_word'}
-                onChange={(e) => updateTextOverlay(selectedText, 'animation', e.target.value)}
-              >
-                <option value="word_by_word">Mot par mot</option>
-                <option value="pop">Pop</option>
-                <option value="fade_in">Fade in</option>
-                <option value="fade_in_slow">Fade in lent</option>
-              </select>
-
-              {/* Font */}
-              <label style={styles.label}>Police</label>
-              <select
-                style={styles.select}
-                value={currentOverlay.font || 'Impact, Arial Black, sans-serif'}
-                onChange={(e) => {
-                  updateTextOverlay(selectedText, 'font', e.target.value);
-                }}
-              >
-                <option value="Impact, Arial Black, sans-serif">Impact</option>
-                <option value="Arial Black, sans-serif">Arial Black</option>
-                <option value="Bebas Neue, sans-serif">Bebas Neue</option>
-                <option value="Helvetica, sans-serif">Helvetica</option>
-              </select>
-
-              {/* Size */}
               <label style={styles.label}>
-                Taille: {currentOverlay.size || 96}px
+                Position titre (haut): {(texts.title_offset_pct ?? 8)}%
               </label>
               <input
                 style={styles.slider}
                 type="range"
-                min="40"
-                max="150"
-                value={currentOverlay.size || 96}
-                onChange={(e) =>
-                  updateTextOverlay(selectedText, 'size', parseInt(e.target.value))
-                }
+                min="2"
+                max="30"
+                value={texts.title_offset_pct ?? 8}
+                onChange={(e) => updateTexts('title_offset_pct', parseInt(e.target.value))}
               />
 
-              {/* Color */}
-              <label style={styles.label}>Couleur</label>
-              <input
-                style={styles.colorPicker}
-                type="color"
-                value={currentOverlay.color || '#FFFFFF'}
-                onChange={(e) => updateTextOverlay(selectedText, 'color', e.target.value)}
-              />
+              {(textMode === 'title+paragraph') && (
+                <>
+                  <label style={styles.label}>Paragraphe (bas, 4 lignes max)</label>
+                  <textarea
+                    style={{ ...styles.input, minHeight: '80px', resize: 'vertical', fontFamily: 'inherit' }}
+                    value={texts.paragraph || ''}
+                    onChange={(e) => updateTexts('paragraph', e.target.value)}
+                  />
+                  <label style={styles.label}>
+                    Position paragraphe (bas): {(texts.paragraph_offset_pct ?? 8)}%
+                  </label>
+                  <input
+                    style={styles.slider}
+                    type="range"
+                    min="2"
+                    max="30"
+                    value={texts.paragraph_offset_pct ?? 8}
+                    onChange={(e) => updateTexts('paragraph_offset_pct', parseInt(e.target.value))}
+                  />
+                </>
+              )}
 
-              {/* Glow intensity */}
-              <label style={styles.label}>
-                Glow néon: {currentOverlay.glow_intensity || 0}%
-              </label>
-              <input
-                style={styles.slider}
-                type="range"
-                min="0"
-                max="100"
-                value={currentOverlay.glow_intensity || 0}
-                onChange={(e) =>
-                  updateTextOverlay(selectedText, 'glow_intensity', parseInt(e.target.value))
-                }
-              />
+              {/* Style global des textes (session) */}
+              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #333' }}>
+                <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                  🎨 Style global des textes (tous les clips)
+                </label>
 
-              {/* Stroke width */}
-              <label style={styles.label}>
-                Contour: {currentOverlay.stroke_width || 0}px
-              </label>
-              <input
-                style={styles.slider}
-                type="range"
-                min="0"
-                max="8"
-                value={currentOverlay.stroke_width || 0}
-                onChange={(e) =>
-                  updateTextOverlay(selectedText, 'stroke_width', parseInt(e.target.value))
-                }
-              />
+                <label style={styles.label}>Police</label>
+                <select
+                  style={styles.select}
+                  value={(session.texts_style || {}).font || 'Impact, Arial Black, sans-serif'}
+                  onChange={(e) => updateSessionTextsStyle('font', e.target.value)}
+                >
+                  <option value="Impact, Arial Black, sans-serif">Impact</option>
+                  <option value="Arial Black, sans-serif">Arial Black</option>
+                  <option value="Bebas Neue, sans-serif">Bebas Neue</option>
+                  <option value="Helvetica, sans-serif">Helvetica</option>
+                </select>
 
-              {/* Position */}
-              <label style={styles.label}>Position</label>
-              <select
-                style={styles.select}
-                value={currentOverlay.position || 'center'}
-                onChange={(e) => updateTextOverlay(selectedText, 'position', e.target.value)}
-              >
-                <option value="center">Centre</option>
-                <option value="center_bottom">Centre bas</option>
-                <option value="top">Haut</option>
-                <option value="center_left">Centre gauche</option>
-                <option value="bottom">Bas</option>
-              </select>
-
-              {/* Timing */}
-              <label style={styles.label}>
-                Timing: {((currentOverlay.start_frame || 0) / fps).toFixed(1)}s -{' '}
-                {((currentOverlay.end_frame || 0) / fps).toFixed(1)}s
-              </label>
-              <div style={{ display: 'flex', gap: '8px' }}>
+                <label style={styles.label}>
+                  Taille titre: {(session.texts_style || {}).size_title || 96}px
+                </label>
                 <input
-                  style={{ ...styles.input, flex: 1 }}
-                  type="number"
-                  step="0.1"
-                  value={((currentOverlay.start_frame || 0) / fps).toFixed(1)}
-                  onChange={(e) =>
-                    updateTextOverlay(
-                      selectedText,
-                      'start_frame',
-                      Math.round(parseFloat(e.target.value) * fps)
-                    )
-                  }
+                  style={styles.slider}
+                  type="range"
+                  min="40"
+                  max="180"
+                  value={(session.texts_style || {}).size_title || 96}
+                  onChange={(e) => updateSessionTextsStyle('size_title', parseInt(e.target.value))}
                 />
+
+                <label style={styles.label}>
+                  Taille paragraphe: {(session.texts_style || {}).size_paragraph || 44}px
+                </label>
                 <input
-                  style={{ ...styles.input, flex: 1 }}
-                  type="number"
-                  step="0.1"
-                  value={((currentOverlay.end_frame || 0) / fps).toFixed(1)}
-                  onChange={(e) =>
-                    updateTextOverlay(
-                      selectedText,
-                      'end_frame',
-                      Math.round(parseFloat(e.target.value) * fps)
-                    )
-                  }
+                  style={styles.slider}
+                  type="range"
+                  min="20"
+                  max="80"
+                  value={(session.texts_style || {}).size_paragraph || 44}
+                  onChange={(e) => updateSessionTextsStyle('size_paragraph', parseInt(e.target.value))}
+                />
+
+                <label style={styles.label}>Couleur texte</label>
+                <input
+                  style={styles.colorPicker}
+                  type="color"
+                  value={(session.texts_style || {}).color || '#FFFFFF'}
+                  onChange={(e) => updateSessionTextsStyle('color', e.target.value)}
+                />
+
+                <label style={styles.label}>Contour</label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="0"
+                  max="8"
+                  value={(session.texts_style || {}).stroke_width || 4}
+                  onChange={(e) => updateSessionTextsStyle('stroke_width', parseInt(e.target.value))}
                 />
               </div>
-
-              {/* Apply to all */}
-              <button
-                style={styles.applyBtn}
-                onClick={() => {
-                  applyToAll('font', currentOverlay.font);
-                  applyToAll('size', currentOverlay.size);
-                  applyToAll('color', currentOverlay.color);
-                  applyToAll('glow_intensity', currentOverlay.glow_intensity);
-                  applyToAll('stroke_width', currentOverlay.stroke_width);
-                  applyToAll('position', currentOverlay.position);
-                }}
-              >
-                📋 Appliquer style à tous les textes
-              </button>
             </div>
           )}
 
-          {/* Effects panel */}
-          {activeTab === 'effects' && (
-            <div style={styles.panelContent}>              {/* Color preset */}
-              <label style={styles.label}>Color preset</label>
+          {/* ══════════ FOND & LOGO : menu déroulant des PNG + taille logo ══════════ */}
+          {activeTab === 'fond' && (
+            <div style={styles.panelContent}>
+              <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                🖼 FOND (dossier public/backgrounds/)
+              </label>
               <select
                 style={styles.select}
-                value={codex.color_preset || 'warm_vibrant'}
+                value={background.image || 'solid'}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  updateSession('background', 'image', v === 'solid' ? null : v);
+                }}
+              >
+                <option value="solid">Couleur unie</option>
+                {backgrounds.map((bg) => (
+                  <option key={bg} value={bg}>🖼 {bg}</option>
+                ))}
+              </select>
+              {backgrounds.length === 0 && (
+                <div style={{ fontSize: '12px', color: '#666' }}>
+                  Aucun PNG trouvé — déposez vos fonds dans <code>public/backgrounds/</code>
+                </div>
+              )}
+
+              {background.image ? (
+                <>
+                  <label style={styles.label}>
+                    Échelle du fond: {(background.scale ?? 1).toFixed(2)}x
+                  </label>
+                  <input
+                    style={styles.slider}
+                    type="range"
+                    min="0.8"
+                    max="2"
+                    step="0.05"
+                    value={background.scale ?? 1}
+                    onChange={(e) => updateSession('background', 'scale', parseFloat(e.target.value))}
+                  />
+                </>
+              ) : (
+                <>
+                  <label style={styles.label}>Couleur de fond</label>
+                  <input
+                    style={styles.colorPicker}
+                    type="color"
+                    value={background.color || '#0a0a0a'}
+                    onChange={(e) => updateSession('background', 'color', e.target.value)}
+                  />
+                </>
+              )}
+
+              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #333' }}>
+                <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                  🏷 LOGO (en bas du cadre — taille ajustable, placement fixe)
+                </label>
+                <label style={styles.label}>
+                  Taille du logo: {(session.logo || {}).width_pct || 20}%
+                </label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="5"
+                  max="60"
+                  value={(session.logo || {}).width_pct || 20}
+                  onChange={(e) => updateSession('logo', 'width_pct', parseInt(e.target.value))}
+                />
+                <label style={styles.label}>
+                  Opacité: {Math.round(((session.logo || {}).opacity ?? 1) * 100)}%
+                </label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={Math.round(((session.logo || {}).opacity ?? 1) * 100)}
+                  onChange={(e) => updateSession('logo', 'opacity', parseInt(e.target.value) / 100)}
+                />
+                <div style={{ marginTop: '8px', padding: '8px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
+                  Placez <code>logo.png</code> dans <code>public/</code>. Le placement
+                  (bas) est imposé — seule la taille est réglable, comme décidé.
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════ EFFETS : presets globaux (session) ══════════ */}
+          {activeTab === 'effects' && (
+            <div style={styles.panelContent}>
+              <label style={styles.label}>Color preset (global)</label>
+              <select
+                style={styles.select}
+                value={presets.color_preset || 'punchy'}
                 onChange={(e) => {
                   const preset = e.target.value;
                   const filters = {
@@ -385,8 +410,8 @@ export default function App() {
                     punchy: 'contrast(1.3) saturate(1.5) brightness(1.1)',
                     sepia_soft: 'sepia(0.3) contrast(1.1) saturate(0.9) brightness(1.05)',
                   };
-                  updateCodexField('color_preset', preset);
-                  updateCodexField('color_css_filter', filters[preset] || '');
+                  updatePreset('color_preset', preset);
+                  updatePreset('color_css_filter', filters[preset] || '');
                 }}
               >
                 <option value="warm_vibrant">Warm Vibrant</option>
@@ -396,29 +421,24 @@ export default function App() {
                 <option value="sepia_soft">Sepia Soft</option>
               </select>
 
-              {/* Audio + Coup brutal */}
-              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #333' }}>
+              <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #333' }}>
                 <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
                   🔊 Audio + Coup brutal
                 </label>
-
                 <label style={styles.label}>
-                  Volume: {Math.round((codex.volume ?? 1.0) * 100)}%
+                  Volume: {Math.round((clip.volume ?? 1) * 100)}%
                 </label>
                 <input
                   style={styles.slider}
                   type="range"
                   min="0"
                   max="100"
-                  value={Math.round((codex.volume ?? 1.0) * 100)}
-                  onChange={(e) => updateCodexField('volume', parseInt(e.target.value) / 100)}
+                  value={Math.round((clip.volume ?? 1) * 100)}
+                  onChange={(e) => updateClip('volume', parseInt(e.target.value) / 100)}
                 />
-
                 <label style={styles.label}>
                   Coup brutal toutes les:{' '}
-                  {codex.brutal_cut_interval_frames
-                    ? (codex.brutal_cut_interval_frames / fps).toFixed(1) + 's'
-                    : 'désactivé'}
+                  {clip.brutal_cut_interval_frames ? (clip.brutal_cut_interval_frames / fps).toFixed(1) + 's' : 'désactivé'}
                 </label>
                 <input
                   style={styles.slider}
@@ -426,63 +446,17 @@ export default function App() {
                   min="0"
                   max="12"
                   step="0.5"
-                  value={(codex.brutal_cut_interval_frames || 0) / fps}
-                  onChange={(e) =>
-                    updateCodexField(
-                      'brutal_cut_interval_frames',
-                      Math.round(parseFloat(e.target.value) * fps)
-                    )
-                  }
+                  value={(clip.brutal_cut_interval_frames || 0) / fps}
+                  onChange={(e) => updateClip('brutal_cut_interval_frames', Math.round(parseFloat(e.target.value) * fps))}
                 />
               </div>
 
-              {/* Enhance 4K */}
-              <label style={styles.label}>
-                <input
-                  type="checkbox"
-                  checked={codex.enhance_4k || false}
-                  onChange={(e) => updateCodexField('enhance_4k', e.target.checked)}
-                  style={{ marginRight: '8px' }}
-                />
-                Enhance 4K
-              </label>
-
-              {/* Vignette */}
-              <label style={styles.label}>
-                Vignette: {Math.round((codex.vignette || 0) * 100)}%
-              </label>
-              <input
-                style={styles.slider}
-                type="range"
-                min="0"
-                max="100"
-                value={Math.round((codex.vignette || 0) * 100)}
-                onChange={(e) => updateCodexField('vignette', parseInt(e.target.value) / 100)}
-              />
-
-              {/* Grain */}
-              <label style={styles.label}>
-                Grain: {Math.round((codex.grain_intensity || 0) * 100)}%
-              </label>
-              <input
-                style={styles.slider}
-                type="range"
-                min="0"
-                max="100"
-                value={Math.round((codex.grain_intensity || 0) * 100)}
-                onChange={(e) =>
-                  updateCodexField('grain_intensity', parseInt(e.target.value) / 100)
-                }
-              />
-
-              {/* Slow motion */}
-              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #333' }}>
+              <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #333' }}>
                 <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
-                  ⏩ Slow Motion + Cut brutal
+                  ⏩ Slow Motion + Shake
                 </label>
-
                 <label style={styles.label}>
-                  Cut start: {((codex.slowmo_start_frame || 0) / fps).toFixed(1)}s
+                  Cut start: {((clip.slowmo_start_frame || 0) / fps).toFixed(1)}s
                 </label>
                 <input
                   style={styles.slider}
@@ -490,122 +464,96 @@ export default function App() {
                   min="0"
                   max={totalFrames}
                   step={fps}
-                  value={codex.slowmo_start_frame || 0}
-                  onChange={(e) => updateCodexField('slowmo_start_frame', parseInt(e.target.value))}
+                  value={clip.slowmo_start_frame || 0}
+                  onChange={(e) => updateClip('slowmo_start_frame', parseInt(e.target.value))}
                 />
-
                 <label style={styles.label}>
-                  Vitesse: {Math.round((codex.slowmo_speed || 1.0) * 100)}%
+                  Vitesse: {Math.round((clip.slowmo_speed || 1) * 100)}%
                 </label>
                 <input
                   style={styles.slider}
                   type="range"
                   min="10"
                   max="100"
-                  value={Math.round((codex.slowmo_speed || 1.0) * 100)}
-                  onChange={(e) => updateCodexField('slowmo_speed', parseInt(e.target.value) / 100)}
+                  value={Math.round((clip.slowmo_speed || 1) * 100)}
+                  onChange={(e) => updateClip('slowmo_speed', parseInt(e.target.value) / 100)}
                 />
-
                 <label style={styles.label}>
-                  Puissance du shake: {codex.shake_power || 0}%
+                  Puissance du shake: {clip.shake_power || 0}%
                 </label>
                 <input
                   style={styles.slider}
                   type="range"
                   min="0"
                   max="100"
-                  value={codex.shake_power || 0}
-                  onChange={(e) => updateCodexField('shake_power', parseInt(e.target.value))}
+                  value={clip.shake_power || 0}
+                  onChange={(e) => updateClip('shake_power', parseInt(e.target.value))}
                 />
               </div>
-
-              {/* Zoom intensity */}
-              <label style={styles.label}>
-                Zoom max:{' '}
-                {codex.zoom_keyframes?.length > 0
-                  ? codex.zoom_keyframes[codex.zoom_keyframes.length - 1].scale.toFixed(2) + 'x'
-                  : '1.0x'}
-              </label>
-              <input
-                style={styles.slider}
-                type="range"
-                min="100"
-                max="200"
-                value={
-                  codex.zoom_keyframes?.length > 0
-                    ? Math.round(codex.zoom_keyframes[codex.zoom_keyframes.length - 1].scale * 100)
-                    : 100
-                }
-                onChange={(e) => {
-                  const maxScale = parseInt(e.target.value) / 100;
-                  const newCodex = { ...codex };
-                  if (newCodex.zoom_keyframes?.length > 0) {
-                    newCodex.zoom_keyframes = newCodex.zoom_keyframes.map((k, i) => ({
-                      ...k,
-                      scale: 1.0 + (maxScale - 1.0) * (i / (newCodex.zoom_keyframes.length - 1)),
-                    }));
-                  }
-                  setCodex(newCodex);
-                }}
-              />
-            </div>
-          )}
-
-          {/* Sharpness panel */}
-          {activeTab === 'sharp' && (
-            <div style={styles.panelContent}>
-              <label style={styles.label}>
-                Sharpening: {codex.sharpening || 0}%
-              </label>
-              <input
-                style={styles.slider}
-                type="range"
-                min="0"
-                max="100"
-                value={codex.sharpening || 0}
-                onChange={(e) => updateCodexField('sharpening', parseInt(e.target.value))}
-              />
-
-              <label style={styles.label}>
-                Débruitage: {codex.denoising || 0}%
-              </label>
-              <input
-                style={styles.slider}
-                type="range"
-                min="0"
-                max="100"
-                value={codex.denoising || 0}
-                onChange={(e) => updateCodexField('denoising', parseInt(e.target.value))}
-              />
-
-              <label style={styles.label}>
-                Grain: {Math.round((codex.grain_intensity || 0) * 100)}%
-              </label>
-              <input
-                style={styles.slider}
-                type="range"
-                min="0"
-                max="100"
-                value={Math.round((codex.grain_intensity || 0) * 100)}
-                onChange={(e) =>
-                  updateCodexField('grain_intensity', parseInt(e.target.value) / 100)
-                }
-              />
 
               <label style={styles.label}>
                 <input
                   type="checkbox"
-                  checked={codex.enhance_4k || false}
-                  onChange={(e) => updateCodexField('enhance_4k', e.target.checked)}
+                  checked={presets.enhance_4k || false}
+                  onChange={(e) => updatePreset('enhance_4k', e.target.checked)}
                   style={{ marginRight: '8px' }}
                 />
-                Enhance 4K
+                Enhance 4K (global)
               </label>
+            </div>
+          )}
 
+          {/* ══════════ NETTETÉ : sharpening, grain, vignette (session) ══════════ */}
+          {activeTab === 'sharp' && (
+            <div style={styles.panelContent}>
+              <label style={styles.label}>
+                Sharpening: {presets.sharpening || 0}%
+              </label>
+              <input
+                style={styles.slider}
+                type="range"
+                min="0"
+                max="100"
+                value={presets.sharpening || 0}
+                onChange={(e) => updatePreset('sharpening', parseInt(e.target.value))}
+              />
+              <label style={styles.label}>
+                Débruitage: {presets.denoising || 0}%
+              </label>
+              <input
+                style={styles.slider}
+                type="range"
+                min="0"
+                max="100"
+                value={presets.denoising || 0}
+                onChange={(e) => updatePreset('denoising', parseInt(e.target.value))}
+              />
+              <label style={styles.label}>
+                Grain: {Math.round((presets.grain_intensity || 0) * 100)}%
+              </label>
+              <input
+                style={styles.slider}
+                type="range"
+                min="0"
+                max="100"
+                value={Math.round((presets.grain_intensity || 0) * 100)}
+                onChange={(e) => updatePreset('grain_intensity', parseInt(e.target.value) / 100)}
+              />
+              <label style={styles.label}>
+                Vignette: {Math.round((presets.vignette || 0) * 100)}%
+              </label>
+              <input
+                style={styles.slider}
+                type="range"
+                min="0"
+                max="100"
+                value={Math.round((presets.vignette || 0) * 100)}
+                onChange={(e) => updatePreset('vignette', parseInt(e.target.value) / 100)}
+              />
               <div style={{ marginTop: '12px', padding: '10px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
-                <strong style={{ color: '#00ff88' }}>Note :</strong>
-                <br />
-                Ces réglages sont appliqués au rendu final par F04.
+                <strong style={{ color: '#00ff88' }}>Global :</strong>
+                <br />Ces effets s'appliquent à TOUTE la scène (fond + vidéo + textes + logo)
+                — c'est le calque presets au-dessus de tout.
               </div>
             </div>
           )}
@@ -619,7 +567,7 @@ export default function App() {
               style={validated ? styles.validatedBtn : styles.validateBtn}
               onClick={() => {
                 setValidated(true);
-                updateCodexField('validated_by_magos', true);
+                setClip({ ...clip, validated_by_magos: true });
               }}
             >
               {validated ? '✓ Validé — codex.json prêt (bouton export)' : '✓ Valider le montage'}
@@ -631,204 +579,25 @@ export default function App() {
   );
 }
 
-/* ──────────────────────────────────────────────────────────────
- * Styles
- * ────────────────────────────────────────────────────────────── */
-
+/* ── Styles ── */
 const styles = {
-  app: {
-    background: '#0a0a0a',
-    color: '#e0e0e0',
-    fontFamily: 'system-ui, -apple-system, sans-serif',
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  loading: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    background: '#0a0a0a',
-    color: '#888',
-    fontFamily: 'system-ui, sans-serif',
-  },
-  header: {
-    padding: '12px 20px',
-    borderBottom: '1px solid #222',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '8px',
-  },
-  mainLayout: {
-    display: 'flex',
-    flexDirection: 'row',
-    flex: 1,
-    gap: '20px',
-    padding: '20px',
-    alignItems: 'flex-start',
-  },
-  playerContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
-  },
-  panel: {
-    width: '320px',
-    minWidth: '280px',
-    maxHeight: '85vh',
-    overflowY: 'auto',
-    background: '#141414',
-    borderRadius: '12px',
-    border: '1px solid #222',
-    padding: '16px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-  },
-  tabs: {
-    display: 'flex',
-    gap: '4px',
-    marginBottom: '8px',
-  },
-  tab: {
-    flex: 1,
-    padding: '8px 12px',
-    background: '#1a1a1a',
-    border: '1px solid #222',
-    borderRadius: '8px',
-    color: '#888',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: 600,
-  },
-  tabActive: {
-    flex: 1,
-    padding: '8px 12px',
-    background: '#2a2a2a',
-    border: '1px solid #00ff88',
-    borderRadius: '8px',
-    color: '#00ff88',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: 600,
-  },
-  panelContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  textSelector: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '4px',
-    marginBottom: '8px',
-  },
-  textBtn: {
-    padding: '4px 8px',
-    background: '#1a1a1a',
-    border: '1px solid #333',
-    borderRadius: '6px',
-    color: '#888',
-    cursor: 'pointer',
-    fontSize: '12px',
-  },
-  textBtnActive: {
-    padding: '4px 8px',
-    background: '#2a2a2a',
-    border: '1px solid #00ff88',
-    borderRadius: '6px',
-    color: '#00ff88',
-    cursor: 'pointer',
-    fontSize: '12px',
-  },
-  label: {
-    fontSize: '13px',
-    color: '#aaa',
-    fontWeight: 600,
-    marginTop: '4px',
-  },
-  input: {
-    padding: '8px 10px',
-    background: '#1a1a1a',
-    border: '1px solid #333',
-    borderRadius: '6px',
-    color: '#e0e0e0',
-    fontSize: '14px',
-    outline: 'none',
-  },
-  select: {
-    padding: '8px 10px',
-    background: '#1a1a1a',
-    border: '1px solid #333',
-    borderRadius: '6px',
-    color: '#e0e0e0',
-    fontSize: '14px',
-    outline: 'none',
-    cursor: 'pointer',
-  },
-  slider: {
-    width: '100%',
-    accentColor: '#00ff88',
-    cursor: 'pointer',
-  },
-  colorPicker: {
-    width: '100%',
-    height: '36px',
-    border: '1px solid #333',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    background: '#1a1a1a',
-  },
-  applyBtn: {
-    marginTop: '8px',
-    padding: '8px 12px',
-    background: '#1a2a1a',
-    border: '1px solid #2a4a2a',
-    borderRadius: '6px',
-    color: '#88ff88',
-    cursor: 'pointer',
-    fontSize: '13px',
-    fontWeight: 600,
-  },
-  actions: {
-    marginTop: '12px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  exportBtn: {
-    padding: '10px 16px',
-    background: '#1a1a2a',
-    border: '1px solid #2a2a4a',
-    borderRadius: '8px',
-    color: '#88aaff',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: 600,
-  },
-  validateBtn: {
-    padding: '10px 16px',
-    background: '#1a2a1a',
-    border: '1px solid #2a4a2a',
-    borderRadius: '8px',
-    color: '#88ff88',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: 700,
-  },
-  validatedBtn: {
-    padding: '10px 16px',
-    background: '#2a4a2a',
-    border: '1px solid #4a8a4a',
-    borderRadius: '8px',
-    color: '#aaffaa',
-    cursor: 'default',
-    fontSize: '14px',
-    fontWeight: 700,
-  },
+  app: { background: '#0a0a0a', color: '#e0e0e0', fontFamily: 'system-ui, -apple-system, sans-serif', minHeight: '100vh', display: 'flex', flexDirection: 'column' },
+  loading: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#0a0a0a', color: '#888', fontFamily: 'system-ui, sans-serif' },
+  header: { padding: '12px 20px', borderBottom: '1px solid #222', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' },
+  mainLayout: { display: 'flex', flexDirection: 'row', flex: 1, gap: '20px', padding: '20px', alignItems: 'flex-start' },
+  playerContainer: { display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 },
+  panel: { width: '340px', minWidth: '300px', maxHeight: '85vh', overflowY: 'auto', background: '#141414', borderRadius: '12px', border: '1px solid #222', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' },
+  tabs: { display: 'flex', gap: '4px', marginBottom: '8px', flexWrap: 'wrap' },
+  tab: { flex: 1, padding: '8px 12px', background: '#1a1a1a', border: '1px solid #222', borderRadius: '8px', color: '#888', cursor: 'pointer', fontSize: '13px', fontWeight: 600, minWidth: '70px' },
+  tabActive: { flex: 1, padding: '8px 12px', background: '#2a2a2a', border: '1px solid #00ff88', borderRadius: '8px', color: '#00ff88', cursor: 'pointer', fontSize: '13px', fontWeight: 600, minWidth: '70px' },
+  panelContent: { display: 'flex', flexDirection: 'column', gap: '6px' },
+  label: { fontSize: '13px', color: '#aaa', fontWeight: 600, marginTop: '4px' },
+  input: { padding: '8px 10px', background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', color: '#e0e0e0', fontSize: '14px', outline: 'none' },
+  select: { padding: '8px 10px', background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', color: '#e0e0e0', fontSize: '14px', outline: 'none', cursor: 'pointer' },
+  slider: { width: '100%', accentColor: '#00ff88', cursor: 'pointer' },
+  colorPicker: { width: '100%', height: '36px', border: '1px solid #333', borderRadius: '6px', cursor: 'pointer', background: '#1a1a1a' },
+  actions: { marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' },
+  exportBtn: { padding: '10px 16px', background: '#1a1a2a', border: '1px solid #2a2a4a', borderRadius: '8px', color: '#88aaff', cursor: 'pointer', fontSize: '14px', fontWeight: 600 },
+  validateBtn: { padding: '10px 16px', background: '#1a2a1a', border: '1px solid #2a4a2a', borderRadius: '8px', color: '#88ff88', cursor: 'pointer', fontSize: '14px', fontWeight: 700 },
+  validatedBtn: { padding: '10px 16px', background: '#2a4a2a', border: '1px solid #4a8a4a', borderRadius: '8px', color: '#aaffaa', cursor: 'default', fontSize: '14px', fontWeight: 700 },
 };

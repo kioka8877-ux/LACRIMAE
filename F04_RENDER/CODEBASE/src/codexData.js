@@ -1,8 +1,42 @@
-// Codex de dev — le vrai codex.json (multi-clips) est produit par F02_FORMAT
-// et régénéré dans src/codexData.js avant chaque render (GHA / LAC_RUN).
+// Codex de dev — le vrai codex.json (multi-clips, v4.0) est produit par F02_FORMAT
+// (ou par le bridge forge) et régénéré dans src/codexData.js avant chaque render.
 export const codex = {
-  version: '3.0',
+  version: '4.0',
   pipeline: 'LACRIMAE_DEV',
+  mode: 'libre',
+  session: {
+    background: {
+      image: null,
+      color: '#0a0a0a',
+      scale: 1.0,
+    },
+    logo: {
+      src: 'logo.png',
+      width_pct: 25,
+      position: 'bottom_left',
+      opacity: 1.0,
+    },
+    texts_style: {
+      font: 'Impact, Arial Black, sans-serif',
+      size_title: 96,
+      size_paragraph: 44,
+      color: '#FFFFFF',
+      stroke_color: '#000000',
+      stroke_width: 4,
+      shadow: '2px 4px 8px rgba(0,0,0,0.9)',
+      glow_intensity: 0,
+      letter_spacing: '0em',
+    },
+    presets: {
+      color_preset: 'punchy',
+      color_css_filter: 'contrast(1.3) saturate(1.5) brightness(1.1)',
+      enhance_4k: false,
+      sharpening: 0,
+      denoising: 0,
+      vignette: 0.25,
+      grain_intensity: 0.15,
+    },
+  },
   validated_by_magos: false,
   clips: [
     {
@@ -13,6 +47,13 @@ export const codex = {
         total_frames: 300,
         width: 1080,
         height: 1920,
+      },
+      texts: {
+        mode: 'title',
+        title: 'LACRIMAE',
+        paragraph: '',
+        title_offset_pct: 8,
+        paragraph_offset_pct: 8,
       },
       text_overlays: [
         {
@@ -34,21 +75,9 @@ export const codex = {
         },
       ],
       zoom_keyframes: [],
-      logo: {
-        src: 'logo.png',
-        width_pct: 25,
-        position: 'top_left',
-        opacity: 1.0,
-      },
+      logo: null,
       brutal_cut_interval_frames: 90,
       volume: 1.0,
-      color_preset: 'punchy',
-      color_css_filter: 'contrast(1.15) saturate(1.3) brightness(1.05)',
-      enhance_4k: false,
-      sharpening: 0,
-      denoising: 0,
-      vignette: 0.25,
-      grain_intensity: 0.15,
       slowmo_start_frame: 0,
       slowmo_speed: 1.0,
       shake_power: 0,

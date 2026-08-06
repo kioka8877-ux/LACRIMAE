@@ -15,27 +15,67 @@ import { loadFont } from '@remotion/google-fonts/Anton';
 
 const { fontFamily: antonFont } = loadFont();
 
-/* ────────────────────────────────────────────────────────────────────────────
- * OmniComposition — Composition principale LACRIMAE (dev)
- * Lit le codex.json et orchestre tous les layers.
+/* ═══════════════════════════════════════════════════════════════════════════
+ * OmniComposition — Composition principale LACRIMAE (dev) — v2 calques
  *
+ * Stack des 6 calques (z-order, du plus bas au plus haut) :
+ *   L1 BACKGROUND  — fond PNG (fourni par l'opérateur) OU couleur unie,
+ *                    façon CRUSADER (cover + scale + fallback couleur)
+ *   L2 CLIP VIDÉO  — clip coupé, au centre, zoom/slow-mo/shake
+ *   L3 TITRE       — en haut
+ *   L4 PARAGRAPHE  — en bas (4 lignes max)
+ *   L5 LOGO        — image transparente (campagne), en bas du cadre
+ *   L6 PRESETS     — calque d'ambiance GLOBAL : colorimétrie + enhance 4K +
+ *                    sharpening appliqués à TOUTE la scène, grain + vignette
+ *                    par-dessus.
+ *
+ * Codex v4.0 : bloc `session` (style global des N clips) + `clips[]`.
  * Props:
- *   codex: object — le codex.json validé via F03
- *   videoSrc: string — chemin vers le clip formaté 9:16
- * ──────────────────────────────────────────────────────────────────────────── */
+ *   codex:   object — le clip en cours (ou le codex entier si clips absent)
+ *   session: object — le bloc session global (optionnel, fallback codex.session)
+ * ═══════════════════════════════════════════════════════════════════════════ */
 
-export const OmniComposition = ({ codex: codexProp }) => {
+const SESSION_FALLBACK = {
+  background: { image: null, color: '#0a0a0a', scale: 1.0 },
+  logo: { src: 'logo.png', width_pct: 20, position: 'bottom_left', opacity: 1.0 },
+  texts_style: {
+    font: 'Impact, Arial Black, sans-serif',
+    size_title: 96,
+    size_paragraph: 44,
+    color: '#FFFFFF',
+    stroke_color: '#000000',
+    stroke_width: 4,
+    shadow: '2px 4px 8px rgba(0,0,0,0.9)',
+    glow_intensity: 0,
+    letter_spacing: '0em',
+  },
+  presets: {
+    color_preset: 'punchy',
+    color_css_filter: 'contrast(1.3) saturate(1.5) brightness(1.1)',
+    enhance_4k: false,
+    sharpening: 0,
+    denoising: 0,
+    vignette: 0.25,
+    grain_intensity: 0.15,
+  },
+};
+
+export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames, width, height } = useVideoConfig();
 
-  // Utiliser le codex importé directement (plus fiable que les props)
-  const codex = codexProp || codexData;
+  // Codex : clip passé en props, ou codex importé (fallback)
+  const clip = codexProp || (codexData.clips?.[0] || codexData);
 
-  // Video source hardcodé — staticFile résoud le chemin vers public/
-  const videoSrc = staticFile(codex.video?.source || 'clip_001.mp4');
+  // Session : props (préférence) → codex.session → défauts
+  const session = sessionProp || clip.session || codexData.session || SESSION_FALLBACK;
+  const presets = { ...SESSION_FALLBACK.presets, ...(session.presets || {}) };
+  const textsStyle = { ...SESSION_FALLBACK.texts_style, ...(session.texts_style || {}) };
 
-  // Guard: si le codex n'est pas chargé, afficher un message d'erreur visible
-  if (!codex) {
+  // Video source
+  const videoSrc = staticFile(clip.video?.source || 'clip_001.mp4');
+
+  if (!clip) {
     return (
       <AbsoluteFill style={{ backgroundColor: '#ff4400', justifyContent: 'center', alignItems: 'center' }}>
         <div style={{ color: 'white', fontSize: 64, fontWeight: 'bold' }}>CODEX MANQUANT</div>
@@ -43,201 +83,275 @@ export const OmniComposition = ({ codex: codexProp }) => {
     );
   }
 
-  // Calculer le zoom actuel basé sur les keyframes
-  const currentZoom = getCurrentZoom(frame, codex.zoom_keyframes || []);
-
-  // CSS filter pour la colorimétrie
-  const colorFilter = codex.color_css_filter || '';
-  const enhanceFilter = codex.enhance_4k
+  // ── Zoom / slow-mo / shake / coup brutal (calculés, logique inchangée) ──
+  const currentZoom = getCurrentZoom(frame, clip.zoom_keyframes || []);
+  const colorFilter = presets.color_css_filter || '';
+  const enhanceFilter = presets.enhance_4k
     ? ' contrast(1.15) saturate(1.2) brightness(1.08)'
     : '';
-
-  // Sharpening (simulé via CSS drop-shadow + contrast)
-  const sharpening = codex.sharpening || 0;
-  const denoising = codex.denoising || 0;
+  const sharpening = presets.sharpening || 0;
   let sharpFilter = '';
   if (sharpening > 0) {
     const s = sharpening / 100;
     sharpFilter = ` contrast(${1 + s * 0.15}) drop-shadow(0 0 ${s * 0.5}px rgba(255,255,255,${s * 0.15}))`;
   }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LE FILTRE COMPLET — c'est cette variable qui était calculée mais JAMAIS appliquée
-  // ═══════════════════════════════════════════════════════════════════════════
+  // CALQUE 6 : le filtre global s'applique à la SCÈNE ENTIÈRE (plus seulement la vidéo)
   const fullFilter = (colorFilter + enhanceFilter + sharpFilter).trim();
 
-  // Vignette
-  const vignetteOpacity = codex.vignette || 0;
-
-  // Grain
-  const grainIntensity = codex.grain_intensity || 0;
-
-  // Slow motion
-  const slowmoStart = codex.slowmo_start_frame || 0;
-  const slowmoSpeed = codex.slowmo_speed || 1.0;
-  const cutFlashFrames = codex.cut_flash_frames || 0;
+  const slowmoStart = clip.slowmo_start_frame || 0;
+  const slowmoSpeed = clip.slowmo_speed || 1.0;
   const isSlowmo = frame >= slowmoStart && slowmoSpeed < 1.0;
   const playbackRate = isSlowmo ? slowmoSpeed : 1.0;
 
-  // Camera shake au moment du cut — purement vertical, fluide
-  const shakePower = codex.shake_power || 50; // 0-100%
+  const shakePower = clip.shake_power || 0;
   const shakeFrame = slowmoStart;
-  const shakeDuration = 20; // frames de shake
+  const shakeDuration = 20;
   const isShaking = shakePower > 0 && frame >= shakeFrame && frame < shakeFrame + shakeDuration;
   let shakeX = 0, shakeY = 0;
   if (isShaking) {
     const shakeProgress = (frame - shakeFrame) / shakeDuration;
-    // Amplitude décroissante smooth (ease-out)
     const decay = Math.pow(1 - shakeProgress, 2);
-    const amp = (shakePower / 100) * decay * 20; // max 20px à 100%
-    // Onde sinusoïdale pure verticale — fluide, pas saccadé
+    const amp = (shakePower / 100) * decay * 20;
     shakeY = Math.sin((frame - shakeFrame) * 0.8) * amp;
-    shakeX = 0; // pas de mouvement horizontal
   }
 
-  // Pas de flash blanc — juste le shake
-
-  // Coup brutal — flash + punch toutes les N frames (0 = désactivé)
-  const brutalInterval = codex.brutal_cut_interval_frames || 0;
+  const brutalInterval = clip.brutal_cut_interval_frames || 0;
   const frameInBrutal = brutalInterval > 0 ? frame % brutalInterval : 999;
   const isBrutalCut = brutalInterval > 0 && frameInBrutal < 5;
   const brutalFlash = isBrutalCut ? 0.45 * (1 - frameInBrutal / 5) : 0;
   const brutalScale = isBrutalCut ? 1.04 : 1;
 
-  // Calcul du transform pour le zoom + shake
   const zoomTransform = `scale(${currentZoom.scale * brutalScale}) translate(${
     (0.5 - currentZoom.target_x) * 100
   }%, ${(0.5 - currentZoom.target_y) * 100}%)`;
 
+  // ── Textes : mode titre / titre+paragraphe (L3 + L4) ──
+  const texts = clip.texts || {};
+  const textMode = texts.mode || (texts.title ? 'title' : 'none');
+
   return (
-    <AbsoluteFill style={{ backgroundColor: '#000' }}>
-      {/* Layer 0: Audio (volume réglé par le Magos — 0 = silence, audio ajouté sur YouTube) */}
-      {codex.audio_enabled !== false && (
-        <Audio src={videoSrc} volume={codex.volume ?? 1} />
+    <AbsoluteFill style={{ backgroundColor: session.background?.color || '#000' }}>
+      {/* Audio (volume réglé par le Magos) */}
+      {clip.audio_enabled !== false && (
+        <Audio src={videoSrc} volume={clip.volume ?? 1} />
       )}
-      {/* Layer 1: Vidéo source avec zoom + colorimétrie + slow motion + shake */}
-      <AbsoluteFill
-        style={{
-          // ═══════════════════════════════════════════════════════════════════
-          // FIX: fullFilter est maintenant APPLIQUÉ ici
-          // ═══════════════════════════════════════════════════════════════════
-          filter: fullFilter || undefined,
-        }}
-      >
-        <OffthreadVideo
-          src={videoSrc}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            transform: `${zoomTransform} translate(${shakeX}px, ${shakeY}px)`,
-          }}
-          playbackRate={playbackRate}
-        />
+
+      {/* ═══ CALQUE 6 (wrapper) : presets globaux sur TOUTE la scène ═══ */}
+      <AbsoluteFill style={{ filter: fullFilter || undefined }}>
+        {/* ── L1 BACKGROUND : PNG façon CRUSADER (cover + scale) OU couleur ── */}
+        {session.background?.image ? (
+          <AbsoluteFill style={{ overflow: 'hidden' }}>
+            <Img
+              src={staticFile(session.background.image)}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                transform: `scale(${session.background.scale ?? 1})`,
+                transformOrigin: 'center center',
+              }}
+            />
+          </AbsoluteFill>
+        ) : (
+          <AbsoluteFill style={{ backgroundColor: session.background?.color || '#0a0a0a' }} />
+        )}
+
+        {/* ── L2 CLIP VIDÉO : zoom + slow-mo + shake (sans filtre couleur) ── */}
+        <AbsoluteFill>
+          <OffthreadVideo
+            src={videoSrc}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              transform: `${zoomTransform} translate(${shakeX}px, ${shakeY}px)`,
+            }}
+            playbackRate={playbackRate}
+          />
+        </AbsoluteFill>
+
+        {/* ── L3 TITRE (en haut, sur le fond) ── */}
+        {(textMode === 'title' || textMode === 'title+paragraph') && texts.title ? (
+          <TitleBlock
+            content={texts.title}
+            style={textsStyle}
+            fps={fps}
+            totalFrames={durationInFrames}
+            offsetPct={texts.title_offset_pct ?? 8}
+          />
+        ) : null}
+
+        {/* ── L4 PARAGRAPHE (en bas, sur le fond) ── */}
+        {textMode === 'title+paragraph' && texts.paragraph ? (
+          <ParagraphBlock
+            content={texts.paragraph}
+            style={textsStyle}
+            totalFrames={durationInFrames}
+            offsetPct={texts.paragraph_offset_pct ?? 8}
+          />
+        ) : null}
+
+        {/* ── L5 LOGO : en bas du cadre, calque permanent ── */}
+        <LogoOverlay logo={clip.logo || session.logo} width={width} />
+
+        {/* Badge SLOW MOTION */}
+        {isSlowmo && (
+          <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'flex-end', padding: 40 }}>
+            <div style={{
+              backgroundColor: 'rgba(0,0,0,0.7)',
+              color: '#FF4444',
+              fontSize: 32,
+              fontWeight: 'bold',
+              padding: '8px 20px',
+              borderRadius: 8,
+              fontFamily: antonFont,
+              letterSpacing: '0.1em',
+            }}>
+              SLOW MOTION
+            </div>
+          </AbsoluteFill>
+        )}
+
+        {/* Text overlays rétro-compat (text_overlays v3) */}
+        {(clip.text_overlays || []).map((overlay, index) => {
+          const startFrame = overlay.start_frame || 0;
+          const endFrame = overlay.end_frame || durationInFrames;
+          if (frame < startFrame || frame > endFrame) return null;
+          return (
+            <Sequence
+              key={overlay.id || index}
+              from={startFrame}
+              durationInFrames={endFrame - startFrame + 1}
+            >
+              <TextOverlay overlay={overlay} frame={frame - startFrame} fps={fps} />
+            </Sequence>
+          );
+        })}
+
+        {/* Flash du coup brutal */}
+        {brutalFlash > 0 && (
+          <AbsoluteFill style={{ backgroundColor: '#fff', opacity: brutalFlash, pointerEvents: 'none' }} />
+        )}
       </AbsoluteFill>
 
-      {/* Layer 2: Badge SLOW MOTION */}
-      {isSlowmo && (
-        <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'flex-end', padding: 40 }}>
-          <div style={{
-            backgroundColor: 'rgba(0,0,0,0.7)',
-            color: '#FF4444',
-            fontSize: 32,
-            fontWeight: 'bold',
-            padding: '8px 20px',
-            borderRadius: 8,
-            fontFamily: antonFont,
-            letterSpacing: '0.1em',
-          }}>
-            SLOW MOTION
-          </div>
-        </AbsoluteFill>
-      )}
-
-      {/* Layer 3: Vignette */}
-      {vignetteOpacity > 0 && (
-        <AbsoluteFill
-          style={{
-            background: `radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,${vignetteOpacity}) 100%)`,
-            pointerEvents: 'none',
-          }}
-        />
-      )}
-
-      {/* Layer 4: Grain cinématique (SVG feTurbulence — style CRUSADER) */}
-      {grainIntensity > 0 && (
-        <AbsoluteFill style={{ opacity: grainIntensity, pointerEvents: 'none' }}>
-          <svg
-            width="100%"
-            height="100%"
-            style={{ position: 'absolute', top: 0, left: 0 }}
-          >
+      {/* ── L6 (finitions) : grain + vignette PAR-DESSUS tout ── */}
+      {(presets.grain_intensity || 0) > 0 && (
+        <AbsoluteFill style={{ opacity: presets.grain_intensity, pointerEvents: 'none', mixBlendMode: 'overlay' }}>
+          <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
             <filter id="grainFilter">
-              <feTurbulence
-                type="fractalNoise"
-                baseFrequency="0.9"
-                numOctaves="2"
-                stitchTiles="stitch"
-              />
-              <feColorMatrix
-                type="matrix"
-                values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0"
-              />
+              <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+              <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0" />
             </filter>
             <rect width="100%" height="100%" filter="url(#grainFilter)" />
           </svg>
         </AbsoluteFill>
       )}
-
-      {/* Layer 5: Text overlays */}
-      {(codex.text_overlays || []).map((overlay, index) => {
-        const startFrame = overlay.start_frame || 0;
-        const endFrame = overlay.end_frame || durationInFrames;
-
-        if (frame < startFrame || frame > endFrame) return null;
-
-        return (
-          <Sequence
-            key={overlay.id || index}
-            from={startFrame}
-            durationInFrames={endFrame - startFrame + 1}
-          >
-            <TextOverlay overlay={overlay} frame={frame - startFrame} fps={fps} />
-          </Sequence>
-        );
-      })}
-
-      {/* Layer 6: Logo calque permanent */}
-      {codex.logo && <LogoOverlay logo={codex.logo} width={width} />}
-
-      {/* Layer 7: Flash du coup brutal */}
-      {brutalFlash > 0 && (
-        <AbsoluteFill style={{ backgroundColor: '#fff', opacity: brutalFlash, pointerEvents: 'none' }} />
+      {(presets.vignette || 0) > 0 && (
+        <AbsoluteFill
+          style={{
+            background: `radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,${presets.vignette}) 100%)`,
+            pointerEvents: 'none',
+          }}
+        />
       )}
     </AbsoluteFill>
   );
 };
 
-/* ────────────────────────────────────────────────────────────────────────────
- * LogoOverlay — Logo calque permanent
- * - position: top_left (défaut), top_center, top_right, bottom_*, ...
- * - width_pct: largeur du logo en % de la largeur de l'écran
- * - opacité réglable (0-1)
- * ──────────────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+ * L3 — TitleBlock : titre en haut, fade-in, style du session.texts_style
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const TitleBlock = ({ content, style, fps, totalFrames, offsetPct }) => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: 'clamp' });
 
-const LogoOverlay = ({ logo, width }) => {
-  const logoWidth = Math.round(width * ((logo.width_pct || 20) / 100));
-  const pos = getLogoPosition(logo.position || 'top_left');
-  if (!logo.src) return null;
   return (
-    <AbsoluteFill style={{ pointerEvents: 'none' }}>
+    <AbsoluteFill
+      style={{
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        paddingTop: `${offsetPct}%`,
+        pointerEvents: 'none',
+      }}
+    >
       <div
         style={{
-          position: 'absolute',
-          ...pos,
-          opacity: logo.opacity ?? 1,
+          fontFamily: style.font,
+          fontSize: `${style.size_title}px`,
+          color: style.color,
+          WebkitTextStroke: `${style.stroke_width}px ${style.stroke_color}`,
+          textShadow: style.shadow,
+          letterSpacing: style.letter_spacing,
+          fontWeight: 900,
+          textTransform: 'uppercase',
+          lineHeight: 1.1,
+          textAlign: 'center',
+          opacity,
+          maxWidth: '88%',
+          wordWrap: 'break-word',
         }}
       >
+        {content}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * L4 — ParagraphBlock : paragraphe en bas (max ~4 lignes)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const ParagraphBlock = ({ content, style, totalFrames, offsetPct }) => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [0, 25], [0, 1], { extrapolateRight: 'clamp' });
+
+  return (
+    <AbsoluteFill
+      style={{
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        paddingBottom: `${offsetPct}%`,
+        pointerEvents: 'none',
+      }}
+    >
+      <div
+        style={{
+          fontFamily: style.font,
+          fontSize: `${style.size_paragraph}px`,
+          color: style.color,
+          WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,
+          textShadow: style.shadow,
+          letterSpacing: style.letter_spacing,
+          fontWeight: 700,
+          lineHeight: 1.25,
+          textAlign: 'center',
+          opacity,
+          maxWidth: '88%',
+          maxHeight: '22%',
+          overflow: 'hidden',
+          display: '-webkit-box',
+          WebkitLineClamp: 4,
+          WebkitBoxOrient: 'vertical',
+          wordWrap: 'break-word',
+        }}
+      >
+        {content}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * L5 — LogoOverlay : logo calque permanent, EN BAS du cadre
+ * - width_pct: largeur en % de l'écran (ajustable dans la preview)
+ * - position: bottom_left (défaut) — le pack interdit de le déplacer en forge
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const LogoOverlay = ({ logo, width }) => {
+  if (!logo || !logo.src) return null;
+  const logoWidth = Math.round(width * ((logo.width_pct || 20) / 100));
+  const pos = getLogoPosition(logo.position || 'bottom_left');
+  return (
+    <AbsoluteFill style={{ pointerEvents: 'none' }}>
+      <div style={{ position: 'absolute', ...pos, opacity: logo.opacity ?? 1 }}>
         <Img src={staticFile(logo.src)} style={{ width: logoWidth, height: 'auto' }} />
       </div>
     </AbsoluteFill>
@@ -251,27 +365,21 @@ function getLogoPosition(position) {
       return { top: pad, left: '50%', transform: 'translateX(-50%)' };
     case 'top_right':
       return { top: pad, right: pad };
-    case 'bottom_left':
-      return { bottom: pad, left: pad };
     case 'bottom_center':
       return { bottom: pad, left: '50%', transform: 'translateX(-50%)' };
     case 'bottom_right':
       return { bottom: pad, right: pad };
     case 'top_left':
-    default:
       return { top: pad, left: pad };
+    case 'bottom_left':
+    default:
+      return { bottom: pad, left: pad };
   }
 }
 
-/* ────────────────────────────────────────────────────────────────────────────
- * TextOverlay — Affiche un texte avec animation mot par mot
- * Style concurrent 140M vues :
- * - Mot par mot (chaque mot = span avec fade + scale)
- * - Glow néon multi-couches si glow_intensity > 0
- * - Contour noir (WebkitTextStroke)
- * - Positions variées (center, top, center_bottom, center_left)
- * ──────────────────────────────────────────────────────────────────────────── */
-
+/* ═══════════════════════════════════════════════════════════════════════════
+ * TextOverlay — rétro-compat text_overlays v3 (animations mot par mot etc.)
+ * ═══════════════════════════════════════════════════════════════════════════ */
 const TextOverlay = ({ overlay, frame, fps }) => {
   const {
     content,
@@ -291,49 +399,33 @@ const TextOverlay = ({ overlay, frame, fps }) => {
 
   const localFrame = frame;
   const words = content.split(' ');
-
-  // Calculer le timing d'apparition des mots
-  // Pour word_by_word : chaque mot apparaît à intervalle régulier
   const totalDuration = (overlay.end_frame || 300) - start_frame;
-  const wordFadeFrames = 8; // frames pour le fade-in d'un mot
+  const wordFadeFrames = 8;
   let wordsPerFrame;
 
   if (animation === 'word_by_word') {
-    // Les mots apparaissent sur les premiers 60% de la durée, puis restent
     const revealDuration = Math.max(totalDuration * 0.6, words.length * 8);
     wordsPerFrame = revealDuration / words.length;
   } else {
-    wordsPerFrame = 0; // pas utilisé pour les autres animations
+    wordsPerFrame = 0;
   }
 
-  // Construire le glow néon
   const glowLayers = [];
   if (glow_intensity > 0) {
     const intensity = glow_intensity / 100;
-    const layers = Math.round(intensity * 4); // 0 à 4 couches
+    const layers = Math.round(intensity * 4);
     const glowSizes = [3, 6, 12, 20];
     for (let i = 0; i < layers; i++) {
       glowLayers.push(`0 0 ${glowSizes[i]}px ${color}`);
     }
-    glowLayers.push(shadow); // ombre portée noire
+    glowLayers.push(shadow);
   } else {
     glowLayers.push(shadow);
   }
   const textShadowStr = glowLayers.join(', ');
 
-  // Contour
-  const strokeStr =
-    stroke_width > 0 ? `${stroke_width}px ${stroke_color}` : '0px transparent';
+  const strokeStr = stroke_width > 0 ? `${stroke_width}px ${stroke_color}` : '0px transparent';
 
-  // 3D depth (couches décalées)
-  const depthLayers = [];
-  if (depth_3d > 0) {
-    for (let d = 1; d <= depth_3d; d++) {
-      depthLayers.push(d);
-    }
-  }
-
-  // Style de base du texte
   const baseTextStyle = {
     fontFamily: font,
     fontSize: `${size}px`,
@@ -352,10 +444,8 @@ const TextOverlay = ({ overlay, frame, fps }) => {
     maxWidth: '85%',
   };
 
-  // Container de position (séparé de l'animation pour éviter les conflits de transform)
   const positionStyle = getPositionStyle(position);
 
-  // Animation du bloc entier (pour pop, fade_in, fade_in_slow)
   let blockOpacity = 1;
   let blockScale = 1;
 
@@ -368,46 +458,21 @@ const TextOverlay = ({ overlay, frame, fps }) => {
     blockOpacity = interpolate(localFrame, [0, 30], [0, 1], { extrapolateRight: 'clamp' });
   }
 
-  // Rendu
   if (animation === 'word_by_word') {
-    // Mot par mot : chaque mot est un span animé individuellement
     return (
       <div style={positionStyle}>
-        <div
-          style={{
-            ...baseTextStyle,
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
+        <div style={{ ...baseTextStyle, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
           {words.map((word, i) => {
             const wordStartFrame = i * wordsPerFrame;
             const wordLocalFrame = localFrame - wordStartFrame;
-            const wordOpacity = interpolate(
-              wordLocalFrame,
-              [0, wordFadeFrames],
-              [0, 1],
-              { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-            );
-            const wordScale = interpolate(
-              wordLocalFrame,
-              [0, wordFadeFrames],
-              [0.92, 1],
-              { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-            );
-
+            const wordOpacity = interpolate(wordLocalFrame, [0, wordFadeFrames], [0, 1], {
+              extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+            });
+            const wordScale = interpolate(wordLocalFrame, [0, wordFadeFrames], [0.92, 1], {
+              extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+            });
             return (
-              <span
-                key={i}
-                style={{
-                  opacity: wordOpacity,
-                  transform: `scale(${wordScale})`,
-                  display: 'inline-block',
-                  transition: 'none',
-                }}
-              >
+              <span key={i} style={{ opacity: wordOpacity, transform: `scale(${wordScale})`, display: 'inline-block', transition: 'none' }}>
                 {word}
                 {i < words.length - 1 ? '\u00A0' : ''}
               </span>
@@ -418,124 +483,51 @@ const TextOverlay = ({ overlay, frame, fps }) => {
     );
   }
 
-  // Animations bloc entier (pop, fade_in, fade_in_slow)
   return (
     <div style={positionStyle}>
-      <div
-        style={{
-          ...baseTextStyle,
-          opacity: blockOpacity,
-          transform: `scale(${blockScale})`,
-        }}
-      >
-        {/* Couches 3D depth (si depth_3d > 0) */}
-        {depthLayers.map((d) => (
-          <div
-            key={d}
-            style={{
-              ...baseTextStyle,
-              position: 'absolute',
-              top: `${d}px`,
-              left: `${d}px`,
-              color: 'rgba(0,0,0,0.3)',
-              WebkitTextStroke: '0px transparent',
-              textShadow: 'none',
-            }}
-          >
-            {content}
-          </div>
-        ))}
+      <div style={{ ...baseTextStyle, opacity: blockOpacity, transform: `scale(${blockScale})` }}>
         {content}
       </div>
     </div>
   );
 };
 
-/* ────────────────────────────────────────────────────────────────────────────
- * Helper: Position styles
- * ──────────────────────────────────────────────────────────────────────────── */
-
 function getPositionStyle(position) {
   switch (position) {
     case 'center':
-      return {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '90%',
-      };
+      return { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90%' };
     case 'top':
-      return {
-        position: 'absolute',
-        top: '10%',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '90%',
-      };
+      return { position: 'absolute', top: '10%', left: '50%', transform: 'translateX(-50%)', width: '90%' };
     case 'center_bottom':
-      return {
-        position: 'absolute',
-        bottom: '15%',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '90%',
-      };
+      return { position: 'absolute', bottom: '15%', left: '50%', transform: 'translateX(-50%)', width: '90%' };
     case 'bottom':
-      return {
-        position: 'absolute',
-        bottom: '8%',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '90%',
-      };
+      return { position: 'absolute', bottom: '8%', left: '50%', transform: 'translateX(-50%)', width: '90%' };
     case 'center_left':
-      return {
-        position: 'absolute',
-        top: '45%',
-        left: '10%',
-        width: '80%',
-      };
+      return { position: 'absolute', top: '45%', left: '10%', width: '80%' };
     default:
-      return {
-        position: 'absolute',
-        bottom: '15%',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '90%',
-      };
+      return { position: 'absolute', bottom: '15%', left: '50%', transform: 'translateX(-50%)', width: '90%' };
   }
 }
 
-/* ────────────────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════════
  * Helper: Zoom interpolation
- * ──────────────────────────────────────────────────────────────────────────── */
-
+ * ═══════════════════════════════════════════════════════════════════════════ */
 function getCurrentZoom(frame, keyframes) {
   if (!keyframes || keyframes.length === 0) {
     return { scale: 1.0, target_x: 0.5, target_y: 0.5 };
   }
-
   if (frame <= keyframes[0].frame) {
-    return {
-      scale: keyframes[0].scale,
-      target_x: keyframes[0].target_x,
-      target_y: keyframes[0].target_y,
-    };
+    return { scale: keyframes[0].scale, target_x: keyframes[0].target_x, target_y: keyframes[0].target_y };
   }
-
   if (frame >= keyframes[keyframes.length - 1].frame) {
     const last = keyframes[keyframes.length - 1];
     return { scale: last.scale, target_x: last.target_x, target_y: last.target_y };
   }
-
-  // Trouver les keyframes encadrants
   for (let i = 0; i < keyframes.length - 1; i++) {
     const k1 = keyframes[i];
     const k2 = keyframes[i + 1];
     if (frame >= k1.frame && frame <= k2.frame) {
       const t = (frame - k1.frame) / (k2.frame - k1.frame);
-      // Interpolation ease-in-out
       const easedT = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
       return {
         scale: k1.scale + (k2.scale - k1.scale) * easedT,
@@ -544,6 +536,5 @@ function getCurrentZoom(frame, keyframes) {
       };
     }
   }
-
   return { scale: 1.0, target_x: 0.5, target_y: 0.5 };
 }

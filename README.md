@@ -45,11 +45,12 @@ marche déjà en production).
 |---------|-----|---------|-------------|
 | F00 | INGEST | Collecte de la vidéo longue (URL YouTube ou fichier) | yt-dlp / FFmpeg |
 | F01 | SELECT | Sélection des séquences par vision (comme un humain) | OpenRouter vision |
-| F02 | FORMAT | Découpe + 9:16 (blur-pad optimisé ou reframe) + template codex | FFmpeg |
-| F03 | PREVIEW | Aperçu temps réel, presets, titre, logo, volume, validation | Vite + @remotion/player |
-| F04 | RENDER | Rendu final logo + titre statique + coup brutal 3s | Remotion |
+| F02 | FORMAT | Découpe + 9:16 (blur-pad/reframe) OU découpe seule (`background`) + template codex v4 | FFmpeg |
+| F03 | PREVIEW | Aperçu temps réel, 6 calques, presets, fond PNG, logo, textes, validation | Vite + @remotion/player |
+| F04 | RENDER | Rendu final logo + titre + paragraphe + coup brutal | Remotion |
 | F05 | CAMOUFLAGE | Wipe métadonnées + loudnorm | FFmpeg |
 | F06 | LUTHER | Effacement empreinte numérique (stream copy) | FFmpeg |
+| BRIDGE | PERTURABO | Pont mode forge : **auto-récupère** le pack `MONDES_FORGES/CLIPPING/EXPORT` → cutlist + codex | Python stdlib |
 | — | LAC_CUSTOS | Validation inter-frégates | Python stdlib |
 
 ## Choix de conception (dev)
@@ -58,7 +59,15 @@ marche déjà en production).
   adapté aux vidéos sans sous-titres (stars, foot, extraits).
 - **PAS de reframe par défaut** : blur-pad (duplique + flou) — la vidéo nette
   remplit la largeur, le fond est flouté/assombri/désaturé. Le profil `reframe`
-  (crop central) existe en alternative.
+  (crop central) existe en alternative. Troisième profil `background` :
+  découpe seule (résolution source conservée) — la mise en page 9:16 se fait
+  dans la composition Remotion (fond PNG + vidéo + textes + logo).
+- **DEUX MODES** : `libre` (F01 vision OpenRouter → cutlist) et
+  `forge` (pack Perturabo → BRIDGE → cutlist validée, F01 sautée). En mode
+  forge, le codex contient un bloc `session` (style global : fond PNG, logo,
+  textes, presets — décidé 1× en preview, appliqué aux N clips) + blocs
+  `clips[]` (contenu du pack). Voir
+  [`TRACKING/LACRIMAE_DEUX_MODES_DESIGN.md`](TRACKING/LACRIMAE_DEUX_MODES_DESIGN.md).
 - **PAS de SFX, PAS de sous-titres** : le titre est un texte statique (fade-in)
   positionné dans la zone safe (bandes floues), couleur et font au choix.
 - **Coup brutal** : flash/impact toutes les 3s (90 frames) — réglable, 0 = désactivé.
@@ -85,7 +94,7 @@ coup brutal). F04 rend une composition par clip, F05/F06 traitent les N clips.
 | Porte | Input `gate` | Ce qui s'exécute | Intervention du Champion |
 |-------|--------------|------------------|--------------------------|
 | G1 | BRIEF + INGEST | F00 (yt-dlp) | Fournit url/titre/sujet/vibe/params dans l'UI |
-| G2 | ORACLE | F01 vision → cutlist.json (N séquences) | Vérifie/édite `F02_FORMAT/IN/cutlist.json` (UI GitHub) |
+| G2 | ORACLE | libre : F01 vision → cutlist · forge : BRIDGE **auto-récupère** le pack PERTURABO/EXPORT → cutlist | Vérifie/édite `F02_FORMAT/IN/cutlist.json` (UI GitHub) |
 | G3 | FORMAT | F02 blur-pad/reframe → codex multi-clips | Édite `F03_PREVIEW/IN/codex.json` (titre/volume/couleurs de chaque clip + `validated_by_magos: true`) |
 | G4 | RENDER | F04 Remotion → 1 rendu par clip (`clip_00X_finale.mp4`) | Télécharge l'artifact `lac-video-finale` |
 | G5 | CAMOUFLAGE + LUTHER | F05 → F06 → `clip_00X_clean.mp4` (N clips) | Télécharge l'artifact `lac-clean` |
@@ -100,6 +109,29 @@ coup brutal). F04 rend une composition par clip, F05/F06 traitent les N clips.
 
 **Le gardien tourne à chaque sortie** : `LAC_CUSTOS.py` est appelé après chaque
 frégate — aucun artefact ne transite sans verdict.
+
+## Mode forge (Perturabo)
+
+**L'ORACLE est autonome** : le bridge va chercher le pack **seul** dans
+`PERTURABO/MONDES_FORGES/CLIPPING/EXPORT` (`production_pack_*.json`, API GitHub,
+stdlib) — il ne prend **rien d'autre**. Tu ne fournis que ce qui n'est **pas**
+dans le pack : la vidéo et les PNG.
+
+```
+1. (UNE FOIS POUR TOUTES) déposer tes fonds : SHARED/IN/backgrounds/*.png
+   et ton logo transparent de campagne : SHARED/IN/logos/logo.png
+2. Déposer la vidéo à couper : BRIDGE_PERTURABO/IN/video_source.mp4
+   (ou la passer en --video)
+3. python LAC_RUN.py forge [--pack-filter SANDOVAL] [--video ...]
+   → l'Oracle récupère le pack, Gate 1 (pack + cuts + assets) → cutlist + codex v4
+4. python LAC_RUN.py run       → F02 profil background (découpe seule)
+5. Preview F03 : choisir le fond PNG (menu déroulant), ajuster, valider → gate --codex
+6. python LAC_RUN.py run       → F04 → F05 → F06 → clean_final.mp4
+```
+
+En GHA : `gate G2` avec `mode: forge` suffit — le pack est auto-récupéré, les
+PNG viennent de `SHARED/IN/` (commités une fois pour toutes) et la vidéo de
+l'artifact G1.
 
 ## Démarrage rapide (local)
 
