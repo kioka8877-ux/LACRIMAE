@@ -113,7 +113,7 @@ jobs:
       - name: Install + build (Vite)
         working-directory: F03_PREVIEW/CODEBASE
         run: |
-          npm install
+          npm ci
           npm run build
 
       - name: Configure Pages
