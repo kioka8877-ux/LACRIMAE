@@ -18,7 +18,7 @@
   "pack_fetched": false,
   "source_video": "SHARED/IN/video_source.mp4",
   "source_type": "operator_file",
-  "video_local": "/home/daytona/codebase/SHARED/IN/video_source.mp4",
+  "video_local": "F02_FORMAT/IN/video_source.mp4",
   "clips": [
     {
       "angle_id": "A01",

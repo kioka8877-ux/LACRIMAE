@@ -1,0 +1,22 @@
+{
+  "pipeline": "LACRIMAE_DEV",
+  "fregates": {
+    "F01": "2026-08-06T15:05:55Z"
+  },
+  "fregate_actuelle": "F01",
+  "derniere_mise_a_jour": "2026-08-06T15:05:55Z",
+  "brief": {
+    "source": "SHARED/IN/video_source.mp4",
+    "title": "SANDOVAL — SIEGE LOGO",
+    "sujet": "Tom Sandoval — drama Vanderpump Rules (TMZ)",
+    "vibe": "informatif / drama",
+    "profile": "background",
+    "preset": "punchy",
+    "sequences": 5,
+    "min_dur": 3.0,
+    "max_dur": 10.0,
+    "mode": "forge",
+    "pack": "BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json",
+    "model": ""
+  }
+}
