@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   AbsoluteFill,
   Audio,
@@ -6,16 +6,16 @@ import {
   useCurrentFrame,
   useVideoConfig,
   interpolate,
-  OffthreadVideo,
+  Video,
   Sequence,
   staticFile,
 } from 'remotion';
 
-/* ═══════════════════════════════════════════════════════════════════════════
- * OmniComposition (F03 PREVIEW) — mêmes 6 calques que F04 RENDER :
- *   L1 BACKGROUND → L2 CLIP → L3 TITRE → L4 PARAGRAPHE → L5 LOGO → L6 PRESETS
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+ * OmniComposition (F03 PREVIEW) â€” mÃªmes 6 calques que F04 RENDER :
+ *   L1 BACKGROUND â†’ L2 CLIP â†’ L3 TITRE â†’ L4 PARAGRAPHE â†’ L5 LOGO â†’ L6 PRESETS
  * Props: codex (clip), videoSrc, session (bloc session v4)
- * ═══════════════════════════════════════════════════════════════════════════ */
+ * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 const SESSION_FALLBACK = {
   background: { image: null, color: '#0a0a0a', scale: 1.0 },
@@ -62,7 +62,7 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
     );
   }
 
-  // ── Zoom / slow-mo / shake / coup brutal ──
+  // â”€â”€ Zoom / slow-mo / shake / coup brutal â”€â”€
   const currentZoom = getCurrentZoom(frame, clip.zoom_keyframes || []);
   const colorFilter = presets.color_css_filter || '';
   const enhanceFilter = presets.enhance_4k
@@ -113,7 +113,7 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
         <Audio src={videoUrl} volume={clip.volume ?? 1} />
       )}
 
-      {/* CALQUE 6 wrapper : presets globaux sur toute la scène */}
+      {/* CALQUE 6 wrapper : presets globaux sur toute la scÃ¨ne */}
       <AbsoluteFill style={{ filter: fullFilter || undefined }}>
         {/* L1 BACKGROUND */}
         {session.background?.image ? (
@@ -133,9 +133,9 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
           <AbsoluteFill style={{ backgroundColor: session.background?.color || '#0a0a0a' }} />
         )}
 
-        {/* L2 CLIP VIDÉO */}
+        {/* L2 CLIP VIDÃ‰O */}
         <AbsoluteFill>
-          <OffthreadVideo
+          <Video
             src={videoUrl}
             style={{
               width: '100%',
@@ -185,7 +185,7 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
           </AbsoluteFill>
         )}
 
-        {/* Text overlays rétro-compat */}
+        {/* Text overlays rÃ©tro-compat */}
         {(clip.text_overlays || []).map((overlay, index) => {
           const startFrame = overlay.start_frame || 0;
           const endFrame = overlay.end_frame || durationInFrames;
@@ -227,7 +227,7 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
   );
 };
 
-/* ── L3 TITRE ── */
+/* â”€â”€ L3 TITRE â”€â”€ */
 const TitleBlock = ({ content, style, offsetPct }) => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: 'clamp' });
@@ -264,7 +264,7 @@ const TitleBlock = ({ content, style, offsetPct }) => {
   );
 };
 
-/* ── L4 PARAGRAPHE ── */
+/* â”€â”€ L4 PARAGRAPHE â”€â”€ */
 const ParagraphBlock = ({ content, style, offsetPct }) => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 25], [0, 1], { extrapolateRight: 'clamp' });
@@ -305,7 +305,7 @@ const ParagraphBlock = ({ content, style, offsetPct }) => {
   );
 };
 
-/* ── L5 LOGO ── */
+/* â”€â”€ L5 LOGO â”€â”€ */
 const LogoOverlay = ({ logo, width }) => {
   if (!logo || !logo.src) return null;
   const logoWidth = Math.round(width * ((logo.width_pct || 20) / 100));
@@ -338,7 +338,7 @@ function getLogoPosition(position) {
   }
 }
 
-/* ── TextOverlay rétro-compat v3 ── */
+/* â”€â”€ TextOverlay rÃ©tro-compat v3 â”€â”€ */
 const TextOverlay = ({ overlay, frame, fps }) => {
   const {
     content,
