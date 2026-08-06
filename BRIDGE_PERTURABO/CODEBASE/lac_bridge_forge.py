@@ -321,7 +321,11 @@ def transit_to_f02(video_path, cutlist_path):
     f02 = FRIGATES["F02"]
     f02_in = f02 / "IN"
     f02_in.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(video_path, f02_in / "video_source.mp4")
+    dest_video = f02_in / "video_source.mp4"
+    # GHA : la vidéo est déjà téléchargée directement dans F02/IN (--video
+    # F02_FORMAT/IN/video_source.mp4) — copie = no-op, pas d'erreur.
+    if video_path.resolve() != dest_video.resolve():
+        shutil.copy2(video_path, dest_video)
     shutil.copy2(cutlist_path, f02_in / "cutlist.json")
     log_ok(f"F02/IN : video_source.mp4 + cutlist.json")
 
