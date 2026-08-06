@@ -1,72 +1,78 @@
 {
-  "pack_id": "LOGO-TS01_SANDOVAL-SIEGE-LOGO-20260804T174153",
+  "pack_id": "LOGO-TS01_SANDOVAL-SIEGE-LOGO-20260804T174153-SA_VIDEO",
   "mode": "logo",
   "videos_count": 5,
   "gate1": "validated",
   "profile_f02": "background",
-  "background": "fond_test.png",
+  "background": "bg_grid_dark.png",
   "backgrounds_available": [
-    "fond_test.png"
+    "bg_grid_dark.png",
+    "bg_paper_crumpled.png",
+    "bg_paper_new.png",
+    "bg_papyrus_old.png",
+    "bg_solid_blue.png",
+    "custom_storm_001.png",
+    "custom_storm_002.png"
   ],
   "f01_skipped": true,
-  "pack_fetched": true,
-  "source_video": "https://www.youtube.com/watch?v=xpG5sIW1jpA",
-  "source_type": "youtube",
-  "video_local": "/home/daytona/codebase/BRIDGE_PERTURABO/IN/video_source.mp4",
+  "pack_fetched": false,
+  "source_video": "SHARED/IN/video_source.mp4",
+  "source_type": "operator_file",
+  "video_local": "/home/daytona/codebase/SHARED/IN/video_source.mp4",
   "clips": [
     {
       "angle_id": "A01",
       "title": "Kicked in front of his band",
       "cut": {
-        "start_sec": 12,
-        "end_sec": 47,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Ouverture du scandale : visage + reaction la plus dense en emotion. VALIDE par le Warsmith (Gate 4)."
+        "start_sec": 0.0,
+        "end_sec": 30.0,
+        "duration_sec": 30.0,
+        "cut_source": "recut_video_operateur",
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 0.0-30.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Ouverture du scandale : visage + reaction la plus dense en emotion. VALIDE par le Warsmith (Gate 4)."
       }
     },
     {
       "angle_id": "A02",
       "title": "4 words that broke him",
       "cut": {
-        "start_sec": 60,
-        "end_sec": 95,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Moment de bascule du recit (accusation/insultes). VALIDE par le Warsmith (Gate 4)."
+        "start_sec": 37.5,
+        "end_sec": 67.5,
+        "duration_sec": 30.0,
+        "cut_source": "recut_video_operateur",
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 37.5-67.5s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Moment de bascule du recit (accusation/insultes). VALIDE par le Warsmith (Gate 4)."
       }
     },
     {
       "angle_id": "A03",
       "title": "She threatened the Ariana Madix treatment",
       "cut": {
-        "start_sec": 130,
-        "end_sec": 165,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Menace / escalade (leverage sur Tom). VALIDE par le Warsmith (Gate 4)."
+        "start_sec": 75.0,
+        "end_sec": 105.0,
+        "duration_sec": 30.0,
+        "cut_source": "recut_video_operateur",
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 75.0-105.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Menace / escalade (leverage sur Tom). VALIDE par le Warsmith (Gate 4)."
       }
     },
     {
       "angle_id": "A04",
       "title": "Restraining order vs her AND dad",
       "cut": {
-        "start_sec": 200,
-        "end_sec": 235,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Consequences legales (ordonnance, tribunal). VALIDE par le Warsmith (Gate 4)."
+        "start_sec": 112.5,
+        "end_sec": 142.5,
+        "duration_sec": 30.0,
+        "cut_source": "recut_video_operateur",
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 112.5-142.5s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Consequences legales (ordonnance, tribunal). VALIDE par le Warsmith (Gate 4)."
       }
     },
     {
       "angle_id": "A05",
       "title": "Her one sentence response changes everything",
       "cut": {
-        "start_sec": 260,
-        "end_sec": 295,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Chute / retournement (deni de l'autre partie). VALIDE par le Warsmith (Gate 4)."
+        "start_sec": 150.0,
+        "end_sec": 180.0,
+        "duration_sec": 30.0,
+        "cut_source": "recut_video_operateur",
+        "note": "Re-cut opérateur (vidéo 182s) — fenêtre 150.0-180.0s (30s) répartie uniformément. Ajustable à la Porte II (editer F02_FORMAT/IN/cutlist.json). Chute / retournement (deni de l'autre partie). VALIDE par le Warsmith (Gate 4)."
       }
     }
   ]

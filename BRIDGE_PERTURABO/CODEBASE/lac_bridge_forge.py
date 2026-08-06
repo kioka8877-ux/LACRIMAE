@@ -56,6 +56,7 @@ import argparse
 import json
 import os
 import shutil
+import subprocess
 import sys
 import urllib.request
 from pathlib import Path
@@ -276,6 +277,42 @@ def check_assets(video_path, shared_backgrounds, logo_path) -> list:
     if logo_path is not None and not logo_path.exists():
         missing.append(f"LOGO manquant : {logo_path}")
     return missing
+
+
+def probe_video_duration(video_path) -> float | None:
+    """Durée de la vidéo via ffprobe (None si ffprobe indisponible)."""
+    try:
+        out = subprocess.check_output(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=nw=1", str(video_path)],
+            stderr=subprocess.DEVNULL)
+        return float(out.decode().split("=")[1].strip())
+    except Exception:
+        return None
+
+
+def check_cuts_within_duration(pack: dict, video_path) -> list:
+    """Vérifie que TOUS les cuts du pack sont dans la durée de la vidéo fournie.
+    Retourne les erreurs (vide = OK).
+
+    Pourquoi : sans ce contrôle, un cut au-delà de la durée produit un clip VIDE
+    à G3 (ffmpeg -ss 200 sur une vidéo de 182s) — l'opérateur découvrirait le
+    problème hors porte. La garde bloque à GATE 1 avec un message clair : la
+    vidéo fournie ne correspond pas au pack (clip_source_ref)."""
+    errors = []
+    duration = probe_video_duration(video_path)
+    if duration is None:
+        log_warn("ffprobe indisponible — contrôle durée vidéo sauté")
+        return errors
+    for v in pack.get("videos", []):
+        cut = v.get("cut") or {}
+        end = float(cut.get("end_sec", 0))
+        if end > duration:
+            errors.append(
+                f"video {v.get('angle_id', '?')} : cut {cut.get('start_sec')}-{end}s "
+                f"dépasse la durée vidéo ({duration:.1f}s) — la vidéo fournie ne "
+                f"correspond pas au pack (voir clip_source_ref)")
+    return errors
 
 
 # ─── TRANSITS ────────────────────────────────────────────────────────────────
@@ -499,6 +536,18 @@ def main():
         print(f"    - vidéo → {SHARED_VIDEO_SOURCE} (directement dans SHARED/IN)")
         print(f"    - fonds → {SHARED_BACKGROUNDS_DIR}/ (PNG, une fois pour toutes)")
         print(f"    - logo  → {SHARED_LOGOS_DIR / LOGO_FILENAME} (optionnel)")
+        sys.exit(1)
+
+    # Garde durée : TOUS les cuts du pack doivent être dans la vidéo fournie.
+    # (Sinon G3 produirait des clips vides — l'opérateur n'agit qu'aux portes.)
+    cut_errors = check_cuts_within_duration(pack, video_path)
+    if cut_errors:
+        for e in cut_errors:
+            log_err(e)
+        print("\n  ══ GATE 1 : ✗ ÉCHOUÉ — vidéo incompatible avec les cuts du pack ══")
+        print("  Le pack référence une source précise (clip_source_ref) — la vidéo")
+        print("  fournie doit la couvrir intégralement. Remplace-la dans la release :")
+        print("    sh _tools/lac_release_video.sh <bonne_video.mp4> [tag]")
         sys.exit(1)
     background_name = shared_backgrounds[0].name  # défaut = 1er fond trié
     log_ok(f"Assets opérateur : vidéo ✓ | {len(shared_backgrounds)} fond(s) "

@@ -126,7 +126,7 @@ dans le pack : la vidéo et les PNG.
      devient un asset de GitHub Release (2 Go max, illimité, gratuit) — chaque
      porte (G1/G2/G3) la télécharge depuis la release. **Jamais via artifact**
      (quota artifacts GHA = 500 Mo total en plan gratuit)
-3. python LAC_RUN.py forge [--pack-filter SANDOVAL]
+3. Si ta vidéo ne couvre pas les cuts du pack : python3 _tools/make_pack_sa_video.py (cree BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json, cuts recalibres/textes conserves) ; en GHA : gate G2 avec mode=forge et pack_path=BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json — sinon : python LAC_RUN.py forge [--pack-filter SANDOVAL]
    → l'Oracle récupère le pack, Gate 1 (pack + cuts + assets) → cutlist + codex v4
 4. python LAC_RUN.py run       → F02 profil background (découpe seule)
 5. Preview F03 : choisir le fond PNG (menu déroulant), ajuster, valider → gate --codex

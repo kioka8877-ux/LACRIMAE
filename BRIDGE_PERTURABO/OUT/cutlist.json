@@ -1,31 +1,31 @@
 {
   "requested_sequences": 5,
-  "video_duration_sec": null,
-  "source": "https://www.youtube.com/watch?v=xpG5sIW1jpA",
+  "video_duration_sec": 182.37,
+  "source": "SHARED/IN/video_source.mp4",
   "sequences": [
     {
-      "start_sec": 12.0,
-      "end_sec": 47.0,
+      "start_sec": 0.0,
+      "end_sec": 30.0,
       "reason": "[A01] Kicked in front of his band"
     },
     {
-      "start_sec": 60.0,
-      "end_sec": 95.0,
+      "start_sec": 37.5,
+      "end_sec": 67.5,
       "reason": "[A02] 4 words that broke him"
     },
     {
-      "start_sec": 130.0,
-      "end_sec": 165.0,
+      "start_sec": 75.0,
+      "end_sec": 105.0,
       "reason": "[A03] She threatened the Ariana Madix treatment"
     },
     {
-      "start_sec": 200.0,
-      "end_sec": 235.0,
+      "start_sec": 112.5,
+      "end_sec": 142.5,
       "reason": "[A04] Restraining order vs her AND dad"
     },
     {
-      "start_sec": 260.0,
-      "end_sec": 295.0,
+      "start_sec": 150.0,
+      "end_sec": 180.0,
       "reason": "[A05] Her one sentence response changes everything"
     }
   ],

@@ -291,7 +291,7 @@ jobs:
           # auto-récupéré sont commités pour survivre jusqu'à G3 (run séparé —
           # le workspace ne persiste pas)
           if [ "${{ github.event.inputs.mode }}" == "forge" ]; then
-            git add F02_FORMAT/IN/cutlist.json BRIDGE_PERTURABO/OUT/ BRIDGE_PERTURABO/IN/production_pack.json TRACKING/LACRIMAE_LEDGER.json
+            git add F02_FORMAT/IN/cutlist.json BRIDGE_PERTURABO/OUT/ BRIDGE_PERTURABO/IN/production_pack.json BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json TRACKING/LACRIMAE_LEDGER.json
           else
             git add F02_FORMAT/IN/cutlist.json TRACKING/LACRIMAE_LEDGER.json
           fi
