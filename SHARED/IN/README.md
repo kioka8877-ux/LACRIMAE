@@ -25,9 +25,11 @@ SHARED/IN/video_source.mp4
 ### Grosse vidéo (> 100 Mo → jusqu'à ~1 Go) — GitHub Releases
 
 **Git refuse les fichiers > 100 Mo** (push) et > 25 Mo (upload web GitHub).
-Pour ta vidéo (~200 Mo), elle ne passe ni par git ni par le web : elle se
-dépose comme asset d'une **GitHub Release** (2 Go max par fichier, gratuit sur
-repo public).
+Et les **artifacts GitHub Actions sont limités à 500 Mo de stockage total**
+(plan gratuit) — la vidéo ne doit JAMAIS y transiter. La vidéo se dépose donc
+comme asset d'une **GitHub Release** (2 Go max par fichier, illimité, gratuit
+sur repo public) et **chaque porte du workflow la re-télécharge depuis la
+release** (G1, G2, G3 — jamais via artifact).
 
 ```
 # Depuis la racine du repo, gh connecté :
@@ -35,9 +37,11 @@ sh _tools/lac_release_video.sh /chemin/vers/ta_video.mp4 [tag]
 ```
 
 - L'asset est nommé automatiquement `video_source.mp4`
-- La porte **G1** du workflow la télécharge toute seule depuis la release
-  (dernière release par défaut, ou tag précis via l'input `release_tag`)
+- Les portes G1/G2/G3 téléchargent depuis la release (dernière release par
+  défaut, ou tag précis via l'input `release_tag`)
 - Tag réutilisable : relance le script pour remplacer la vidéo (`--clobber`)
+- Une vidéo < 100 Mo peut aussi être déposée dans `SHARED/IN/` ou passer par
+  l'URL G1 (yt-dlp)
 
 ## Ce qui ne va PAS ici
 

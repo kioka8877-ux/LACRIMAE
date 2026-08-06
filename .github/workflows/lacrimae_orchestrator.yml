@@ -166,8 +166,21 @@ jobs:
         if: github.event.inputs.gate == 'G1'
         run: python3 LAC_CUSTOS.py --frigate F00 --mode check-out --drive-base .
 
-      - name: G1 - Upload video
+      # G1 - Upload vidéo : SEULEMENT si la vidéo est petite (< 400 Mo).
+      # Les artifacts GHA sont limités (500 Mo de stockage total / repo en
+      # plan gratuit, rétention 90 j). Une vidéo > 100 Mo vit dans la Release
+      # GitHub (2 Go/asset, illimité, gratuit sur repo public) : les portes
+      # G2/G3 la re-téléchargent depuis la Release, PAS depuis l'artifact.
+      - name: G1 - Check video size
         if: github.event.inputs.gate == 'G1'
+        id: vidsize
+        run: |
+          SIZE=$(stat -c%s F00_INGEST/OUT/video_source.mp4)
+          echo "size=$SIZE" >> "$GITHUB_OUTPUT"
+          echo "  [→] Vidéo ingérée : $(( SIZE / 1000000 )) Mo"
+
+      - name: G1 - Upload video (petit, < 400 Mo)
+        if: github.event.inputs.gate == 'G1' && fromJson(steps.vidsize.outputs.size) < 400000000
         uses: actions/upload-artifact@v4
         with:
           name: lac-video
@@ -190,11 +203,24 @@ jobs:
 
       # ──────────────────────────── G2 : ORACLE ou FORGE ──────────────────────
 
+      # G2 - Vidéo : d'abord la Release GitHub (2 Go/asset, illimité, gratuit
+      # repo public — gère les vidéos > 100 Mo), sinon repli sur l'artifact
+      # lac-video (vidéos petites / mode libre sans release).
       - name: G2 - Download video
         if: github.event.inputs.gate == 'G2'
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.release_tag }}
         run: |
           mkdir -p F01_SELECT/IN F02_FORMAT/IN
-          python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F02_FORMAT/IN/ "$BRANCH"
+          REL_ARG=""
+          if [ -n "$RELEASE_TAG" ]; then REL_ARG="$RELEASE_TAG"; fi
+          echo "  [→] G2 : recherche de la vidéo dans les GitHub Releases…"
+          if python3 _tools/download_release_video.py F02_FORMAT/IN/ $REL_ARG; then
+            echo "  [✓] Vidéo depuis la Release"
+          else
+            echo "  [→] Pas de vidéo en Release — repli artifact lac-video…"
+            python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F02_FORMAT/IN/ "$BRANCH"
+          fi
           if [ "${{ github.event.inputs.mode }}" == "libre" ]; then
             cp F02_FORMAT/IN/video_source.mp4 F01_SELECT/IN/video_source.mp4
           fi
@@ -282,11 +308,22 @@ jobs:
 
       # ──────────────────────────── G3 : FORMAT ──────────────────────────────
 
+      # G3 - Vidéo : même logique que G2 — Release GitHub d'abord, artifact en repli.
       - name: G3 - Download video
         if: github.event.inputs.gate == 'G3'
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.release_tag }}
         run: |
           mkdir -p F02_FORMAT/IN
-          python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F02_FORMAT/IN/ "$BRANCH"
+          REL_ARG=""
+          if [ -n "$RELEASE_TAG" ]; then REL_ARG="$RELEASE_TAG"; fi
+          echo "  [→] G3 : recherche de la vidéo dans les GitHub Releases…"
+          if python3 _tools/download_release_video.py F02_FORMAT/IN/ $REL_ARG; then
+            echo "  [✓] Vidéo depuis la Release"
+          else
+            echo "  [→] Pas de vidéo en Release — repli artifact lac-video…"
+            python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F02_FORMAT/IN/ "$BRANCH"
+          fi
 
       - name: G3 - Format (blur-pad/reframe/background)
         if: github.event.inputs.gate == 'G3'

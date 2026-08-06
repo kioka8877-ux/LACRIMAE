@@ -123,7 +123,9 @@ dans le pack : la vidéo et les PNG.
 2. Déposer la vidéo à couper :
    - < 100 Mo : SHARED/IN/video_source.mp4 (directement dans IN, gitignorée)
    - > 100 Mo : `sh _tools/lac_release_video.sh <video.mp4> [tag]` → la vidéo
-     devient un asset de GitHub Release (2 Go max, gratuit) — G1 la télécharge
+     devient un asset de GitHub Release (2 Go max, illimité, gratuit) — chaque
+     porte (G1/G2/G3) la télécharge depuis la release. **Jamais via artifact**
+     (quota artifacts GHA = 500 Mo total en plan gratuit)
 3. python LAC_RUN.py forge [--pack-filter SANDOVAL]
    → l'Oracle récupère le pack, Gate 1 (pack + cuts + assets) → cutlist + codex v4
 4. python LAC_RUN.py run       → F02 profil background (découpe seule)
@@ -134,7 +136,8 @@ dans le pack : la vidéo et les PNG.
 En GHA : `gate G1` (ingère la vidéo : URL → SHARED/IN/video_source.mp4 →
 Release GitHub, dans cet ordre) puis `gate G2` avec `mode: forge` suffit — le
 pack est auto-récupéré, les PNG viennent de `SHARED/IN/` (commités une fois
-pour toutes) et la vidéo de l'artifact G1.
+pour toutes) et la vidéo est re-téléchargée depuis la Release à chaque porte
+(G2/G3 : Release d'abord, artifact en repli pour les vidéos < 400 Mo).
 
 ## Démarrage rapide (local)
 
