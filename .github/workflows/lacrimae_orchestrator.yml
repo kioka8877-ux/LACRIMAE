@@ -57,6 +57,9 @@ on:
       pack_filter:
         description: 'Filtre du pack auto-récupéré (forge only, substring du nom, ex: SANDOVAL)'
         required: false
+      release_tag:
+        description: 'Tag de la Release contenant video_source.mp4 (G1 only, optionnel — défaut: dernière release)'
+        required: false
       preset:
         description: 'Preset couleurs codex (G1 only)'
         required: false
@@ -135,6 +138,7 @@ jobs:
         if: github.event.inputs.gate == 'G1'
         env:
           URL: ${{ github.event.inputs.url }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag }}
         run: |
           cd F00_INGEST/CODEBASE
           if [ -n "$URL" ]; then
@@ -144,8 +148,18 @@ jobs:
           elif [ -f "../IN/video_source.mp4" ]; then
             python3 lac_f00_ingest.py --file "../IN/video_source.mp4" --output ../OUT/
           else
-            echo "ERREUR: ni URL ni SHARED/IN/video_source.mp4 ni F00_INGEST/IN/video_source.mp4"
-            exit 1
+            # Vidéo > 100 Mo : uploadée par l'opérateur comme asset d'une GitHub
+            # Release (_tools/lac_release_video.sh) — G1 la télécharge ici.
+            REL_ARG=""
+            if [ -n "$RELEASE_TAG" ]; then REL_ARG="$RELEASE_TAG"; fi
+            echo "  [→] Aucune vidéo locale — recherche dans les GitHub Releases…"
+            if python3 ../../_tools/download_release_video.py ../IN/ $REL_ARG; then
+              python3 lac_f00_ingest.py --file "../IN/video_source.mp4" --output ../OUT/
+            else
+              echo "ERREUR: ni URL, ni SHARED/IN/video_source.mp4, ni vidéo en Release."
+              echo "  → Upload : sh _tools/lac_release_video.sh <video.mp4> [tag]"
+              exit 1
+            fi
           fi
 
       - name: G1 - Gardien F00
