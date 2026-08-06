@@ -35,7 +35,7 @@
       "grain_intensity": 0.15
     }
   },
-  "validated_by_magos": false,
+  "validated_by_magos": true,
   "clips": [
     {
       "id": "clip_001",
