@@ -1,0 +1,53 @@
+name: F04 RENDER (dev)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev]
+    paths:
+      - 'F04_RENDER/**'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: F04_RENDER/CODEBASE/package-lock.json
+
+      - name: Install
+        working-directory: F04_RENDER/CODEBASE
+        run: npm ci
+
+      - name: Stage assets (fonds + logo + clips)
+        working-directory: F04_RENDER/CODEBASE
+        run: |
+          mkdir -p public/backgrounds
+          cp ../../SHARED/IN/backgrounds/*.png public/backgrounds/
+          cp ../../SHARED/IN/logos/logo.png public/logo.png
+          cp ../../F02_FORMAT/OUT/clips/*.mp4 public/
+
+      - name: Render les 5 clips (codex confirmé)
+        working-directory: F04_RENDER/CODEBASE
+        run: |
+          mkdir -p OUT
+          for id in clip-001 clip-002 clip-003 clip-004 clip-005; do
+            echo "=== Rendu $id ==="
+            npx remotion render src/index.jsx "$id" "OUT/${id}.mp4"
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: shorts
+          path: F04_RENDER/CODEBASE/OUT/*.mp4
+          retention-days: 14

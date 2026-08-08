@@ -1,86 +1,279 @@
-// Codex de dev — le vrai codex.json (multi-clips, v4.0) est produit par F02_FORMAT
-// (ou par le bridge forge) et régénéré dans src/codexData.js avant chaque render.
+// Codex v4.0 CONFIRMÉ (release codex → codex.1.json) — regénéré avant chaque render.
 export const codex = {
-  version: '4.0',
-  pipeline: 'LACRIMAE_DEV',
-  mode: 'libre',
-  session: {
-    background: {
-      image: null,
-      color: '#0a0a0a',
-      scale: 1.0,
+  "version": "4.0",
+  "pipeline": "LACRIMAE_DEV",
+  "mode": "forge",
+  "profile": "background",
+  "session": {
+    "background": {
+      "image": "bg_paper_crumpled.png",
+      "color": "#0a0a0a",
+      "scale": 1
     },
-    logo: {
-      src: 'logo.png',
-      width_pct: 25,
-      position: 'bottom_left',
-      opacity: 1.0,
+    "logo": {
+      "src": "logo.png",
+      "width_pct": 89,
+      "position": "custom",
+      "opacity": 1,
+      "x_pct": 45.8,
+      "y_pct": 67.5
     },
-    texts_style: {
-      font: 'Impact, Arial Black, sans-serif',
-      size_title: 96,
-      size_paragraph: 44,
-      color: '#FFFFFF',
-      stroke_color: '#000000',
-      stroke_width: 4,
-      shadow: '2px 4px 8px rgba(0,0,0,0.9)',
-      glow_intensity: 0,
-      letter_spacing: '0em',
+    "texts_style": {
+      "font": "Arial Black, sans-serif",
+      "size_title": 79,
+      "size_paragraph": 44,
+      "color": "#cacd13",
+      "stroke_color": "#000000",
+      "stroke_width": 4,
+      "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
+      "glow_intensity": 0,
+      "letter_spacing": "0em",
+      "title_box": {
+        "enabled": true
+      },
+      "paragraph_box": {
+        "enabled": true
+      }
     },
-    presets: {
-      color_preset: 'punchy',
-      color_css_filter: 'contrast(1.3) saturate(1.5) brightness(1.1)',
-      enhance_4k: false,
-      sharpening: 0,
-      denoising: 0,
-      vignette: 0.25,
-      grain_intensity: 0.15,
+    "presets": {
+      "color_preset": "punchy",
+      "color_css_filter": "contrast(1.1) saturate(0.6) brightness(0.95) hue-rotate(-10deg)",
+      "contrast": 1.3,
+      "brightness": 1,
+      "enhance_4k": false,
+      "sharpening": 0,
+      "denoising": 0,
+      "vignette": 0.25,
+      "grain_intensity": 0.15
     },
+    "profile": "background",
+    "video": {
+      "offset_y": -12
+    }
   },
-  validated_by_magos: false,
-  clips: [
+  "validated_by_magos": true,
+  "clips": [
     {
-      id: 'clip_001',
-      video: {
-        source: 'clip_001.mp4',
-        fps: 30,
-        total_frames: 300,
-        width: 1080,
-        height: 1920,
+      "id": "clip_001",
+      "video": {
+        "source": "clip_001.mp4",
+        "fps": 30,
+        "total_frames": 900,
+        "width": 1080,
+        "height": 1920
       },
-      texts: {
-        mode: 'title',
-        title: 'LACRIMAE',
-        paragraph: '',
-        title_offset_pct: 8,
-        paragraph_offset_pct: 8,
+      "texts": {
+        "mode": "title+paragraph",
+        "title": "SHE KICKED HIM IN FRONT OF HIS BAND",
+        "paragraph": "Tom Sandoval says his ex Victoria kicked him in the groin in front of his band, crew and fans during a Florida tour stop. The insult that came with it, he says, hurt worse than the kick. New court filing is out.",
+        "title_offset_pct": 6,
+        "paragraph_offset_pct": 8
       },
-      text_overlays: [
+      "text_overlays": [
         {
-          id: 'title_00',
-          content: 'LACRIMAE',
-          start_frame: 0,
-          end_frame: 300,
-          animation: 'fade_in',
-          font: 'Impact, Arial Black, sans-serif',
-          size: 96,
-          color: '#FFFFFF',
-          stroke_color: '#000000',
-          stroke_width: 4,
-          shadow: '2px 4px 8px rgba(0,0,0,0.9)',
-          position: 'top',
-          letter_spacing: '0em',
-          glow_intensity: 0,
-          depth_3d: 0,
-        },
+          "id": "title_00",
+          "content": "SHE KICKED HIM IN FRONT OF HIS BAND",
+          "start_frame": 0,
+          "end_frame": 900,
+          "animation": "fade_in",
+          "font": "Impact, Arial Black, sans-serif",
+          "size": 96,
+          "color": "#FFFFFF",
+          "stroke_color": "#000000",
+          "stroke_width": 4,
+          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
+          "position": "top",
+          "letter_spacing": "0em",
+          "glow_intensity": 0,
+          "depth_3d": 0
+        }
       ],
-      zoom_keyframes: [],
-      logo: null,
-      brutal_cut_interval_frames: 90,
-      volume: 1.0,
-      slowmo_start_frame: 0,
-      slowmo_speed: 1.0,
-      shake_power: 0,
+      "zoom_keyframes": [],
+      "logo": null,
+      "brutal_cut_interval_frames": 90,
+      "volume": 1,
+      "slowmo_start_frame": 0,
+      "slowmo_speed": 1,
+      "shake_power": 0,
+      "validated_by_magos": true
     },
+    {
+      "id": "clip_002",
+      "video": {
+        "source": "clip_002.mp4",
+        "fps": 30,
+        "total_frames": 900,
+        "width": 1080,
+        "height": 1920
+      },
+      "texts": {
+        "mode": "title+paragraph",
+        "title": "THE WORDS THAT BROKE HIM",
+        "paragraph": "Tom Sandoval says Victoria screamed insults at him in front of witnesses — the kind that left him 'frazzled' and 'anxious' before his America's Got Talent performance. He claims she questioned his manhood in the most humiliating way possible.",
+        "title_offset_pct": 8,
+        "paragraph_offset_pct": 8
+      },
+      "text_overlays": [
+        {
+          "id": "title_00",
+          "content": "THE WORDS THAT BROKE HIM",
+          "start_frame": 0,
+          "end_frame": 900,
+          "animation": "fade_in",
+          "font": "Impact, Arial Black, sans-serif",
+          "size": 96,
+          "color": "#FFFFFF",
+          "stroke_color": "#000000",
+          "stroke_width": 4,
+          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
+          "position": "top",
+          "letter_spacing": "0em",
+          "glow_intensity": 0,
+          "depth_3d": 0
+        }
+      ],
+      "zoom_keyframes": [],
+      "logo": null,
+      "brutal_cut_interval_frames": 90,
+      "volume": 1,
+      "slowmo_start_frame": 0,
+      "slowmo_speed": 1,
+      "shake_power": 0
+    },
+    {
+      "id": "clip_003",
+      "video": {
+        "source": "clip_003.mp4",
+        "fps": 30,
+        "total_frames": 900,
+        "width": 1080,
+        "height": 1920
+      },
+      "texts": {
+        "mode": "title+paragraph",
+        "title": "'I'LL GET THE ARIANA TREATMENT'",
+        "paragraph": "Tom Sandoval says Victoria repeatedly warned she would 'destroy' his life and 'get the Ariana Madix treatment' — the public attention that followed his ex's breakup with him. He claims that's exactly why he stayed.",
+        "title_offset_pct": 8,
+        "paragraph_offset_pct": 8
+      },
+      "text_overlays": [
+        {
+          "id": "title_00",
+          "content": "'I'LL GET THE ARIANA TREATMENT'",
+          "start_frame": 0,
+          "end_frame": 900,
+          "animation": "fade_in",
+          "font": "Impact, Arial Black, sans-serif",
+          "size": 96,
+          "color": "#FFFFFF",
+          "stroke_color": "#000000",
+          "stroke_width": 4,
+          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
+          "position": "top",
+          "letter_spacing": "0em",
+          "glow_intensity": 0,
+          "depth_3d": 0
+        }
+      ],
+      "zoom_keyframes": [],
+      "logo": null,
+      "brutal_cut_interval_frames": 90,
+      "volume": 1,
+      "slowmo_start_frame": 0,
+      "slowmo_speed": 1,
+      "shake_power": 0
+    },
+    {
+      "id": "clip_004",
+      "video": {
+        "source": "clip_004.mp4",
+        "fps": 30,
+        "total_frames": 900,
+        "width": 1080,
+        "height": 1920
+      },
+      "texts": {
+        "mode": "title+paragraph",
+        "title": "HER AND HER DAD — BOTH NAMED",
+        "paragraph": "A judge granted Tom Sandoval a temporary domestic violence restraining order against Victoria AND her father Will Robinson in June. Victoria's own attempt to get one against Tom was denied pending a future hearing.",
+        "title_offset_pct": 8,
+        "paragraph_offset_pct": 8
+      },
+      "text_overlays": [
+        {
+          "id": "title_00",
+          "content": "HER AND HER DAD — BOTH NAMED",
+          "start_frame": 0,
+          "end_frame": 900,
+          "animation": "fade_in",
+          "font": "Impact, Arial Black, sans-serif",
+          "size": 96,
+          "color": "#FFFFFF",
+          "stroke_color": "#000000",
+          "stroke_width": 4,
+          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
+          "position": "top",
+          "letter_spacing": "0em",
+          "glow_intensity": 0,
+          "depth_3d": 0
+        }
+      ],
+      "zoom_keyframes": [],
+      "logo": null,
+      "brutal_cut_interval_frames": 90,
+      "volume": 1,
+      "slowmo_start_frame": 0,
+      "slowmo_speed": 1,
+      "shake_power": 0
+    },
+    {
+      "id": "clip_005",
+      "video": {
+        "source": "clip_005.mp4",
+        "fps": 30,
+        "total_frames": 900,
+        "width": 1080,
+        "height": 1920
+      },
+      "texts": {
+        "mode": "title+paragraph",
+        "title": "HER SIDE OF THE STORY",
+        "paragraph": "Victoria Lee Robinson says: 'I did not kick Tom, and I did not touch him.' She claims she took a shot, asked him to take care of her, and went back to bed. Two versions of the same night — only the court can decide.",
+        "title_offset_pct": 8,
+        "paragraph_offset_pct": 8
+      },
+      "text_overlays": [
+        {
+          "id": "title_00",
+          "content": "HER SIDE OF THE STORY",
+          "start_frame": 0,
+          "end_frame": 900,
+          "animation": "fade_in",
+          "font": "Impact, Arial Black, sans-serif",
+          "size": 96,
+          "color": "#FFFFFF",
+          "stroke_color": "#000000",
+          "stroke_width": 4,
+          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
+          "position": "top",
+          "letter_spacing": "0em",
+          "glow_intensity": 0,
+          "depth_3d": 0
+        }
+      ],
+      "zoom_keyframes": [],
+      "logo": null,
+      "brutal_cut_interval_frames": 90,
+      "volume": 1,
+      "slowmo_start_frame": 0,
+      "slowmo_speed": 1,
+      "shake_power": 0
+    }
   ],
+  "forge": {
+    "pack_id": "LOGO-TS01_SANDOVAL-SIEGE-LOGO-20260804T174153-SA_VIDEO",
+    "siege_id": "SIEGE-LOGO-20260804T174153",
+    "pack_mode": "logo",
+    "campaign_id": null
+  }
 };

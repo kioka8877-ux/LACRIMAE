@@ -52,6 +52,8 @@ const SESSION_FALLBACK = {
   presets: {
     color_preset: 'punchy',
     color_css_filter: 'contrast(1.3) saturate(1.5) brightness(1.1)',
+    contrast: 1.3,
+    brightness: 1.1,
     enhance_4k: false,
     sharpening: 0,
     denoising: 0,
@@ -85,7 +87,17 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
 
   // ── Zoom / slow-mo / shake / coup brutal (calculés, logique inchangée) ──
   const currentZoom = getCurrentZoom(frame, clip.zoom_keyframes || []);
-  const colorFilter = presets.color_css_filter || '';
+  // Le slider Contraste (session) pilote le contrast() du filtre global.
+  const contrastValue = presets.contrast ?? 1.3;
+  const baseFilter = presets.color_css_filter || '';
+  const colorFilter = baseFilter.includes('contrast')
+    ? baseFilter.replace(/contrast\([^)]*\)/g, `contrast(${contrastValue})`)
+    : `contrast(${contrastValue}) ${baseFilter}`.trim();
+  // Le slider Luminosité (session) pilote le brightness() du filtre global.
+  const brightnessValue = presets.brightness ?? 1.1;
+  const brightnessFilter = colorFilter.includes('brightness')
+    ? colorFilter.replace(/brightness\([^)]*\)/g, `brightness(${brightnessValue})`)
+    : `${colorFilter} brightness(${brightnessValue})`.trim();
   const enhanceFilter = presets.enhance_4k
     ? ' contrast(1.15) saturate(1.2) brightness(1.08)'
     : '';
@@ -96,7 +108,7 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
     sharpFilter = ` contrast(${1 + s * 0.15}) drop-shadow(0 0 ${s * 0.5}px rgba(255,255,255,${s * 0.15}))`;
   }
   // CALQUE 6 : le filtre global s'applique à la SCÈNE ENTIÈRE (plus seulement la vidéo)
-  const fullFilter = (colorFilter + enhanceFilter + sharpFilter).trim();
+  const fullFilter = (brightnessFilter + enhanceFilter + sharpFilter).trim();
 
   const slowmoStart = clip.slowmo_start_frame || 0;
   const slowmoSpeed = clip.slowmo_speed || 1.0;
@@ -142,7 +154,11 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
         {session.background?.image ? (
           <AbsoluteFill style={{ overflow: 'hidden' }}>
             <Img
-              src={staticFile(session.background.image)}
+              src={staticFile(
+                session.background.image.includes('/')
+                  ? session.background.image
+                  : `backgrounds/${session.background.image}`
+              )}
               style={{
                 width: '100%',
                 height: '100%',
@@ -163,8 +179,10 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
-              transform: `${zoomTransform} translate(${shakeX}px, ${shakeY}px)`,
+              objectFit: session.profile === 'background' ? 'contain' : 'cover',
+              transform: `${zoomTransform} translate(${shakeX}px, ${shakeY}px) translateY(${
+                session.video?.offset_y || 0
+              }%)`,
             }}
             playbackRate={playbackRate}
           />
@@ -192,7 +210,7 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
         ) : null}
 
         {/* ── L5 LOGO : en bas du cadre, calque permanent ── */}
-        <LogoOverlay logo={clip.logo || session.logo} width={width} />
+        <LogoOverlay logo={session.logo || clip.logo} width={width} />
 
         {/* Badge SLOW MOTION */}
         {isSlowmo && (
@@ -348,7 +366,7 @@ const ParagraphBlock = ({ content, style, totalFrames, offsetPct }) => {
 const LogoOverlay = ({ logo, width }) => {
   if (!logo || !logo.src) return null;
   const logoWidth = Math.round(width * ((logo.width_pct || 20) / 100));
-  const pos = getLogoPosition(logo.position || 'bottom_left');
+  const pos = getLogoPosition(logo);
   return (
     <AbsoluteFill style={{ pointerEvents: 'none' }}>
       <div style={{ position: 'absolute', ...pos, opacity: logo.opacity ?? 1 }}>
@@ -357,9 +375,16 @@ const LogoOverlay = ({ logo, width }) => {
     </AbsoluteFill>
   );
 };
-
-function getLogoPosition(position) {
+function getLogoPosition(logo) {
+  const position = logo.position || 'bottom_left';
   const pad = 40;
+  if (position === 'custom') {
+    return {
+      left: `${logo.x_pct ?? 50}%`,
+      top: `${logo.y_pct ?? 50}%`,
+      transform: 'translate(-50%, -50%)',
+    };
+  }
   switch (position) {
     case 'top_center':
       return { top: pad, left: '50%', transform: 'translateX(-50%)' };

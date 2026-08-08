@@ -18,10 +18,11 @@ export const Root = () => {
         const totalFrames = clip.video?.total_frames || 300;
         const width = clip.video?.width || 1080;
         const height = clip.video?.height || 1920;
+        const compId = (clip.id || 'clip_001').replace(/_/g, '-');
         return (
           <Composition
-            key={clip.id || 'clip_001'}
-            id={clip.id || 'clip_001'}
+            key={compId}
+            id={compId}
             component={OmniComposition}
             durationInFrames={totalFrames}
             fps={fps}
