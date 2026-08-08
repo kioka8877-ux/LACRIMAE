@@ -1,0 +1,38 @@
+name: F03 RENDER
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'F03_PREVIEW/CODEBASE/**'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: F03_PREVIEW/CODEBASE/package-lock.json
+
+      - name: Install
+        working-directory: F03_PREVIEW/CODEBASE
+        run: npm ci
+
+      - name: Render (LacrimaeShort)
+        working-directory: F03_PREVIEW/CODEBASE
+        run: npm run render
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: short_final
+          path: F03_PREVIEW/CODEBASE/out/short_final.mp4
+          retention-days: 14
