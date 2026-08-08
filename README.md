@@ -43,6 +43,7 @@ Nommé d'après les **Larmes de l'Ange** — les larmes de Sanguinius, Primarque
 | F03 | **PICTOR** | Rendu vidéo frame par frame | Remotion (React) |
 | F04 | **SIGNUM** | Assemblage final MP4 | FFmpeg |
 | — | **LAC_CUSTOS** | Validation inter-frégates | Python stdlib only |
+| F03 | **PREVIEW** | Preview interactive du codex v4 | Vite + React + Remotion Player |
 
 ---
 
