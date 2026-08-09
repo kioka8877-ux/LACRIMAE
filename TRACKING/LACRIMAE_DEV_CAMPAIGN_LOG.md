@@ -69,6 +69,15 @@
   toutes les 3s (90 frames), volume seul réglage audio.
 - PAS de SFX, PAS de sous-titres, PAS de voix off.
 
+## DOCUMENTATION TRANSMISE
+
+- `GUIDE_UTILISATION.md` (racine) — guide Champion + Oracle : démarrage à zéro,
+  les 4 **Portes** (I Brief / II Cutlist / III Montage / IV Publication), workflow
+  F00→CLOSE, artifacts, pièges, prérequis — avec le **lore Blood Angels** (LACRIMAE =
+  larmes de l'Ange, hommage à la IXe Légion de Sanguinius).
+- `TRACKING/HANDOFF_NEXT_DEV.md` — état exact de la forge + checklist sandbox neuf +
+  backlog + comment lancer une nouvelle production.
+
 ## PROCHAINES ÉTAPES (test réel)
 
 - [x] **Flux réel mené de bout en bout (mode forge)** : pack SANDOVAL → F01 (forge) → F02 (codex v4 + clips) → F04 (render 5 clips, codex confirmé) → F05 (camouflage) → F06 (luther) → **CLOSE** — artifacts finaux `lac-clean` récupérés, projet **TERMINÉ** 🏆
