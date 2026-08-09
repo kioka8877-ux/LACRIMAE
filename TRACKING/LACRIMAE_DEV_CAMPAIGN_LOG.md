@@ -1,18 +1,25 @@
 # LACRIMAE — DEV : CARNET DE CAMPAGNE (branche dev)
 > *"La transformation ne s'arrête jamais."*
 
+# 🏆 VICTOIRE — PROJET TERMINÉ (2026-08-09)
+
+> Production SANDOVAL « SIEGE LOGO » menée de bout en bout sur **GitHub Actions** :
+> F01 (forge) → F02 (codex + clips) → F04 (render Remotion, 5 clips) → F05 (camouflage
+> + loudnorm) → F06 (luther, empreinte zéro) → **CLOSE**. Artifacts `lac-clean` livrables.
+> Le Champion a validé le rendu final (bandes OK, titre unique OK).
+
 ## ÉTAT DE LA FLOTTE DEV
 
 | Frégate | Nom | Statut | Date |
 |---------|-----|--------|------|
-| F00 | INGEST | 🟢 FORGÉE | 2026-08-03 |
-| F01 | SELECT | 🟡 EN FORGE | 2026-08-03 |
-| F02 | FORMAT | 🟡 EN FORGE | 2026-08-03 |
-| F03 | PREVIEW | 🟢 PILLÉE (OMNIS F02_PREVIEW) | 2026-08-03 |
-| F04 | RENDER | 🟢 PILLÉE (OMNIS F03A_REMOTION) | 2026-08-03 |
-| F05 | CAMOUFLAGE | 🟢 PILLÉE (OMNIS F04) | 2026-08-03 |
-| F06 | LUTHER | 🟢 PILLÉE (OMNIS F05) | 2026-08-03 |
-| — | LAC_CUSTOS | 🟢 ADAPTÉ | 2026-08-03 |
+| F00 | INGEST | 🟢 SCELLÉE | 2026-08-03 |
+| F01 | SELECT | 🟢 SCELLÉE (forge) | 2026-08-03 |
+| F02 | FORMAT | 🟢 SCELLÉE | 2026-08-03 |
+| F03 | PREVIEW | 🟢 SCELLÉE (OMNIS F02_PREVIEW) | 2026-08-03 |
+| F04 | RENDER | 🟢 SCELLÉE | 2026-08-09 |
+| F05 | CAMOUFLAGE | 🟢 SCELLÉE | 2026-08-09 |
+| F06 | LUTHER | 🟢 SCELLÉE | 2026-08-09 |
+| — | LAC_CUSTOS | 🟢 SCELLÉE | 2026-08-03 |
 
 **Légende :** ⚪ En attente | 🟡 En forge | 🔵 En test | 🟢 SCELLÉE | 🔴 BLOQUÉE
 
@@ -46,6 +53,10 @@
 | 2026-08-06 | RUBICON | MEDIA | **Vidéos > 100 Mo → GitHub Releases** (git refuse > 100 Mo push / > 25 Mo web) — `_tools/lac_release_video.sh` (upload opérateur : vidéo → asset `video_source.mp4` d'une release, 2 Go max/asset, gratuit repo public) + `_tools/download_release_video.py` (télécharge l'asset, dernière release ou tag via input `release_tag`) + F00 Ingest fallback : URL → SHARED/IN → Release, docs mises à jour | ✅ commit + push |
 | 2026-08-06 | RUBICON | SOURCE | **Décision Champion : garder SA vidéo (182s), ajuster le pack** — la vidéo uploadée (33 Mo) ne couvrait pas les cuts du pack (jusquà 295s) ; garde durée ajoutée au bridge (Contrôle 1 bloque si cut > durée vidéo) ; pack ajusté BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json créé (5 cuts recalibrés 0-180s, textes conservés) via _tools/make_pack_sa_video.py, F01 le commit à la porte, usage : input pack_path ; testé : Contrôle 1 validé avec le pack ajusté | ✅ commit + push |
 | 2026-08-06 | RUBICON | MEDIA | **Goulot artifacts cassé — vidéos jusqu'à 1 Go OK** : les artifacts GHA = 500 Mo de stockage total/repo (plan gratuit, rétention 90 j) → la vidéo ne transite PLUS jamais par artifact. F00 n'upload l'artifact `lac-video` que si < 400 Mo (garde-fou quota), F01/F02 re-téléchargent depuis la **Release** en priorité (repli artifact) — la Release est la source de vérité vidéo, chaque frégate la re-fetch | ✅ commit + push |
+| 2026-08-09 | F04 | RENDER | **Rendu réel des 5 clips validé (run `31325383646`)** — codex confirmé (`codex.1.json`, validated_by_magos, fond `bg_paper_crumpled`, logo custom 89% à 45.8/67.5, offset_y -12, contrast/brightness) ; correctifs portés au moteur : `defaultProps` sur `<Composition>` (props ignorées par Remotion v4 → toutes les compos chargeaient clip_001), masking `text_overlays` v3 quand texts v4 actifs (doublon titre), bandes `title_box`/`paragraph_box` (title+paragraph) ; workflow `f04-render.yml` en matrix 1 job/clip | ✅ |
+| 2026-08-09 | F05 | CAMOUFLAGE | **Run réel succès (run `31326992043`)** — wipe métadonnées + loudnorm -14 LUFS sur les 5 clips → artifact `lac-youtube` (`clip_00X_youtube.mp4` + `rapport_f05.html`) ; CUSTOS PASS | ✅ |
+| 2026-08-09 | F06 | LUTHER | **Run réel succès (même run)** — stream copy, empreinte zéro → artifact `lac-clean` (`clip_00X_clean.mp4`) ; CUSTOS PASS | ✅ |
+| 2026-08-09 | CLOSE | FERMETURE | **Ledger fermé (run `31328179178`)** — `fregate_actuelle: CLOSE`, production TERMINÉE | ✅ |
 
 ## DÉCISIONS DE FORGE
 
@@ -60,7 +71,7 @@
 
 ## PROCHAINES ÉTAPES (test réel)
 
-- [ ] **Mode libre** : configurer secret GitHub `ORACLE_API_KEY` (+ vars `ORACLE_MODEL`/`ORACLE_BASE_URL`), commiter `SHARED/IN/logos/logo.png`, frégate F00 → F06
-- [ ] **Mode forge** : déposer les PNG une fois pour toutes (`SHARED/IN/backgrounds/` + `SHARED/IN/logos/logo.png`), la vidéo **dans `SHARED/IN/video_source.mp4`** si < 100 Mo — sinon `sh _tools/lac_release_video.sh <video.mp4> [tag]` (Release GitHub, F00 la télécharge) — puis frégate F01 (mode=forge) — **l'Oracle va chercher le pack SEUL dans PERTURABO/EXPORT** → F06
-- [ ] Valider le flux complet jusqu'à `lac-clean` (clean_final.mp4)
-- [x] **Preview en ligne** : Pages activé (Source = GitHub Actions) + branche `dev` autorisée sur l'environnement `github-pages` — **reste** : lancer le workflow "LACRIMAE Preview Pages" (manuel, ou auto au prochain push PNG/clip) — URL : `https://kioka8877-ux.github.io/LACRIMAE/`
+- [x] **Flux réel mené de bout en bout (mode forge)** : pack SANDOVAL → F01 (forge) → F02 (codex v4 + clips) → F04 (render 5 clips, codex confirmé) → F05 (camouflage) → F06 (luther) → **CLOSE** — artifacts finaux `lac-clean` récupérés, projet **TERMINÉ** 🏆
+- [ ] **Mode libre** : configurer secret GitHub `ORACLE_API_KEY` (+ vars `ORACLE_MODEL`/`ORACLE_BASE_URL`) — non exécuté (flux forge utilisé)
+- [x] Valider le flux complet jusqu'à `lac-clean` (clean_final.mp4) — **fait** (run `31326992043`)
+- [x] **Preview en ligne** : Pages activé (Source = GitHub Actions) + branche `dev` autorisée sur l'environnement `github-pages` — URL : `https://kioka8877-ux.github.io/LACRIMAE/`

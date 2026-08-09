@@ -1,5 +1,6 @@
 # LACRIMAE — DESIGN : LES 2 MODES + CALQUES
 > *"La transformation ne s'arrête jamais."*
+> **PROJET TERMINÉ 🏆 (2026-08-09)** — design appliqué et validé en réel (mode forge → `lac-clean`)
 
 Document de conception figé le 2026-08-05. Source : analyse des repos réels
 (LACRIMAE branche `dev`, PERTURABO `MONDES_FORGES/CLIPPING`, CRUSADER `F03_SIGISMUND`).

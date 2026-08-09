@@ -1,6 +1,7 @@
 # LACRIMAE — CARNET DE BORD DE CAMPAGNE
 > *"Les larmes de l'Ange ne tombent jamais en vain."*
-> Croisade active : FORGE ALPHA | Magos : —
+> Croisade : FORGE ALPHA — **PROJET TERMINÉ 🏆 (2026-08-09)**
+> Magos : —
 
 ---
 
@@ -11,7 +12,7 @@
 | F01 | CANTOR | 🟢 SCELLÉE | 2026-05-19 |
 | F02 | VISIO | 🟢 SCELLÉE | 2026-05-19 |
 | F03 | PICTOR | 🟢 SCELLÉE | 2026-05-19 |
-| F04 | SIGNUM | 🔵 EN TEST | — |
+| F04 | SIGNUM | 🟢 SCELLÉE | 2026-08-09 |
 | — | LAC_CUSTOS | 🟢 SCELLÉE | 2026-05-19 |
 
 **Légende :** ⚪ En attente | 🟡 En forge | 🔵 En test | 🟢 SCELLÉE | 🔴 BLOQUÉE
@@ -35,16 +36,17 @@
 | 2026-05-19 | F03 | TEST PROD | Rendu Remotion 258/258 frames — short_final.mp4 65.3 Mo | ✅ |
 | 2026-05-19 | F03 | TEST PROD | CUSTOS check-out F03 validé — Transit F03→F04 autorisé | ✅ |
 | 2026-05-19 | F03 | SCELLAGE | **F03 PICTOR SCELLÉE** — Ad Victoriam | ✅ |
+| 2026-08-09 | F04 | SCELLAGE | **F04 SIGNUM SCELLÉE** — production SANDOVAL terminée sur la branche dev (F01→F06 + CLOSE), artifacts `lac-clean` livrés | ✅ |
 
 ---
 
 ## COMPTEUR DE GUERRE
 
 ```
-Forge des Frégates : [███████░░░] 3/4 Frégates Scellées — F01 ✓ F02 ✓ F03 ✓
+Forge des Frégates : [██████████] 4/4 Frégates Scellées — F01 ✓ F02 ✓ F03 ✓ F04 ✓
 LAC_CUSTOS         : [██████████] SCELLÉE ✓
-Fleet Seal         : [░░░░░░░░░░] En attente — F04 SIGNUM en test
-Objectif           : Fleet Seal Certificate + 1er Short rendu
+Fleet Seal         : [██████████] SCELLÉE ✓ — PROJET TERMINÉ 🏆
+Objectif           : Fleet Seal Certificate + 1er Short rendu — ATTEINT
 ```
 
 ---
@@ -135,7 +137,7 @@ IN/ (timing + config + audio + images)  →  OUT/short_final.mp4  ✅
 
 ---
 
-## FRÉGATE F04 — SIGNUM 🔵 EN TEST
+## FRÉGATE F04 — SIGNUM 🟢 SCELLÉE (2026-08-09)
 
 ### Composants Forgés
 - 🔵 `LAC_F04.ipynb` — Notebook Colab (8 étapes + download)

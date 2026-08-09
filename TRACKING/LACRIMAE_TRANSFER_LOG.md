@@ -1,6 +1,6 @@
 # LACRIMAE — REGISTRE DES TRANSFERTS
 > *"Aucun transit n'existe sans inscription dans ce registre."*
-> Matrice de traçabilité des flux — Rempli par le Magos lors des transferts manuels
+> Matrice de traçabilité des flux — **PROJET TERMINÉ 🏆 (2026-08-09)** — flux dev (forge) mené jusqu'à CLOSE sur GitHub Actions
 
 ---
 
