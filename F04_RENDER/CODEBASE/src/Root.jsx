@@ -28,7 +28,7 @@ export const Root = () => {
             fps={fps}
             width={width}
             height={height}
-            props={{
+            defaultProps={{
               codex: clip,
               session,
             }}
