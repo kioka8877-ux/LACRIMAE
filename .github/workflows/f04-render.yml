@@ -2,15 +2,38 @@ name: F04 RENDER (dev)
 
 on:
   workflow_dispatch:
+    inputs:
+      clip:
+        description: 'Clip à rendre (clip-001..clip-005) ou "all"'
+        required: false
+        default: 'all'
   push:
     branches: [dev]
     paths:
       - 'F04_RENDER/**'
 
 jobs:
+  select:
+    runs-on: ubuntu-latest
+    outputs:
+      clips: ${{ steps.choose.outputs.clips }}
+    steps:
+      - id: choose
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.clip }}" != "all" ]; then
+            echo "clips=[\"${{ inputs.clip }}\"]" >> "$GITHUB_OUTPUT"
+          else
+            echo 'clips=["clip-001","clip-002","clip-003","clip-004","clip-005"]' >> "$GITHUB_OUTPUT"
+          fi
+
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 90
+    needs: select
+    strategy:
+      fail-fast: false
+      matrix:
+        clip: ${{ fromJSON(needs.select.outputs.clips) }}
     steps:
       - name: Checkout dev
         uses: actions/checkout@v4
@@ -28,26 +51,24 @@ jobs:
         working-directory: F04_RENDER/CODEBASE
         run: npm ci
 
-      - name: Stage assets (fonds + logo + clips)
+      - name: Stage assets (fonds + logo + clip du job)
         working-directory: F04_RENDER/CODEBASE
         run: |
           mkdir -p public/backgrounds
           cp ../../SHARED/IN/backgrounds/*.png public/backgrounds/
           cp ../../SHARED/IN/logos/logo.png public/logo.png
-          cp ../../F02_FORMAT/OUT/clips/*.mp4 public/
+          src=$(echo "${{ matrix.clip }}" | tr '-' '_')
+          cp "../../F02_FORMAT/OUT/clips/${src}.mp4" public/
 
-      - name: Render les 5 clips (codex confirmé)
+      - name: Render ${{ matrix.clip }}
         working-directory: F04_RENDER/CODEBASE
         run: |
           mkdir -p OUT
-          for id in clip-001 clip-002 clip-003 clip-004 clip-005; do
-            echo "=== Rendu $id ==="
-            npx remotion render src/index.jsx "$id" "OUT/${id}.mp4"
-          done
+          npx remotion render src/index.jsx "${{ matrix.clip }}" "OUT/${{ matrix.clip }}.mp4"
 
-      - name: Upload artifacts
+      - name: Upload artifact ${{ matrix.clip }}
         uses: actions/upload-artifact@v4
         with:
-          name: shorts
-          path: F04_RENDER/CODEBASE/OUT/*.mp4
+          name: ${{ matrix.clip }}
+          path: F04_RENDER/CODEBASE/OUT/${{ matrix.clip }}.mp4
           retention-days: 14

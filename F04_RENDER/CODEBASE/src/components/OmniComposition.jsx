@@ -193,6 +193,7 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
           <TitleBlock
             content={texts.title}
             style={textsStyle}
+            box={textsStyle.title_box}
             fps={fps}
             totalFrames={durationInFrames}
             offsetPct={texts.title_offset_pct ?? 8}
@@ -204,6 +205,7 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
           <ParagraphBlock
             content={texts.paragraph}
             style={textsStyle}
+            box={textsStyle.paragraph_box}
             totalFrames={durationInFrames}
             offsetPct={texts.paragraph_offset_pct ?? 8}
           />
@@ -230,21 +232,22 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
           </AbsoluteFill>
         )}
 
-        {/* Text overlays rétro-compat (text_overlays v3) */}
-        {(clip.text_overlays || []).map((overlay, index) => {
-          const startFrame = overlay.start_frame || 0;
-          const endFrame = overlay.end_frame || durationInFrames;
-          if (frame < startFrame || frame > endFrame) return null;
-          return (
-            <Sequence
-              key={overlay.id || index}
-              from={startFrame}
-              durationInFrames={endFrame - startFrame + 1}
-            >
-              <TextOverlay overlay={overlay} frame={frame - startFrame} fps={fps} />
-            </Sequence>
-          );
-        })}
+        {/* Text overlays rétro-compat — masqués quand les textes v4 sont actifs (doublon) */}
+        {(textMode === 'none' || !texts.title) &&
+          (clip.text_overlays || []).map((overlay, index) => {
+            const startFrame = overlay.start_frame || 0;
+            const endFrame = overlay.end_frame || durationInFrames;
+            if (frame < startFrame || frame > endFrame) return null;
+            return (
+              <Sequence
+                key={overlay.id || index}
+                from={startFrame}
+                durationInFrames={endFrame - startFrame + 1}
+              >
+                <TextOverlay overlay={overlay} frame={frame - startFrame} fps={fps} />
+              </Sequence>
+            );
+          })}
 
         {/* Flash du coup brutal */}
         {brutalFlash > 0 && (
@@ -279,9 +282,44 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
 /* ═══════════════════════════════════════════════════════════════════════════
  * L3 — TitleBlock : titre en haut, fade-in, style du session.texts_style
  * ═══════════════════════════════════════════════════════════════════════════ */
-const TitleBlock = ({ content, style, fps, totalFrames, offsetPct }) => {
+const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct }) => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: 'clamp' });
+
+  const boxEnabled = box && box.enabled;
+  const textStyle = boxEnabled
+    ? {
+        fontFamily: style.font,
+        fontSize: `${style.size_title}px`,
+        color: box.text_color || style.color,
+        fontWeight: 900,
+        textTransform: 'uppercase',
+        lineHeight: 1.1,
+        textAlign: 'center',
+        backgroundColor: box.color || 'rgba(0,0,0,0.7)',
+        border: (box.border_width || 0) > 0
+          ? `${box.border_width}px solid ${box.border_color || '#FFFFFF'}`
+          : 'none',
+        borderRadius: `${box.radius || 0}px`,
+        padding: `${box.padding || 12}px ${(box.padding || 12) * 1.6}px`,
+        maxWidth: '88%',
+        wordWrap: 'break-word',
+      }
+    : {
+        fontFamily: style.font,
+        fontSize: `${style.size_title}px`,
+        color: style.color,
+        WebkitTextStroke: `${style.stroke_width}px ${style.stroke_color}`,
+        textShadow: style.shadow,
+        letterSpacing: style.letter_spacing,
+        fontWeight: 900,
+        textTransform: 'uppercase',
+        lineHeight: 1.1,
+        textAlign: 'center',
+        opacity,
+        maxWidth: '88%',
+        wordWrap: 'break-word',
+      };
 
   return (
     <AbsoluteFill
@@ -292,25 +330,7 @@ const TitleBlock = ({ content, style, fps, totalFrames, offsetPct }) => {
         pointerEvents: 'none',
       }}
     >
-      <div
-        style={{
-          fontFamily: style.font,
-          fontSize: `${style.size_title}px`,
-          color: style.color,
-          WebkitTextStroke: `${style.stroke_width}px ${style.stroke_color}`,
-          textShadow: style.shadow,
-          letterSpacing: style.letter_spacing,
-          fontWeight: 900,
-          textTransform: 'uppercase',
-          lineHeight: 1.1,
-          textAlign: 'center',
-          opacity,
-          maxWidth: '88%',
-          wordWrap: 'break-word',
-        }}
-      >
-        {content}
-      </div>
+      <div style={{ ...textStyle, opacity }}>{content}</div>
     </AbsoluteFill>
   );
 };
@@ -318,9 +338,51 @@ const TitleBlock = ({ content, style, fps, totalFrames, offsetPct }) => {
 /* ═══════════════════════════════════════════════════════════════════════════
  * L4 — ParagraphBlock : paragraphe en bas (max ~4 lignes)
  * ═══════════════════════════════════════════════════════════════════════════ */
-const ParagraphBlock = ({ content, style, totalFrames, offsetPct }) => {
+const ParagraphBlock = ({ content, style, box, totalFrames, offsetPct }) => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 25], [0, 1], { extrapolateRight: 'clamp' });
+
+  const boxEnabled = box && box.enabled;
+  const textStyle = boxEnabled
+    ? {
+        fontFamily: style.font,
+        fontSize: `${style.size_paragraph}px`,
+        color: box.text_color || style.color,
+        fontWeight: 700,
+        lineHeight: 1.25,
+        textAlign: 'center',
+        backgroundColor: box.color || 'rgba(0,0,0,0.7)',
+        border: (box.border_width || 0) > 0
+          ? `${box.border_width}px solid ${box.border_color || '#FFFFFF'}`
+          : 'none',
+        borderRadius: `${box.radius || 0}px`,
+        padding: `${box.padding || 12}px ${(box.padding || 12) * 1.6}px`,
+        maxWidth: '88%',
+        maxHeight: '22%',
+        overflow: 'hidden',
+        display: '-webkit-box',
+        WebkitLineClamp: 4,
+        WebkitBoxOrient: 'vertical',
+        wordWrap: 'break-word',
+      }
+    : {
+        fontFamily: style.font,
+        fontSize: `${style.size_paragraph}px`,
+        color: style.color,
+        WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,
+        textShadow: style.shadow,
+        letterSpacing: style.letter_spacing,
+        fontWeight: 700,
+        lineHeight: 1.25,
+        textAlign: 'center',
+        maxWidth: '88%',
+        maxHeight: '22%',
+        overflow: 'hidden',
+        display: '-webkit-box',
+        WebkitLineClamp: 4,
+        WebkitBoxOrient: 'vertical',
+        wordWrap: 'break-word',
+      };
 
   return (
     <AbsoluteFill
@@ -331,29 +393,7 @@ const ParagraphBlock = ({ content, style, totalFrames, offsetPct }) => {
         pointerEvents: 'none',
       }}
     >
-      <div
-        style={{
-          fontFamily: style.font,
-          fontSize: `${style.size_paragraph}px`,
-          color: style.color,
-          WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,
-          textShadow: style.shadow,
-          letterSpacing: style.letter_spacing,
-          fontWeight: 700,
-          lineHeight: 1.25,
-          textAlign: 'center',
-          opacity,
-          maxWidth: '88%',
-          maxHeight: '22%',
-          overflow: 'hidden',
-          display: '-webkit-box',
-          WebkitLineClamp: 4,
-          WebkitBoxOrient: 'vertical',
-          wordWrap: 'break-word',
-        }}
-      >
-        {content}
-      </div>
+      <div style={{ ...textStyle, opacity }}>{content}</div>
     </AbsoluteFill>
   );
 };
