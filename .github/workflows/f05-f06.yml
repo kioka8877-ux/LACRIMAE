@@ -1,0 +1,88 @@
+name: F05-F06 CAMOUFLAGE + LUTHER (dev)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  WORKFLOW_SRC: f04-render.yml
+  BRANCH: dev
+
+jobs:
+  camoufler:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: F05 - Download clips rendus (artifacts f04-render)
+        run: |
+          mkdir -p F05_CAMOUFLAGE/IN
+          for A in clip-001 clip-002 clip-003 clip-004 clip-005; do
+            python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_SRC" "$A" F05_CAMOUFLAGE/IN/ "$BRANCH"
+          done
+          ls -la F05_CAMOUFLAGE/IN/
+
+      - name: F05 - Camouflage (wipe métadonnées + loudnorm -14 LUFS)
+        run: |
+          cd F05_CAMOUFLAGE/CODEBASE
+          python3 lac_f05_camouflage.py --input ../IN/ --output ../OUT/
+
+      - name: F05 - Gardien CUSTOS
+        run: python3 LAC_CUSTOS.py --frigate F05 --mode check-out --drive-base .
+
+      - name: F05 - Upload lac-youtube
+        uses: actions/upload-artifact@v4
+        with:
+          name: lac-youtube
+          path: F05_CAMOUFLAGE/OUT/
+          retention-days: 14
+
+      - name: F05 - Ledger + commit
+        run: |
+          python3 _tools/update_ledger.py F05
+          git config user.name "lacrimae-orchestrator"
+          git config user.email "orchestrator@lacrimae"
+          git add TRACKING/LACRIMAE_LEDGER.json
+          git commit -m "ledger: fregate F05 — camouflage [skip ci]" || echo "No change"
+          git push
+
+      - name: F06 - Luther (stream copy, empreinte zéro) sur l'OUT de F05
+        run: |
+          mkdir -p F06_LUTHER/OUT
+          cd F06_LUTHER/CODEBASE
+          python3 lac_f06_luther.py --input ../../F05_CAMOUFLAGE/OUT/ --output ../OUT/
+
+      - name: F06 - Gardien CUSTOS
+        run: python3 LAC_CUSTOS.py --frigate F06 --mode check-out --drive-base .
+
+      - name: F06 - Upload lac-clean
+        uses: actions/upload-artifact@v4
+        with:
+          name: lac-clean
+          path: F06_LUTHER/OUT/
+          retention-days: 14
+
+      - name: F06 - Ledger + commit
+        run: |
+          python3 _tools/update_ledger.py F06
+          git config user.name "lacrimae-orchestrator"
+          git config user.email "orchestrator@lacrimae"
+          git add TRACKING/LACRIMAE_LEDGER.json
+          git commit -m "ledger: fregate F06 — production complète [skip ci]" || echo "No change"
+          git push
