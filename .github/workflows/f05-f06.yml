@@ -2,6 +2,10 @@ name: F05-F06 CAMOUFLAGE + LUTHER (dev)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [dev]
+    paths:
+      - '.github/workflows/f05-f06.yml'
 
 permissions:
   contents: write
