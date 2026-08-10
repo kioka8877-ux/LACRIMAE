@@ -3,8 +3,8 @@
   "pipeline": "LACRIMAE_DEV",
   "mode": "forge",
   "forge": {
-    "pack_id": "LOGO-TS01_SANDOVAL-SIEGE-LOGO-20260804T174153",
-    "siege_id": "SIEGE-LOGO-20260804T174153",
+    "pack_id": "LOGO-SPINWIN_BRADPITT-siege_20260810_205150",
+    "siege_id": "siege_20260810_205150",
     "pack_mode": "logo",
     "campaign_id": null
   },
@@ -49,23 +49,23 @@
       "video": {
         "source": "clip_001.mp4",
         "fps": 30,
-        "total_frames": 1050,
+        "total_frames": 4097,
         "width": 1080,
         "height": 1920
       },
       "texts": {
         "mode": "title+paragraph",
-        "title": "SHE KICKED HIM IN FRONT OF HIS BAND",
-        "paragraph": "Tom Sandoval says his ex Victoria kicked him in the groin in front of his band, crew and fans during a Florida tour stop. The insult that came with it, he says, hurt worse than the kick. New court filing is out.",
+        "title": "7 YEARS SOBER — GONE",
+        "paragraph": "Seven years clean. Gone. Brad Pitt just admitted he's drinking again after walking away from sobriety. He calls it \"moderate\" now — a few glasses of wine, nothing crazy. But the man who thanked Bradley Cooper for saving him from alcohol just chose to go back. He hit AA for over a year after the Angelina split. The pain got so unbearable he understood why someone could see death as relief. He never",
         "title_offset_pct": 8,
         "paragraph_offset_pct": 8
       },
       "text_overlays": [
         {
           "id": "title_00",
-          "content": "SHE KICKED HIM IN FRONT OF HIS BAND",
+          "content": "7 YEARS SOBER — GONE",
           "start_frame": 0,
-          "end_frame": 1050,
+          "end_frame": 4097,
           "animation": "fade_in",
           "font": "Impact, Arial Black, sans-serif",
           "size": 96,
@@ -93,23 +93,23 @@
       "video": {
         "source": "clip_002.mp4",
         "fps": 30,
-        "total_frames": 1050,
+        "total_frames": 4097,
         "width": 1080,
         "height": 1920
       },
       "texts": {
         "mode": "title+paragraph",
-        "title": "THE WORDS THAT BROKE HIM",
-        "paragraph": "Tom Sandoval says Victoria screamed insults at him in front of witnesses — the kind that left him 'frazzled' and 'anxious' before his America's Got Talent performance. He claims she questioned his manhood in the most humiliating way possible.",
+        "title": "7 YEARS SOBER — NOW HE DRINKS AGAIN",
+        "paragraph": "Seven years clean. Gone. Brad Pitt just confirmed he's drinking again after half a decade of sobriety. He told Esquire he now keeps it moderate — a few glasses of wine, nothing reckless. But after the Angelina Jolie split, family pain got so unbearable he understood why some people see death as relief.",
         "title_offset_pct": 8,
         "paragraph_offset_pct": 8
       },
       "text_overlays": [
         {
           "id": "title_00",
-          "content": "THE WORDS THAT BROKE HIM",
+          "content": "7 YEARS SOBER — NOW HE DRINKS AGAIN",
           "start_frame": 0,
-          "end_frame": 1050,
+          "end_frame": 4097,
           "animation": "fade_in",
           "font": "Impact, Arial Black, sans-serif",
           "size": 96,
@@ -137,23 +137,23 @@
       "video": {
         "source": "clip_003.mp4",
         "fps": 30,
-        "total_frames": 1050,
+        "total_frames": 4097,
         "width": 1080,
         "height": 1920
       },
       "texts": {
         "mode": "title+paragraph",
-        "title": "'I'LL GET THE ARIANA TREATMENT'",
-        "paragraph": "Tom Sandoval says Victoria repeatedly warned she would 'destroy' his life and 'get the Ariana Madix treatment' — the public attention that followed his ex's breakup with him. He claims that's exactly why he stayed.",
+        "title": "7 YEARS SOBER — ENDED",
+        "paragraph": "Brad Pitt just admitted his seven years of sobriety are over. He told Esquire he's drinking again, but claims it's \"more moderate\" now. After AA, Bradley Cooper's help, and unbearable family pain, he says he still needs to \"stay professional.\" The man who thanked Cooper for saving him is pouring his own wine again.",
         "title_offset_pct": 8,
         "paragraph_offset_pct": 8
       },
       "text_overlays": [
         {
           "id": "title_00",
-          "content": "'I'LL GET THE ARIANA TREATMENT'",
+          "content": "7 YEARS SOBER — ENDED",
           "start_frame": 0,
-          "end_frame": 1050,
+          "end_frame": 4097,
           "animation": "fade_in",
           "font": "Impact, Arial Black, sans-serif",
           "size": 96,
@@ -181,23 +181,23 @@
       "video": {
         "source": "clip_004.mp4",
         "fps": 30,
-        "total_frames": 1050,
+        "total_frames": 4097,
         "width": 1080,
         "height": 1920
       },
       "texts": {
         "mode": "title+paragraph",
-        "title": "HER AND HER DAD — BOTH NAMED",
-        "paragraph": "A judge granted Tom Sandoval a temporary domestic violence restraining order against Victoria AND her father Will Robinson in June. Victoria's own attempt to get one against Tom was denied pending a future hearing.",
+        "title": "7 YEARS SOBER — GONE",
+        "paragraph": "Seven years clean. Gone. Brad Pitt just told Esquire he's drinking again after half a decade of sobriety. He says it's \"more moderate\" now, a few glasses of wine, nothing crazy. But after thanking Bradley Cooper for saving him from addiction, the relapse raises a question nobody's asking out loud.",
         "title_offset_pct": 8,
         "paragraph_offset_pct": 8
       },
       "text_overlays": [
         {
           "id": "title_00",
-          "content": "HER AND HER DAD — BOTH NAMED",
+          "content": "7 YEARS SOBER — GONE",
           "start_frame": 0,
-          "end_frame": 1050,
+          "end_frame": 4097,
           "animation": "fade_in",
           "font": "Impact, Arial Black, sans-serif",
           "size": 96,
@@ -225,23 +225,23 @@
       "video": {
         "source": "clip_005.mp4",
         "fps": 30,
-        "total_frames": 1050,
+        "total_frames": 4097,
         "width": 1080,
         "height": 1920
       },
       "texts": {
         "mode": "title+paragraph",
-        "title": "HER SIDE OF THE STORY",
-        "paragraph": "Victoria Lee Robinson says: 'I did not kick Tom, and I did not touch him.' She claims she took a shot, asked him to take care of her, and went back to bed. Two versions of the same night — only the court can decide.",
+        "title": "7 YEARS SOBER — GONE",
+        "paragraph": "Seven years sober — gone. Brad Pitt just admitted he's drinking again after one of Hollywood's most watched recovery journeys. But this time, he says it's different: moderate, controlled, professional. After hitting rock bottom during his split from Angelina Jolie, attending AA for over a year, and crediting Bradley Cooper for his sobriety — why risk it now? Sometimes the hardest lesson isn't fall",
         "title_offset_pct": 8,
         "paragraph_offset_pct": 8
       },
       "text_overlays": [
         {
           "id": "title_00",
-          "content": "HER SIDE OF THE STORY",
+          "content": "7 YEARS SOBER — GONE",
           "start_frame": 0,
-          "end_frame": 1050,
+          "end_frame": 4097,
           "animation": "fade_in",
           "font": "Impact, Arial Black, sans-serif",
           "size": 96,

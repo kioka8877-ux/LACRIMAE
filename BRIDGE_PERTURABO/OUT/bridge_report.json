@@ -1,5 +1,5 @@
 {
-  "pack_id": "LOGO-TS01_SANDOVAL-SIEGE-LOGO-20260804T174153",
+  "pack_id": "LOGO-SPINWIN_BRADPITT-siege_20260810_205150",
   "mode": "logo",
   "videos_count": 5,
   "controle1": "validated",
@@ -16,63 +16,63 @@
   ],
   "f01_skipped": true,
   "pack_fetched": true,
-  "source_video": "https://www.youtube.com/watch?v=xpG5sIW1jpA",
+  "source_video": "https://www.youtube.com/watch?v=w8NCD14oIDA",
   "source_type": "youtube",
   "video_local": "F02_FORMAT/IN/video_source.mp4",
   "clips": [
     {
       "angle_id": "A01",
-      "title": "Kicked in front of his band",
+      "title": "Brad Pitt Breaks Seven Years Sober",
       "cut": {
-        "start_sec": 12,
-        "end_sec": 47,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Ouverture du scandale : visage + reaction la plus dense en emotion. VALIDE par le Warsmith (Gate 4)."
+        "start_sec": null,
+        "end_sec": null,
+        "duration_sec": null,
+        "cut_source": "perturabo_proposed",
+        "note": "cuts proposés par PERTURABO — validation Warsmith requise"
       }
     },
     {
       "angle_id": "A02",
-      "title": "4 words that broke him",
+      "title": "Brad Pitt Almost Relapsed, He Explains",
       "cut": {
-        "start_sec": 60,
-        "end_sec": 95,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Moment de bascule du recit (accusation/insultes). VALIDE par le Warsmith (Gate 4)."
+        "start_sec": null,
+        "end_sec": null,
+        "duration_sec": null,
+        "cut_source": "perturabo_proposed",
+        "note": "cuts proposés par PERTURABO — validation Warsmith requise"
       }
     },
     {
       "angle_id": "A03",
-      "title": "She threatened the Ariana Madix treatment",
+      "title": "Brad Pitt Ended Seven Years Sober",
       "cut": {
-        "start_sec": 130,
-        "end_sec": 165,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Menace / escalade (leverage sur Tom). VALIDE par le Warsmith (Gate 4)."
+        "start_sec": null,
+        "end_sec": null,
+        "duration_sec": null,
+        "cut_source": "perturabo_proposed",
+        "note": "cuts proposés par PERTURABO — validation Warsmith requise"
       }
     },
     {
       "angle_id": "A04",
-      "title": "Restraining order vs her AND dad",
+      "title": "Brad Pitt Seven Years Sober Gone",
       "cut": {
-        "start_sec": 200,
-        "end_sec": 235,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Consequences legales (ordonnance, tribunal). VALIDE par le Warsmith (Gate 4)."
+        "start_sec": null,
+        "end_sec": null,
+        "duration_sec": null,
+        "cut_source": "perturabo_proposed",
+        "note": "cuts proposés par PERTURABO — validation Warsmith requise"
       }
     },
     {
       "angle_id": "A05",
-      "title": "Her one sentence response changes everything",
+      "title": "Brad Pitt Sobriety: His Greatest Lesson",
       "cut": {
-        "start_sec": 260,
-        "end_sec": 295,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Chute / retournement (deni de l'autre partie). VALIDE par le Warsmith (Gate 4)."
+        "start_sec": null,
+        "end_sec": null,
+        "duration_sec": null,
+        "cut_source": "perturabo_proposed",
+        "note": "cuts proposés par PERTURABO — validation Warsmith requise"
       }
     }
   ]

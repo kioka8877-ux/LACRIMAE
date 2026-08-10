@@ -1,32 +1,32 @@
 {
   "requested_sequences": 5,
-  "video_duration_sec": null,
-  "source": "https://www.youtube.com/watch?v=xpG5sIW1jpA",
+  "video_duration_sec": 682.945306,
+  "source": "https://www.youtube.com/watch?v=w8NCD14oIDA",
   "sequences": [
     {
-      "start_sec": 12.0,
-      "end_sec": 47.0,
-      "reason": "[A01] Kicked in front of his band"
+      "start_sec": 0.0,
+      "end_sec": 136.59,
+      "reason": "[A01] Brad Pitt Breaks Seven Years Sober"
     },
     {
-      "start_sec": 60.0,
-      "end_sec": 95.0,
-      "reason": "[A02] 4 words that broke him"
+      "start_sec": 136.59,
+      "end_sec": 273.18,
+      "reason": "[A02] Brad Pitt Almost Relapsed, He Explains"
     },
     {
-      "start_sec": 130.0,
-      "end_sec": 165.0,
-      "reason": "[A03] She threatened the Ariana Madix treatment"
+      "start_sec": 273.18,
+      "end_sec": 409.77,
+      "reason": "[A03] Brad Pitt Ended Seven Years Sober"
     },
     {
-      "start_sec": 200.0,
-      "end_sec": 235.0,
-      "reason": "[A04] Restraining order vs her AND dad"
+      "start_sec": 409.77,
+      "end_sec": 546.36,
+      "reason": "[A04] Brad Pitt Seven Years Sober Gone"
     },
     {
-      "start_sec": 260.0,
-      "end_sec": 295.0,
-      "reason": "[A05] Her one sentence response changes everything"
+      "start_sec": 546.36,
+      "end_sec": 682.95,
+      "reason": "[A05] Brad Pitt Sobriety: His Greatest Lesson"
     }
   ],
   "origin": "PERTURABO_FORGE"

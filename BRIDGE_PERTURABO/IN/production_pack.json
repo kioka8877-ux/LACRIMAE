@@ -1,79 +1,62 @@
 {
-  "pack_id": "LOGO-TS01_SANDOVAL-SIEGE-LOGO-20260804T174153",
-  "siege_id": "SIEGE-LOGO-20260804T174153",
+  "pack_id": "LOGO-SPINWIN_BRADPITT-siege_20260810_205150",
+  "siege_id": "siege_20260810_205150",
   "mode": "logo",
   "sub_mode": "informatif",
   "clip_source_ref": {
     "source_type": "youtube",
-    "reference": "https://www.youtube.com/watch?v=xpG5sIW1jpA",
-    "celebrity_or_subject": "Tom Sandoval",
-    "niche": "celebrity / drama (Vanderpump Rules - TMZ)",
+    "reference": "https://www.youtube.com/watch?v=w8NCD14oIDA",
+    "celebrity_or_subject": "Brad Pitt",
+    "niche": "celebrity / sobriety news (The Hollywood Reporter)",
     "duration_sec": null,
     "timecodes": null
   },
   "article_source": {
-    "reference": "TMZ — 'Tom Sandoval on Ex-GF Victoria: My Ex Berated Me About Tiny Penis During Alleged Fight' (texte de l'article fourni par le Warsmith, 2026-08-04)",
-    "subject": "Tom Sandoval (Vanderpump Rules) accuse son ex Victoria Lee Robinson de l'avoir frappé au bas-ventre et insulté ('tiny f****** penis', 'not a real man') lors d'une altercation en octobre pendant sa tournée en Floride, dans le cadre de son affaire d'ordonnance restrictive.",
-    "celebrity_or_subject": "Tom Sandoval"
+    "reference": "TMZ — 'Brad Pitt affirme que ses sept années de sobriété sont terminées... il boit à nouveau' (texte de l'article fourni par le Warsmith, 2026-08-10, interview Esquire)",
+    "subject": "Brad Pitt affirme dans une longue interview accordée à Esquire que ses sept années de sobriété sont terminées : il boit à nouveau, mais insiste sur le fait qu'il a appris qu'il doit encore se contrôler. Il déclare : « J'ai été sobre pendant sept ans. Et puis j'ai replongé » — ajoutant qu'il boit désormais « de manière plus modérée », quelques verres de vin mais pas trop : « Je dois rester professionnel. »",
+    "celebrity_or_subject": "Brad Pitt"
   },
   "joke_source": null,
-  "reference_clip_style": {
-    "source": "à fournir par le Warsmith (top clip viral de référence)",
-    "ratio": "9:16",
-    "blur": false,
-    "editing_style": "Auto-snap logo sur template LOGO_PRE_PLACED 1080x1920, cuts rapides, sous-titres on-screen, aucun fond de logo à retirer (GIF transparent).",
-    "rules": [
-      "Ratio projet obligatoire 9:16 (1080x1920) — auto-placement logo garanti",
-      "Logo GIF transparent fourni par la campagne — ne pas déplacer, redimensionner ni recolorer",
-      "Logo visible en permanence, non couvert à plus de 50% (UI plateforme, graphiques, objets)",
-      "Safezone : >25% d'overlap avec la zone rouge = rejet probable",
-      "Durée minimale 7s — engagement minimal 0.8%",
-      "Blur background interdit (image source conservée en 9:16)"
-    ],
-    "ref": [
-      "Campagne RuneScape (4 logos + logo pré-placé)",
-      "Campagne CS / rain (logo GIF auto-snap)"
-    ]
-  },
+  "reference_clip_style": null,
   "angles": [
     {
       "angle_id": "A01",
       "zone": "direct",
       "angle_family": "reframing",
-      "emotion_mode": "outrage",
+      "emotion_mode": "tension",
       "engagement_type": "question",
       "reframe_dim": "victime_vers_survivant"
     },
     {
       "angle_id": "A02",
       "zone": "direct",
-      "angle_family": "emotion",
-      "emotion_mode": "outrage",
-      "engagement_type": "assertion",
-      "reframe_dim": "cache_vers_revele"
+      "angle_family": "reframing",
+      "emotion_mode": "tension",
+      "engagement_type": "confirmation",
+      "reframe_dim": "anonyme_vers_incroyable"
     },
     {
       "angle_id": "A03",
       "zone": "direct",
-      "angle_family": "engagement",
+      "angle_family": "reframing",
+      "emotion_mode": "tension",
+      "engagement_type": "assertion",
+      "reframe_dim": "banal_vers_suspect"
+    },
+    {
+      "angle_id": "A04",
+      "zone": "direct",
+      "angle_family": "reframing",
       "emotion_mode": "tension",
       "engagement_type": "cliffhanger",
       "reframe_dim": "fait_vers_absurde"
     },
     {
-      "angle_id": "A04",
-      "zone": "direct",
-      "angle_family": "structural",
-      "emotion_mode": "inspiration",
-      "engagement_type": "question",
-      "reframe_dim": "anonyme_vers_incroyable"
-    },
-    {
       "angle_id": "A05",
       "zone": "direct",
-      "angle_family": "reframing",
-      "emotion_mode": "joie",
-      "engagement_type": "confirmation",
+      "angle_family": "emotion",
+      "emotion_mode": "admiration",
+      "engagement_type": "question",
       "reframe_dim": "echec_vers_lecon"
     }
   ],
@@ -81,137 +64,164 @@
     {
       "video_index": 1,
       "angle_id": "A01",
-      "title": "Kicked in front of his band",
-      "viral_paragraph": "Tom Sandoval says his ex Victoria kicked him in the groin in front of his band, crew and fans during a Florida tour stop. The insult that came with it, he says, hurt worse than the kick. New court filing is out.",
+      "title": "Brad Pitt Breaks Seven Years Sober",
+      "viral_paragraph": "Seven years clean. Gone. Brad Pitt just admitted he's drinking again after walking away from sobriety. He calls it \"moderate\" now — a few glasses of wine, nothing crazy. But the man who thanked Bradley Cooper for saving him from alcohol just chose to go back. He hit AA for over a year after the Angelina split. The pain got so unbearable he understood why someone could see death as relief. He never",
       "metadata": {
-        "title": "Tom Sandoval says ex kicked him in front of his band — the insult that broke him",
-        "description": "Tom Sandoval claims his ex-girlfriend Victoria Lee Robinson kicked him in the groin in front of his band, tour crew and fans during an October tour stop in Florida, according to a new declaration in his restraining order case.\n\nCopyright Disclaimer: Under Section 107 of the Copyright Act of 1976, allowance is made for \"fair use\" for purposes such as criticism, comment, news reporting, teaching, scholarship, and research. Fair use is a use permitted by copyright statute that might otherwise be infringing. Non-profit, educational or personal use tips the balance in favor of fair use.",
+        "title": "Brad Pitt Breaks Seven Years Sober — What He Told Esquire",
+        "description": "Brad Pitt revealed in a new Esquire interview that his seven years of sobriety are over. He drinks moderately now — a few glasses of wine — while acknowledging he must stay professional and in control. He also opened up about a painful post-divorce period, attending AA for over a year and crediting Bradley Cooper for helping him get sober.\n\nThis video summarizes a publicly reported TMZ article based on Brad Pitt's Esquire interview. The background clip is used purely as illustration and has no connection to the subject matter. All claims are sourced from the original article.",
         "tags": [
-          "Tom Sandoval",
-          "Victoria Lee Robinson",
-          "Vanderpump Rules",
-          "celebrity drama",
-          "restraining order",
-          "TMZ"
+          "bradpitt",
+          "sobriety",
+          "celebritynews",
+          "esquire",
+          "recovery",
+          "angelinajolie",
+          "bradleycooper",
+          "alcoholicsanonymous",
+          "mentalhealth",
+          "entertainmentnews",
+          "#betplayio",
+          "#betplay.io"
         ]
       },
       "cut": {
-        "start_sec": 12,
-        "end_sec": 47,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Ouverture du scandale : visage + reaction la plus dense en emotion. VALIDE par le Warsmith (Gate 4)."
+        "start_sec": null,
+        "end_sec": null,
+        "duration_sec": null,
+        "cut_source": "perturabo_proposed",
+        "note": "cuts proposés par PERTURABO — validation Warsmith requise"
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
-      "on_screen_text": "SHE KICKED HIM IN FRONT OF HIS BAND"
+      "on_screen_text": "7 YEARS SOBER — GONE"
     },
     {
       "video_index": 2,
       "angle_id": "A02",
-      "title": "4 words that broke him",
-      "viral_paragraph": "Tom Sandoval says Victoria screamed insults at him in front of witnesses — the kind that left him 'frazzled' and 'anxious' before his America's Got Talent performance. He claims she questioned his manhood in the most humiliating way possible.",
+      "title": "Brad Pitt Almost Relapsed, He Explains",
+      "viral_paragraph": "Seven years clean. Gone. Brad Pitt just confirmed he's drinking again after half a decade of sobriety. He told Esquire he now keeps it moderate — a few glasses of wine, nothing reckless. But after the Angelina Jolie split, family pain got so unbearable he understood why some people see death as relief.",
       "metadata": {
-        "title": "The 4 words she screamed that left Tom Sandoval 'frazzled' before AGT",
-        "description": "Tom Sandoval claims his ex Victoria Lee Robinson hurled insults at him — including degrading comments about his manhood — leaving him 'frazzled' and 'anxious' before his America's Got Talent quarterfinal performance in August 2025.\n\nCopyright Disclaimer: Under Section 107 of the Copyright Act of 1976, allowance is made for \"fair use\" for purposes such as criticism, comment, news reporting, teaching, scholarship, and research. Fair use is a use permitted by copyright statute that might otherwise be infringing. Non-profit, educational or personal use tips the balance in favor of fair use.",
+        "title": "Brad Pitt Breaks Seven Years Sobriety — He's Drinking Again",
+        "description": "Brad Pitt revealed in a candid Esquire interview that his seven-year sobriety streak has ended — he now drinks moderately, crediting Bradley Cooper for helping him get sober during his painful post-Jolie split.\n\nThis video uses a background clip for illustration purposes only. All facts are sourced from the referenced TMZ article and Esquire interview under fair use for commentary and reporting.",
         "tags": [
-          "Tom Sandoval",
-          "AGT",
-          "celebrity scandal",
-          "toxic relationship",
-          "Vanderpump Rules",
-          "viral"
+          "bradpitt",
+          "sobriety",
+          "celebritynews",
+          "esquireinterview",
+          "bradleycooper",
+          "recovery",
+          "mentalhealth",
+          "angelinajolie",
+          "#betplayio",
+          "#betplay.io",
+          "#betplayspins.io"
         ]
       },
       "cut": {
-        "start_sec": 60,
-        "end_sec": 95,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Moment de bascule du recit (accusation/insultes). VALIDE par le Warsmith (Gate 4)."
+        "start_sec": null,
+        "end_sec": null,
+        "duration_sec": null,
+        "cut_source": "perturabo_proposed",
+        "note": "cuts proposés par PERTURABO — validation Warsmith requise"
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
-      "on_screen_text": "THE WORDS THAT BROKE HIM"
+      "on_screen_text": "7 YEARS SOBER — NOW HE DRINKS AGAIN"
     },
     {
       "video_index": 3,
       "angle_id": "A03",
-      "title": "She threatened the Ariana Madix treatment",
-      "viral_paragraph": "Tom Sandoval says Victoria repeatedly warned she would 'destroy' his life and 'get the Ariana Madix treatment' — the public attention that followed his ex's breakup with him. He claims that's exactly why he stayed.",
+      "title": "Brad Pitt Ended Seven Years Sober",
+      "viral_paragraph": "Brad Pitt just admitted his seven years of sobriety are over. He told Esquire he's drinking again, but claims it's \"more moderate\" now. After AA, Bradley Cooper's help, and unbearable family pain, he says he still needs to \"stay professional.\" The man who thanked Cooper for saving him is pouring his own wine again.",
       "metadata": {
-        "title": "Why Tom Sandoval says he stayed: she threatened the 'Ariana Madix treatment'",
-        "description": "Tom Sandoval claims his ex Victoria Lee Robinson threatened to ruin his life and 'get the Ariana Madix treatment' — referencing the fame his former girlfriend gained after their split. He says the threat is why he stayed in the relationship.\n\nCopyright Disclaimer: Under Section 107 of the Copyright Act of 1976, allowance is made for \"fair use\" for purposes such as criticism, comment, news reporting, teaching, scholarship, and research. Fair use is a use permitted by copyright statute that might otherwise be infringing. Non-profit, educational or personal use tips the balance in favor of fair use.",
+        "title": "Brad Pitt Reveals He's Drinking Again After 7 Years Sober (Esquire Interview)",
+        "description": "Brad Pitt confirmed in a new Esquire interview that his seven-year sobriety has ended and he is drinking again, claiming moderation and professionalism. He also opened up about painful family issues, his time in AA, and gratitude toward Bradley Cooper.\n\nThis video uses a background clip for illustrative purposes only. The source footage is unrelated to the reported story and is used under fair use for commentary and information.",
         "tags": [
-          "Tom Sandoval",
-          "Ariana Madix",
-          "celebrity drama",
-          "breakup",
-          "Vanderpump Rules",
-          "TMZ"
+          "bradpitt",
+          "sobriety",
+          "celebritynews",
+          "esquireinterview",
+          "recovery",
+          "angelinajolie",
+          "bradleycooper",
+          "alcoholicsanonymous",
+          "hollywood",
+          "mentalhealth",
+          "#betplayio",
+          "#betplay.io"
         ]
       },
       "cut": {
-        "start_sec": 130,
-        "end_sec": 165,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Menace / escalade (leverage sur Tom). VALIDE par le Warsmith (Gate 4)."
+        "start_sec": null,
+        "end_sec": null,
+        "duration_sec": null,
+        "cut_source": "perturabo_proposed",
+        "note": "cuts proposés par PERTURABO — validation Warsmith requise"
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
-      "on_screen_text": "'I'LL GET THE ARIANA TREATMENT'"
+      "on_screen_text": "7 YEARS SOBER — ENDED"
     },
     {
       "video_index": 4,
       "angle_id": "A04",
-      "title": "Restraining order vs her AND dad",
-      "viral_paragraph": "A judge granted Tom Sandoval a temporary domestic violence restraining order against Victoria AND her father Will Robinson in June. Victoria's own attempt to get one against Tom was denied pending a future hearing.",
+      "title": "Brad Pitt Seven Years Sober Gone",
+      "viral_paragraph": "Seven years clean. Gone. Brad Pitt just told Esquire he's drinking again after half a decade of sobriety. He says it's \"more moderate\" now, a few glasses of wine, nothing crazy. But after thanking Bradley Cooper for saving him from addiction, the relapse raises a question nobody's asking out loud.",
       "metadata": {
-        "title": "Tom Sandoval's restraining order covers his ex AND her father — here's why",
-        "description": "At the end of June, Tom Sandoval was granted a temporary domestic violence restraining order against Victoria Lee Robinson and her father Will Robinson. Victoria's own protective order request against Tom was denied until a future hearing.\n\nCopyright Disclaimer: Under Section 107 of the Copyright Act of 1976, allowance is made for \"fair use\" for purposes such as criticism, comment, news reporting, teaching, scholarship, and research. Fair use is a use permitted by copyright statute that might otherwise be infringing. Non-profit, educational or personal use tips the balance in favor of fair use.",
+        "title": "Brad Pitt Breaks Sobriety After Seven Years",
+        "description": "Brad Pitt revealed in an Esquire interview that his seven-year sobriety streak has ended and he is drinking again, albeit more moderately. He credits Bradley Cooper for helping him get sober and admits the post-divorce period was so painful he understood how death could feel like relief.\n\nThis video uses background footage for illustrative purposes only. The clip source is unrelated to the reported story. All claims are sourced from the cited Esquire interview as reported by TMZ.\n\nCopyright Disclaimer: Under Section 107 of the Copyright Act of 1976, allowance is made for \"fair use\" for purposes such as criticism, comment, news reporting, teaching, scholarship, and research. Fair use is a use permitted by copyright statute that might otherwise be infringing. Non-profit, educational or personal use tips the balance in favor of fair use.",
         "tags": [
-          "Tom Sandoval",
-          "restraining order",
-          "court case",
-          "celebrity news",
-          "Vanderpump Rules",
-          "drama"
+          "bradpitt",
+          "sobriety",
+          "celebritynews",
+          "esquireinterview",
+          "recovery",
+          "bradleycooper",
+          "angelinajolie",
+          "mentalhealth",
+          "#betplayio",
+          "#betplay.io",
+          "#betplayspins.io"
         ]
       },
       "cut": {
-        "start_sec": 200,
-        "end_sec": 235,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Consequences legales (ordonnance, tribunal). VALIDE par le Warsmith (Gate 4)."
+        "start_sec": null,
+        "end_sec": null,
+        "duration_sec": null,
+        "cut_source": "perturabo_proposed",
+        "note": "cuts proposés par PERTURABO — validation Warsmith requise"
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
-      "on_screen_text": "HER AND HER DAD — BOTH NAMED"
+      "on_screen_text": "7 YEARS SOBER — GONE"
     },
     {
       "video_index": 5,
       "angle_id": "A05",
-      "title": "Her one sentence response changes everything",
-      "viral_paragraph": "Victoria Lee Robinson says: 'I did not kick Tom, and I did not touch him.' She claims she took a shot, asked him to take care of her, and went back to bed. Two versions of the same night — only the court can decide.",
+      "title": "Brad Pitt Sobriety: His Greatest Lesson",
+      "viral_paragraph": "Seven years sober — gone. Brad Pitt just admitted he's drinking again after one of Hollywood's most watched recovery journeys. But this time, he says it's different: moderate, controlled, professional. After hitting rock bottom during his split from Angelina Jolie, attending AA for over a year, and crediting Bradley Cooper for his sobriety — why risk it now? Sometimes the hardest lesson isn't fall",
       "metadata": {
-        "title": "Victoria Lee Robinson breaks her silence: 'I did not kick Tom'",
-        "description": "Victoria Lee Robinson denies the allegations: 'I did not kick Tom, and I did not touch him.' She says she had taken a shot, asked Tom to take care of her, and went back to bed on the bus — and that she keeps getting pulled back into the drama.\n\nCopyright Disclaimer: Under Section 107 of the Copyright Act of 1976, allowance is made for \"fair use\" for purposes such as criticism, comment, news reporting, teaching, scholarship, and research. Fair use is a use permitted by copyright statute that might otherwise be infringing. Non-profit, educational or personal use tips the balance in favor of fair use.",
+        "title": "Brad Pitt Breaks Seven Years Sobriety — He's Drinking Again",
+        "description": "Brad Pitt revealed in a new Esquire interview that his seven years of sobriety have ended — he's drinking again, but moderately. He credits Bradley Cooper for helping him get sober after his painful split from Angelina Jolie, a period so dark he understood how someone could see death as relief.\n\nThis video uses a background clip for illustrative purposes only. The source footage is unrelated to the reported story. All claims are sourced from the cited TMZ and Esquire interviews. If you or someone you know is struggling, call or text 988 (Suicide & Crisis Lifeline).\n\nCopyright Disclaimer: Under Section 107 of the Copyright Act of 1976, allowance is made for \"fair use\" for purposes such as criticism, comment, news reporting, teaching, scholarship, and research. Fair use is a use permitted by copyright statute that might otherwise be infringing. Non-profit, educational or personal use tips the balance in favor of fair use.",
         "tags": [
-          "Victoria Lee Robinson",
-          "Tom Sandoval",
-          "he said she said",
-          "celebrity drama",
-          "Vanderpump Rules",
-          "viral"
+          "bradpitt",
+          "sobriety",
+          "celebritynews",
+          "recovery",
+          "angelinajolie",
+          "bradleycooper",
+          "hollywood",
+          "mentalhealth",
+          "#betplayio",
+          "#betplay.io",
+          "#betplayspins.io"
         ]
       },
       "cut": {
-        "start_sec": 260,
-        "end_sec": 295,
-        "duration_sec": 35,
-        "cut_source": "perturabo_validated",
-        "note": "Chute / retournement (deni de l'autre partie). VALIDE par le Warsmith (Gate 4)."
+        "start_sec": null,
+        "end_sec": null,
+        "duration_sec": null,
+        "cut_source": "perturabo_proposed",
+        "note": "cuts proposés par PERTURABO — validation Warsmith requise"
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
-      "on_screen_text": "HER SIDE OF THE STORY"
+      "on_screen_text": "7 YEARS SOBER — GONE"
     }
   ],
   "checklist": {
