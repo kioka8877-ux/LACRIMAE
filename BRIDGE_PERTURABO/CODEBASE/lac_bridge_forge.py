@@ -205,10 +205,18 @@ def validate_pack(pack: dict) -> list:
     else:
         for v in videos:
             cut = v.get("cut") or {}
-            if "start_sec" not in cut or "end_sec" not in cut:
+            has_timecodes = (cut.get("start_sec") is not None
+                             and cut.get("end_sec") is not None)
+            if "start_sec" in cut and "end_sec" in cut and has_timecodes:
+                if float(cut["end_sec"]) <= float(cut["start_sec"]):
+                    errors.append(f"video {v.get('angle_id', '?')} : cut invalide (end<=start)")
+            elif "start_sec" not in cut or "end_sec" not in cut:
                 errors.append(f"video {v.get('angle_id', '?')} : cut.start_sec/end_sec manquant")
-            elif cut.get("end_sec", 0) <= cut.get("start_sec", 0):
-                errors.append(f"video {v.get('angle_id', '?')} : cut invalide (end<=start)")
+            else:
+                # Cuts proposés sans timecodes (validation Warsmith requise) :
+                # accepté — le bridge génère des timecodes par défaut répartis
+                # sur la durée de la vidéo fournie.
+                pass
             if not v.get("title") and not v.get("on_screen_text") and not v.get("viral_paragraph"):
                 errors.append(f"video {v.get('angle_id', '?')} : ni title ni on_screen_text")
     return errors
@@ -216,26 +224,45 @@ def validate_pack(pack: dict) -> list:
 
 # ─── MAPPING pack → cutlist ──────────────────────────────────────────────────
 
-def pack_to_cutlist(pack: dict) -> dict:
-    """Videos[].cut → cutlist.json (format F02/F01). Gère les 2 formats."""
+def pack_to_cutlist(pack: dict, video_path=None, video_duration=None) -> dict:
+    """Videos[].cut → cutlist.json (format F02/F01). Gère les 2 formats.
+
+    Les cuts sans timecodes (start_sec/end_sec = null, validation Warsmith
+    requise) sont répartis UNIFORMÉMENT sur la durée de la vidéo fournie
+    (probe ffprobe, sinon duration_sec du pack, sinon défaut 30s/coupe)."""
     videos = pack.get("videos", [])
     source = pack.get("clip_source_ref") or {}
     if not source:
         source = (pack.get("source") or {}).get("video_url") and {
             "reference": (pack.get("source") or {}).get("video_url")
         } or {}
+    if video_duration is None and video_path is not None:
+        video_duration = probe_video_duration(video_path)
+    if video_duration is None:
+        video_duration = source.get("duration_sec")
+    n = len(videos)
     sequences = []
-    for v in videos:
+    for i, v in enumerate(videos):
         cut = v.get("cut") or {}
+        start = cut.get("start_sec")
+        end = cut.get("end_sec")
+        if start is None or end is None:
+            # Répartition uniforme de la durée sur les N coupes
+            if video_duration:
+                start = round(video_duration * i / n, 2)
+                end = round(video_duration * (i + 1) / n, 2)
+            else:
+                start = round(i * 30.0, 2)
+                end = round((i + 1) * 30.0, 2)
         reason = v.get("title") or v.get("on_screen_text") or cut.get("note", "")
         sequences.append({
-            "start_sec": float(cut["start_sec"]),
-            "end_sec": float(cut["end_sec"]),
+            "start_sec": float(start),
+            "end_sec": float(end),
             "reason": f"[{v.get('angle_id', '?')}] {reason}",
         })
     return {
         "requested_sequences": len(sequences),
-        "video_duration_sec": source.get("duration_sec"),
+        "video_duration_sec": video_duration,
         "source": source.get("reference"),
         "sequences": sequences,
         "origin": "PERTURABO_FORGE",
@@ -306,6 +333,8 @@ def check_cuts_within_duration(pack: dict, video_path) -> list:
         return errors
     for v in pack.get("videos", []):
         cut = v.get("cut") or {}
+        if cut.get("start_sec") is None or cut.get("end_sec") is None:
+            continue  # cuts proposés sans timecodes — générés par pack_to_cutlist
         end = float(cut.get("end_sec", 0))
         if end > duration:
             errors.append(
@@ -571,7 +600,7 @@ def main():
 
     # 3. Mapping pack → cutlist + texts
     BRIDGE_OUT.mkdir(parents=True, exist_ok=True)
-    cutlist = pack_to_cutlist(pack)
+    cutlist = pack_to_cutlist(pack, video_path=video_path)
     cutlist_path = BRIDGE_OUT / "cutlist.json"
     cutlist_path.write_text(json.dumps(cutlist, ensure_ascii=False, indent=2), encoding="utf-8")
     log_ok(f"cutlist forge écrit : {cutlist_path}")
