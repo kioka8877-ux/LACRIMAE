@@ -224,6 +224,24 @@ def validate_pack(pack: dict) -> list:
 
 # ─── MAPPING pack → cutlist ──────────────────────────────────────────────────
 
+def resolve_cut_timecodes(cut: dict, index: int, count: int,
+                          video_duration=None) -> tuple:
+    """Retourne (start_sec, end_sec) du cut, en générant des valeurs par défaut
+    si les timecodes sont absents (cuts 'validation Warsmith requise') :
+    répartition UNIFORME de la durée de la vidéo sur les N coupes (sinon 30s).
+    Ne plante jamais sur des valeurs null."""
+    start = cut.get("start_sec")
+    end = cut.get("end_sec")
+    if start is None or end is None:
+        if video_duration:
+            start = round(video_duration * index / count, 2)
+            end = round(video_duration * (index + 1) / count, 2)
+        else:
+            start = round(index * 30.0, 2)
+            end = round((index + 1) * 30.0, 2)
+    return float(start), float(end)
+
+
 def pack_to_cutlist(pack: dict, video_path=None, video_duration=None) -> dict:
     """Videos[].cut → cutlist.json (format F02/F01). Gère les 2 formats.
 
@@ -244,20 +262,11 @@ def pack_to_cutlist(pack: dict, video_path=None, video_duration=None) -> dict:
     sequences = []
     for i, v in enumerate(videos):
         cut = v.get("cut") or {}
-        start = cut.get("start_sec")
-        end = cut.get("end_sec")
-        if start is None or end is None:
-            # Répartition uniforme de la durée sur les N coupes
-            if video_duration:
-                start = round(video_duration * i / n, 2)
-                end = round(video_duration * (i + 1) / n, 2)
-            else:
-                start = round(i * 30.0, 2)
-                end = round((i + 1) * 30.0, 2)
+        start, end = resolve_cut_timecodes(cut, i, n, video_duration)
         reason = v.get("title") or v.get("on_screen_text") or cut.get("note", "")
         sequences.append({
-            "start_sec": float(start),
-            "end_sec": float(end),
+            "start_sec": start,
+            "end_sec": end,
             "reason": f"[{v.get('angle_id', '?')}] {reason}",
         })
     return {
@@ -401,12 +410,19 @@ def transit_codex(codex_path):
 
 # ─── CODEX FORGE (v4.0, session + clips) ─────────────────────────────────────
 
-def build_forge_codex(pack: dict, texts_map: dict, background_name, fps=30) -> dict:
+def build_forge_codex(pack: dict, texts_map: dict, background_name,
+                      video_duration=None, fps=30) -> dict:
     videos = pack.get("videos", [])
+    n = len(videos)
     clips = []
     for i, v in enumerate(videos):
         cut = v.get("cut") or {}
-        duration = float(cut.get("duration_sec") or (cut.get("end_sec", 0) - cut.get("start_sec", 0)))
+        _, end = resolve_cut_timecodes(cut, i, n, video_duration)
+        duration_sec = cut.get("duration_sec")
+        if duration_sec is None:
+            start, end = resolve_cut_timecodes(cut, i, n, video_duration)
+            duration_sec = end - start
+        duration = float(duration_sec)
         t = texts_map.get(str(i + 1), {})
         clips.append({
             "id": f"clip_{i + 1:03d}",
@@ -608,7 +624,8 @@ def main():
     texts_map = pack_to_texts(pack)
 
     # 4. Codex forge v4.0 (session + clips)
-    codex = build_forge_codex(pack, texts_map, background_name)
+    codex = build_forge_codex(pack, texts_map, background_name,
+                              video_duration=cutlist.get("video_duration_sec"))
     codex_path = BRIDGE_OUT / "codex.json"
     codex_path.write_text(json.dumps(codex, ensure_ascii=False, indent=2), encoding="utf-8")
     log_ok(f"codex forge v4.0 écrit : {codex_path} ({len(codex['clips'])} clip(s))")
