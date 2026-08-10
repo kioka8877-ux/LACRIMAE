@@ -39,7 +39,8 @@
       "denoising": 0,
       "vignette": 0.25,
       "grain_intensity": 0.15
-    }
+    },
+    "profile": "background"
   },
   "validated_by_magos": false,
   "clips": [
