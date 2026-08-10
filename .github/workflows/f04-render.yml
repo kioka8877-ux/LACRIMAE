@@ -8,7 +8,7 @@ on:
         required: false
         default: 'all'
   push:
-    branches: [dev]
+    branches: [dev, dev2]
     paths:
       - 'F04_RENDER/**'
 
@@ -35,10 +35,10 @@ jobs:
       matrix:
         clip: ${{ fromJSON(needs.select.outputs.clips) }}
     steps:
-      - name: Checkout dev
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: dev
+          ref: ${{ github.ref_name }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -59,6 +59,10 @@ jobs:
           cp ../../SHARED/IN/logos/logo.png public/logo.png
           src=$(echo "${{ matrix.clip }}" | tr '-' '_')
           cp "../../F02_FORMAT/OUT/clips/${src}.mp4" public/
+
+      - name: F04b SIGNE — signatures anti-doublon + codex final
+        working-directory: F04_RENDER/CODEBASE
+        run: python3 lac_signe.py --codex ../IN/codex.json --js src/codexData.js --signatures ../IN/signatures.json
 
       - name: Render ${{ matrix.clip }}
         working-directory: F04_RENDER/CODEBASE

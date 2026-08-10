@@ -141,6 +141,39 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
   const texts = clip.texts || {};
   const textMode = texts.mode || (texts.title ? 'title' : 'none');
 
+  // ═══ F04b SIGNE : signature anti-doublon par clip (déterministe) ═══
+  const sig = clip.sig || {};
+  const grainIntensity = sig.grain?.intensity ?? presets.grain_intensity ?? 0;
+  const grainSeed = sig.grain?.seed ?? 0;
+  const grainId = 'grain-' + (clip.id || 'clip').replace(/_/g, '-');
+
+  // Mouvement unique du fond PNG (L1) — caméra fixe, seul le fond dérive
+  const bgBaseScale = sig.bg_motion?.base_scale ?? 1.0;
+  const bgScale = (session.background?.scale ?? 1) * bgBaseScale;
+  const bgProgress = frame / Math.max(1, durationInFrames);
+  const bgAmpX = sig.bg_motion?.amp_x ?? 0;
+  const bgAmpY = sig.bg_motion?.amp_y ?? 0;
+  const bgFreq = sig.bg_motion?.freq ?? 0;
+  const bgPhase = sig.bg_motion?.phase ?? 0;
+  const bgDriftX = sig.bg_motion?.drift_x ?? 0;
+  const bgDriftY = sig.bg_motion?.drift_y ?? 0;
+  const bgX = Math.sin(bgProgress * Math.PI * 2 * bgFreq + bgPhase) * bgAmpX
+    + bgDriftX * bgProgress;
+  const bgY = Math.cos(bgProgress * Math.PI * 2 * bgFreq + bgPhase) * bgAmpY
+    + bgDriftY * bgProgress;
+
+  // Miroir (L2) : flip horizontal de la VIDÉO uniquement — texte jamais flippé
+  const mirrorFactor = sig.mirror ? '-1' : '1';
+
+  // Micro dérive caméra (L2) : zoom lent + léger pan, à peine perceptible
+  const cam = sig.cam_drift || {};
+  const camZoom = interpolate(frame, [0, durationInFrames],
+    [cam.zoom_from ?? 1, cam.zoom_to ?? 1], { extrapolateRight: 'clamp' });
+  const camProgress = frame / Math.max(1, durationInFrames);
+  const camDx = (cam.dx ?? 0) * camProgress;
+  const camDy = (cam.dy ?? 0) * camProgress;
+  const camDriftTransform = `scale(${camZoom}) translate(${camDx}px, ${camDy}px)`;
+
   return (
     <AbsoluteFill style={{ backgroundColor: session.background?.color || '#000' }}>
       {/* Audio (volume réglé par le Magos) */}
@@ -163,7 +196,7 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
-                transform: `scale(${session.background.scale ?? 1})`,
+                transform: `scale(${bgScale}) translate(${bgX}px, ${bgY}px)`,
                 transformOrigin: 'center center',
               }}
             />
@@ -180,7 +213,7 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
               width: '100%',
               height: '100%',
               objectFit: session.profile === 'background' ? 'contain' : 'cover',
-              transform: `${zoomTransform} translate(${shakeX}px, ${shakeY}px) translateY(${
+              transform: `scaleX(${mirrorFactor}) ${zoomTransform} ${camDriftTransform} translate(${shakeX}px, ${shakeY}px) translateY(${
                 session.video?.offset_y || 0
               }%)`,
             }}
@@ -197,6 +230,7 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
             fps={fps}
             totalFrames={durationInFrames}
             offsetPct={texts.title_offset_pct ?? 8}
+            anim={sig.text_anim}
           />
         ) : null}
 
@@ -208,6 +242,7 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
             box={textsStyle.paragraph_box}
             totalFrames={durationInFrames}
             offsetPct={texts.paragraph_offset_pct ?? 8}
+            anim={sig.text_anim}
           />
         ) : null}
 
@@ -253,17 +288,42 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
         {brutalFlash > 0 && (
           <AbsoluteFill style={{ backgroundColor: '#fff', opacity: brutalFlash, pointerEvents: 'none' }} />
         )}
+
+        {/* F04b SIGNE : flash blanc subtil en début de clip (anti-doublon) */}
+        {(() => {
+          const flashFrame = sig.flash?.frame;
+          if (flashFrame == null) return null;
+          const d = frame - flashFrame;
+          if (d < 0 || d > 5) return null;
+          return (
+            <AbsoluteFill style={{
+              backgroundColor: '#fff',
+              opacity: (sig.flash.opacity ?? 0.1) * (1 - d / 6),
+              pointerEvents: 'none',
+            }} />
+          );
+        })()}
       </AbsoluteFill>
 
-      {/* ── L6 (finitions) : grain + vignette PAR-DESSUS tout ── */}
-      {(presets.grain_intensity || 0) > 0 && (
-        <AbsoluteFill style={{ opacity: presets.grain_intensity, pointerEvents: 'none', mixBlendMode: 'overlay' }}>
+      {/* ── L6 (finitions) : grain (seed unique par clip) + vignette PAR-DESSUS tout ── */}
+      {(grainIntensity || 0) > 0 && (
+        <AbsoluteFill style={{
+          opacity: grainIntensity * (0.9 + 0.1 * Math.sin(frame * 0.7)),
+          pointerEvents: 'none',
+          mixBlendMode: 'overlay',
+        }}>
           <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
-            <filter id="grainFilter">
-              <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+            <filter id={grainId}>
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.9"
+                numOctaves="2"
+                stitchTiles="stitch"
+                seed={grainSeed}
+              />
               <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0" />
             </filter>
-            <rect width="100%" height="100%" filter="url(#grainFilter)" />
+            <rect width="100%" height="100%" filter={`url(#${grainId})`} />
           </svg>
         </AbsoluteFill>
       )}
@@ -282,9 +342,9 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
 /* ═══════════════════════════════════════════════════════════════════════════
  * L3 — TitleBlock : titre en haut, fade-in, style du session.texts_style
  * ═══════════════════════════════════════════════════════════════════════════ */
-const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct }) => {
+const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, anim }) => {
   const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: 'clamp' });
+  const { transform: textTransform, opacity } = getTextAnim(frame, anim, 15);
 
   const boxEnabled = box && box.enabled;
   const textStyle = boxEnabled
@@ -330,7 +390,7 @@ const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct }) => {
         pointerEvents: 'none',
       }}
     >
-      <div style={{ ...textStyle, opacity }}>{content}</div>
+      <div style={{ ...textStyle, opacity, transform: textTransform }}>{content}</div>
     </AbsoluteFill>
   );
 };
@@ -338,9 +398,9 @@ const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct }) => {
 /* ═══════════════════════════════════════════════════════════════════════════
  * L4 — ParagraphBlock : paragraphe en bas (max ~4 lignes)
  * ═══════════════════════════════════════════════════════════════════════════ */
-const ParagraphBlock = ({ content, style, box, totalFrames, offsetPct }) => {
+const ParagraphBlock = ({ content, style, box, totalFrames, offsetPct, anim }) => {
   const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 25], [0, 1], { extrapolateRight: 'clamp' });
+  const { transform: textTransform, opacity } = getTextAnim(frame, anim, 25);
 
   const boxEnabled = box && box.enabled;
   const textStyle = boxEnabled
@@ -393,7 +453,7 @@ const ParagraphBlock = ({ content, style, box, totalFrames, offsetPct }) => {
         pointerEvents: 'none',
       }}
     >
-      <div style={{ ...textStyle, opacity }}>{content}</div>
+      <div style={{ ...textStyle, opacity, transform: textTransform }}>{content}</div>
     </AbsoluteFill>
   );
 };
@@ -602,4 +662,29 @@ function getCurrentZoom(frame, keyframes) {
     }
   }
   return { scale: 1.0, target_x: 0.5, target_y: 0.5 };
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Helper: animation d'apparition des textes (F04b SIGNE)
+ * - sans anim (ou direction 'none') : fade-in classique
+ * - sinon : slide horizontal/vertical avec easing, puis le texte se fige
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function getTextAnim(frame, anim, defaultFadeFrames) {
+  if (!anim || !anim.direction || anim.direction === 'none') {
+    const opacity = interpolate(frame, [0, defaultFadeFrames], [0, 1], {
+      extrapolateRight: 'clamp',
+    });
+    return { transform: 'none', opacity };
+  }
+  const dur = anim.duration_frames || 30;
+  const p = Math.min(1, frame / dur);
+  const eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+  const off = (1 - eased) * 90;
+  let transform = 'none';
+  if (anim.direction === 'ltr') transform = `translateX(${-off}px)`;
+  else if (anim.direction === 'rtl') transform = `translateX(${off}px)`;
+  else if (anim.direction === 'up') transform = `translateY(${off}px)`;
+  else if (anim.direction === 'down') transform = `translateY(${-off}px)`;
+  const opacity = Math.min(1, p * 1.4);
+  return { transform, opacity };
 }
