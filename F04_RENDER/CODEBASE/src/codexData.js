@@ -1,4 +1,4 @@
-// Codex v4.0 CONFIRMÉ (release codex → codex.1.json) — regénéré avant chaque render.
+// Généré par lac_signe.py (F04b SIGNE) — ne pas éditer à la main.
 export const codex = {
   "version": "4.0",
   "pipeline": "LACRIMAE_DEV",
@@ -95,7 +95,38 @@ export const codex = {
       "slowmo_start_frame": 0,
       "slowmo_speed": 1,
       "shake_power": 0,
-      "validated_by_magos": true
+      "validated_by_magos": true,
+      "sig": {
+        "grain": {
+          "seed": 7114,
+          "intensity": 0.207
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 20.3,
+          "amp_y": 25.9,
+          "freq": 1.14,
+          "phase": 4.607,
+          "drift_x": -12.3,
+          "drift_y": 1.8
+        },
+        "mirror": true,
+        "cam_drift": {
+          "zoom_from": 1.003,
+          "zoom_to": 1.033,
+          "dx": 3.1,
+          "dy": 1.4
+        },
+        "text_anim": {
+          "direction": "ltr",
+          "duration_frames": 38,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 4,
+          "opacity": 0.133
+        }
+      }
     },
     {
       "id": "clip_002",
@@ -138,7 +169,38 @@ export const codex = {
       "volume": 1,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1,
-      "shake_power": 0
+      "shake_power": 0,
+      "sig": {
+        "grain": {
+          "seed": 3322,
+          "intensity": 0.132
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 12.7,
+          "amp_y": 22.1,
+          "freq": 1.09,
+          "phase": 1.917,
+          "drift_x": 1.3,
+          "drift_y": 10.7
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.004,
+          "zoom_to": 1.075,
+          "dx": -11.8,
+          "dy": 5.2
+        },
+        "text_anim": {
+          "direction": "down",
+          "duration_frames": 27,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 5,
+          "opacity": 0.09
+        }
+      }
     },
     {
       "id": "clip_003",
@@ -181,7 +243,38 @@ export const codex = {
       "volume": 1,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1,
-      "shake_power": 0
+      "shake_power": 0,
+      "sig": {
+        "grain": {
+          "seed": 4976,
+          "intensity": 0.16
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 14.8,
+          "amp_y": 26.1,
+          "freq": 0.64,
+          "phase": 1.794,
+          "drift_x": 6.0,
+          "drift_y": -4.9
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.004,
+          "zoom_to": 1.054,
+          "dx": -9.6,
+          "dy": -3.2
+        },
+        "text_anim": {
+          "direction": "down",
+          "duration_frames": 25,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 4,
+          "opacity": 0.06
+        }
+      }
     },
     {
       "id": "clip_004",
@@ -224,7 +317,38 @@ export const codex = {
       "volume": 1,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1,
-      "shake_power": 0
+      "shake_power": 0,
+      "sig": {
+        "grain": {
+          "seed": 5498,
+          "intensity": 0.156
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 19.5,
+          "amp_y": 22.5,
+          "freq": 0.74,
+          "phase": 0.554,
+          "drift_x": 0.2,
+          "drift_y": -2.5
+        },
+        "mirror": true,
+        "cam_drift": {
+          "zoom_from": 1.004,
+          "zoom_to": 1.075,
+          "dx": -6.0,
+          "dy": -10.0
+        },
+        "text_anim": {
+          "direction": "up",
+          "duration_frames": 34,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 2,
+          "opacity": 0.109
+        }
+      }
     },
     {
       "id": "clip_005",
@@ -267,7 +391,38 @@ export const codex = {
       "volume": 1,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1,
-      "shake_power": 0
+      "shake_power": 0,
+      "sig": {
+        "grain": {
+          "seed": 1056,
+          "intensity": 0.135
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 23.0,
+          "amp_y": 22.1,
+          "freq": 1.21,
+          "phase": 3.363,
+          "drift_x": -2.0,
+          "drift_y": 13.7
+        },
+        "mirror": true,
+        "cam_drift": {
+          "zoom_from": 1.004,
+          "zoom_to": 1.061,
+          "dx": 7.9,
+          "dy": -4.5
+        },
+        "text_anim": {
+          "direction": "up",
+          "duration_frames": 32,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 2,
+          "opacity": 0.12
+        }
+      }
     }
   ],
   "forge": {

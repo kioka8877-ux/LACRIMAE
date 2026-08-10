@@ -27,7 +27,10 @@ export default function App() {
   const [error, setError] = useState(null);
   const [validated, setValidated] = useState(false);
   const [activeTab, setActiveTab] = useState('text');
+  const [logoPending, setLogoPending] = useState(null); // {x_pct, y_pct} balise double-clic
+  const [logoFiles, setLogoFiles] = useState([]); // liste des PNG logos disponibles
   const playerRef = useRef(null);
+  const lastClickRef = useRef({ t: 0, x: 0, y: 0, count: 0 });
 
   // Charger le codex.json (v4 : session + clips), la vidéo et les fonds
   useEffect(() => {
@@ -50,6 +53,16 @@ export default function App() {
           }
         } catch (e) {
           setBackgrounds([]); // pas de dossier fonds — menu vide
+        }
+        // Liste des logos PNG (multi-logos — dossier public/logos/)
+        try {
+          const lgResp = await fetch('./logos/manifest.json');
+          if (lgResp.ok) {
+            const lg = await lgResp.json();
+            setLogoFiles(Array.isArray(lg) ? lg : (lg.files || []));
+          }
+        } catch (e) {
+          setLogoFiles([]); // pas de dossier logos — menu vide
         }
         setLoading(false);
       } catch (err) {
@@ -104,6 +117,173 @@ export default function App() {
     updateSession('texts_style', key, value);
   const updatePreset = (key, value) => updateSession('presets', key, value);
 
+  // ── Balise logo : double-clic → poser ici / triple-clic → dupliquer ──
+  const handleLogoClick = (e) => {
+    const now = Date.now();
+    const last = lastClickRef.current;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX, y = e.clientY;
+    const isSame = now - last.t < 500 && Math.abs(x - last.x) < 12 && Math.abs(y - last.y) < 12;
+    const count = isSame ? last.count + 1 : 1;
+    lastClickRef.current = { t: now, x, y, count };
+    if (count < 2) return;
+    const xPct = Math.round(((x - rect.left) / rect.width) * 1000) / 10;
+    const yPct = Math.round(((y - rect.top) / rect.height) * 1000) / 10;
+    if (count === 2) {
+      // double-clic → proposer de poser le logo ici
+      setLogoPending({ x_pct: xPct, y_pct: yPct });
+    } else if (count >= 3) {
+      // triple-clic → dupliquer le dernier logo à cet endroit (léger décalage)
+      setLogoPending(null);
+      duplicateLogo({ x_pct: xPct, y_pct: yPct });
+      lastClickRef.current = { t: 0, x: 0, y: 0, count: 0 };
+    }
+  };
+
+  const confirmLogoPlacement = (ok) => {
+    if (ok && logoPending) {
+      // FIX: update atomique — les 3 updateSession séquentielles lisaient le
+      // même `session` obsolète (closure) et React les batchait : seule la
+      // dernière (y_pct) survivait, position/custom et x_pct étaient perdus.
+      setSession((s) => {
+        const hasList = s.logos && s.logos.length;
+        const base = hasList ? s.logos[0] : s.logo;
+        const placed = {
+          ...(base || {}),
+          position: 'custom',
+          x_pct: logoPending.x_pct,
+          y_pct: logoPending.y_pct,
+        };
+        if (hasList) {
+          return { ...s, logos: [placed, ...s.logos.slice(1)] };
+        }
+        return { ...s, logo: placed };
+      });
+    }
+    setLogoPending(null);
+  };
+
+  // ── Multi-logos : session.logos[] (rétro-compat session.logo) ──
+  const logosList = () => {
+    if (session.logos && session.logos.length) return session.logos;
+    if (session.logo) return [session.logo];
+    return [];
+  };
+  const defaultLogo = () => {
+    const src = logoFiles.length ? `logos/${logoFiles[0]}` : 'logo.png';
+    return { src, width_pct: 20, position: 'top_center', opacity: 1 };
+  };
+  const updateLogo = (index, key, value) => {
+    const current = logosList();
+    const next = current.map((lg, i) => (i === index ? { ...lg, [key]: value } : lg));
+    setSession((s) => ({ ...s, logos: next }));
+  };
+  const addLogo = () => {
+    const current = logosList();
+    setSession((s) => ({ ...s, logos: [...current, defaultLogo()] }));
+  };
+  const duplicateLogo = (pos) => {
+    const current = logosList();
+    const base = current[current.length - 1] || defaultLogo();
+    const offset = 4; // léger décalage pour éviter une superposition parfaite
+    const copy = {
+      ...base,
+      position: 'custom',
+      x_pct: pos.x_pct + offset,
+      y_pct: pos.y_pct + offset,
+    };
+    setSession((s) => ({ ...s, logos: [...current, copy] }));
+  };
+  const removeLogo = (index) => {
+    const current = logosList();
+    const next = current.filter((_, i) => i !== index);
+    setSession((s) => ({ ...s, logos: next }));
+  };
+
+  // ── Helpers panneaux texte (fond/bord/coins) ──
+  const updateTextBox = (boxKey, key, value) => {
+    const ts = session.texts_style || {};
+    const box = ts[boxKey] || {};
+    updateSession('texts_style', boxKey, { ...box, [key]: value });
+  };
+
+  // Panneau de fond d'un texte : activer, couleur fond, texte, bord, coins, padding
+  const renderTextBox = (boxKey) => {
+    const ts = session.texts_style || {};
+    const box = ts[boxKey] || {};
+    return (
+      <>
+        <label style={styles.label} >
+          <input
+            type="checkbox"
+            style={{ marginRight: '8px', accentColor: '#00ff88' }}
+            checked={!!box.enabled}
+            onChange={(e) => updateTextBox(boxKey, 'enabled', e.target.checked)}
+          />
+          Activer le fond du panneau
+        </label>
+        {box.enabled && (
+          <>
+            <label style={styles.label}>Couleur du fond</label>
+            <input
+              style={styles.colorPicker}
+              type="color"
+              value={hexColor(box.color, '#1a1a1a')}
+              onChange={(e) => updateTextBox(boxKey, 'color', e.target.value)}
+            />
+            <label style={styles.label}>Couleur du texte (dans le panneau)</label>
+            <input
+              style={styles.colorPicker}
+              type="color"
+              value={hexColor(box.text_color, '#FFFFFF')}
+              onChange={(e) => updateTextBox(boxKey, 'text_color', e.target.value)}
+            />
+            <label style={styles.label}>Bordure — couleur</label>
+            <input
+              style={styles.colorPicker}
+              type="color"
+              value={hexColor(box.border_color, '#FFFFFF')}
+              onChange={(e) => updateTextBox(boxKey, 'border_color', e.target.value)}
+            />
+            <label style={styles.label}>
+              Épaisseur bordure: {(box.border_width || 0)}px
+            </label>
+            <input
+              style={styles.slider}
+              type="range"
+              min="0"
+              max="12"
+              value={box.border_width || 0}
+              onChange={(e) => updateTextBox(boxKey, 'border_width', parseInt(e.target.value))}
+            />
+            <label style={styles.label}>
+              Coins arrondis: {(box.radius || 0)}px
+            </label>
+            <input
+              style={styles.slider}
+              type="range"
+              min="0"
+              max="60"
+              value={box.radius || 0}
+              onChange={(e) => updateTextBox(boxKey, 'radius', parseInt(e.target.value))}
+            />
+            <label style={styles.label}>
+              Padding: {(box.padding || 0)}px
+            </label>
+            <input
+              style={styles.slider}
+              type="range"
+              min="0"
+              max="40"
+              value={box.padding || 0}
+              onChange={(e) => updateTextBox(boxKey, 'padding', parseInt(e.target.value))}
+            />
+          </>
+        )}
+      </>
+    );
+  };
+
   const exportCodex = () => {
     // Réintègre le clip édité + la session dans le codex multi-clips
     const merged = {
@@ -151,28 +331,84 @@ export default function App() {
       {/* Main layout */}
       <div style={styles.mainLayout}>
         {/* Player */}
-        <div style={styles.playerContainer}>
-          <Player
-            ref={playerRef}
-            component={OmniComposition}
-            inputProps={{ codex: clip, videoSrc, session }}
-            durationInFrames={totalFrames}
-            fps={fps}
-            compositionWidth={vidWidth}
-            compositionHeight={vidHeight}
-            style={{
-              width: '100%',
-              maxWidth: '300px',
-              aspectRatio: '9 / 16',
-              borderRadius: '12px',
-              overflow: 'hidden',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-            }}
-            controls
-            autoPlay
-            muted
-            loop
-          />
+        <div style={styles.playerContainer} title="Double-clic : poser le logo. Triple-clic : dupliquer le logo ici">
+          <div
+            style={{ position: 'relative', width: '100%', maxWidth: '300px' }}
+            onClick={handleLogoClick}
+          >
+            <Player
+              ref={playerRef}
+              component={OmniComposition}
+              inputProps={{ codex: clip, videoSrc, session }}
+              durationInFrames={totalFrames}
+              fps={fps}
+              compositionWidth={vidWidth}
+              compositionHeight={vidHeight}
+              style={{
+                width: '100%',
+                maxWidth: '300px',
+                aspectRatio: '9 / 16',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+              }}
+              controls
+              autoPlay
+              muted
+              loop
+            />
+
+            {/* Repère + modale de confirmation de la balise logo */}
+            {logoPending && (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${logoPending.x_pct}%`,
+                  top: `${logoPending.y_pct}%`,
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 30,
+                }}
+              >
+                <div style={{
+                  width: '44px', height: '44px', borderRadius: '50%',
+                  border: '3px solid #00ff88', backgroundColor: 'rgba(0,0,0,0.4)',
+                  boxShadow: '0 0 12px rgba(0,255,136,0.8)',
+                  pointerEvents: 'none',
+                }} />
+              </div>
+            )}
+            {logoPending && (
+              <div style={{
+                position: 'absolute', inset: 0, display: 'flex',
+                alignItems: 'center', justifyContent: 'center', zIndex: 40,
+                pointerEvents: 'none',
+              }}>
+                <div style={{
+                  background: '#141414', border: '1px solid #00ff88', borderRadius: '10px',
+                  padding: '16px 20px', textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.8)',
+                  maxWidth: '260px', pointerEvents: 'auto',
+                }}>
+                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#e0e0e0', marginBottom: '10px' }}>
+                    Poser le logo ici ?
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                    <button
+                      style={{ padding: '8px 20px', background: '#1a3a1a', border: '1px solid #2a5a2a', borderRadius: '8px', color: '#88ff88', cursor: 'pointer', fontWeight: 700 }}
+                      onClick={() => confirmLogoPlacement(true)}
+                    >
+                      Oui
+                    </button>
+                    <button
+                      style={{ padding: '8px 20px', background: '#1a1a1a', border: '1px solid #444', borderRadius: '8px', color: '#aaa', cursor: 'pointer', fontWeight: 700 }}
+                      onClick={() => confirmLogoPlacement(false)}
+                    >
+                      Non
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right panel */}
@@ -183,6 +419,9 @@ export default function App() {
             </button>
             <button style={activeTab === 'fond' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('fond')}>
               🖼 Fond & Logo
+            </button>
+            <button style={activeTab === 'video' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('video')}>
+              🎬 Vidéo
             </button>
             <button style={activeTab === 'effects' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('effects')}>
               🎨 Effets
@@ -307,6 +546,35 @@ export default function App() {
                   onChange={(e) => updateSessionTextsStyle('stroke_width', parseInt(e.target.value))}
                 />
               </div>
+
+              {/* Panneaux de fond : TITRE et PARAGRAPHE séparés */}
+              {textMode !== 'none' && (
+                <>
+                  {/* ── Panneau TITRE ── */}
+                  <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #333' }}>
+                    <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                      📦 Panneau du TITRE
+                    </label>
+                    {renderTextBox('title_box')}
+                    <div style={{ marginTop: '6px', fontSize: '11px', color: '#777' }}>
+                      Fond actif → les effets texte (contour, ombre) s'annulent automatiquement.
+                    </div>
+                  </div>
+
+                  {/* ── Panneau PARAGRAPHE ── */}
+                  {textMode === 'title+paragraph' && (
+                    <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #333' }}>
+                      <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                        📦 Panneau du PARAGRAPHE
+                      </label>
+                      {renderTextBox('paragraph_box')}
+                      <div style={{ marginTop: '6px', fontSize: '11px', color: '#777' }}>
+                        Fond actif → les effets texte s'annulent automatiquement.
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
 
@@ -364,34 +632,162 @@ export default function App() {
 
               <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #333' }}>
                 <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
-                  🏷 LOGO (en bas du cadre — taille ajustable, placement fixe)
+                  🏷 LOGOS (multi — double-clic : poser / triple-clic : dupliquer)
                 </label>
-                <label style={styles.label}>
-                  Taille du logo: {(session.logo || {}).width_pct || 20}%
-                </label>
-                <input
-                  style={styles.slider}
-                  type="range"
-                  min="5"
-                  max="60"
-                  value={(session.logo || {}).width_pct || 20}
-                  onChange={(e) => updateSession('logo', 'width_pct', parseInt(e.target.value))}
-                />
-                <label style={styles.label}>
-                  Opacité: {Math.round(((session.logo || {}).opacity ?? 1) * 100)}%
-                </label>
-                <input
-                  style={styles.slider}
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={Math.round(((session.logo || {}).opacity ?? 1) * 100)}
-                  onChange={(e) => updateSession('logo', 'opacity', parseInt(e.target.value) / 100)}
-                />
-                <div style={{ marginTop: '8px', padding: '8px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
-                  Placez <code>logo.png</code> dans <code>public/</code>. Le placement
-                  (bas) est imposé — seule la taille est réglable, comme décidé.
+                {logosList().length === 0 && (
+                  <div style={{ padding: '8px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
+                    Aucun logo actif. Cliquez <strong>+ Ajouter un logo</strong> ou
+                    double-cliquez sur la vidéo.
+                  </div>
+                )}
+                {logosList().map((logo, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      marginTop: '10px',
+                      padding: '10px',
+                      background: '#181818',
+                      border: '1px solid #2a2a2a',
+                      borderRadius: '8px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <label style={{ ...styles.label, color: '#00ff88', margin: 0 }}>
+                        LOGO {index + 1}
+                      </label>
+                      <button
+                        style={{
+                          background: '#3a1a1a', border: '1px solid #5a2a2a', borderRadius: '6px',
+                          color: '#ff8888', cursor: 'pointer', fontSize: '12px', padding: '4px 10px',
+                        }}
+                        onClick={() => removeLogo(index)}
+                      >
+                        ✕ Supprimer
+                      </button>
+                    </div>
+
+                    <label style={styles.label}>Fichier PNG</label>
+                    <select
+                      style={styles.select}
+                      value={logo.src || 'logo.png'}
+                      onChange={(e) => updateLogo(index, 'src', e.target.value)}
+                    >
+                      <option value="logo.png">logo.png (racine)</option>
+                      {logoFiles.map((f) => (
+                        <option key={f} value={`logos/${f}`}>logos/{f}</option>
+                      ))}
+                    </select>
+
+                    <label style={styles.label}>Position</label>
+                    <select
+                      style={styles.select}
+                      value={logo.position || 'top_center'}
+                      onChange={(e) => updateLogo(index, 'position', e.target.value)}
+                    >
+                      <option value="top_center">Haut — centré</option>
+                      <option value="top_left">Haut — gauche</option>
+                      <option value="top_right">Haut — droite</option>
+                      <option value="center">Centre</option>
+                      <option value="bottom_center">Bas — centré</option>
+                      <option value="bottom_left">Bas — gauche</option>
+                      <option value="bottom_right">Bas — droite</option>
+                      <option value="custom">Personnalisé (double-clic)</option>
+                    </select>
+
+                    {logo.position === 'custom' && (
+                      <>
+                        <label style={styles.label}>
+                          X: {(logo.x_pct ?? 50).toFixed(1)}%
+                        </label>
+                        <input
+                          style={styles.slider}
+                          type="range"
+                          min="0"
+                          max="100"
+                          step="0.5"
+                          value={logo.x_pct ?? 50}
+                          onChange={(e) => updateLogo(index, 'x_pct', parseFloat(e.target.value))}
+                        />
+                        <label style={styles.label}>
+                          Y: {(logo.y_pct ?? 50).toFixed(1)}%
+                        </label>
+                        <input
+                          style={styles.slider}
+                          type="range"
+                          min="0"
+                          max="100"
+                          step="0.5"
+                          value={logo.y_pct ?? 50}
+                          onChange={(e) => updateLogo(index, 'y_pct', parseFloat(e.target.value))}
+                        />
+                      </>
+                    )}
+
+                    <label style={styles.label}>
+                      Taille: {(logo.width_pct || 20)}%
+                    </label>
+                    <input
+                      style={styles.slider}
+                      type="range"
+                      min="5"
+                      max="90"
+                      value={logo.width_pct || 20}
+                      onChange={(e) => updateLogo(index, 'width_pct', parseInt(e.target.value))}
+                    />
+                    <label style={styles.label}>
+                      Opacité: {Math.round(((logo.opacity ?? 1) * 100))}%
+                    </label>
+                    <input
+                      style={styles.slider}
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={Math.round(((logo.opacity ?? 1) * 100))}
+                      onChange={(e) => updateLogo(index, 'opacity', parseInt(e.target.value) / 100)}
+                    />
+                  </div>
+                ))}
+                <button
+                  style={{
+                    marginTop: '10px', padding: '8px 16px', background: '#1a3a1a',
+                    border: '1px solid #2a5a2a', borderRadius: '8px', color: '#88ff88',
+                    cursor: 'pointer', fontWeight: 700,
+                  }}
+                  onClick={addLogo}
+                >
+                  + Ajouter un logo
+                </button>
+                <div style={{ marginTop: '8px', padding: '8px', background: '#0f2a1a', borderRadius: '8px', fontSize: '12px', color: '#88ff88' }}>
+                  💡 <strong>Double-clic</strong> sur la vidéo = poser le logo à cet endroit.
+                  <strong> Triple-clic</strong> = dupliquer le dernier logo (léger décalage).
+                  Les PNG sont listés depuis <code>public/logos/</code> (manifest généré par le staging).
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════ VIDÉO : centrage vertical (session, tous les clips) ══════════ */}
+          {activeTab === 'video' && (
+            <div style={styles.panelContent}>
+              <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                🎬 VIDÉO — centrage vertical
+              </label>
+              <label style={styles.label}>
+                Position verticale: {((session.video || {}).offset_y ?? 0) > 0 ? '+' : ''}
+                {((session.video || {}).offset_y ?? 0)}%
+              </label>
+              <input
+                style={styles.slider}
+                type="range"
+                min="-20"
+                max="20"
+                step="0.5"
+                value={(session.video || {}).offset_y ?? 0}
+                onChange={(e) => updateSession('video', 'offset_y', parseFloat(e.target.value))}
+              />
+              <div style={{ marginTop: '8px', padding: '8px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
+                Réglage appliqué à tous les clips (session). <strong>+</strong> = vers le bas,
+                <strong> −</strong> = vers le haut. Les particularités vidéo s'ajouteront ici.
               </div>
             </div>
           )}
@@ -422,6 +818,31 @@ export default function App() {
                 <option value="punchy">Punchy</option>
                 <option value="sepia_soft">Sepia Soft</option>
               </select>
+
+              <label style={styles.label}>
+                Contraste: {(presets.contrast ?? 1.3).toFixed(2)}x
+              </label>
+              <input
+                style={styles.slider}
+                type="range"
+                min="0.5"
+                max="2"
+                step="0.05"
+                value={presets.contrast ?? 1.3}
+                onChange={(e) => updatePreset('contrast', parseFloat(e.target.value))}
+              />
+              <label style={styles.label}>
+                Luminosité: {(presets.brightness ?? 1.1).toFixed(2)}x
+              </label>
+              <input
+                style={styles.slider}
+                type="range"
+                min="0.5"
+                max="2"
+                step="0.05"
+                value={presets.brightness ?? 1.1}
+                onChange={(e) => updatePreset('brightness', parseFloat(e.target.value))}
+              />
 
               <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #333' }}>
                 <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
@@ -603,3 +1024,15 @@ const styles = {
   validateBtn: { padding: '10px 16px', background: '#1a2a1a', border: '1px solid #2a4a2a', borderRadius: '8px', color: '#88ff88', cursor: 'pointer', fontSize: '14px', fontWeight: 700 },
   validatedBtn: { padding: '10px 16px', background: '#2a4a2a', border: '1px solid #4a8a4a', borderRadius: '8px', color: '#aaffaa', cursor: 'default', fontSize: '14px', fontWeight: 700 },
 };
+
+/* Convertit une couleur (hex ou rgba) en hex pour les <input type=color> */
+function hexColor(color, fallback) {
+  if (!color) return fallback;
+  if (/^#[0-9a-fA-F]{6}$/.test(color)) return color;
+  const m = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (m) {
+    const toHex = (n) => parseInt(n, 10).toString(16).padStart(2, '0');
+    return `#${toHex(m[1])}${toHex(m[2])}${toHex(m[3])}`;
+  }
+  return fallback;
+}

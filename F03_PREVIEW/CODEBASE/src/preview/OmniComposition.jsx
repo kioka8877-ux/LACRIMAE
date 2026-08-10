@@ -30,10 +30,30 @@ const SESSION_FALLBACK = {
     shadow: '2px 4px 8px rgba(0,0,0,0.9)',
     glow_intensity: 0,
     letter_spacing: '0em',
+    title_box: {
+      enabled: false,
+      color: 'rgba(0,0,0,0.7)',
+      text_color: '#FFFFFF',
+      border_color: '#FFFFFF',
+      border_width: 0,
+      radius: 12,
+      padding: 12,
+    },
+    paragraph_box: {
+      enabled: false,
+      color: 'rgba(0,0,0,0.7)',
+      text_color: '#FFFFFF',
+      border_color: '#FFFFFF',
+      border_width: 0,
+      radius: 12,
+      padding: 12,
+    },
   },
   presets: {
     color_preset: 'punchy',
     color_css_filter: 'contrast(1.3) saturate(1.5) brightness(1.1)',
+    contrast: 1.3,
+    brightness: 1.1,
     enhance_4k: false,
     sharpening: 0,
     denoising: 0,
@@ -64,7 +84,17 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
 
   // â”€â”€ Zoom / slow-mo / shake / coup brutal â”€â”€
   const currentZoom = getCurrentZoom(frame, clip.zoom_keyframes || []);
-  const colorFilter = presets.color_css_filter || '';
+  // Le slider Contraste (session) pilote le contrast() du filtre global.
+  const contrastValue = presets.contrast ?? 1.3;
+  const baseFilter = presets.color_css_filter || '';
+  const colorFilter = baseFilter.includes('contrast')
+    ? baseFilter.replace(/contrast\([^)]*\)/g, `contrast(${contrastValue})`)
+    : `contrast(${contrastValue}) ${baseFilter}`.trim();
+  // Le slider Luminosité (session) pilote le brightness() du filtre global.
+  const brightnessValue = presets.brightness ?? 1.1;
+  const brightnessFilter = colorFilter.includes('brightness')
+    ? colorFilter.replace(/brightness\([^)]*\)/g, `brightness(${brightnessValue})`)
+    : `${colorFilter} brightness(${brightnessValue})`.trim();
   const enhanceFilter = presets.enhance_4k
     ? ' contrast(1.15) saturate(1.2) brightness(1.08)'
     : '';
@@ -74,7 +104,7 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
     const s = sharpening / 100;
     sharpFilter = ` contrast(${1 + s * 0.15}) drop-shadow(0 0 ${s * 0.5}px rgba(255,255,255,${s * 0.15}))`;
   }
-  const fullFilter = (colorFilter + enhanceFilter + sharpFilter).trim();
+  const fullFilter = (brightnessFilter + enhanceFilter + sharpFilter).trim();
 
   const slowmoStart = clip.slowmo_start_frame || 0;
   const slowmoSpeed = clip.slowmo_speed || 1.0;
@@ -119,7 +149,11 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
         {session.background?.image ? (
           <AbsoluteFill style={{ overflow: 'hidden' }}>
             <Img
-              src={staticFile(session.background.image)}
+              src={staticFile(
+                session.background.image.includes('/')
+                  ? session.background.image
+                  : `backgrounds/${session.background.image}`
+              )}
               style={{
                 width: '100%',
                 height: '100%',
@@ -140,8 +174,10 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
-              transform: `${zoomTransform} translate(${shakeX}px, ${shakeY}px)`,
+              objectFit: session.profile === 'background' ? 'contain' : 'cover',
+              transform: `${zoomTransform} translate(${shakeX}px, ${shakeY}px) translateY(${
+                session.video?.offset_y || 0
+              }%)`,
             }}
             playbackRate={playbackRate}
           />
@@ -152,6 +188,7 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
           <TitleBlock
             content={texts.title}
             style={textsStyle}
+            box={textsStyle.title_box}
             offsetPct={texts.title_offset_pct ?? 8}
           />
         ) : null}
@@ -161,12 +198,13 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
           <ParagraphBlock
             content={texts.paragraph}
             style={textsStyle}
+            box={textsStyle.paragraph_box}
             offsetPct={texts.paragraph_offset_pct ?? 8}
           />
         ) : null}
 
         {/* L5 LOGO */}
-        <LogoOverlay logo={clip.logo || session.logo} width={width} />
+        <LogoOverlay logos={session.logos?.length ? session.logos : (session.logo ? [session.logo] : (clip.logo ? [clip.logo] : []))} width={width} />
 
         {/* Badge SLOW MOTION */}
         {isSlowmo && (
@@ -185,17 +223,18 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
           </AbsoluteFill>
         )}
 
-        {/* Text overlays rÃ©tro-compat */}
-        {(clip.text_overlays || []).map((overlay, index) => {
-          const startFrame = overlay.start_frame || 0;
-          const endFrame = overlay.end_frame || durationInFrames;
-          if (frame < startFrame || frame > endFrame) return null;
-          return (
-            <Sequence key={overlay.id || index} from={startFrame} durationInFrames={endFrame - startFrame + 1}>
-              <TextOverlay overlay={overlay} frame={frame - startFrame} fps={fps} />
-            </Sequence>
-          );
-        })}
+        {/* Text overlays rÃ©tro-compat — masquÃ©s quand les textes v4 sont actifs (doublon) */}
+        {(textMode === 'none' || !texts.title) &&
+          (clip.text_overlays || []).map((overlay, index) => {
+            const startFrame = overlay.start_frame || 0;
+            const endFrame = overlay.end_frame || durationInFrames;
+            if (frame < startFrame || frame > endFrame) return null;
+            return (
+              <Sequence key={overlay.id || index} from={startFrame} durationInFrames={endFrame - startFrame + 1}>
+                <TextOverlay overlay={overlay} frame={frame - startFrame} fps={fps} />
+              </Sequence>
+            );
+          })}
 
         {/* Flash coup brutal */}
         {brutalFlash > 0 && (
@@ -228,9 +267,43 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp }) => {
 };
 
 /* â”€â”€ L3 TITRE â”€â”€ */
-const TitleBlock = ({ content, style, offsetPct }) => {
+const TitleBlock = ({ content, style, box, offsetPct }) => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: 'clamp' });
+
+  const boxEnabled = box && box.enabled;
+  const textStyle = boxEnabled
+    ? {
+        fontFamily: style.font,
+        fontSize: `${style.size_title}px`,
+        color: box.text_color || style.color,
+        fontWeight: 900,
+        textTransform: 'uppercase',
+        lineHeight: 1.1,
+        textAlign: 'center',
+        backgroundColor: box.color || 'rgba(0,0,0,0.7)',
+        border: (box.border_width || 0) > 0
+          ? `${box.border_width}px solid ${box.border_color || '#FFFFFF'}`
+          : 'none',
+        borderRadius: `${box.radius || 0}px`,
+        padding: `${box.padding || 12}px ${(box.padding || 12) * 1.6}px`,
+        maxWidth: '88%',
+        wordWrap: 'break-word',
+      }
+    : {
+        fontFamily: style.font,
+        fontSize: `${style.size_title}px`,
+        color: style.color,
+        WebkitTextStroke: `${style.stroke_width}px ${style.stroke_color}`,
+        textShadow: style.shadow,
+        letterSpacing: style.letter_spacing,
+        fontWeight: 900,
+        textTransform: 'uppercase',
+        lineHeight: 1.1,
+        textAlign: 'center',
+        maxWidth: '88%',
+        wordWrap: 'break-word',
+      };
 
   return (
     <AbsoluteFill
@@ -241,33 +314,51 @@ const TitleBlock = ({ content, style, offsetPct }) => {
         pointerEvents: 'none',
       }}
     >
-      <div
-        style={{
-          fontFamily: style.font,
-          fontSize: `${style.size_title}px`,
-          color: style.color,
-          WebkitTextStroke: `${style.stroke_width}px ${style.stroke_color}`,
-          textShadow: style.shadow,
-          letterSpacing: style.letter_spacing,
-          fontWeight: 900,
-          textTransform: 'uppercase',
-          lineHeight: 1.1,
-          textAlign: 'center',
-          opacity,
-          maxWidth: '88%',
-          wordWrap: 'break-word',
-        }}
-      >
-        {content}
-      </div>
+      <div style={{ ...textStyle, opacity }}>{content}</div>
     </AbsoluteFill>
   );
 };
 
 /* â”€â”€ L4 PARAGRAPHE â”€â”€ */
-const ParagraphBlock = ({ content, style, offsetPct }) => {
+const ParagraphBlock = ({ content, style, box, offsetPct }) => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 25], [0, 1], { extrapolateRight: 'clamp' });
+
+  const boxEnabled = box && box.enabled;
+  const textStyle = boxEnabled
+    ? {
+        fontFamily: style.font,
+        fontSize: `${style.size_paragraph}px`,
+        color: box.text_color || style.color,
+        fontWeight: 700,
+        lineHeight: 1.25,
+        textAlign: 'center',
+        backgroundColor: box.color || 'rgba(0,0,0,0.7)',
+        border: (box.border_width || 0) > 0
+          ? `${box.border_width}px solid ${box.border_color || '#FFFFFF'}`
+          : 'none',
+        borderRadius: `${box.radius || 0}px`,
+        padding: `${box.padding || 12}px ${(box.padding || 12) * 1.6}px`,
+        maxWidth: '88%',
+      }
+    : {
+        fontFamily: style.font,
+        fontSize: `${style.size_paragraph}px`,
+        color: style.color,
+        WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,
+        textShadow: style.shadow,
+        letterSpacing: style.letter_spacing,
+        fontWeight: 700,
+        lineHeight: 1.25,
+        textAlign: 'center',
+        maxWidth: '88%',
+        maxHeight: '22%',
+        overflow: 'hidden',
+        display: '-webkit-box',
+        WebkitLineClamp: 4,
+        WebkitBoxOrient: 'vertical',
+        wordWrap: 'break-word',
+      };
 
   return (
     <AbsoluteFill
@@ -278,54 +369,47 @@ const ParagraphBlock = ({ content, style, offsetPct }) => {
         pointerEvents: 'none',
       }}
     >
-      <div
-        style={{
-          fontFamily: style.font,
-          fontSize: `${style.size_paragraph}px`,
-          color: style.color,
-          WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,
-          textShadow: style.shadow,
-          letterSpacing: style.letter_spacing,
-          fontWeight: 700,
-          lineHeight: 1.25,
-          textAlign: 'center',
-          opacity,
-          maxWidth: '88%',
-          maxHeight: '22%',
-          overflow: 'hidden',
-          display: '-webkit-box',
-          WebkitLineClamp: 4,
-          WebkitBoxOrient: 'vertical',
-          wordWrap: 'break-word',
-        }}
-      >
-        {content}
-      </div>
+      <div style={{ ...textStyle, opacity }}>{content}</div>
     </AbsoluteFill>
   );
 };
 
 /* â”€â”€ L5 LOGO â”€â”€ */
-const LogoOverlay = ({ logo, width }) => {
-  if (!logo || !logo.src) return null;
-  const logoWidth = Math.round(width * ((logo.width_pct || 20) / 100));
-  const pos = getLogoPosition(logo.position || 'bottom_left');
+const LogoOverlay = ({ logos, width }) => {
+  const list = (logos || []).filter((l) => l && l.src);
+  if (!list.length) return null;
   return (
     <AbsoluteFill style={{ pointerEvents: 'none' }}>
-      <div style={{ position: 'absolute', ...pos, opacity: logo.opacity ?? 1 }}>
-        <Img src={staticFile(logo.src)} style={{ width: logoWidth, height: 'auto' }} />
-      </div>
+      {list.map((logo, i) => {
+        const logoWidth = Math.round(width * ((logo.width_pct || 20) / 100));
+        const pos = getLogoPosition(logo);
+        return (
+          <div key={i} style={{ position: 'absolute', ...pos, opacity: logo.opacity ?? 1 }}>
+            <Img src={staticFile(logo.src)} style={{ width: logoWidth, height: 'auto' }} />
+          </div>
+        );
+      })}
     </AbsoluteFill>
   );
 };
 
-function getLogoPosition(position) {
+function getLogoPosition(logo) {
   const pad = 40;
+  const position = logo.position || 'bottom_left';
+  if (position === 'custom') {
+    return {
+      left: `${logo.x_pct ?? 50}%`,
+      top: `${logo.y_pct ?? 50}%`,
+      transform: 'translate(-50%, -50%)',
+    };
+  }
   switch (position) {
     case 'top_center':
       return { top: pad, left: '50%', transform: 'translateX(-50%)' };
     case 'top_right':
       return { top: pad, right: pad };
+    case 'center':
+      return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
     case 'bottom_center':
       return { bottom: pad, left: '50%', transform: 'translateX(-50%)' };
     case 'bottom_right':
@@ -382,7 +466,7 @@ const TextOverlay = ({ overlay, frame, fps }) => {
     color,
     WebkitTextStroke: strokeStr,
     textShadow: textShadowStr,
-    letterSpacing,
+    letterSpacing: letter_spacing,
     fontWeight: 900,
     textTransform: 'uppercase',
     lineHeight: 1.1,
