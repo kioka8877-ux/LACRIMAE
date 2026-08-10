@@ -48,7 +48,25 @@
     "profile": "background",
     "video": {
       "offset_y": -12
-    }
+    },
+    "logos": [
+      {
+        "src": "logo.png",
+        "width_pct": 65,
+        "position": "custom",
+        "opacity": 1,
+        "x_pct": 46.8,
+        "y_pct": 15.8
+      },
+      {
+        "src": "logos/logo2.png",
+        "width_pct": 63,
+        "position": "custom",
+        "opacity": 1,
+        "x_pct": 47,
+        "y_pct": 66
+      }
+    ]
   },
   "validated_by_magos": true,
   "clips": [
