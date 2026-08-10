@@ -58,6 +58,7 @@ jobs:
           cp ../../SHARED/IN/backgrounds/*.png public/backgrounds/
           mkdir -p public/logos
           cp ../../SHARED/IN/logos/*.png public/logos/
+          cp ../../SHARED/IN/*.png public/logos/
           ls public/logos/*.png | xargs -n1 basename | sort > public/logos/manifest.list
           python3 - <<'EOF'
           import json
