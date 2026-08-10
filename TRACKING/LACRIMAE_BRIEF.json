@@ -6,7 +6,7 @@
   "sequences": 2,
   "min_dur": 3,
   "max_dur": 10,
-  "profile": "blur-pad",
+  "profile": "background",
   "preset": "punchy",
   "model": ""
 }
