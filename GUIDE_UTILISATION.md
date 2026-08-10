@@ -84,7 +84,8 @@ Assets partagés dans les 2 modes : `SHARED/IN/backgrounds/` (fonds) + `SHARED/I
 ### 5.2 Déposer les assets (une fois pour toutes)
 ```
 SHARED/IN/backgrounds/   ← les 7 fonds PNG (déjà commités)
-SHARED/IN/logos/logo.png ← le logo campagne (déjà commité)
+SHARED/IN/logos/         ← logos PNG (multi) — `logo.png` déjà commité
+SHARED/IN/*.png          ← logos déposés à la racine (ex: `logo2.png`)
 ```
 Pour une NOUVELLE vidéo source :
 - **< 100 Mo** : la déposer dans `SHARED/IN/video_source.mp4` (gitignore, non commitée).
@@ -161,13 +162,15 @@ La production SANDOVAL a révélé 3 pièges corrigés, à connaître absolument
    mouvement ; le grain est **seedé unique par clip** — le tout généré
    automatiquement et déterministe.
 
-Réglages validés de la session SANDOVAL : fond `bg_paper_crumpled`, logo 89 %
-position custom (x 45.8 / y 67.5), offset vidéo -12 %, contraste 1.3,
-luminosité 1.1, preset couleurs `cold_desaturated`, clips 900 frames @30fps 1080x1920.
+Réglages validés de la session SANDOVAL (codex v2) : fond `bg_paper_crumpled`,
+2 logos (`logo.png` 65 % en haut, `logo2.png` 63 % en bas), offset vidéo -12 %,
+contraste 1.3, luminosité 1.1, preset couleurs `cold_desaturated`,
+clips 900 frames @30fps 1080x1920.
 
-### 7.1 Multi-logos (onglet Fond, section LOGOS)
+### 7.1 Multi-logos (onglet Fond, section LOGOS) — MODE VALIDÉ
 
-La preview F03 gère **plusieurs logos** par clip (2-3 courants en Short) :
+La preview F03 gère **plusieurs logos** par clip (2-3 courants en Short) —
+mode validé sur SANDOVAL (codex v2, `session.logos[]` avec 2 logos) :
 
 - **Double-clic** sur la vidéo → « Poser le logo ici ? » → le 1er logo est
   placé aux coordonnées cliquées (position `custom`).
@@ -180,9 +183,11 @@ La preview F03 gère **plusieurs logos** par clip (2-3 courants en Short) :
 - Le codex exporté contient `session.logos[]` (prioritaire) — le champ
   `session.logo` (1 logo) reste supporté en rétro-compat.
 
-Les PNG disponibles viennent de `SHARED/IN/logos/` (stagés par le workflow /
-le bridge dans `public/logos/`, avec un `manifest.json` généré). Ajoutez vos
-logos dans `SHARED/IN/logos/`, le manifest se met à jour au staging.
+Les PNG disponibles viennent de **`SHARED/IN/logos/`** ET de la **racine
+`SHARED/IN/`** (stagés par le workflow dans `public/logos/`, avec un
+`manifest.json` généré). Ajoutez vos logos à l'un de ces endroits, le
+manifest se met à jour au staging. Exemple validé : `logo.png` (haut, 65 %)
++ `logo2.png` (bas, 63 %).
 
 ---
 
