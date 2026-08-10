@@ -51,12 +51,21 @@ jobs:
         working-directory: F04_RENDER/CODEBASE
         run: npm ci
 
-      - name: Stage assets (fonds + logo + clip du job)
+      - name: Stage assets (fonds + logos + clip du job)
         working-directory: F04_RENDER/CODEBASE
         run: |
           mkdir -p public/backgrounds
           cp ../../SHARED/IN/backgrounds/*.png public/backgrounds/
-          cp ../../SHARED/IN/logos/logo.png public/logo.png
+          mkdir -p public/logos
+          cp ../../SHARED/IN/logos/*.png public/logos/
+          ls public/logos/*.png | xargs -n1 basename | sort > public/logos/manifest.list
+          python3 - <<'EOF'
+          import json
+          files = [l.strip() for l in open('public/logos/manifest.list') if l.strip()]
+          json.dump({"files": files}, open('public/logos/manifest.json', 'w'))
+          EOF
+          rm -f public/logos/manifest.list
+          cp public/logos/logo.png public/logo.png
           src=$(echo "${{ matrix.clip }}" | tr '-' '_')
           cp "../../F02_FORMAT/OUT/clips/${src}.mp4" public/
 

@@ -165,6 +165,25 @@ Réglages validés de la session SANDOVAL : fond `bg_paper_crumpled`, logo 89 %
 position custom (x 45.8 / y 67.5), offset vidéo -12 %, contraste 1.3,
 luminosité 1.1, preset couleurs `cold_desaturated`, clips 900 frames @30fps 1080x1920.
 
+### 7.1 Multi-logos (onglet Fond, section LOGOS)
+
+La preview F03 gère **plusieurs logos** par clip (2-3 courants en Short) :
+
+- **Double-clic** sur la vidéo → « Poser le logo ici ? » → le 1er logo est
+  placé aux coordonnées cliquées (position `custom`).
+- **Triple-clic** sur la vidéo → **duplique le dernier logo** en le plaçant
+  là aussi (léger décalage pour éviter la superposition parfaite).
+- L'onglet **Fond → LOGOS** liste chaque logo avec : fichier PNG (menu
+  déroulant), position (Haut/Bas/Centre/Personnalisé), taille (%), opacité
+  (%) et un bouton **Supprimer**. Bouton **+ Ajouter un logo** pour partir
+  d'un autre PNG.
+- Le codex exporté contient `session.logos[]` (prioritaire) — le champ
+  `session.logo` (1 logo) reste supporté en rétro-compat.
+
+Les PNG disponibles viennent de `SHARED/IN/logos/` (stagés par le workflow /
+le bridge dans `public/logos/`, avec un `manifest.json` généré). Ajoutez vos
+logos dans `SHARED/IN/logos/`, le manifest se met à jour au staging.
+
 ---
 
 ## 8. F04b SIGNE — LA COUCHE ANTI-DOUBLON

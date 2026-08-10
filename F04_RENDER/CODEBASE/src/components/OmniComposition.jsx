@@ -247,7 +247,7 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
         ) : null}
 
         {/* ── L5 LOGO : en bas du cadre, calque permanent ── */}
-        <LogoOverlay logo={session.logo || clip.logo} width={width} />
+        <LogoOverlay logos={session.logos?.length ? session.logos : (session.logo ? [session.logo] : (clip.logo ? [clip.logo] : []))} width={width} />
 
         {/* Badge SLOW MOTION */}
         {isSlowmo && (
@@ -463,15 +463,20 @@ const ParagraphBlock = ({ content, style, box, totalFrames, offsetPct, anim }) =
  * - width_pct: largeur en % de l'écran (ajustable dans la preview)
  * - position: bottom_left (défaut) — le pack interdit de le déplacer en forge
  * ═══════════════════════════════════════════════════════════════════════════ */
-const LogoOverlay = ({ logo, width }) => {
-  if (!logo || !logo.src) return null;
-  const logoWidth = Math.round(width * ((logo.width_pct || 20) / 100));
-  const pos = getLogoPosition(logo);
+const LogoOverlay = ({ logos, width }) => {
+  const list = (logos || []).filter((l) => l && l.src);
+  if (!list.length) return null;
   return (
     <AbsoluteFill style={{ pointerEvents: 'none' }}>
-      <div style={{ position: 'absolute', ...pos, opacity: logo.opacity ?? 1 }}>
-        <Img src={staticFile(logo.src)} style={{ width: logoWidth, height: 'auto' }} />
-      </div>
+      {list.map((logo, i) => {
+        const logoWidth = Math.round(width * ((logo.width_pct || 20) / 100));
+        const pos = getLogoPosition(logo);
+        return (
+          <div key={i} style={{ position: 'absolute', ...pos, opacity: logo.opacity ?? 1 }}>
+            <Img src={staticFile(logo.src)} style={{ width: logoWidth, height: 'auto' }} />
+          </div>
+        );
+      })}
     </AbsoluteFill>
   );
 };
@@ -490,6 +495,8 @@ function getLogoPosition(logo) {
       return { top: pad, left: '50%', transform: 'translateX(-50%)' };
     case 'top_right':
       return { top: pad, right: pad };
+    case 'center':
+      return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
     case 'bottom_center':
       return { bottom: pad, left: '50%', transform: 'translateX(-50%)' };
     case 'bottom_right':
