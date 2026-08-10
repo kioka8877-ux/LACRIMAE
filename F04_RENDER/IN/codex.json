@@ -43,8 +43,8 @@
         "source": "clip_001.mp4",
         "fps": 30,
         "total_frames": 4098,
-        "width": 1080,
-        "height": 1920
+        "width": 640,
+        "height": 360
       },
       "texts": {
         "mode": "title+paragraph",
@@ -86,8 +86,8 @@
         "source": "clip_002.mp4",
         "fps": 30,
         "total_frames": 4098,
-        "width": 1080,
-        "height": 1920
+        "width": 640,
+        "height": 360
       },
       "texts": {
         "mode": "title+paragraph",
@@ -129,8 +129,8 @@
         "source": "clip_003.mp4",
         "fps": 30,
         "total_frames": 4098,
-        "width": 1080,
-        "height": 1920
+        "width": 640,
+        "height": 360
       },
       "texts": {
         "mode": "title+paragraph",
@@ -172,8 +172,8 @@
         "source": "clip_004.mp4",
         "fps": 30,
         "total_frames": 4098,
-        "width": 1080,
-        "height": 1920
+        "width": 640,
+        "height": 360
       },
       "texts": {
         "mode": "title+paragraph",
@@ -215,8 +215,8 @@
         "source": "clip_005.mp4",
         "fps": 30,
         "total_frames": 4097,
-        "width": 1080,
-        "height": 1920
+        "width": 640,
+        "height": 360
       },
       "texts": {
         "mode": "title+paragraph",

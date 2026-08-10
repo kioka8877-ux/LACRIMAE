@@ -1,5 +1,5 @@
 {
-  "profile": "blur-pad",
+  "profile": "background",
   "clips_count": 5,
   "clips": [
     {
@@ -10,9 +10,9 @@
       "reason": "[A01] Brad Pitt Breaks Seven Years Sober",
       "output": "clips/clip_001.mp4",
       "total_frames": 4098,
-      "width": 1080,
-      "height": 1920,
-      "size_mb": 36.37
+      "width": 640,
+      "height": 360,
+      "size_mb": 11.12
     },
     {
       "index": 2,
@@ -22,9 +22,9 @@
       "reason": "[A02] Brad Pitt Almost Relapsed, He Explains",
       "output": "clips/clip_002.mp4",
       "total_frames": 4098,
-      "width": 1080,
-      "height": 1920,
-      "size_mb": 39.01
+      "width": 640,
+      "height": 360,
+      "size_mb": 10.84
     },
     {
       "index": 3,
@@ -34,9 +34,9 @@
       "reason": "[A03] Brad Pitt Ended Seven Years Sober",
       "output": "clips/clip_003.mp4",
       "total_frames": 4098,
-      "width": 1080,
-      "height": 1920,
-      "size_mb": 46.87
+      "width": 640,
+      "height": 360,
+      "size_mb": 12.89
     },
     {
       "index": 4,
@@ -46,9 +46,9 @@
       "reason": "[A04] Brad Pitt Seven Years Sober Gone",
       "output": "clips/clip_004.mp4",
       "total_frames": 4098,
-      "width": 1080,
-      "height": 1920,
-      "size_mb": 34.96
+      "width": 640,
+      "height": 360,
+      "size_mb": 10.68
     },
     {
       "index": 5,
@@ -58,9 +58,9 @@
       "reason": "[A05] Brad Pitt Sobriety: His Greatest Lesson",
       "output": "clips/clip_005.mp4",
       "total_frames": 4097,
-      "width": 1080,
-      "height": 1920,
-      "size_mb": 30.96
+      "width": 640,
+      "height": 360,
+      "size_mb": 9.8
     }
   ]
 }
