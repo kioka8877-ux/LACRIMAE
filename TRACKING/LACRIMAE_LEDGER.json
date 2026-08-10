@@ -7,27 +7,21 @@
     "F04": "2026-08-09T17:20:00Z",
     "F05": "2026-08-09T17:42:21Z",
     "F06": "2026-08-09T17:42:26Z",
-    "CLOSE": "2026-08-09T18:07:11Z"
+    "CLOSE": "2026-08-09T18:07:11Z",
+    "F00": "2026-08-10T21:45:33Z"
   },
-  "fregate_actuelle": "CLOSE",
-  "derniere_mise_a_jour": "2026-08-09T18:07:11Z",
+  "fregate_actuelle": "F00",
+  "derniere_mise_a_jour": "2026-08-10T21:45:33Z",
   "brief": {
-    "source": "SHARED/IN/video_source.mp4",
-    "title": "SANDOVAL — SIEGE LOGO",
-    "sujet": "Tom Sandoval — drama Vanderpump Rules (TMZ)",
-    "vibe": "informatif / drama",
-    "profile": "background",
+    "source": "",
+    "title": "",
+    "sujet": "",
+    "vibe": "",
+    "sequences": 2,
+    "min_dur": 3,
+    "max_dur": 10,
+    "profile": "blur-pad",
     "preset": "punchy",
-    "sequences": 5,
-    "min_dur": 3.0,
-    "max_dur": 10.0,
-    "mode": "forge",
-    "pack": "BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json",
-    "model": "",
-    "artifacts_finaux": {
-      "render": "run 31325383646 (clip-001..clip-005)",
-      "youtube": "artifact lac-youtube (clip_00X_youtube.mp4 + rapport_f05.html)",
-      "clean": "artifact lac-clean (clip_00X_clean.mp4)"
-    }
+    "model": ""
   }
 }

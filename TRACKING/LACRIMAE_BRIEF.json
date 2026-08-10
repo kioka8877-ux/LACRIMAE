@@ -1,14 +1,12 @@
 {
-  "source": "SHARED/IN/video_source.mp4",
-  "title": "SANDOVAL — SIEGE LOGO",
-  "sujet": "Tom Sandoval — drama Vanderpump Rules (TMZ)",
-  "vibe": "informatif / drama",
-  "profile": "background",
+  "source": "",
+  "title": "",
+  "sujet": "",
+  "vibe": "",
+  "sequences": 2,
+  "min_dur": 3,
+  "max_dur": 10,
+  "profile": "blur-pad",
   "preset": "punchy",
-  "sequences": 5,
-  "min_dur": 3.0,
-  "max_dur": 10.0,
-  "mode": "forge",
-  "pack": "BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json",
   "model": ""
 }
