@@ -1,15 +1,21 @@
 import React from 'react';
 import { Composition } from 'remotion';
 import { OmniComposition } from './components/OmniComposition';
+import { MemeComposition } from './components/MemeComposition';
 import { codex } from './codexData';
 
-// Codex multi-clips : une Composition par clip — jusqu'à N Shorts par vidéo longue.
-// Chaque clip porte son propre block de contenu (titre, paragraphe, cut) ;
-// le bloc `session` (style global : fond, logo, textes, presets) est partagé
-// par TOUS les clips de la session (v4.0).
+// Codex multi-clips : une Composition par clip — jusqu'à N Shorts par session.
+// Deux modes de composition :
+//   - mode "meme" : MemeComposition (split-screen : tweet + texte émotion +
+//     meme horizontal + watermark @chaine + logo) — layout 04_MODE_MEME.md.
+//   - sinon      : OmniComposition (vidéo-centrée, mode libre / forge stars).
+// Chaque clip porte son propre block de contenu ; le bloc `session` (style
+// global : fond, logo, textes, presets) est partagé par TOUS les clips (v4.0).
 export const Root = () => {
   const clips = codex.clips && codex.clips.length > 0 ? codex.clips : [codex];
   const session = codex.session || {};
+  const isMemeMode = codex.mode === 'meme' || codex.sub_mode === 'meme';
+  const Comp = isMemeMode ? MemeComposition : OmniComposition;
 
   return (
     <>
@@ -23,7 +29,7 @@ export const Root = () => {
           <Composition
             key={compId}
             id={compId}
-            component={OmniComposition}
+            component={Comp}
             durationInFrames={totalFrames}
             fps={fps}
             width={width}

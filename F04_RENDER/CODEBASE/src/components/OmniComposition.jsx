@@ -35,7 +35,7 @@ const { fontFamily: antonFont } = loadFont();
  *   session: object — le bloc session global (optionnel, fallback codex.session)
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-const SESSION_FALLBACK = {
+export const SESSION_FALLBACK = {
   background: { image: null, color: '#0a0a0a', scale: 1.0 },
   logo: { src: 'logo.png', width_pct: 20, position: 'bottom_left', opacity: 1.0 },
   texts_style: {
@@ -342,7 +342,7 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
 /* ═══════════════════════════════════════════════════════════════════════════
  * L3 — TitleBlock : titre en haut, fade-in, style du session.texts_style
  * ═══════════════════════════════════════════════════════════════════════════ */
-const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, anim }) => {
+export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, anim }) => {
   const frame = useCurrentFrame();
   const { transform: textTransform, opacity } = getTextAnim(frame, anim, 15);
 
@@ -398,7 +398,7 @@ const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, anim }) 
 /* ═══════════════════════════════════════════════════════════════════════════
  * L4 — ParagraphBlock : paragraphe en bas (max ~4 lignes)
  * ═══════════════════════════════════════════════════════════════════════════ */
-const ParagraphBlock = ({ content, style, box, totalFrames, offsetPct, anim }) => {
+export const ParagraphBlock = ({ content, style, box, totalFrames, offsetPct, anim }) => {
   const frame = useCurrentFrame();
   const { transform: textTransform, opacity } = getTextAnim(frame, anim, 25);
 
@@ -463,7 +463,7 @@ const ParagraphBlock = ({ content, style, box, totalFrames, offsetPct, anim }) =
  * - width_pct: largeur en % de l'écran (ajustable dans la preview)
  * - position: bottom_left (défaut) — le pack interdit de le déplacer en forge
  * ═══════════════════════════════════════════════════════════════════════════ */
-const LogoOverlay = ({ logos, width }) => {
+export const LogoOverlay = ({ logos, width }) => {
   const list = (logos || []).filter((l) => l && l.src);
   if (!list.length) return null;
   return (
@@ -676,7 +676,7 @@ function getCurrentZoom(frame, keyframes) {
  * - sans anim (ou direction 'none') : fade-in classique
  * - sinon : slide horizontal/vertical avec easing, puis le texte se fige
  * ═══════════════════════════════════════════════════════════════════════════ */
-function getTextAnim(frame, anim, defaultFadeFrames) {
+export function getTextAnim(frame, anim, defaultFadeFrames) {
   if (!anim || !anim.direction || anim.direction === 'none') {
     const opacity = interpolate(frame, [0, defaultFadeFrames], [0, 1], {
       extrapolateRight: 'clamp',
