@@ -1,12 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Player } from '@remotion/player';
 import { OmniComposition } from './preview/OmniComposition';
+import { MemeComposition } from './preview/MemeComposition';
 
 /**
- * App — F03 PREVIEW (v4.0 — session + clips)
+ * App — F03 PREVIEW (v4.1 — session + clips, mode meme)
  *
  * Charge le codex.json (bloc session + clips) et le clip 9:16 depuis public/,
  * rend la composition en temps réel via @remotion/player.
+ *
+ * Deux modes :
+ *  - mode "meme" (codex.sub_mode === 'meme') : MemeComposition + onglet MEME
+ *    (tweet, texte émotion, watermark, parcours de la méméthèque)
+ *  - mode stars (sinon) : OmniComposition + panneaux session classiques
  *
  * L'opérateur ajuste la SESSION (style global appliqué aux N clips) :
  *  - Fond : menu déroulant des PNG déposés dans public/backgrounds/ (dossier
@@ -29,6 +35,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('text');
   const [logoPending, setLogoPending] = useState(null); // {x_pct, y_pct} balise double-clic
   const [logoFiles, setLogoFiles] = useState([]); // liste des PNG logos disponibles
+  const [memes, setMemes] = useState([]); // liste des memes de la méméthèque (mode meme)
   const playerRef = useRef(null);
   const lastClickRef = useRef({ t: 0, x: 0, y: 0, count: 0 });
 
@@ -63,6 +70,16 @@ export default function App() {
           }
         } catch (e) {
           setLogoFiles([]); // pas de dossier logos — menu vide
+        }
+        // Liste des memes de la méméthèque (mode meme — dossier public/memes/)
+        try {
+          const mResp = await fetch('./memes/manifest.json');
+          if (mResp.ok) {
+            const m = await mResp.json();
+            setMemes(Array.isArray(m) ? m : (m.files || []));
+          }
+        } catch (e) {
+          setMemes([]); // pas de dossier memes — parcours vide
         }
         setLoading(false);
       } catch (err) {
@@ -103,6 +120,10 @@ export default function App() {
   const vidWidth = clip.video?.width || 1080;
   const vidHeight = clip.video?.height || 1920;
 
+  // Mode meme : codex.sub_mode === 'meme' → MemeComposition + panneaux meme
+  const isMemeMode = codex?.sub_mode === 'meme' || codex?.mode === 'meme' || !!clip.tweet;
+  const PreviewComposition = isMemeMode ? MemeComposition : OmniComposition;
+
   // ── Helpers session ──
   const updateSession = (section, key, value) => {
     const newSession = {
@@ -116,6 +137,23 @@ export default function App() {
   const updateSessionTextsStyle = (key, value) =>
     updateSession('texts_style', key, value);
   const updatePreset = (key, value) => updateSession('presets', key, value);
+
+  // ── Mode meme : helpers panneaux (tweet / émotion / watermark / meme) ──
+  const updateTweet = (key, value) => setClip({ ...clip, tweet: { ...(clip.tweet || {}), [key]: value } });
+  const updateTweetKeywords = (group, value) => {
+    const kw = { ...((clip.tweet || {}).keywords_style || {}), [group]: value.split(',').map((s) => s.trim()).filter(Boolean) };
+    setClip({ ...clip, tweet: { ...(clip.tweet || {}), keywords_style: kw } });
+  };
+  const updateEmotion = (value) => setClip({ ...clip, text_emotion: value, texts: { ...(clip.texts || {}), emotion: value } });
+  const updateWatermark = (key, value) => updateSession('watermark', key, value);
+  const selectMeme = (memeName) => {
+    const memeFile = memeName.endsWith('.mp4') ? memeName : `${memeName}.mp4`;
+    // La preview joue le meme choisi directement depuis la méméthèque ; le
+    // codex garde video.source = clip_00X.mp4 (F04 rend le clip stagé).
+    setClip({ ...clip, meme: { ...(clip.meme || {}), source: memeFile } });
+    setVideoSrc(`./memes/${memeFile}`);
+  };
+  const watermark = session.watermark || {};
 
   // ── Balise logo : double-clic → poser ici / triple-clic → dupliquer ──
   const handleLogoClick = (e) => {
@@ -338,7 +376,7 @@ export default function App() {
           >
             <Player
               ref={playerRef}
-              component={OmniComposition}
+              component={PreviewComposition}
               inputProps={{ codex: clip, videoSrc, session }}
               durationInFrames={totalFrames}
               fps={fps}
@@ -429,6 +467,11 @@ export default function App() {
             <button style={activeTab === 'sharp' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('sharp')}>
               🔍 Netteté
             </button>
+            {isMemeMode && (
+              <button style={activeTab === 'meme' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('meme')}>
+                🧩 Meme
+              </button>
+            )}
           </div>
 
           {/* ══════════ TEXTE : mode titre / titre+paragraphe ══════════ */}
@@ -977,6 +1020,171 @@ export default function App() {
                 <strong style={{ color: '#00ff88' }}>Global :</strong>
                 <br />Ces effets s'appliquent à TOUTE la scène (fond + vidéo + textes + logo)
                 — c'est le calque presets au-dessus de tout.
+              </div>
+            </div>
+          )}
+
+          {/* ══════════ MEME : tweet, texte émotion, watermark, méméthèque ══════════ */}
+          {activeTab === 'meme' && (
+            <div style={styles.panelContent}>
+              <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                🧩 MODE MEME — panneaux par calque
+              </label>
+
+              {/* ── L2 TWEET (card) ── */}
+              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #333' }}>
+                <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                  🐦 L2 — TWEET (texte du pack, card générée par LACRIMAE)
+                </label>
+                <label style={styles.label}>Texte du tweet</label>
+                <textarea
+                  style={{ ...styles.input, minHeight: '70px', resize: 'vertical', fontFamily: 'inherit' }}
+                  value={(clip.tweet || {}).text || ''}
+                  onChange={(e) => updateTweet('text', e.target.value)}
+                />
+                <label style={styles.label}>
+                  Mots en vert (virgules) : {(clip.tweet || {}).keywords_style?.green || []}.join(', ')
+                </label>
+                <input
+                  style={styles.input}
+                  type="text"
+                  value={((clip.tweet || {}).keywords_style?.green || []).join(', ')}
+                  onChange={(e) => updateTweetKeywords('green', e.target.value)}
+                />
+                <label style={styles.label}>
+                  Mots en rouge (virgules) : {(clip.tweet || {}).keywords_style?.red || []}.join(', ')
+                </label>
+                <input
+                  style={styles.input}
+                  type="text"
+                  value={((clip.tweet || {}).keywords_style?.red || []).join(', ')}
+                  onChange={(e) => updateTweetKeywords('red', e.target.value)}
+                />
+                <label style={styles.label}>
+                  Largeur card: {((clip.tweet || {}).width_pct || 82)}%
+                </label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="60"
+                  max="98"
+                  value={(clip.tweet || {}).width_pct || 82}
+                  onChange={(e) => updateTweet('width_pct', parseInt(e.target.value))}
+                />
+                <div style={{ marginTop: '6px', padding: '8px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
+                  Persona + likes/partages : générés par le bridge (seed déterministe
+                  pack_id + clip) — comme SIGNE, aucun réseau.
+                </div>
+              </div>
+
+              {/* ── L4 TEXTE ÉMOTION ── */}
+              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #333' }}>
+                <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                  💬 L4 — TEXTE ÉMOTION (milieu)
+                </label>
+                <input
+                  style={styles.input}
+                  type="text"
+                  value={clip.text_emotion || (clip.texts || {}).emotion || ''}
+                  onChange={(e) => updateEmotion(e.target.value)}
+                />
+              </div>
+
+              {/* ── L6 WATERMARK @chaine ── */}
+              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #333' }}>
+                <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                  💧 L6 — WATERMARK @chaine (sur le meme)
+                </label>
+                <input
+                  style={styles.input}
+                  type="text"
+                  value={watermark.text || '@lacrimae'}
+                  onChange={(e) => updateWatermark('text', e.target.value)}
+                />
+                <label style={styles.label}>Position</label>
+                <select
+                  style={styles.select}
+                  value={watermark.position || 'bottom_left'}
+                  onChange={(e) => updateWatermark('position', e.target.value)}
+                >
+                  <option value="bottom_left">Bas — gauche</option>
+                  <option value="bottom_right">Bas — droite</option>
+                  <option value="bottom_center">Bas — centre</option>
+                  <option value="top_left">Haut — gauche</option>
+                  <option value="top_right">Haut — droite</option>
+                </select>
+                <label style={styles.label}>
+                  Opacité: {Math.round(((watermark.opacity ?? 0.4) * 100))}%
+                </label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="10"
+                  max="90"
+                  value={Math.round(((watermark.opacity ?? 0.4) * 100))}
+                  onChange={(e) => updateWatermark('opacity', parseInt(e.target.value) / 100)}
+                />
+                <label style={styles.label}>
+                  Taille: {(watermark.font_size || 36)}px
+                </label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="16"
+                  max="64"
+                  value={watermark.font_size || 36}
+                  onChange={(e) => updateWatermark('font_size', parseInt(e.target.value))}
+                />
+                <label style={styles.label}>Couleur</label>
+                <input
+                  style={styles.colorPicker}
+                  type="color"
+                  value={watermark.color || '#FFFFFF'}
+                  onChange={(e) => updateWatermark('color', e.target.value)}
+                />
+              </div>
+
+              {/* ── L5 MEME : parcours de la méméthèque ── */}
+              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #333' }}>
+                <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                  🎞 L5 — MÉMÉTHÈQUE (public/memes/)
+                </label>
+                <select
+                  style={styles.select}
+                  value={(clip.meme || {}).source || ''}
+                  onChange={(e) => selectMeme(e.target.value)}
+                >
+                  <option value="">— choisir un meme —</option>
+                  {memes.map((m) => (
+                    <option key={m} value={m}>🎞 {m}</option>
+                  ))}
+                </select>
+                {memes.length === 0 && (
+                  <div style={{ fontSize: '12px', color: '#666' }}>
+                    Aucun meme trouvé — déposez vos memes mp4 dans{' '}
+                    <code>public/memes/</code>
+                  </div>
+                )}
+                <label style={styles.label}>
+                  Durée cible: {(totalFrames / fps).toFixed(1)}s (durée du pack)
+                </label>
+                <div style={{ marginTop: '6px', padding: '8px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
+                  Loop net si le meme est plus court que la durée cible ; trim sinon.
+                  La durée est dirigée par le pack (défaut 5-7s), pas par le probe.
+                </div>
+              </div>
+
+              {/* ── L3 TITRE (optionnel) ── */}
+              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #333' }}>
+                <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                  🏷 L3 — TITRE (optionnel, haut)
+                </label>
+                <input
+                  style={styles.input}
+                  type="text"
+                  value={(clip.texts || {}).title || ''}
+                  onChange={(e) => updateTexts('title', e.target.value)}
+                />
               </div>
             </div>
           )}

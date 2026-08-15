@@ -9,6 +9,8 @@ Trois profils :
   - background        : découpe SEULE (résolution source conservée) — la mise
     en page (fond PNG + vidéo + titre + paragraphe + logo) se fait dans la
     composition Remotion (F03/F04). Profil utilisé par le mode forge Perturabo.
+  - meme              : AUCUNE découpe — staging des memes de la méméthèque
+    (copie meme_XXX.mp4 → clip_00X.mp4). Mode MEME (sub_mode: meme).
 
 Génère aussi OUT/codex.json — template de départ pour la preview F03.
 Codex v4.0 : bloc `session` (style global : fond PNG, logo, textes, presets)
@@ -232,6 +234,64 @@ def extract_clip(video_path, start_sec, end_sec, profile, src_info, out_path):
     return True
 
 
+# ─── MODE MEME : staging (aucune découpe) ────────────────────────────────────
+
+def stage_meme_clips(input_dir, output_clips_dir):
+    """Mode meme : copie les memes de IN/memes/ vers clips/clip_00X.mp4.
+
+    Les memes sont déjà coupés et prêts dans la méméthèque (SHARED/memes/,
+    transités par le bridge dans F02/IN/memes/). Le codex bridge porte
+    clip.meme.source → IN/memes/<meme_file> ; F02 copie chaque meme vers le
+    clip attendu par le rendu (clip_001.mp4...). Retourne la liste des
+    résultats (index, meme_source, duration_sec, total_frames cible)."""
+    memes_dir = input_dir / "memes"
+    codex_bridge = input_dir / "codex.json"
+    if not memes_dir.exists():
+        log_fail(f"Dossier memes introuvable : {memes_dir}")
+        sys.exit(1)
+    if not codex_bridge.exists():
+        log_fail(f"Codex bridge introuvable : {codex_bridge}")
+        sys.exit(1)
+
+    codex = json.loads(codex_bridge.read_text(encoding="utf-8"))
+    clips_data = codex.get("clips", [])
+    if not clips_data:
+        log_fail("Aucun clip dans le codex bridge (mode meme)")
+        sys.exit(1)
+
+    results = []
+    for i, clip in enumerate(clips_data):
+        meme = clip.get("meme") or {}
+        meme_file = meme.get("source")
+        if not meme_file:
+            log_fail(f"clip_{i + 1:03d} : meme.source manquant dans le codex bridge")
+            sys.exit(1)
+        src = memes_dir / meme_file
+        if not src.exists():
+            log_fail(f"Meme introuvable : {src}")
+            sys.exit(1)
+        target = output_clips_dir / f"clip_{i + 1:03d}.mp4"
+        import shutil
+        shutil.copy2(src, target)
+        # Durée cible = durée du pack (video.total_frames / fps du bridge)
+        fps = (clip.get("video") or {}).get("fps", FPS_TARGET)
+        total_frames = (clip.get("video") or {}).get("total_frames", 180)
+        duration_sec = round(total_frames / fps, 2)
+        size_mb = target.stat().st_size / 1_000_000
+        log_ok(f"{target.name} ← {meme_file} ({duration_sec}s, {size_mb:.1f} Mo)")
+        results.append({
+            "index": i + 1,
+            "meme_source": meme_file,
+            "duration_sec": duration_sec,
+            "output": f"{OUTPUT_DIR_CLIPS}/{target.name}",
+            "total_frames": total_frames,
+            "width": (clip.get("video") or {}).get("width", TARGET_WIDTH),
+            "height": (clip.get("video") or {}).get("height", TARGET_HEIGHT),
+            "size_mb": round(size_mb, 2),
+        })
+    return results
+
+
 # ─── CODEX TEMPLATE (v4.0 — session + clips) ────────────────────────────────
 
 def write_starter_codex(clips, fps, out_path, title="", preset="punchy",
@@ -333,7 +393,7 @@ def main():
     parser.add_argument("--input", required=True, help="Dossier IN/")
     parser.add_argument("--output", required=True, help="Dossier OUT/")
     parser.add_argument("--profile", default="blur-pad",
-                        choices=["blur-pad", "reframe", "background"],
+                        choices=["blur-pad", "reframe", "background", "meme"],
                         help="Profil de formatage (défaut blur-pad)")
     parser.add_argument("--title", default="", help="Titre de la production (brief du Champion)")
     parser.add_argument("--preset", default="punchy", choices=list(COLOR_PRESETS.keys()),
@@ -356,6 +416,38 @@ def main():
 
     video_path = input_dir / INPUT_VIDEO
     cutlist_path = input_dir / INPUT_CUTLIST
+
+    # ── MODE MEME : staging (aucune découpe, aucun video_source) ──
+    if args.profile == "meme":
+        section("Mode MEME — staging des memes de la méméthèque")
+        results = stage_meme_clips(input_dir, clips_dir)
+        manifest = {
+            "profile": "meme",
+            "clips_count": len(results),
+            "clips": results,
+        }
+        (output_dir / OUTPUT_MANIFEST).write_text(
+            json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        log_ok(f"{OUTPUT_MANIFEST} écrit")
+        # Le codex meme du bridge est déjà complet (session + clips avec meme,
+        # tweet, emotion, durée pack) — F02 le transfère tel quel à F03/F04.
+        bridge_codex = input_dir / "codex.json"
+        if bridge_codex.exists():
+            import shutil
+            shutil.copy2(bridge_codex, output_dir / OUTPUT_CODEX)
+            log_ok(f"codex meme bridge transité : {output_dir / OUTPUT_CODEX}")
+        else:
+            log_fail(f"Codex bridge introuvable : {bridge_codex}")
+            sys.exit(1)
+
+        print()
+        print("═" * 52)
+        print(" F02 FORMAT (MODE MEME) — MISSION ACCOMPLIE")
+        print(f"  Profil      : meme (aucune découpe)")
+        print(f"  Clips       : {len(results)} (copies des memes de la méméthèque)")
+        print("═" * 52)
+        sys.exit(0)
 
     section("Vérification des entrées")
     if not video_path.exists():

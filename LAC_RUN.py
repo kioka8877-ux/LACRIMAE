@@ -169,14 +169,21 @@ def copy_artefact(src: Path, dst: Path) -> bool:
 # ─── TRANSITS (copies inter-frégates) ────────────────────────────────────────
 
 def transit_bridge(ledger):
-    """BRIDGE → F02/IN : la cutlist + la vidéo transitent par F02.
-    (Le bridge écrit déjà directement dans F02/IN + F03/F04 public.)"""
+    """BRIDGE → F02 : la cutlist + la vidéo transitent par F02.
+    (Le bridge écrit déjà directement dans F02/IN + F03/F04 public.)
+
+    Mode MEME : pas de cutlist (memes pré-coupés), le codex est déjà transité
+    par le bridge dans F02/IN — on copie seulement le codex vers F02/OUT."""
     bridge = FRIGATE_PATHS["BRIDGE"]
     f02 = FRIGATE_PATHS["F02"]
-    return all([
-        copy_artefact(bridge / "OUT" / "cutlist.json", f02 / "IN" / "cutlist.json"),
-        copy_artefact(bridge / "OUT" / "codex.json", f02 / "OUT" / "codex.json"),
-    ])
+    ok = True
+    cutlist = bridge / "OUT" / "cutlist.json"
+    if cutlist.exists():
+        ok = copy_artefact(cutlist, f02 / "IN" / "cutlist.json") and ok
+    else:
+        log_ok("BRIDGE → F02 : pas de cutlist (mode meme — staging sans découpe)")
+    ok = copy_artefact(bridge / "OUT" / "codex.json", f02 / "OUT" / "codex.json") and ok
+    return ok
 
 
 def transit_f00(ledger):
@@ -485,6 +492,14 @@ def cmd_forge(args):
     if not transit_bridge(ledger):
         log_err("BRIDGE : transit échoué")
         sys.exit(1)
+    # Mode MEME : le bridge l'a détecté (sub_mode meme) → profil F02 = meme
+    bridge_report = FRIGATE_PATHS["BRIDGE"] / "OUT" / "bridge_report.json"
+    if bridge_report.exists():
+        rep = json.loads(bridge_report.read_text(encoding="utf-8"))
+        if rep.get("sub_mode") == "meme":
+            ledger["brief"]["profile"] = "meme"
+            ledger["brief"]["preset"] = "punchy"
+            log_ok("Profil F02 basculé sur 'meme' (détecté par le bridge)")
     mark(ledger, "BRIDGE", "done", custos="check-out")
     save_ledger(ledger)
     log_ok("BRIDGE scellé — Contrôle 1 validé (pack validé, artefacts transités)")

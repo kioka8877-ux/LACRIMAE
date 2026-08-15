@@ -53,8 +53,10 @@ Sorties :
 """
 
 import argparse
+import hashlib
 import json
 import os
+import random
 import shutil
 import subprocess
 import sys
@@ -76,6 +78,21 @@ SHARED_VIDEO_SOURCE = SHARED_IN_DIR / "video_source.mp4"
 SHARED_BACKGROUNDS_DIR = SHARED_IN_DIR / "backgrounds"
 SHARED_LOGOS_DIR = SHARED_IN_DIR / "logos"
 LOGO_FILENAME = "logo.png"
+# Méméthèque plate : SHARED/memes/meme_XXX.mp4 (voir SHARED/memes/README.md)
+MEMES_DIR = ROOT / "SHARED" / "memes"
+MEME_GUIDE_PATH = ROOT / "GUIDE_UTILISATION" / "04_MODE_MEME.md"
+
+# ─── Mode MEME : personas de tweets (génération déterministe) ────────────────
+MEME_PERSONAS = [
+    {"name": "Chad Hunter", "handle": "@chadhunter", "avatar_color": "#1DA1F2", "verified": True},
+    {"name": "Mia Foxx", "handle": "@miafoxx", "avatar_color": "#E0245E", "verified": True},
+    {"name": "Jay Walker", "handle": "@jaywalker", "avatar_color": "#17BF63", "verified": False},
+    {"name": "Zoe Prime", "handle": "@zoe_prime", "avatar_color": "#F45D22", "verified": True},
+    {"name": "Leo Cross", "handle": "@leocross", "avatar_color": "#794BC4", "verified": False},
+]
+MEME_LIKES_RANGE = (800, 25000)
+MEME_REPOSTS_RANGE = (50, 3000)
+MEME_REPLIES_RANGE = (10, 900)
 
 FRIGATES = {
     "F02": ROOT / "F02_FORMAT",
@@ -353,6 +370,226 @@ def check_cuts_within_duration(pack: dict, video_path) -> list:
     return errors
 
 
+# ─── MODE MEME : validation + mapping pack → codex ───────────────────────────
+
+def is_meme_pack(pack: dict) -> bool:
+    """True si le pack est en mode meme (sub_mode: meme, contrat 04_MODE_MEME.md)."""
+    return pack.get("sub_mode") == "meme"
+
+
+def validate_meme_pack(pack: dict) -> list:
+    """Validation spécifique mode meme — retourne les erreurs (vide = OK).
+    Échecs BLOQUANTS (contrat §7) :
+      - meme manquant ou absent de la méméthèque SHARED/memes/
+      - tweet.text ou text_emotion manquant
+      - durée hors range (défaut 5-7s)
+    NB : le guide 04_MODE_MEME.md est vérifié en amont par main()."""
+    errors = []
+    videos = pack.get("videos")
+    if not isinstance(videos, list) or len(videos) == 0:
+        errors.append("pack.videos doit être une liste non vide (mode meme)")
+        return errors
+
+    for v in videos:
+        angle = v.get("angle_id", "?")
+        meme = v.get("meme")
+        if not meme:
+            errors.append(f"video {angle} : meme manquant (ex 'meme_004')")
+        else:
+            meme_name = meme if meme.endswith(".mp4") else f"{meme}.mp4"
+            if not (MEMES_DIR / meme_name).exists():
+                errors.append(f"video {angle} : meme '{meme_name}' ABSENT de la "
+                              f"méméthèque {MEMES_DIR}/")
+        tweet = v.get("tweet") or {}
+        if not tweet.get("text"):
+            errors.append(f"video {angle} : tweet.text manquant")
+        if not v.get("text_emotion"):
+            errors.append(f"video {angle} : text_emotion manquant")
+        dur = v.get("duration_sec")
+        if dur is not None:
+            try:
+                dur = float(dur)
+            except (TypeError, ValueError):
+                errors.append(f"video {angle} : duration_sec invalide ({dur})")
+                dur = None
+            if dur is not None and not (3.0 <= dur <= 10.0):
+                errors.append(f"video {angle} : duration_sec hors range "
+                              f"autorisée 3-10s ({dur}s)")
+    return errors
+
+
+def meme_duration_sec(v: dict) -> float:
+    """Durée cible d'un angle meme : duration_sec du pack (sinon range défaut 5-7s)."""
+    dur = v.get("duration_sec")
+    if dur is not None:
+        try:
+            return float(dur)
+        except (TypeError, ValueError):
+            pass
+    return 6.0  # défaut contrat (range 5-7s)
+
+
+def gen_tweet_card(pack: dict, clip_id: str) -> dict:
+    """Card tweet générée par LACRIMAE (déterministe, seed = pack_id + clip_id) :
+    persona (5) + likes/reposts/réponses crédibles. Aucune API externe."""
+    pack_id = pack.get("pack_id") or "MEME"
+    seed = int(hashlib.sha256(f"LACRIMAE-MEME-v1|{pack_id}|{clip_id}".encode("utf-8")).hexdigest(), 16)
+    rnd = random.Random(seed)
+    persona = MEME_PERSONAS[rnd.randrange(len(MEME_PERSONAS))]
+    likes = rnd.randint(*MEME_LIKES_RANGE)
+    reposts = rnd.randint(*MEME_REPOSTS_RANGE)
+    replies = rnd.randint(*MEME_REPLIES_RANGE)
+    # Garder la hiérarchie crédible : likes > reposts > réponses
+    if reposts > likes:
+        reposts = rnd.randint(MEME_REPOSTS_RANGE[0], likes)
+    if replies > reposts:
+        replies = rnd.randint(MEME_REPLIES_RANGE[0], max(MEME_REPLIES_RANGE[0], reposts))
+    return {
+        "persona": persona,
+        "likes": likes,
+        "reposts": reposts,
+        "replies": replies,
+    }
+
+
+def build_meme_codex(pack: dict, background_name, fps=30) -> dict:
+    """Codex v4.1 mode MEME : session (fond, logo, watermark, textes, presets)
+    + clips[] (meme, tweet, text_emotion, titre, durée pack)."""
+    videos = pack.get("videos", [])
+    clips = []
+    for i, v in enumerate(videos):
+        clip_id = f"clip_{i + 1:03d}"
+        duration = meme_duration_sec(v)
+        tweet = (v.get("tweet") or {})
+        card = gen_tweet_card(pack, clip_id)
+        meme_name = v.get("meme")
+        meme_file = meme_name if meme_name.endswith(".mp4") else f"{meme_name}.mp4"
+        title = v.get("title")
+        clips.append({
+            "id": clip_id,
+            "angle_id": v.get("angle_id", f"A{i + 1:02d}"),
+            "video": {
+                "source": f"clip_{i + 1:03d}.mp4",
+                "fps": fps,
+                "total_frames": int(duration * fps),
+                "width": 1080,
+                "height": 1920,
+            },
+            "meme": {
+                "source": meme_file,
+                # total_frames réels du meme : rempli par F02 (probe) — la
+                # composition boucle net / trime selon durée pack vs réelle.
+            },
+            "texts": {
+                "mode": "title" if title else "none",
+                "title": title or "",
+                "emotion": v.get("text_emotion", ""),
+                "title_offset_pct": 4,
+            },
+            "tweet": {
+                "text": tweet.get("text", ""),
+                "keywords_style": tweet.get("keywords_style") or {},
+                "persona": card["persona"],
+                "likes": card["likes"],
+                "reposts": card["reposts"],
+                "replies": card["replies"],
+            },
+            "logo": None,  # session.logo
+            "volume": 1.0,
+            "brutal_cut_interval_frames": 0,
+            "slowmo_start_frame": 0,
+            "slowmo_speed": 1.0,
+            "shake_power": 0,
+        })
+
+    codex = {
+        "version": "4.1",
+        "pipeline": "LACRIMAE_DEV",
+        "mode": "meme",
+        "sub_mode": "meme",
+        "forge": {
+            "pack_id": pack.get("pack_id"),
+            "siege_id": pack.get("siege_id"),
+            "pack_mode": pack.get("mode", "logo"),
+            "campaign_id": (pack.get("identite") or {}).get("campaign_id"),
+            "montage_guide_ref": pack.get("montage_guide_ref"),
+        },
+        "session": {
+            "background": {
+                "image": background_name or None,
+                "color": "#0a0a0a",
+                "scale": 1.0,
+            },
+            "logo": {
+                "src": LOGO_FILENAME,
+                "width_pct": 18,
+                "position": "bottom_right",
+                "opacity": 1.0,
+            },
+            "watermark": {
+                "text": "@lacrimae",
+                "opacity": 0.4,
+                "font_size": 36,
+                "position": "bottom_left",
+                "color": "#FFFFFF",
+            },
+            "texts_style": {
+                "font": "Impact, Arial Black, sans-serif",
+                "size_title": 64,
+                "size_paragraph": 40,
+                "color": "#FFFFFF",
+                "stroke_color": "#000000",
+                "stroke_width": 4,
+                "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
+                "glow_intensity": 0,
+                "letter_spacing": "0em",
+            },
+            "presets": {
+                "color_preset": "punchy",
+                "color_css_filter": "contrast(1.3) saturate(1.5) brightness(1.1)",
+                "enhance_4k": False,
+                "sharpening": 0,
+                "denoising": 0,
+                "vignette": 0.25,
+                "grain_intensity": 0.15,
+            },
+        },
+        "validated_by_magos": False,
+        "clips": clips,
+    }
+    return codex
+
+
+def transit_memes_to_f02():
+    """Tous les memes partagés → F02/IN/memes/ (staging F02 sans découpe)."""
+    f02_in = FRIGATES["F02"] / "IN" / "memes"
+    f02_in.mkdir(parents=True, exist_ok=True)
+    memes = sorted(MEMES_DIR.glob("*.mp4")) if MEMES_DIR.exists() else []
+    for meme in memes:
+        shutil.copy2(meme, f02_in / meme.name)
+    log_ok(f"F02/IN/memes : {len(memes)} meme(s) transité(s)")
+    return memes
+
+
+def transit_memes_to_preview_render():
+    """Tous les memes partagés → public/memes/ des F03+F04 (parcours méméthèque
+    + rendu) + manifest.json (menu déroulant de la preview)."""
+    memes = sorted(MEMES_DIR.glob("*.mp4")) if MEMES_DIR.exists() else []
+    for name, frig in FRIGATES.items():
+        if name == "F02":
+            continue
+        meme_dir = frig / "CODEBASE" / "public" / "memes"
+        meme_dir.mkdir(parents=True, exist_ok=True)
+        for meme in memes:
+            shutil.copy2(meme, meme_dir / meme.name)
+        manifest = sorted(meme.name for meme in memes)
+        (meme_dir / "manifest.json").write_text(
+            json.dumps({"files": manifest}, ensure_ascii=False, indent=2),
+            encoding="utf-8")
+        log_ok(f"{frig.name} : {len(memes)} meme(s) transité(s) → public/memes/")
+    return memes
+
+
 # ─── TRANSITS ────────────────────────────────────────────────────────────────
 
 def transit_to_f02(video_path, cutlist_path):
@@ -550,7 +787,92 @@ def main():
 
     pack = json.loads(pack_path.read_text(encoding="utf-8"))
 
-    # 1. Validation schéma + cuts
+    # ════════════════ MODE MEME (sub_mode: meme) ════════════════
+    # Aucune découpe : les memes sont déjà coupés dans la méméthèque
+    # (SHARED/memes/), le pack nomme explicitement le meme de chaque angle.
+    # F02 stage simplement (copie meme → clip_00X.mp4), pas de vidéo source.
+    if is_meme_pack(pack):
+        if not MEME_GUIDE_PATH.exists():
+            log_err(f"Guide mode MEME absent : {MEME_GUIDE_PATH}")
+            log_err("Un pack sub_mode: meme exige le contrat 04_MODE_MEME.md "
+                    "(échec bloquant).")
+            print("\n  ══ CONTRÔLE 1 : ✗ ÉCHOUÉ — mode meme sans contrat ══")
+            sys.exit(1)
+        log_ok(f"Contrat mode MEME présent : {MEME_GUIDE_PATH.name}")
+
+        meme_errors = validate_meme_pack(pack)
+        if meme_errors:
+            for e in meme_errors:
+                log_err(e)
+            print("\n  ══ CONTRÔLE 1 : ✗ ÉCHOUÉ — pack meme invalide ══")
+            sys.exit(1)
+        log_ok(f"Pack meme valide : {pack.get('pack_id', '?')} | "
+               f"{len(pack.get('videos', []))} angle(s)")
+
+        shared_backgrounds = sorted(SHARED_BACKGROUNDS_DIR.glob("*.png")) if SHARED_BACKGROUNDS_DIR.exists() else []
+        logo_path = SHARED_LOGOS_DIR / LOGO_FILENAME
+        if not logo_path.exists():
+            logo_path = None
+        background_name = shared_backgrounds[0].name if shared_backgrounds else None
+
+        if args.dry_run:
+            print("\n[DRY-RUN] Plan meme :")
+            print(f"  pack     : {pack.get('pack_id', '?')} (sub_mode meme)")
+            print(f"  memes    : {len(pack.get('videos', []))} (méméthèque SHARED/memes/)")
+            print(f"  fonds    : {len(shared_backgrounds)} PNG → preview + rendu"
+                  + ("" if background_name else "  (aucun — couleur unie)"))
+            print("  Aucun fichier écrit.")
+            sys.exit(0)
+
+        # Mapping pack → codex meme v4.1 (session + clips)
+        BRIDGE_OUT.mkdir(parents=True, exist_ok=True)
+        codex = build_meme_codex(pack, background_name)
+        codex_path = BRIDGE_OUT / "codex.json"
+        codex_path.write_text(json.dumps(codex, ensure_ascii=False, indent=2), encoding="utf-8")
+        log_ok(f"codex meme v4.1 écrit : {codex_path} ({len(codex['clips'])} clip(s))")
+
+        # Transits : memes → F02/IN + F03/F04 public, fonds, logo, codex
+        transit_memes_to_f02()
+        transit_memes_to_preview_render()
+        transit_backgrounds_to_preview_render()
+        transit_logo(logo_path)
+        transit_codex(codex_path)
+        # F02 (profil meme) lit le codex bridge pour le staging (IN/codex.json)
+        f02_in = FRIGATES["F02"] / "IN"
+        f02_in.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(codex_path, f02_in / "codex.json")
+        log_ok(f"F02/IN : codex.json meme transité (staging)")
+
+        report = {
+            "pack_id": pack.get("pack_id"),
+            "mode": pack.get("mode"),
+            "sub_mode": "meme",
+            "videos_count": len(pack.get("videos", [])),
+            "controle1": "validated",
+            "profile_f02": "meme",
+            "background": background_name,
+            "backgrounds_available": [b.name for b in shared_backgrounds],
+            "f01_skipped": True,
+            "pack_fetched": not args.pack,
+            "source_video": None,
+            "clips": [{"angle_id": v.get("angle_id"),
+                       "meme": v.get("meme"),
+                       "duration_sec": meme_duration_sec(v)} for v in pack.get("videos", [])],
+        }
+        (BRIDGE_OUT / "bridge_report.json").write_text(
+            json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        print()
+        print("═" * 52)
+        print(" BRIDGE FORGE (MODE MEME) — MISSION ACCOMPLIE")
+        print(f"  Pack     : {pack.get('pack_id', '?')} (récupéré par l'Oracle)")
+        print(f"  Angles   : {len(codex['clips'])} (memes de la méméthèque)")
+        print(f"  F01      : SAUTÉE — aucune découpe (memes prêts)")
+        print(f"  Prochain : LAC_RUN.py run (F02 meme → preview F03)")
+        print("═" * 52)
+        sys.exit(0)
+
+    # 1. Validation schéma + cuts (mode standard, PAS meme)
     errors = validate_pack(pack)
     if errors:
         for e in errors:

@@ -219,6 +219,26 @@ def check_json_content(path: Path, require_validation: bool = True) -> bool:
             if texts.get("mode") in ("title", "title+paragraph") and not texts.get("title"):
                 log_err(f"codex.json — texts.title manquant sur {clip.get('id', '?')}")
                 return False
+        # Mode MEME (sub_mode/mode meme) : règles spécifiques 04_MODE_MEME.md
+        if data.get("sub_mode") == "meme" or data.get("mode") == "meme":
+            session = data.get("session") or {}
+            if "watermark" not in session:
+                log_err("codex.json — session.watermark manquant (mode meme)")
+                return False
+            for clip in clips:
+                meme = clip.get("meme") or {}
+                if not meme.get("source"):
+                    log_err(f"codex.json — meme.source manquant sur {clip.get('id', '?')}")
+                    return False
+                tweet = clip.get("tweet") or {}
+                if not tweet.get("text"):
+                    log_err(f"codex.json — tweet.text manquant sur {clip.get('id', '?')}")
+                    return False
+                clip_texts = clip.get("texts") or {}
+                if not (clip_texts.get("emotion") or clip.get("text_emotion")):
+                    log_err(f"codex.json — text_emotion manquant sur {clip.get('id', '?')}")
+                    return False
+            log_ok(f"codex.json — MODE MEME OK ({len(clips)} meme(s))")
         status = "validé par le Magos" if require_validation else "template (validation à la porte III)"
         log_ok(f"codex.json — {len(clips)} clip(s), {status}")
 
@@ -267,6 +287,30 @@ def check_mp4_non_empty(path: Path) -> bool:
     return True
 
 
+def is_meme_mode(drive_base: Path, frigate: str) -> bool:
+    """Détecte le mode MEME (codex sub_mode/mode meme) d'une frégate.
+
+    Utilisé pour détendre les exigences du manifeste :
+      - BRIDGE check-out : pas de cutlist en mode meme (memes pré-coupés)
+      - F02 check-in     : pas de video_source.mp4 ni cutlist (staging memes)
+    """
+    base = {
+        "BRIDGE": drive_base / "BRIDGE_PERTURABO",
+        "F02": drive_base / "F02_FORMAT",
+    }.get(frigate)
+    if base is None:
+        return False
+    for codex_candidate in (base / "OUT" / "codex.json", base / "IN" / "codex.json"):
+        if codex_candidate.exists():
+            try:
+                data = json.loads(codex_candidate.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                continue
+            if data.get("sub_mode") == "meme" or data.get("mode") == "meme":
+                return True
+    return False
+
+
 # ─── VALIDATION PRINCIPALE ────────────────────────────────────────────────────
 
 def run_custos(frigate: str, mode: str, drive_base: Path) -> bool:
@@ -289,11 +333,20 @@ def run_custos(frigate: str, mode: str, drive_base: Path) -> bool:
     }
 
     frigate_base = frigate_dirs[frigate]
+    meme = is_meme_mode(drive_base, frigate)
     rules = MANIFEST[frigate][mode]
     all_ok = True
 
-    log_section(f"LAC_CUSTOS — {frigate} | {mode.upper()}")
+    log_section(f"LAC_CUSTOS — {frigate} | {mode.upper()}"
+                + (" | MODE MEME" if meme else ""))
     print(f"  Base : {frigate_base}")
+
+    # Mode MEME : les exigences du manifeste qui n'ont pas de sens sont
+    # retirées (pas de cutlist ni de vidéo source — les memes sont pré-coupés).
+    if meme and frigate == "BRIDGE" and mode == "check-out":
+        rules = {"OUT": ["codex.json"]}
+    if meme and frigate == "F02" and mode == "check-in":
+        rules = {"IN/memes": []}
 
     for folder_rel, files in rules.items():
         folder_path = frigate_base / folder_rel
