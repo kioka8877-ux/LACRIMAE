@@ -17,17 +17,20 @@
 | P3 | F02 `lac_f02_format.py` : profil `meme` (staging = copie meme → `clip_00X.mp4`, aucune découpe) | ✅ poussé (`2d3e397`) |
 | P5 | Preview F03 : `src/preview/MemeComposition.jsx` (miroir 7 calques) + `App.jsx` onglet MEME (panneaux tweet / émotion / watermark / méméthèque / titre) | ✅ poussé (`2d3e397`) |
 | P7 | `LAC_CUSTOS.py` (validations codex meme + manifeste détendu) + `LAC_RUN.py` (profil F02 → meme via bridge_report) | ✅ poussé (`2d3e397`) |
-| **P6** | **GHA : orchestrator + f04-render + f05-f06 + preview_pages adaptés au mode meme** | ⏳ **PROCHAINE ÉTAPE** |
+| **P6** | **GHA : orchestrator + f04-render + f05-f06 + preview_pages adaptés au mode meme** | ✅ poussé (`47e4429`) |
 
 Commits sur `dev3` :
 - `b7d0a7b` — P0/P1/P4 (meméthèque + contrat + MemeComposition rendu)
 - `2d3e397` — P2/P3/P5/P7 (bridge + F02 + preview + CUSTOS)
+- `47e4429` — P6 GHA (workflows meme-aware sans casser le mode stars)
 
-Vérifications déjà faites : `py_compile` OK (4 fichiers Python), esbuild OK (2 JSX).
+Vérifications déjà faites : `py_compile` OK (4 fichiers Python), esbuild OK (2 JSX),
+YAML OK (4 workflows), bash -n OK (blocs run), simulation locale meme OK
+(bridge sans vidéo → CUSTOS BRIDGE ✓ → F02 detect/stage/format meme → CUSTOS F02 ✓).
 
 ---
 
-## 2. PROCHAINE ÉTAPE — P6 GHA (à coder)
+## 2. P6 GHA — TERMINÉ (à relire avant run de bout en bout)
 
 Fichiers : `.github/workflows/orchestrator.yml`, `f04-render.yml`, `f05-f06.yml`, `preview_pages.yml`.
 
