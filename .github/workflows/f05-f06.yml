@@ -3,7 +3,7 @@ name: F05-F06 CAMOUFLAGE + LUTHER (dev)
 on:
   workflow_dispatch:
   push:
-    branches: [dev]
+    branches: [dev, dev3]
     paths:
       - '.github/workflows/f05-f06.yml'
 
@@ -14,17 +14,17 @@ permissions:
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   WORKFLOW_SRC: f04-render.yml
-  BRANCH: dev
+  BRANCH: ${{ github.ref_name }}
 
 jobs:
   camoufler:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
-      - name: Checkout dev
+      - name: Checkout branche courante
         uses: actions/checkout@v4
         with:
-          ref: dev
+          ref: ${{ github.ref_name }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -40,8 +40,18 @@ jobs:
       - name: F05 - Download clips rendus (artifacts f04-render)
         run: |
           mkdir -p F05_CAMOUFLAGE/IN
-          for A in clip-001 clip-002 clip-003 clip-004 clip-005; do
-            python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_SRC" "$A" F05_CAMOUFLAGE/IN/ "$BRANCH"
+          # Clips à récupérer : ceux du codex (mode MEME = N clips) sinon les 5
+          # par défaut (mode stars). Les artifacts absents sont ignorés — le
+          # camouflage traite ce qui est présent.
+          CLIPS=""
+          if [ -f F04_RENDER/IN/codex.json ]; then
+            CLIPS=$(python3 -c "import json; c=json.load(open('F04_RENDER/IN/codex.json')); cs=c.get('clips') or [c]; print(' '.join((x.get('id') or x['video']['source'].replace('.mp4','')).replace('_','-') for x in cs if x.get('video')))")
+          fi
+          if [ -z "$CLIPS" ]; then CLIPS="clip-001 clip-002 clip-003 clip-004 clip-005"; fi
+          echo "  [→] Clips attendus : $CLIPS"
+          for A in $CLIPS; do
+            python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_SRC" "$A" F05_CAMOUFLAGE/IN/ "$BRANCH" \
+              || echo "  [!] artifact $A absent (ignoré)"
           done
           ls -la F05_CAMOUFLAGE/IN/
 

@@ -80,7 +80,9 @@ permissions:
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   WORKFLOW_FILE: lacrimae_orchestrator.yml
-  BRANCH: dev
+  # Branche courante du run (dev | dev2 | dev3 ...) — les artifacts sont
+  # récupérés depuis les runs de CETTE branche, pas d'une branche codée en dur.
+  BRANCH: ${{ github.ref_name }}
 
 jobs:
   orchestrator:
@@ -216,13 +218,29 @@ jobs:
           REL_ARG=""
           if [ -n "$RELEASE_TAG" ]; then REL_ARG="$RELEASE_TAG"; fi
           echo "  [→] F01 : recherche de la vidéo dans les GitHub Releases…"
+          VIDEO_OK=0
           if python3 _tools/download_release_video.py F02_FORMAT/IN/ $REL_ARG; then
             echo "  [✓] Vidéo depuis la Release"
+            VIDEO_OK=1
           else
             echo "  [→] Pas de vidéo en Release — repli artifact lac-video…"
-            python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F02_FORMAT/IN/ "$BRANCH"
+            if python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F02_FORMAT/IN/ "$BRANCH"; then
+              echo "  [✓] Vidéo depuis l'artifact lac-video"
+              VIDEO_OK=1
+            fi
           fi
-          if [ "${{ github.event.inputs.mode }}" == "libre" ]; then
+          # Mode libre : la vidéo est OBLIGATOIRE (F01 vision découpe la source).
+          if [ "$VIDEO_OK" == "0" ] && [ "${{ github.event.inputs.mode }}" == "libre" ]; then
+            echo "ERREUR: F01 (libre) exige une vidéo (Release GitHub ou artifact lac-video)."
+            exit 1
+          fi
+          # Mode forge : pas de vidéo = OK si le pack est un meme (aucune découpe,
+          # méméthèque SHARED/memes/). Le bridge tranche : pack stars → échec
+          # bloquant (assets opérateur manquants) ; pack meme → staging memes.
+          if [ "$VIDEO_OK" == "0" ]; then
+            echo "  [!] Aucune vidéo locale — mode forge : le bridge décide (meme = sans vidéo)."
+          fi
+          if [ "${{ github.event.inputs.mode }}" == "libre" ] && [ -f F02_FORMAT/IN/video_source.mp4 ]; then
             cp F02_FORMAT/IN/video_source.mp4 F01_SELECT/IN/video_source.mp4
           fi
 
@@ -241,11 +259,20 @@ jobs:
           if [ -n "$PACK" ]; then PACK_ARG="--pack $PACK"; fi
           PACK_FILTER_ARG=""
           if [ -n "$PACK_FILTER" ]; then PACK_FILTER_ARG="--pack-filter $PACK_FILTER"; fi
+          # Mode MEME : pas de video_source (memes pré-coupés dans la méméthèque)
+          # → on ne passe --video que si une vidéo a été téléchargée.
+          VIDEO_ARG=""
+          if [ -f F02_FORMAT/IN/video_source.mp4 ]; then
+            VIDEO_ARG="--video F02_FORMAT/IN/video_source.mp4"
+          fi
           python3 BRIDGE_PERTURABO/CODEBASE/lac_bridge_forge.py \
-            $PACK_ARG $PACK_FILTER_ARG \
-            --video F02_FORMAT/IN/video_source.mp4
+            $PACK_ARG $PACK_FILTER_ARG $VIDEO_ARG
+          # Mode MEME : pas de cutlist (F02 stage les memes directement) — la
+          # copie est protégée pour ne pas planter sur un bridge meme.
           mkdir -p F02_FORMAT/IN
-          cp BRIDGE_PERTURABO/OUT/cutlist.json F02_FORMAT/IN/cutlist.json
+          if [ -f BRIDGE_PERTURABO/OUT/cutlist.json ]; then
+            cp BRIDGE_PERTURABO/OUT/cutlist.json F02_FORMAT/IN/cutlist.json
+          fi
 
       - name: F01 - Oracle (vision) — mode libre
         if: github.event.inputs.fregate == 'F01' && github.event.inputs.mode != 'forge'
@@ -292,7 +319,12 @@ jobs:
           # auto-récupéré sont commités pour survivre jusqu'à F02 (run séparé —
           # le workspace ne persiste pas)
           if [ "${{ github.event.inputs.mode }}" == "forge" ]; then
-            git add F02_FORMAT/IN/cutlist.json BRIDGE_PERTURABO/OUT/ BRIDGE_PERTURABO/IN/production_pack.json BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json TRACKING/LACRIMAE_LEDGER.json
+            git add BRIDGE_PERTURABO/OUT/ BRIDGE_PERTURABO/IN/production_pack.json BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json TRACKING/LACRIMAE_LEDGER.json
+            # Mode MEME : pas de cutlist (F02 stage les memes) — add seulement
+            # si le bridge en a produit une (le bridge meme n'en écrit pas).
+            if [ -f F02_FORMAT/IN/cutlist.json ]; then
+              git add F02_FORMAT/IN/cutlist.json
+            fi
           else
             git add F02_FORMAT/IN/cutlist.json TRACKING/LACRIMAE_LEDGER.json
           fi
@@ -301,7 +333,8 @@ jobs:
           echo "PORTE II: vérifie/édite F02_FORMAT/IN/cutlist.json dans l'UI GitHub, puis frégate F02"
 
       - name: F01 - Upload cutlist
-        if: github.event.inputs.fregate == 'F01'
+        # Mode MEME : pas de cutlist (memes pré-coupés) → l'upload est sauté
+        if: github.event.inputs.fregate == 'F01' && hashFiles('F02_FORMAT/IN/cutlist.json') != ''
         uses: actions/upload-artifact@v4
         with:
           name: lac-cutlist
@@ -309,9 +342,26 @@ jobs:
 
       # ─────────────────────────── F02 : FORMAT ─────────────────────────────
 
-      # F02 - Vidéo : même logique que F01 — Release GitHub d'abord, artifact en repli.
-      - name: F02 - Download video
+      # F02 - Détection du mode : le bridge (run F01) commit bridge_report.json
+      # avec sub_mode: "meme" pour un pack meme. F02 bascule sur le profil meme
+      # (staging des memes, aucune découpe) et saute le téléchargement vidéo.
+      - name: F02 - Detect mode (stars|meme)
+        id: f02mode
         if: github.event.inputs.fregate == 'F02'
+        run: |
+          IS_MEME="false"
+          if [ -f BRIDGE_PERTURABO/OUT/bridge_report.json ]; then
+            if [ "$(python3 -c "import json; print(json.load(open('BRIDGE_PERTURABO/OUT/bridge_report.json')).get('sub_mode',''))")" == "meme" ]; then
+              IS_MEME="true"
+            fi
+          fi
+          echo "is_meme=$IS_MEME" >> "$GITHUB_OUTPUT"
+          echo "  [→] F02 : mode $([ "$IS_MEME" == "true" ] && echo 'MEME (staging memes, pas de vidéo)' || echo 'stars (découpe vidéo)')"
+
+      # F02 - Vidéo : même logique que F01 — Release GitHub d'abord, artifact en
+      # repli. SAUTÉE en mode meme (aucune vidéo source : memes pré-coupés).
+      - name: F02 - Download video
+        if: github.event.inputs.fregate == 'F02' && steps.f02mode.outputs.is_meme != 'true'
         env:
           RELEASE_TAG: ${{ github.event.inputs.release_tag }}
         run: |
@@ -326,15 +376,36 @@ jobs:
             python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-video F02_FORMAT/IN/ "$BRANCH"
           fi
 
-      - name: F02 - Format (blur-pad/reframe/background)
+      # F02 - Mode MEME : staging des entrées F02 (codex bridge + méméthèque).
+      # Le bridge a transité memes + codex vers F02/IN pendant le run F01, mais
+      # ces copies ne sont PAS commitées (workspace éphémère) — on les re-stage
+      # ici depuis les sources de vérité : SHARED/memes/ + BRIDGE_PERTURABO/OUT/
+      # (le codex bridge, lui, est commité par F01).
+      - name: F02 - Stage memes (mode meme)
+        if: github.event.inputs.fregate == 'F02' && steps.f02mode.outputs.is_meme == 'true'
+        run: |
+          mkdir -p F02_FORMAT/IN/memes
+          cp BRIDGE_PERTURABO/OUT/codex.json F02_FORMAT/IN/codex.json
+          if compgen -G "SHARED/memes/*.mp4" > /dev/null; then
+            cp SHARED/memes/*.mp4 F02_FORMAT/IN/memes/
+          fi
+          echo "  [→] F02 : memes stagés (IN/memes + IN/codex.json meme)"
+          ls -la F02_FORMAT/IN/ F02_FORMAT/IN/memes/
+
+      - name: F02 - Format (blur-pad/reframe/background/meme)
         if: github.event.inputs.fregate == 'F02'
         env:
           MODE: ${{ github.event.inputs.mode }}
         run: |
           cd F02_FORMAT/CODEBASE
-          PROFILE=$(python3 -c "import json; print(json.load(open('../../TRACKING/LACRIMAE_BRIEF.json')).get('profile','blur-pad'))")
-          PRESET=$(python3 -c "import json; print(json.load(open('../../TRACKING/LACRIMAE_BRIEF.json')).get('preset','punchy'))")
-          TITLE=$(python3 -c "import json; print(json.load(open('../../TRACKING/LACRIMAE_BRIEF.json')).get('title',''))")
+          # Brief : profil/preset/titre (défauts robustes si brief absent)
+          if [ -f ../../TRACKING/LACRIMAE_BRIEF.json ]; then
+            PROFILE=$(python3 -c "import json; print(json.load(open('../../TRACKING/LACRIMAE_BRIEF.json')).get('profile','blur-pad'))")
+            PRESET=$(python3 -c "import json; print(json.load(open('../../TRACKING/LACRIMAE_BRIEF.json')).get('preset','punchy'))")
+            TITLE=$(python3 -c "import json; print(json.load(open('../../TRACKING/LACRIMAE_BRIEF.json')).get('title',''))")
+          else
+            PROFILE="blur-pad"; PRESET="punchy"; TITLE=""
+          fi
           MODE_ARG=""
           FORGE_CODEX_ARG=""
           if [ "$MODE" == "forge" ] && [ -f "../../BRIDGE_PERTURABO/OUT/codex.json" ]; then
@@ -342,6 +413,16 @@ jobs:
             # F02 lit le codex bridge : préserve la session (fond PNG/logo) et
             # reprend les textes par clip du pack — pas de quoting JSON en shell
             FORGE_CODEX_ARG="--forge-codex ../../BRIDGE_PERTURABO/OUT/codex.json"
+          fi
+          # Mode MEME : le bridge l'a détecté (sub_mode: meme) → F02 stage les
+          # memes (profil meme, aucune découpe). Le codex meme est déjà dans
+          # IN/codex.json (stage ci-dessus) — pas de --forge-codex (le profil
+          # meme lit IN/codex.json directement).
+          if [ -f "../../BRIDGE_PERTURABO/OUT/bridge_report.json" ]; then
+            if [ "$(python3 -c "import json; print(json.load(open('../../BRIDGE_PERTURABO/OUT/bridge_report.json')).get('sub_mode',''))")" == "meme" ]; then
+              PROFILE="meme"
+              FORGE_CODEX_ARG=""
+            fi
           fi
           python3 lac_f02_format.py --input ../IN/ --output ../OUT/ \
             --profile "$PROFILE" --preset "$PRESET" --title "$TITLE" $MODE_ARG $FORGE_CODEX_ARG
@@ -409,6 +490,14 @@ jobs:
             if [ -f SHARED/IN/logos/logo.png ]; then
               cp SHARED/IN/logos/logo.png F04_RENDER/CODEBASE/public/logo.png
               cp SHARED/IN/logos/logo.png F03_PREVIEW/CODEBASE/public/logo.png
+            fi
+            # Mode MEME : la méméthèque → public/memes/ (F03 preview + F04
+            # rendu) + manifest.json (menu déroulant du parcours méméthèque)
+            if compgen -G "SHARED/memes/*.mp4" > /dev/null; then
+              mkdir -p F04_RENDER/CODEBASE/public/memes F03_PREVIEW/CODEBASE/public/memes
+              cp SHARED/memes/*.mp4 F04_RENDER/CODEBASE/public/memes/
+              cp SHARED/memes/*.mp4 F03_PREVIEW/CODEBASE/public/memes/
+              python3 -c "import json,pathlib; files=sorted(p.name for p in pathlib.Path('SHARED/memes').glob('*.mp4')); [ (pathlib.Path(d)/'manifest.json').write_text(json.dumps({'files':files}), encoding='utf-8') for d in ('F04_RENDER/CODEBASE/public/memes','F03_PREVIEW/CODEBASE/public/memes') ]"
             fi
           fi
 

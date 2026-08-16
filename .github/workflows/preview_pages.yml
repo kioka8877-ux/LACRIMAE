@@ -24,7 +24,7 @@ on:
     workflows: ["LACRIMAE Orchestrator"]
     types: [completed]
   push:
-    branches: [dev, main]
+    branches: [dev, main, dev3]
     paths:
       - 'F03_PREVIEW/IN/**'
       - 'F03_PREVIEW/CODEBASE/src/**'
@@ -32,6 +32,7 @@ on:
       - 'F03_PREVIEW/CODEBASE/package.json'
       - 'F03_PREVIEW/CODEBASE/vite.config.js'
       - 'SHARED/IN/**'
+      - 'SHARED/memes/**'
       - '.github/workflows/preview_pages.yml'
 
 permissions:
@@ -100,6 +101,15 @@ jobs:
           # 4. Logo campagne (optionnel)
           if [ -f "SHARED/IN/logos/logo.png" ]; then
             cp "SHARED/IN/logos/logo.png" "$PUB/logo.png"
+          fi
+
+          # 5. Méméthèque MEME (mode meme) : public/memes/ + manifest.json
+          #    (menu déroulant du parcours méméthèque dans la preview F03).
+          #    Garde : rien à faire si pas de memes (mode stars).
+          if compgen -G "SHARED/memes/*.mp4" > /dev/null; then
+            mkdir -p "$PUB/memes"
+            cp SHARED/memes/*.mp4 "$PUB/memes/"
+            python3 -c "import json,pathlib; files=sorted(p.name for p in pathlib.Path('SHARED/memes').glob('*.mp4')); json.dump({'files':files}, open('F03_PREVIEW/CODEBASE/public/memes/manifest.json','w'))"
           fi
 
           echo "public/ assemble :"
