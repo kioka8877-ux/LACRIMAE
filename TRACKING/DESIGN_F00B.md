@@ -1,5 +1,22 @@
 # LACRIMAE — DESIGN F00B « RÉCOLTE DES MEMES »
 
+## STATUT (2026-08-16)
+
+- **Codé + poussé** : script `F00B/CODEBASE/lac_f00b_harvest.py`, fiche design,
+  `F00B/cuts.txt`, workflow `.github/workflows/f00b-harvest.yml`.
+- **Test local OK** : py_compile, harvest + miniatures + validation, publish,
+  anti-écrasement (exit 1), numérotation continue.
+- **Test GHA réel OK (2 phases, branche dev3)** :
+  - Phase 1 harvest : run `31979725659` → artifact `f00b-harvest` (meme_001/002/007.mp4 + jpg + manifest, all_validated).
+  - Phase 2 publish : run `31979785462` → commit `63d37fb` (memes dans `SHARED/memes/` + listing README).
+- **Vidéo source de test** : Release GitHub `f00b-test-01` (asset `video_source.mp4`, testsrc synthétique 30 s).
+
+> Le run réel F00B nécessite un asset `video_source.mp4` dans une GitHub Release
+> (`_tools/lac_release_video.sh`) + le fichier `F00B/cuts.txt` commité.
+
+---
+
+
 > F00B est la frégate qui produit les memes de la méméthèque (`SHARED/memes/`).
 > L'opérateur regarde une vidéo source, donne des découpes (début/fin), F00B
 > coupe, nomme `meme_00X.mp4`, range dans `F00B/OUT/` pour vérification, et
