@@ -1,0 +1,4 @@
+# Test F00B — coupes de la vidéo source synthétique (30 s)
+1.0 4.5
+7.0 11.0
+15.5 20.0 # meme_007
