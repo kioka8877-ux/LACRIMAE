@@ -29,3 +29,11 @@ Dossier plat de la méméthèque. Les memes sont fournis par l'opérateur,
    textes, pas la source brute du meme).
 3. Déposer les memes dans ce dossier, ils sont commités et re-stagés par les
    workflows GHA vers `public/` des frégates F03/F04 à chaque run.
+
+<!-- F00B-LISTING -->
+## Méméthèque actuelle (généré par F00B)
+
+- meme_001.mp4
+- meme_002.mp4
+- meme_007.mp4
+
