@@ -33,6 +33,11 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
 
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+
       - name: F00B - Télécharger la vidéo source (Release GitHub)
         run: |
           REL_ARG=""
