@@ -84,6 +84,9 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp }) => {
   const texts = clip.texts || {};
   const title = texts.title || null;
   const emotionText = texts.emotion || clip.text_emotion || '';
+  const memeHeightPct = clip.meme?.height_pct ?? 48;
+  const emotionPositionPct = clip.text_emotion_position_pct ?? 43;
+  const emotionFontSize = clip.text_emotion_size ?? textsStyle.size_paragraph ?? 40;
 
   return (
     <AbsoluteFill style={{ backgroundColor: session.background?.color || '#000' }}>
@@ -122,12 +125,12 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp }) => {
 
         {/* ── L4 TEXTE ÉMOTION ── */}
         {emotionText ? (
-          <EmotionText content={emotionText} style={textsStyle} totalFrames={durationInFrames} />
+          <EmotionText content={emotionText} style={textsStyle} totalFrames={durationInFrames} positionPct={emotionPositionPct} fontSize={emotionFontSize} />
         ) : null}
 
         {/* ── L5 MEME (moitié basse, contain) ── */}
         <AbsoluteFill style={{ justifyContent: 'flex-end', alignItems: 'center' }}>
-          <div style={{ width: '100%', height: '48%', overflow: 'hidden', position: 'relative' }}>
+          <div style={{ width: '100%', height: `${memeHeightPct}%`, overflow: 'hidden', position: 'relative' }}>
             <Video
               src={videoUrl}
               loop={shouldLoop}
@@ -184,6 +187,7 @@ const TweetCard = ({ tweet, width }) => {
   const cardWidth = Math.round(width * ((tweet.width_pct || 82) / 100));
   const avatarColor = persona.avatar_color || '#1DA1F2';
   const initials = (persona.name || '?').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+  const textScale = (tweet.text_size || 17) / 17;
 
   return (
     <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: '16%', pointerEvents: 'none' }}>
@@ -195,17 +199,17 @@ const TweetCard = ({ tweet, width }) => {
         boxShadow: '0 4px 18px rgba(0,0,0,0.4)',
         opacity,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 * textScale }}>
           <div style={{
-            width: 44,
-            height: 44,
+            width: 44 * textScale,
+            height: 44 * textScale,
             borderRadius: '50%',
             backgroundColor: avatarColor,
             color: '#fff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 18,
+            fontSize: 18 * textScale,
             fontWeight: 700,
             marginRight: 10,
           }}>
@@ -213,18 +217,18 @@ const TweetCard = ({ tweet, width }) => {
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ fontWeight: 700, color: '#000', fontSize: 15 }}>{persona.name || 'User'}</span>
+              <span style={{ fontWeight: 700, color: '#000', fontSize: 15 * textScale }}>{persona.name || 'User'}</span>
               {persona.verified ? (
-                <span style={{ color: '#1DA1F2', fontSize: 14, lineHeight: 1 }}>✓</span>
+                <span style={{ color: '#1DA1F2', fontSize: 14 * textScale, lineHeight: 1 }}>✓</span>
               ) : null}
             </div>
-            <div style={{ color: '#657786', fontSize: 13 }}>{persona.handle || '@user'}</div>
+            <div style={{ color: '#657786', fontSize: 13 * textScale }}>{persona.handle || '@user'}</div>
           </div>
         </div>
-        <div style={{ color: '#0f1419', fontSize: 17, lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>
+        <div style={{ color: '#0f1419', fontSize: 17 * textScale, lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>
           {renderTweetText(tweet.text, tweet.keywords_style)}
         </div>
-        <div style={{ display: 'flex', gap: 24, marginTop: 12, color: '#657786', fontSize: 14 }}>
+        <div style={{ display: 'flex', gap: 24, marginTop: 12, color: '#657786', fontSize: 14 * textScale }}>
           <span>Reply {formatCount(tweet.replies)}</span>
           <span>Repost {formatCount(tweet.reposts)}</span>
           <span>Likes {formatCount(tweet.likes)}</span>
@@ -289,14 +293,14 @@ const TitleBlock = ({ content, style, offsetPct }) => {
 };
 
 /* ── L4 TEXTE ÉMOTION ── */
-const EmotionText = ({ content, style, totalFrames }) => {
+const EmotionText = ({ content, style, totalFrames, positionPct = 43, fontSize = 40 }) => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 20], [0, 1], { extrapolateRight: 'clamp' });
   return (
-    <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: '43%', pointerEvents: 'none' }}>
+    <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: `${positionPct}%`, pointerEvents: 'none' }}>
       <div style={{
         fontFamily: style.font,
-        fontSize: `${style.size_paragraph || 40}px`,
+        fontSize: `${fontSize}px`,
         color: style.color,
         WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,
         textShadow: style.shadow,

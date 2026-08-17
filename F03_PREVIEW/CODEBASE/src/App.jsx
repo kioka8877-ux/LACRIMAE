@@ -1071,6 +1071,17 @@ export default function App() {
                   value={(clip.tweet || {}).width_pct || 82}
                   onChange={(e) => updateTweet('width_pct', parseInt(e.target.value))}
                 />
+                <label style={styles.label}>
+                  Taille textes tweet: {((clip.tweet || {}).text_size || 17)}px
+                </label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="12"
+                  max="30"
+                  value={(clip.tweet || {}).text_size || 17}
+                  onChange={(e) => updateTweet('text_size', parseInt(e.target.value))}
+                />
                 <div style={{ marginTop: '6px', padding: '8px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
                   Persona + likes/partages : générés par le bridge (seed déterministe
                   pack_id + clip) — comme SIGNE, aucun réseau.
@@ -1087,6 +1098,28 @@ export default function App() {
                   type="text"
                   value={clip.text_emotion || (clip.texts || {}).emotion || ''}
                   onChange={(e) => updateEmotion(e.target.value)}
+                />
+                <label style={styles.label}>
+                  Position (haut → bas): {(clip.text_emotion_position_pct ?? 43)}%
+                </label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="10"
+                  max="80"
+                  value={clip.text_emotion_position_pct ?? 43}
+                  onChange={(e) => updateClip('text_emotion_position_pct', parseInt(e.target.value))}
+                />
+                <label style={styles.label}>
+                  Taille: {(clip.text_emotion_size ?? 40)}px
+                </label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="20"
+                  max="80"
+                  value={clip.text_emotion_size ?? 40}
+                  onChange={(e) => updateClip('text_emotion_size', parseInt(e.target.value))}
                 />
               </div>
 
@@ -1168,6 +1201,17 @@ export default function App() {
                 <label style={styles.label}>
                   Durée cible: {(totalFrames / fps).toFixed(1)}s (durée du pack)
                 </label>
+                <label style={styles.label}>
+                  Hauteur du meme: {((clip.meme || {}).height_pct || 48)}%
+                </label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="30"
+                  max="75"
+                  value={(clip.meme || {}).height_pct || 48}
+                  onChange={(e) => updateClip('meme', { ...(clip.meme || {}), height_pct: parseInt(e.target.value) })}
+                />
                 <div style={{ marginTop: '6px', padding: '8px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
                   Loop net si le meme est plus court que la durée cible ; trim sinon.
                   La durée est dirigée par le pack (défaut 5-7s), pas par le probe.

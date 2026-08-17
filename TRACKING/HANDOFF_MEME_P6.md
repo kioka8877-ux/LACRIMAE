@@ -6,6 +6,30 @@
 
 ---
 
+## ⚡ MISE À JOUR (2026-08-17) — RUN MEME RÉEL EN COURS (F01✅ F02✅ → F04)
+
+- **Pack conforme** : `BRIDGE_PERTURABO/IN/production_pack_meme_student_debt.json`
+  transformé au format contrat (commit `1436b8d`) : `montage_guide_ref` ajouté,
+  `tweet_text`→`tweet.text`, `reaction_text`→`text_emotion`, `meme` affecté
+  (A01-A03→meme_001, A04-A05→meme_002), `duration_sec: 6`. Bridge dry-run : 0 erreur.
+- **F01 FORGE validé** (run `32015947432`, Porte II ✓) — bridge écrit
+  `BRIDGE_PERTURABO/OUT/codex.json` (codex meme v4.1, 5 clips) + `bridge_report.json`
+  (`sub_mode: meme`, `profile_f02: meme`, `f01_skipped: true`).
+- **F02 FORGE validé** (run `32016600916`, Porte III ✓) — 5 clips stagés/formatés
+  (`F02_FORMAT/OUT/clips/clip_001..005.mp4`), `F03_PREVIEW/IN/codex.json` + manifest
+  committés, codex meme = clip_001-003→meme_001, clip_004-005→meme_002.
+- **Preview F03 améliorée** (commit en cours) : panneau meme enrichi —
+  taille textes tweet (`tweet.text_size`, défaut 17px, curseur 12-30),
+  position texte émotion haut→bas (`clip.text_emotion_position_pct`, défaut 43,
+  curseur 10-80), taille texte émotion (`clip.text_emotion_size`, défaut 40,
+  curseur 20-80), hauteur du meme (`clip.meme.height_pct`, défaut 48, curseur 30-75).
+  Les 2 miroirs (F03 preview `MemeComposition.jsx` + F04 render) sont synchronisés.
+- **PROCHAINE ÉTAPE** : F04 RENDER (forge) — puis F05/F06/CLOSE.
+- **F00B/cuts.txt** : réinitialisé (plus de coupe active) — poser la coupe de la prochaine
+  vidéo source avant un harvest.
+
+---
+
 ## ⚡ MISE À JOUR (2026-08-17) — reprise d'URGENCE, chat suivant
 
 - **F00B « RÉCOLTE DES MEMES » opérationnelle** (workflow `f00b-harvest.yml`, 2 phases).
