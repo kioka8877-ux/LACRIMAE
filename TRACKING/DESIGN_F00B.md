@@ -1,17 +1,23 @@
 # LACRIMAE — DESIGN F00B « RÉCOLTE DES MEMES »
 
-## STATUT (2026-08-16)
+## STATUT (2026-08-17)
 
 - **Codé + poussé** : script `F00B/CODEBASE/lac_f00b_harvest.py`, fiche design,
   `F00B/cuts.txt`, workflow `.github/workflows/f00b-harvest.yml`.
-- **Test local OK** : py_compile, harvest + miniatures + validation, publish,
-  anti-écrasement (exit 1), numérotation continue.
-- **Test GHA réel OK (2 phases, branche dev3)** :
-  - Phase 1 harvest : run `31979725659` → artifact `f00b-harvest` (meme_001/002/007.mp4 + jpg + manifest, all_validated).
-  - Phase 2 publish : run `31979785462` → commit `63d37fb` (memes dans `SHARED/memes/` + listing README).
-- **Vidéo source de test** : Release GitHub `f00b-test-01` (asset `video_source.mp4`, testsrc synthétique 30 s).
+- **Fix workflow** (`bf360b2`) : en déclenchement par push, les inputs de
+  `workflow_dispatch` sont vides → `cuts_file` par défaut `F00B/cuts.txt`.
+- **Récolte RÉELLE opérationnelle (branche dev3)** — memes publiés dans la méméthèque :
+  - `meme_001` = Fallen Knight (release `m4`), coupe 2s→7s — publish `f013df3`
+    (harvest run `32008762563` · publish run `32009337969`).
+  - `meme_002` = NO IT CAN'T BE (release `m5`), coupe 0s→7s — publish `5b7e80b`
+    (harvest run `32011122710` · publish run `32011454972`).
+  - `meme_003` = John Cena sad (release `m3`), vidéo déjà coupée, posée
+    directement (conformée `+faststart`) — commit `16ff6a3`.
+- **Placeholders de test archivés** : `SHARED/memes/_retired/` (`075b1af`).
+- **Méméthèque actuelle** : `meme_001` (Fallen Knight), `meme_002` (NO IT CAN'T
+  BE), `meme_003` (John Cena) — prête pour le run meme réel (P6).
 
-> Le run réel F00B nécessite un asset `video_source.mp4` dans une GitHub Release
+> Le run F00B nécessite un asset `video_source.mp4` dans une GitHub Release
 > (`_tools/lac_release_video.sh`) + le fichier `F00B/cuts.txt` commité.
 
 ---

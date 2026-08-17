@@ -56,7 +56,24 @@ Objectif : la chaîne GHA doit tourner en mode MEME comme en mode stars, sans ca
 
 ---
 
-## 3. RAPPELS CONTEXTE (à relire avant de coder)
+## 3. MÉMÉTHÈQUE RÉELLE + F00B (2026-08-17) — prêt pour le run meme réel
+
+- **F00B « RÉCOLTE DES MEMES » opérationnelle** : workflow `.github/workflows/f00b-harvest.yml`
+  (2 phases : harvest artifact → publish après validation opérateur), fix `cuts_file` par défaut
+  en push (`bf360b2`). Script : `F00B/CODEBASE/lac_f00b_harvest.py`.
+- **Méméthèque non vide** (`SHARED/memes/`, placeholders archivés dans `_retired/`) :
+  - `meme_001` = Fallen Knight (release `m4`), coupe 2s→7s — publish `f013df3`
+  - `meme_002` = NO IT CAN'T BE (release `m5`), coupe 0s→7s — publish `5b7e80b`
+  - `meme_003` = John Cena sad (release `m3`), déjà coupé, posé directement — `16ff6a3`
+- **Pack Perturabo conforme** : `BRIDGE_PERTURABO/IN/production_pack_meme_student_debt.json`
+  (v2.5, sub_mode meme, 5 angles A01-A05 → meme_001/meme_002) — commit `c0a6839`.
+  Contrat pack : `GUIDE_UTILISATION/05_NOTE_PERTURABO_PACK_MEME.md`.
+- **PROCHAINE ÉTAPE** : lancer la chaîne meme réelle (orchestrator/F00→F02→F04 avec le pack
+  student debt v2.5) et vérifier la couverture memes A01-A05.
+
+---
+
+## 4. RAPPELS CONTEXTE (à relire avant de coder)
 
 - Repo : `kioka8877-ux/LACRIMAE`, branche de travail : **`dev3`**.
 - Mode MEME : **aucune découpe** (memes pré-coupés dans `SHARED/memes/`), durée pilotée par le pack (défaut 5-7s), loop net / trim dans la composition, pas de SFX.
