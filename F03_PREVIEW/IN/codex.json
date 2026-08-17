@@ -1,284 +1,251 @@
 {
-  "version": "4.0",
+  "version": "4.1",
   "pipeline": "LACRIMAE_DEV",
-  "mode": "forge",
+  "mode": "meme",
+  "sub_mode": "meme",
+  "forge": {
+    "pack_id": "LOGO-SIEGE-siege_20260815_195037",
+    "siege_id": "siege_20260815_195037",
+    "pack_mode": "logo",
+    "campaign_id": null,
+    "montage_guide_ref": "GUIDE_UTILISATION/04_MODE_MEME.md"
+  },
   "session": {
     "background": {
-      "image": "bg_paper_crumpled.png",
+      "image": "bg_grid_dark.png",
       "color": "#0a0a0a",
-      "scale": 1
+      "scale": 1.0
     },
     "logo": {
       "src": "logo.png",
-      "width_pct": 20,
+      "width_pct": 18,
+      "position": "bottom_right",
+      "opacity": 1.0
+    },
+    "watermark": {
+      "text": "@lacrimae",
+      "opacity": 0.4,
+      "font_size": 36,
       "position": "bottom_left",
-      "opacity": 1
+      "color": "#FFFFFF"
     },
     "texts_style": {
-      "font": "Arial Black, sans-serif",
-      "size_title": 79,
-      "size_paragraph": 33,
-      "color": "#e5e90c",
+      "font": "Impact, Arial Black, sans-serif",
+      "size_title": 64,
+      "size_paragraph": 40,
+      "color": "#FFFFFF",
       "stroke_color": "#000000",
       "stroke_width": 4,
       "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
       "glow_intensity": 0,
-      "letter_spacing": "0em",
-      "title_box": {
-        "enabled": false
-      },
-      "paragraph_box": {
-        "enabled": true
-      }
+      "letter_spacing": "0em"
     },
     "presets": {
       "color_preset": "punchy",
-      "color_css_filter": "contrast(1.2) saturate(1.15) brightness(1.05) hue-rotate(3deg)",
+      "color_css_filter": "contrast(1.3) saturate(1.5) brightness(1.1)",
       "enhance_4k": false,
-      "sharpening": 40,
+      "sharpening": 0,
       "denoising": 0,
       "vignette": 0.25,
-      "grain_intensity": 0.15,
-      "contrast": 0.95,
-      "brightness": 0.9
-    },
-    "profile": "background",
-    "logos": [
-      {
-        "src": "logo.png",
-        "width_pct": 90,
-        "position": "custom",
-        "opacity": 1,
-        "x_pct": 49.8,
-        "y_pct": 61.7
-      }
-    ],
-    "video": {
-      "offset_y": -12
+      "grain_intensity": 0.15
     }
   },
   "validated_by_magos": false,
   "clips": [
     {
       "id": "clip_001",
+      "angle_id": "A01",
       "video": {
         "source": "clip_001.mp4",
         "fps": 30,
-        "total_frames": 4098,
+        "total_frames": 180,
         "width": 1080,
         "height": 1920
       },
-      "texts": {
-        "mode": "title+paragraph",
-        "title": "7 YEARS SOBER — GONE",
-        "paragraph": "Seven years clean. Gone. Brad Pitt just admitted he's drinking again after walking away from sobriety. He calls it \"moderate\" now — a few glasses of wine, nothing crazy. But the man who thanked Bradley Cooper for saving him from alcohol just chose to go back. He hit AA for over a year after the Angelina split. The pain got so unbearable he understood why someone could see death as relief. He never",
-        "title_offset_pct": 8,
-        "paragraph_offset_pct": 8
+      "meme": {
+        "source": "meme_001.mp4"
       },
-      "text_overlays": [
-        {
-          "id": "title_00",
-          "content": "7 YEARS SOBER — GONE",
-          "start_frame": 0,
-          "end_frame": 4098,
-          "animation": "fade_in",
-          "font": "Impact, Arial Black, sans-serif",
-          "size": 96,
-          "color": "#FFFFFF",
-          "stroke_color": "#000000",
-          "stroke_width": 4,
-          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-          "position": "top",
-          "letter_spacing": "0em",
-          "glow_intensity": 0,
-          "depth_3d": 0
-        }
-      ],
-      "zoom_keyframes": [],
+      "texts": {
+        "mode": "title",
+        "title": "Your Degree Was A Trap",
+        "emotion": "This Actually Hurts",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Took out $50K in student loans for a degree\nNobody told me the interest would double it\nNow I owe more than my parents' mortgage",
+        "keywords_style": {},
+        "persona": {
+          "name": "Leo Cross",
+          "handle": "@leocross",
+          "avatar_color": "#794BC4",
+          "verified": false
+        },
+        "likes": 22263,
+        "reposts": 1375,
+        "replies": 737
+      },
       "logo": null,
-      "brutal_cut_interval_frames": 90,
-      "volume": 1,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
-      "slowmo_speed": 1,
+      "slowmo_speed": 1.0,
       "shake_power": 0
     },
     {
       "id": "clip_002",
+      "angle_id": "A02",
       "video": {
         "source": "clip_002.mp4",
         "fps": 30,
-        "total_frames": 4098,
+        "total_frames": 180,
         "width": 1080,
         "height": 1920
       },
-      "texts": {
-        "mode": "title+paragraph",
-        "title": "7 YEARS SOBER — NOW HE DRINKS AGAIN",
-        "paragraph": "Seven years clean. Gone. Brad Pitt just confirmed he's drinking again after half a decade of sobriety. He told Esquire he now keeps it moderate — a few glasses of wine, nothing reckless. But after the Angelina Jolie split, family pain got so unbearable he understood why some people see death as relief.",
-        "title_offset_pct": 8,
-        "paragraph_offset_pct": 8
+      "meme": {
+        "source": "meme_001.mp4"
       },
-      "text_overlays": [
-        {
-          "id": "title_00",
-          "content": "7 YEARS SOBER — NOW HE DRINKS AGAIN",
-          "start_frame": 0,
-          "end_frame": 4098,
-          "animation": "fade_in",
-          "font": "Impact, Arial Black, sans-serif",
-          "size": 96,
-          "color": "#FFFFFF",
-          "stroke_color": "#000000",
-          "stroke_width": 4,
-          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-          "position": "top",
-          "letter_spacing": "0em",
-          "glow_intensity": 0,
-          "depth_3d": 0
-        }
-      ],
-      "zoom_keyframes": [],
+      "texts": {
+        "mode": "title",
+        "title": "Student Debt Is A Scam",
+        "emotion": "Bro is cooked forever",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "My student debt is $87,000.\nThe degree got me a $42K job.\nI make less than my Uber driver cousin.",
+        "keywords_style": {},
+        "persona": {
+          "name": "Mia Foxx",
+          "handle": "@miafoxx",
+          "avatar_color": "#E0245E",
+          "verified": true
+        },
+        "likes": 14379,
+        "reposts": 1945,
+        "replies": 510
+      },
       "logo": null,
-      "brutal_cut_interval_frames": 90,
-      "volume": 1,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
-      "slowmo_speed": 1,
+      "slowmo_speed": 1.0,
       "shake_power": 0
     },
     {
       "id": "clip_003",
+      "angle_id": "A03",
       "video": {
         "source": "clip_003.mp4",
         "fps": 30,
-        "total_frames": 4098,
+        "total_frames": 180,
         "width": 1080,
         "height": 1920
       },
-      "texts": {
-        "mode": "title+paragraph",
-        "title": "7 YEARS SOBER — ENDED",
-        "paragraph": "Brad Pitt just admitted his seven years of sobriety are over. He told Esquire he's drinking again, but claims it's \"more moderate\" now. After AA, Bradley Cooper's help, and unbearable family pain, he says he still needs to \"stay professional.\" The man who thanked Cooper for saving him is pouring his own wine again.",
-        "title_offset_pct": 8,
-        "paragraph_offset_pct": 8
+      "meme": {
+        "source": "meme_001.mp4"
       },
-      "text_overlays": [
-        {
-          "id": "title_00",
-          "content": "7 YEARS SOBER — ENDED",
-          "start_frame": 0,
-          "end_frame": 4098,
-          "animation": "fade_in",
-          "font": "Impact, Arial Black, sans-serif",
-          "size": 96,
-          "color": "#FFFFFF",
-          "stroke_color": "#000000",
-          "stroke_width": 4,
-          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-          "position": "top",
-          "letter_spacing": "0em",
-          "glow_intensity": 0,
-          "depth_3d": 0
-        }
-      ],
-      "zoom_keyframes": [],
+      "texts": {
+        "mode": "title",
+        "title": "They Erased Her Debt",
+        "emotion": "Bro the system is",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "My university just wiped $47K of my student debt 💀\nI literally cried in the financial aid office\nTurns out they HAD to — here's the loophole nobody talks about 👀",
+        "keywords_style": {},
+        "persona": {
+          "name": "Leo Cross",
+          "handle": "@leocross",
+          "avatar_color": "#794BC4",
+          "verified": false
+        },
+        "likes": 13105,
+        "reposts": 1717,
+        "replies": 733
+      },
       "logo": null,
-      "brutal_cut_interval_frames": 90,
-      "volume": 1,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
-      "slowmo_speed": 1,
+      "slowmo_speed": 1.0,
       "shake_power": 0
     },
     {
       "id": "clip_004",
+      "angle_id": "A04",
       "video": {
         "source": "clip_004.mp4",
         "fps": 30,
-        "total_frames": 4098,
+        "total_frames": 180,
         "width": 1080,
         "height": 1920
       },
-      "texts": {
-        "mode": "title+paragraph",
-        "title": "7 YEARS SOBER — GONE",
-        "paragraph": "Seven years clean. Gone. Brad Pitt just told Esquire he's drinking again after half a decade of sobriety. He says it's \"more moderate\" now, a few glasses of wine, nothing crazy. But after thanking Bradley Cooper for saving him from addiction, the relapse raises a question nobody's asking out loud.",
-        "title_offset_pct": 8,
-        "paragraph_offset_pct": 8
+      "meme": {
+        "source": "meme_002.mp4"
       },
-      "text_overlays": [
-        {
-          "id": "title_00",
-          "content": "7 YEARS SOBER — GONE",
-          "start_frame": 0,
-          "end_frame": 4098,
-          "animation": "fade_in",
-          "font": "Impact, Arial Black, sans-serif",
-          "size": 96,
-          "color": "#FFFFFF",
-          "stroke_color": "#000000",
-          "stroke_width": 4,
-          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-          "position": "top",
-          "letter_spacing": "0em",
-          "glow_intensity": 0,
-          "depth_3d": 0
-        }
-      ],
-      "zoom_keyframes": [],
+      "texts": {
+        "mode": "title",
+        "title": "Your Degree Was A Trap",
+        "emotion": "We got played",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Took out $50K in student loans for a degree nobody asked for.\nNow I owe more than my car's worth.\nBest financial decision of my life though 💀",
+        "keywords_style": {},
+        "persona": {
+          "name": "Chad Hunter",
+          "handle": "@chadhunter",
+          "avatar_color": "#1DA1F2",
+          "verified": true
+        },
+        "likes": 16962,
+        "reposts": 2023,
+        "replies": 140
+      },
       "logo": null,
-      "brutal_cut_interval_frames": 90,
-      "volume": 1,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
-      "slowmo_speed": 1,
+      "slowmo_speed": 1.0,
       "shake_power": 0
     },
     {
       "id": "clip_005",
+      "angle_id": "A05",
       "video": {
         "source": "clip_005.mp4",
         "fps": 30,
-        "total_frames": 4097,
+        "total_frames": 180,
         "width": 1080,
         "height": 1920
       },
-      "texts": {
-        "mode": "title+paragraph",
-        "title": "7 YEARS SOBER — GONE",
-        "paragraph": "Seven years sober — gone. Brad Pitt just admitted he's drinking again after one of Hollywood's most watched recovery journeys. But this time, he says it's different: moderate, controlled, professional. After hitting rock bottom during his split from Angelina Jolie, attending AA for over a year, and crediting Bradley Cooper for his sobriety — why risk it now? Sometimes the hardest lesson isn't fall",
-        "title_offset_pct": 8,
-        "paragraph_offset_pct": 8
+      "meme": {
+        "source": "meme_002.mp4"
       },
-      "text_overlays": [
-        {
-          "id": "title_00",
-          "content": "7 YEARS SOBER — GONE",
-          "start_frame": 0,
-          "end_frame": 4097,
-          "animation": "fade_in",
-          "font": "Impact, Arial Black, sans-serif",
-          "size": 96,
-          "color": "#FFFFFF",
-          "stroke_color": "#000000",
-          "stroke_width": 4,
-          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-          "position": "top",
-          "letter_spacing": "0em",
-          "glow_intensity": 0,
-          "depth_3d": 0
-        }
-      ],
-      "zoom_keyframes": [],
+      "texts": {
+        "mode": "title",
+        "title": "Your Degree Was A Lesson",
+        "emotion": "that hit different",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Graduated with $50K student debt and a degree I never used\nBut that debt taught me more about money than any class ever did\nThe real degree was the failure",
+        "keywords_style": {},
+        "persona": {
+          "name": "Mia Foxx",
+          "handle": "@miafoxx",
+          "avatar_color": "#E0245E",
+          "verified": true
+        },
+        "likes": 1477,
+        "reposts": 473,
+        "replies": 321
+      },
       "logo": null,
-      "brutal_cut_interval_frames": 90,
-      "volume": 1,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
-      "slowmo_speed": 1,
+      "slowmo_speed": 1.0,
       "shake_power": 0
     }
-  ],
-  "forge": {
-    "pack_id": "LOGO-SPINWIN_BRADPITT-siege_20260810_205150",
-    "siege_id": "siege_20260810_205150",
-    "pack_mode": "logo",
-    "campaign_id": null
-  }
+  ]
 }

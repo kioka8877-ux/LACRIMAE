@@ -1,66 +1,56 @@
 {
-  "profile": "background",
+  "profile": "meme",
   "clips_count": 5,
   "clips": [
     {
       "index": 1,
-      "start_sec": 0.0,
-      "end_sec": 136.59,
-      "duration_sec": 136.59,
-      "reason": "[A01] Brad Pitt Breaks Seven Years Sober",
+      "meme_source": "meme_001.mp4",
+      "duration_sec": 6.0,
       "output": "clips/clip_001.mp4",
-      "total_frames": 4098,
-      "width": 640,
-      "height": 360,
-      "size_mb": 11.12
+      "total_frames": 180,
+      "width": 1080,
+      "height": 1920,
+      "size_mb": 3.63
     },
     {
       "index": 2,
-      "start_sec": 136.59,
-      "end_sec": 273.18,
-      "duration_sec": 136.59,
-      "reason": "[A02] Brad Pitt Almost Relapsed, He Explains",
+      "meme_source": "meme_001.mp4",
+      "duration_sec": 6.0,
       "output": "clips/clip_002.mp4",
-      "total_frames": 4098,
-      "width": 640,
-      "height": 360,
-      "size_mb": 10.84
+      "total_frames": 180,
+      "width": 1080,
+      "height": 1920,
+      "size_mb": 3.63
     },
     {
       "index": 3,
-      "start_sec": 273.18,
-      "end_sec": 409.77,
-      "duration_sec": 136.58999999999997,
-      "reason": "[A03] Brad Pitt Ended Seven Years Sober",
+      "meme_source": "meme_001.mp4",
+      "duration_sec": 6.0,
       "output": "clips/clip_003.mp4",
-      "total_frames": 4098,
-      "width": 640,
-      "height": 360,
-      "size_mb": 12.89
+      "total_frames": 180,
+      "width": 1080,
+      "height": 1920,
+      "size_mb": 3.63
     },
     {
       "index": 4,
-      "start_sec": 409.77,
-      "end_sec": 546.36,
-      "duration_sec": 136.59000000000003,
-      "reason": "[A04] Brad Pitt Seven Years Sober Gone",
+      "meme_source": "meme_002.mp4",
+      "duration_sec": 6.0,
       "output": "clips/clip_004.mp4",
-      "total_frames": 4098,
-      "width": 640,
-      "height": 360,
-      "size_mb": 10.68
+      "total_frames": 180,
+      "width": 1080,
+      "height": 1920,
+      "size_mb": 1.73
     },
     {
       "index": 5,
-      "start_sec": 546.36,
-      "end_sec": 682.95,
-      "duration_sec": 136.59000000000003,
-      "reason": "[A05] Brad Pitt Sobriety: His Greatest Lesson",
+      "meme_source": "meme_002.mp4",
+      "duration_sec": 6.0,
       "output": "clips/clip_005.mp4",
-      "total_frames": 4097,
-      "width": 640,
-      "height": 360,
-      "size_mb": 9.8
+      "total_frames": 180,
+      "width": 1080,
+      "height": 1920,
+      "size_mb": 1.73
     }
   ]
 }
