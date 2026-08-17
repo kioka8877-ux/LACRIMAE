@@ -538,14 +538,17 @@ jobs:
           c = json.load(open('public/codex.json', encoding='utf-8'))
           clips = c.get('clips') or [c]
           for clip in clips:
-              print(clip.get('id') or clip['video']['source'].replace('.mp4',''))
+              raw = clip.get('id') or clip['video']['source'].replace('.mp4','')
+              comp = raw.replace('_', '-')
+              print(f"{raw} {comp}")
           PYEOF
           )
           mkdir -p ../OUT
-          for CID in $CLIP_IDS; do
-            echo "═══ Rendu: $CID ═══"
+          echo "$CLIP_IDS" | while read -r RAW CID; do
+            [ -z "$RAW" ] && continue
+            echo "═══ Rendu: $CID (fichier: ${RAW}_finale.mp4) ═══"
             npx remotion render src/index.jsx "$CID" \
-              "../OUT/${CID}_finale.mp4" \
+              "../OUT/${RAW}_finale.mp4" \
               --codec h264 \
               --image-format jpeg \
               --concurrency 1
