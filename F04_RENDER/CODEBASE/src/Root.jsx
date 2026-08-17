@@ -16,6 +16,7 @@ export const Root = () => {
   const session = codex.session || {};
   const isMemeMode = codex.mode === 'meme' || codex.sub_mode === 'meme';
   const Comp = isMemeMode ? MemeComposition : OmniComposition;
+  const masterClip = clips[0];
 
   return (
     <>
@@ -37,6 +38,7 @@ export const Root = () => {
             defaultProps={{
               codex: clip,
               session,
+              masterClip,
             }}
           />
         );

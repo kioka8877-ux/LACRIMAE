@@ -323,12 +323,27 @@ export default function App() {
   };
 
   const exportCodex = () => {
+    // Le clip édité est le MAÎTRE : ses réglages de style (taille textes,
+    // position/taille émotion, hauteur meme) se répercutent à l'identique sur
+    // tous les autres clips. Les contenus (texte tweet, émotion, titre)
+    // restent propres à chaque clip.
+    const propagateStyle = (source) => {
+      const srcTweet = source.tweet || {};
+      return (target) => {
+        const out = { ...target };
+        if (source.text_emotion_size != null) out.text_emotion_size = source.text_emotion_size;
+        if (source.text_emotion_position_pct != null) out.text_emotion_position_pct = source.text_emotion_position_pct;
+        if (source.meme?.height_pct != null) out.meme = { ...(out.meme || {}), height_pct: source.meme.height_pct };
+        if (srcTweet.text_size != null) out.tweet = { ...(out.tweet || {}), text_size: srcTweet.text_size };
+        return out;
+      };
+    };
     // Réintègre le clip édité + la session dans le codex multi-clips
     const merged = {
       ...(codex || {}),
       session,
       clips: codex?.clips
-        ? [clip, ...(codex.clips || []).slice(1)]
+        ? [clip, ...(codex.clips || []).slice(1).map(propagateStyle(clip))]
         : [clip],
     };
     const finalCodex = validated ? { ...merged, validated_by_magos: true } : merged;
@@ -377,7 +392,7 @@ export default function App() {
             <Player
               ref={playerRef}
               component={PreviewComposition}
-              inputProps={{ codex: clip, videoSrc, session }}
+              inputProps={{ codex: clip, videoSrc, session, masterClip: codex?.clips?.[0] || clip }}
               durationInFrames={totalFrames}
               fps={fps}
               compositionWidth={vidWidth}

@@ -158,7 +158,8 @@
         },
         "likes": 14379,
         "reposts": 1945,
-        "replies": 510
+        "replies": 510,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1,
@@ -196,7 +197,9 @@
           "frame": 4,
           "opacity": 0.116
         }
-      }
+      },
+      "text_emotion_size": 100,
+      "text_emotion_position_pct": 92
     },
     {
       "id": "clip_003",
@@ -228,7 +231,8 @@
         },
         "likes": 13105,
         "reposts": 1717,
-        "replies": 733
+        "replies": 733,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1,
@@ -266,7 +270,9 @@
           "frame": 4,
           "opacity": 0.091
         }
-      }
+      },
+      "text_emotion_size": 100,
+      "text_emotion_position_pct": 92
     },
     {
       "id": "clip_004",
@@ -298,7 +304,8 @@
         },
         "likes": 16962,
         "reposts": 2023,
-        "replies": 140
+        "replies": 140,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1,
@@ -336,7 +343,9 @@
           "frame": 6,
           "opacity": 0.091
         }
-      }
+      },
+      "text_emotion_size": 100,
+      "text_emotion_position_pct": 92
     },
     {
       "id": "clip_005",
@@ -368,7 +377,8 @@
         },
         "likes": 1477,
         "reposts": 473,
-        "replies": 321
+        "replies": 321,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1,
@@ -406,7 +416,9 @@
           "frame": 5,
           "opacity": 0.108
         }
-      }
+      },
+      "text_emotion_size": 100,
+      "text_emotion_position_pct": 92
     }
   ]
 }

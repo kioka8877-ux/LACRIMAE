@@ -47,11 +47,12 @@ const SESSION_FALLBACK = {
   },
 };
 
-export const MemeComposition = ({ codex, videoSrc, session: sessionProp }) => {
+export const MemeComposition = ({ codex, videoSrc, session: sessionProp, masterClip: masterClipProp }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames, width, height } = useVideoConfig();
 
   const clip = codex || {};
+  const masterClip = masterClipProp || clip;
   const session = sessionProp || clip.session || SESSION_FALLBACK;
   const presets = { ...SESSION_FALLBACK.presets, ...(session.presets || {}) };
   const textsStyle = { ...SESSION_FALLBACK.texts_style, ...(session.texts_style || {}) };
@@ -84,9 +85,9 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp }) => {
   const texts = clip.texts || {};
   const title = texts.title || null;
   const emotionText = texts.emotion || clip.text_emotion || '';
-  const memeHeightPct = clip.meme?.height_pct ?? 48;
-  const emotionPositionPct = clip.text_emotion_position_pct ?? 43;
-  const emotionFontSize = clip.text_emotion_size ?? textsStyle.size_paragraph ?? 40;
+  const memeHeightPct = clip.meme?.height_pct ?? masterClip.meme?.height_pct ?? 48;
+  const emotionPositionPct = clip.text_emotion_position_pct ?? masterClip.text_emotion_position_pct ?? 43;
+  const emotionFontSize = clip.text_emotion_size ?? masterClip.text_emotion_size ?? textsStyle.size_paragraph ?? 40;
 
   // ── SIGNE : mouvement fond + mirror/zoom meme + flash (miroir F04) ──
   const sig = clip.sig || {};
@@ -217,7 +218,7 @@ const TweetCard = ({ tweet, width }) => {
   const cardWidth = Math.round(width * ((tweet.width_pct || 82) / 100));
   const avatarColor = persona.avatar_color || '#1DA1F2';
   const initials = (persona.name || '?').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
-  const textScale = (tweet.text_size || 17) / 17;
+  const textScale = (tweet.text_size || masterClip.tweet?.text_size || 17) / 17;
 
   return (
     <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: '16%', pointerEvents: 'none' }}>
