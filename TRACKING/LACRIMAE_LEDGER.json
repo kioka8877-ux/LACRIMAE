@@ -7,11 +7,11 @@
     "F04": "2026-08-17T20:05:33Z",
     "F05": "2026-08-17T20:24:04Z",
     "F06": "2026-08-17T20:33:49Z",
-    "CLOSE": "2026-08-17T18:42:50Z",
+    "CLOSE": "2026-08-17T20:36:27Z",
     "F00": "2026-08-10T21:45:33Z"
   },
-  "fregate_actuelle": "F06",
-  "derniere_mise_a_jour": "2026-08-17T20:33:49Z",
+  "fregate_actuelle": "CLOSE",
+  "derniere_mise_a_jour": "2026-08-17T20:36:27Z",
   "brief": {
     "source": "",
     "title": "",
