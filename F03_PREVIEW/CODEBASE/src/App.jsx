@@ -1078,7 +1078,7 @@ export default function App() {
                   style={styles.slider}
                   type="range"
                   min="12"
-                  max="30"
+                  max="36"
                   value={(clip.tweet || {}).text_size || 17}
                   onChange={(e) => updateTweet('text_size', parseInt(e.target.value))}
                 />
@@ -1117,7 +1117,7 @@ export default function App() {
                   style={styles.slider}
                   type="range"
                   min="20"
-                  max="80"
+                  max="96"
                   value={clip.text_emotion_size ?? 40}
                   onChange={(e) => updateClip('text_emotion_size', parseInt(e.target.value))}
                 />
