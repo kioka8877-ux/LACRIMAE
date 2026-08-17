@@ -33,7 +33,5 @@ Dossier plat de la méméthèque. Les memes sont fournis par l'opérateur,
 <!-- F00B-LISTING -->
 ## Méméthèque actuelle (généré par F00B)
 
-- meme_001.mp4
-- meme_002.mp4
-- meme_007.mp4
+- *(méméthèque vide — en attente de la récolte F00B)*
 
