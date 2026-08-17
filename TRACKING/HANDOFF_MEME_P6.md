@@ -6,6 +6,33 @@
 
 ---
 
+## ⚡ MISE À JOUR (2026-08-17) — reprise d'URGENCE, chat suivant
+
+- **F00B « RÉCOLTE DES MEMES » opérationnelle** (workflow `f00b-harvest.yml`, 2 phases).
+  Fix important `bf360b2` : en déclenchement par push, `${{ inputs.cuts_file }}` est VIDE
+  → le workflow définit par défaut `F00B/cuts.txt` (sinon `--cuts` sans argument, exit 2).
+- **Méméthèque RÉELLE** (`SHARED/memes/`, placeholders de test archivés dans `_retired/`) :
+  - `meme_001` = Fallen Knight (release `m4`, coupe 2s→7s) — publish `f013df3`
+  - `meme_002` = NO IT CAN'T BE (release `m5`, coupe 0s→7s) — publish `5b7e80b`
+  - `meme_003` = John Cena sad (release `m3`, déjà coupé, posé directement) — `16ff6a3`
+  - Flush : les release GitHub m1-m5 ont chacune une vidéo source taguée ; pour un
+    run F00B, l'asset DOIT s'appeler `video_source.mp4` dans la release (sinon le
+    pipeline ne le trouve pas).
+- **BLOCAGE avant run meme réel** : le pack `BRIDGE_PERTURABO/IN/production_pack_meme_student_debt.json`
+  (v2.5) est **NON-CONFORME** au contrat `GUIDE_UTILISATION/05_NOTE_PERTURABO_PACK_MEME.md`.
+  `validate_meme_pack` = **15 erreurs** : `videos[].meme` manquant, `videos[].tweet.text`
+  manquant (le pack a `tweet_text` string), `videos[].text_emotion` manquant (le pack a
+  `emotion`). → **le run serait bloqué au bridge (CUSTOS BRIDGE), F02 ne sortirait rien.**
+  Contenu exploitable présent (`tweet_text`, `emotion`, `reaction_text`, `duration_sec_range`
+  5-7s). Déblocage : (a) Perturabo refait le pack au format contrat, ou (b) transformation
+  locale du pack (mapping tweet_text→tweet.text, emotion→text_emotion, affectation
+  A01-A03→meme_001, A04-A05→meme_002).
+- **F00B/cuts.txt** : réinitialisé (plus de coupe active) — poser la coupe de la prochaine
+  vidéo source avant un harvest.
+- Dernier SHA poussé `dev3` : voir la section suivante / `git log origin/dev3`.
+
+---
+
 ## 1. OÙ ON EN EST (2026-08-15) — branche `dev3`
 
 | Phase | Contenu | Statut |
@@ -65,11 +92,19 @@ Objectif : la chaîne GHA doit tourner en mode MEME comme en mode stars, sans ca
   - `meme_001` = Fallen Knight (release `m4`), coupe 2s→7s — publish `f013df3`
   - `meme_002` = NO IT CAN'T BE (release `m5`), coupe 0s→7s — publish `5b7e80b`
   - `meme_003` = John Cena sad (release `m3`), déjà coupé, posé directement — `16ff6a3`
-- **Pack Perturabo conforme** : `BRIDGE_PERTURABO/IN/production_pack_meme_student_debt.json`
-  (v2.5, sub_mode meme, 5 angles A01-A05 → meme_001/meme_002) — commit `c0a6839`.
-  Contrat pack : `GUIDE_UTILISATION/05_NOTE_PERTURABO_PACK_MEME.md`.
-- **PROCHAINE ÉTAPE** : lancer la chaîne meme réelle (orchestrator/F00→F02→F04 avec le pack
-  student debt v2.5) et vérifier la couverture memes A01-A05.
+- **Pack Perturabo** : `BRIDGE_PERTURABO/IN/production_pack_meme_student_debt.json`
+  (v2.5, sub_mode meme, 5 angles A01-A05) — commit `c0a6839`.
+  ⚠️ **NON-CONFORME au contrat** `05_NOTE_PERTURABO_PACK_MEME.md` : validation bridge
+  `validate_meme_pack` = **15 erreurs** (les 5 angles) — `videos[].meme` manquant,
+  `videos[].tweet.text` manquant (le pack utilise `tweet_text` en string),
+  `videos[].text_emotion` manquant (le pack utilise `emotion`). Le run meme réel
+  est donc **BLOQUÉ au bridge (CUSTOS BRIDGE), F02 ne sortirait rien**.
+  Contenu utilisable présent : `tweet_text`, `emotion`, `reaction_text` par angle,
+  `duration_sec_range: {min:5, max:7}`. Deux options : (a) Perturabo refait le pack
+  au format contrat ; (b) transformation locale (mapping tweet_text→tweet.text,
+  emotion→text_emotion, affectation A01-A03→meme_001, A04-A05→meme_002).
+- **PROCHAINE ÉTAPE** : résoudre le blocage pack (option a ou b), puis lancer la
+  chaîne meme réelle (orchestrator/F00→F02→F04 avec le pack student debt v2.5).
 
 ---
 
