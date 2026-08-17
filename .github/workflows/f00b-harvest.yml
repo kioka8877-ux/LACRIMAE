@@ -46,9 +46,11 @@ jobs:
 
       - name: F00B - Harvest (découpe + miniatures + validation ffprobe)
         run: |
+          CUTS_FILE="${{ inputs.cuts_file }}"
+          if [ -z "$CUTS_FILE" ]; then CUTS_FILE="F00B/cuts.txt"; fi
           python3 F00B/CODEBASE/lac_f00b_harvest.py \
             --video F00B/IN/video_source.mp4 \
-            --cuts ${{ inputs.cuts_file }}
+            --cuts "$CUTS_FILE"
 
       - name: F00B - Upload artifacts (clips + miniatures + manifest)
         uses: actions/upload-artifact@v4
@@ -61,9 +63,11 @@ jobs:
       - name: F00B - Publish (vers SHARED/memes/) + commit/push dev3
         if: inputs.publish
         run: |
+          CUTS_FILE="${{ inputs.cuts_file }}"
+          if [ -z "$CUTS_FILE" ]; then CUTS_FILE="F00B/cuts.txt"; fi
           python3 F00B/CODEBASE/lac_f00b_harvest.py \
             --video F00B/IN/video_source.mp4 \
-            --cuts ${{ inputs.cuts_file }} \
+            --cuts "$CUTS_FILE" \
             --publish
           git config user.name "LACRIMAE F00B"
           git config user.email "f00b@users.noreply.github.com"
