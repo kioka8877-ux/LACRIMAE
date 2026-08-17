@@ -1078,7 +1078,7 @@ export default function App() {
                   style={styles.slider}
                   type="range"
                   min="12"
-                  max="36"
+                  max="60"
                   value={(clip.tweet || {}).text_size || 17}
                   onChange={(e) => updateTweet('text_size', parseInt(e.target.value))}
                 />
@@ -1106,7 +1106,7 @@ export default function App() {
                   style={styles.slider}
                   type="range"
                   min="10"
-                  max="80"
+                  max="95"
                   value={clip.text_emotion_position_pct ?? 43}
                   onChange={(e) => updateClip('text_emotion_position_pct', parseInt(e.target.value))}
                 />
@@ -1117,7 +1117,7 @@ export default function App() {
                   style={styles.slider}
                   type="range"
                   min="20"
-                  max="96"
+                  max="140"
                   value={clip.text_emotion_size ?? 40}
                   onChange={(e) => updateClip('text_emotion_size', parseInt(e.target.value))}
                 />
@@ -1208,7 +1208,7 @@ export default function App() {
                   style={styles.slider}
                   type="range"
                   min="30"
-                  max="75"
+                  max="95"
                   value={(clip.meme || {}).height_pct || 48}
                   onChange={(e) => updateClip('meme', { ...(clip.meme || {}), height_pct: parseInt(e.target.value) })}
                 />
