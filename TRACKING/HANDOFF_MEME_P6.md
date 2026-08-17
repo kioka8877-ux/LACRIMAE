@@ -8,6 +8,16 @@
 
 ## ⚡ MISE À JOUR (2026-08-17) — RUN MEME RÉEL EN COURS (F01✅ F02✅ → F04)
 
+- **CODEX23 VALIDÉ** : l'opérateur a exporté le codex final dans la Release
+  `codex23` (asset `codex.3.json`) et l'a ajusté dans la preview (clip 1 :
+  `text_emotion: "This Actually Hurts :"`, position 92%, taille 100px — CHOIX
+  OPÉRATEUR, ne pas toucher). `validated_by_magos` passé à **true** (Porte III
+  franchie) et installé dans `F03_PREVIEW/IN/codex.json` (source de vérité F04).
+- **Preview F03 + miroir SIGNE** : la preview affiche maintenant le mouvement
+  de fond (`sig.bg_motion`), le mirror/zoom meme (`sig.mirror`/`cam_drift`) et
+  le flash (`sig.flash`) comme F04 render — vérifié esbuild.
+- **PROCHAINE ÉTAPE** : F04 RENDER (forge) — puis F05/F06/CLOSE.
+
 - **Pack conforme** : `BRIDGE_PERTURABO/IN/production_pack_meme_student_debt.json`
   transformé au format contrat (commit `1436b8d`) : `montage_guide_ref` ajouté,
   `tweet_text`→`tweet.text`, `reaction_text`→`text_emotion`, `meme` affecté

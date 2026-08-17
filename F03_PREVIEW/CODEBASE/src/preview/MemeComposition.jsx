@@ -88,6 +88,20 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp }) => {
   const emotionPositionPct = clip.text_emotion_position_pct ?? 43;
   const emotionFontSize = clip.text_emotion_size ?? textsStyle.size_paragraph ?? 40;
 
+  // ── SIGNE : mouvement fond + mirror/zoom meme + flash (miroir F04) ──
+  const sig = clip.sig || {};
+  const bgBaseScale = sig.bg_motion?.base_scale ?? 1.0;
+  const bgScale = (session.background?.scale ?? 1) * bgBaseScale;
+  const bgProgress = frame / Math.max(1, durationInFrames);
+  const bgX = Math.sin(bgProgress * Math.PI * 2 * (sig.bg_motion?.freq ?? 0) + (sig.bg_motion?.phase ?? 0)) * (sig.bg_motion?.amp_x ?? 0)
+    + (sig.bg_motion?.drift_x ?? 0) * bgProgress;
+  const bgY = Math.cos(bgProgress * Math.PI * 2 * (sig.bg_motion?.freq ?? 0) + (sig.bg_motion?.phase ?? 0)) * (sig.bg_motion?.amp_y ?? 0)
+    + (sig.bg_motion?.drift_y ?? 0) * bgProgress;
+  const mirrorFactor = sig.mirror ? '-1' : '1';
+  const cam = sig.cam_drift || {};
+  const camZoom = interpolate(frame, [0, durationInFrames],
+    [cam.zoom_from ?? 1, cam.zoom_to ?? 1], { extrapolateRight: 'clamp' });
+
   return (
     <AbsoluteFill style={{ backgroundColor: session.background?.color || '#000' }}>
       <AbsoluteFill style={{ filter: fullFilter || undefined }}>
@@ -104,7 +118,7 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp }) => {
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
-                transform: `scale(${session.background.scale ?? 1})`,
+                transform: `scale(${bgScale}) translate(${bgX}px, ${bgY}px)`,
                 transformOrigin: 'center center',
               }}
             />
@@ -139,6 +153,7 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp }) => {
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
+                transform: `scaleX(${mirrorFactor}) scale(${camZoom})`,
               }}
             />
             {/* ── L6 WATERMARK @chaine ── */}
@@ -153,6 +168,21 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp }) => {
           </div>
         </AbsoluteFill>
       </AbsoluteFill>
+
+      {/* Flash SIGNE (miroir F04) */}
+      {(() => {
+        const flashFrame = sig.flash?.frame;
+        if (flashFrame == null) return null;
+        const d = frame - flashFrame;
+        if (d < 0 || d > 5) return null;
+        return (
+          <AbsoluteFill style={{
+            backgroundColor: '#fff',
+            opacity: (sig.flash.opacity ?? 0.1) * (1 - d / 6),
+            pointerEvents: 'none',
+          }} />
+        );
+      })()}
 
       {/* Grain + vignette (comme OmniComposition) */}
       {(presets.grain_intensity || 0) > 0 && (
