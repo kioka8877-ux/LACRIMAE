@@ -16,6 +16,19 @@
   Blocs **`sig`** (SIGNE : bg_motion, mirror, cam_drift, text_anim, flash, grain)
   injectés de façon déterministe (sel `LACRIMAE-SIGNE-v1|pack_id`) — identiques
   à ceux que F04b régénérera (même sel).
+- **F04 RENDER** : run `32047911817` → **SUCCÈS** (5 clips rendus
+  `clip_001..005_finale.mp4`, ~6.5 Mo chacun). Bug fixé au passage : le workflow
+  appelait Remotion avec `clip_001` (underscores) alors que les IDs de
+  composition sont en tirets (`clip-001`) → fix dans
+  `lacrimae_orchestrator.yml` (ligne ~536-556) qui sépare `RAW` (nom fichier,
+  underscores) de `CID` (composition, tirets).
+- **FIX POLICE (non validé encore)** : le rendu sortait en fallback Arial Black
+  car Impact n'existe pas sur le runner Linux. Police **Anton** (Impact-like,
+  licence OFL) embarquée dans `SHARED/IN/fonts/Anton-Regular.ttf`, chargée via
+  `@font-face` (`src/fonts.css`) dans F03+F04, pile de polices `Anton, Impact,
+  Arial Black, sans-serif` quand Impact est demandé. Le workflow copie la police
+  vers `public/fonts/` des deux projets. Commit `61a9329`. **PORTE IV non
+  validée — attend la revalidation du clip 1 par l'opérateur.**
 - **Preview F03 + miroir SIGNE** : la preview affiche maintenant le mouvement
   de fond (`sig.bg_motion`), le mirror/zoom meme (`sig.mirror`/`cam_drift`) et
   le flash (`sig.flash`) comme F04 render — vérifié esbuild.
