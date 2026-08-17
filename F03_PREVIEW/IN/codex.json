@@ -95,7 +95,38 @@
       "shake_power": 0,
       "text_emotion_position_pct": 92,
       "text_emotion_size": 100,
-      "text_emotion": "This Actually Hurts :"
+      "text_emotion": "This Actually Hurts :",
+      "sig": {
+        "grain": {
+          "seed": 2904,
+          "intensity": 0.114
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 25.4,
+          "amp_y": 11.4,
+          "freq": 1.07,
+          "phase": 5.606,
+          "drift_x": -12.4,
+          "drift_y": -1.1
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.001,
+          "zoom_to": 1.057,
+          "dx": 1.8,
+          "dy": -5.5
+        },
+        "text_anim": {
+          "direction": "ltr",
+          "duration_frames": 39,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 2,
+          "opacity": 0.103
+        }
+      }
     },
     {
       "id": "clip_002",
@@ -134,7 +165,38 @@
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1,
-      "shake_power": 0
+      "shake_power": 0,
+      "sig": {
+        "grain": {
+          "seed": 6323,
+          "intensity": 0.195
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 25.1,
+          "amp_y": 26.9,
+          "freq": 1.15,
+          "phase": 1.014,
+          "drift_x": -5.4,
+          "drift_y": -0.9
+        },
+        "mirror": true,
+        "cam_drift": {
+          "zoom_from": 1.007,
+          "zoom_to": 1.051,
+          "dx": 5.0,
+          "dy": 2.8
+        },
+        "text_anim": {
+          "direction": "down",
+          "duration_frames": 45,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 4,
+          "opacity": 0.116
+        }
+      }
     },
     {
       "id": "clip_003",
@@ -173,7 +235,38 @@
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1,
-      "shake_power": 0
+      "shake_power": 0,
+      "sig": {
+        "grain": {
+          "seed": 3876,
+          "intensity": 0.215
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 26.2,
+          "amp_y": 16.4,
+          "freq": 1.02,
+          "phase": 3.403,
+          "drift_x": 17.4,
+          "drift_y": -8.6
+        },
+        "mirror": true,
+        "cam_drift": {
+          "zoom_from": 1.008,
+          "zoom_to": 1.061,
+          "dx": 2.4,
+          "dy": 8.0
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 42,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 4,
+          "opacity": 0.091
+        }
+      }
     },
     {
       "id": "clip_004",
@@ -212,7 +305,38 @@
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1,
-      "shake_power": 0
+      "shake_power": 0,
+      "sig": {
+        "grain": {
+          "seed": 3880,
+          "intensity": 0.215
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 10.0,
+          "amp_y": 19.5,
+          "freq": 1.15,
+          "phase": 2.065,
+          "drift_x": 3.7,
+          "drift_y": 4.6
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.001,
+          "zoom_to": 1.078,
+          "dx": -0.3,
+          "dy": -2.8
+        },
+        "text_anim": {
+          "direction": "up",
+          "duration_frames": 22,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 6,
+          "opacity": 0.091
+        }
+      }
     },
     {
       "id": "clip_005",
@@ -251,7 +375,38 @@
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1,
-      "shake_power": 0
+      "shake_power": 0,
+      "sig": {
+        "grain": {
+          "seed": 6049,
+          "intensity": 0.132
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 13.5,
+          "amp_y": 26.3,
+          "freq": 0.94,
+          "phase": 2.194,
+          "drift_x": 11.4,
+          "drift_y": 16.7
+        },
+        "mirror": true,
+        "cam_drift": {
+          "zoom_from": 1.004,
+          "zoom_to": 1.069,
+          "dx": -1.8,
+          "dy": -1.6
+        },
+        "text_anim": {
+          "direction": "ltr",
+          "duration_frames": 33,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 5,
+          "opacity": 0.108
+        }
+      }
     }
   ]
 }

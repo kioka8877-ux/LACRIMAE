@@ -13,6 +13,9 @@
   `text_emotion: "This Actually Hurts :"`, position 92%, taille 100px — CHOIX
   OPÉRATEUR, ne pas toucher). `validated_by_magos` passé à **true** (Porte III
   franchie) et installé dans `F03_PREVIEW/IN/codex.json` (source de vérité F04).
+  Blocs **`sig`** (SIGNE : bg_motion, mirror, cam_drift, text_anim, flash, grain)
+  injectés de façon déterministe (sel `LACRIMAE-SIGNE-v1|pack_id`) — identiques
+  à ceux que F04b régénérera (même sel).
 - **Preview F03 + miroir SIGNE** : la preview affiche maintenant le mouvement
   de fond (`sig.bg_motion`), le mirror/zoom meme (`sig.mirror`/`cam_drift`) et
   le flash (`sig.flash`) comme F04 render — vérifié esbuild.
