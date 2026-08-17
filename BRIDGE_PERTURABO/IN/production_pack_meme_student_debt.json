@@ -85,13 +85,13 @@
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
       "on_screen_text": null,
-      "tweet_text": "Took out $50K in student loans for a degree\nNobody told me the interest would double it\nNow I owe more than my parents' mortgage",
-      "reaction_text": "This Actually Hurts",
       "emotion": "poignant",
-      "duration_sec_range": {
-        "min": 5,
-        "max": 7
-      }
+      "meme": "meme_001",
+      "tweet": {
+        "text": "Took out $50K in student loans for a degree\nNobody told me the interest would double it\nNow I owe more than my parents' mortgage"
+      },
+      "text_emotion": "This Actually Hurts",
+      "duration_sec": 6
     },
     {
       "video_index": 2,
@@ -121,13 +121,13 @@
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
       "on_screen_text": null,
-      "tweet_text": "My student debt is $87,000.\nThe degree got me a $42K job.\nI make less than my Uber driver cousin.",
-      "reaction_text": "Bro is cooked forever",
       "emotion": "drole",
-      "duration_sec_range": {
-        "min": 5,
-        "max": 7
-      }
+      "meme": "meme_001",
+      "tweet": {
+        "text": "My student debt is $87,000.\nThe degree got me a $42K job.\nI make less than my Uber driver cousin."
+      },
+      "text_emotion": "Bro is cooked forever",
+      "duration_sec": 6
     },
     {
       "video_index": 3,
@@ -159,13 +159,13 @@
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
       "on_screen_text": null,
-      "tweet_text": "My university just wiped $47K of my student debt 💀\nI literally cried in the financial aid office\nTurns out they HAD to — here's the loophole nobody talks about 👀",
-      "reaction_text": "Bro the system is",
       "emotion": "choc",
-      "duration_sec_range": {
-        "min": 5,
-        "max": 7
-      }
+      "meme": "meme_001",
+      "tweet": {
+        "text": "My university just wiped $47K of my student debt 💀\nI literally cried in the financial aid office\nTurns out they HAD to — here's the loophole nobody talks about 👀"
+      },
+      "text_emotion": "Bro the system is",
+      "duration_sec": 6
     },
     {
       "video_index": 4,
@@ -195,13 +195,13 @@
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
       "on_screen_text": null,
-      "tweet_text": "Took out $50K in student loans for a degree nobody asked for.\nNow I owe more than my car's worth.\nBest financial decision of my life though 💀",
-      "reaction_text": "We got played",
       "emotion": "tendu",
-      "duration_sec_range": {
-        "min": 5,
-        "max": 7
-      }
+      "meme": "meme_002",
+      "tweet": {
+        "text": "Took out $50K in student loans for a degree nobody asked for.\nNow I owe more than my car's worth.\nBest financial decision of my life though 💀"
+      },
+      "text_emotion": "We got played",
+      "duration_sec": 6
     },
     {
       "video_index": 5,
@@ -231,13 +231,13 @@
       },
       "logo_placement": "Logo fourni par la campagne (image transparente). OMNIS_WATCH applique l'image transparente contenant le logo — placement campagne 1080x1920, ne pas déplacer, ne pas redimensionner, ne pas recolorer.",
       "on_screen_text": null,
-      "tweet_text": "Graduated with $50K student debt and a degree I never used\nBut that debt taught me more about money than any class ever did\nThe real degree was the failure",
-      "reaction_text": "that hit different",
       "emotion": "poignant",
-      "duration_sec_range": {
-        "min": 5,
-        "max": 7
-      }
+      "meme": "meme_002",
+      "tweet": {
+        "text": "Graduated with $50K student debt and a degree I never used\nBut that debt taught me more about money than any class ever did\nThe real degree was the failure"
+      },
+      "text_emotion": "that hit different",
+      "duration_sec": 6
     }
   ],
   "checklist": {
@@ -632,5 +632,6 @@
       "min": 5,
       "max": 7
     }
-  }
+  },
+  "montage_guide_ref": "GUIDE_UTILISATION/04_MODE_MEME.md"
 }
