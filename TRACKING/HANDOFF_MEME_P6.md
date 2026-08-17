@@ -1,63 +1,55 @@
 # LACRIMAE — HANDOFF MODE MEME (P6 GHA) — reprise par un autre chat
 
-> Note de continuation. Run meme réel EN COURS sur la branche **`dev3`**.
-> Dernier SHA poussé : `611f551` (git log origin/dev3 pour vérifier).
-> CE FICHIER EST LA SOURCE DE VÉRITÉ — relire les sections 1 et 2 avant toute action.
+> Note de continuation. Session 2026-08-17 TERMINÉE : chaîne meme réelle ALLER-RETOUR
+> COMPLÈTE et validée par l'opérateur. Branche de travail : **`dev3`**.
+> Dernier SHA poussé : `04c7427` (git log origin/dev3 pour vérifier).
+> CE FICHIER EST LA SOURCE DE VÉRITÉ — relire ce bloc puis les sections utiles avant toute action.
 
 ---
 
-## ⚡ ÉTAT IMMÉDIAT (2026-08-17, chat en cours de fermeture) — PORTE IV EN ATTENTE
+## ✅ ÉTAT FINAL (2026-08-17, fin de session) — CHAÎNE MEME COMPLÈTE VALIDÉE
 
-### OÙ ON EST
-- Chaîne meme réelle : F01 ✅ (run `32015947432`, Porte II) → F02 ✅ (run `32016600916`,
-  Porte III) → F04 RENDER **lancé 2 fois, PAS ENCORE validé par l'opérateur**.
-- **Porte IV (rendu F04) NON validée.** L'opérateur a vu le clip 1 : police FAUSSE
-  (fallback au lieu d'Impact) → fix Anton fait mais **le rerendu n'a PAS encore abouti**
-  (échec sur le téléchargement des clips, corrigé, relaunch en attente).
+### OÙ ON EST (tout est terminé et validé)
+- Chaîne meme réelle : F01 ✅ → F02 ✅ → **F04 RENDER ✅** → **F05 CAMOUFLAGE ✅** →
+  **F06 LUTHER ✅** → **CLOSE ✅**. Toutes les portes validées par l'opérateur.
+- **Livrables finaux** : artifact `lac-clean` (5 clips `clip_001..005_finale_youtube_clean.mp4`,
+  ~4,5-5,7 Mo chacun) + artifact `lac-video-finale` (rendus F04).
+- Le fix « clip 1 = MAÎTRE » (tailles tweet/émotion propagées à TOUS les clips) est
+  **implémenté, pushé et re-validé** via un re-rendu F04 complet (les 5 clips ressortent
+  avec les réglages du clip 1 : taille émotion 100px, position 92%, tweet 51px).
 
-### LES 3 FIX PUSHÉS SUR dev3 (à garder)
-1. `fe8722e` — **IDs composition Remotion** : le workflow appelait `clip_001` (underscores)
-   alors que les IDs de composition sont en tirets (`clip-001`). Fix dans
-   `lacrimae_orchestrator.yml` (~ligne 536-556) : sépare `RAW` (nom fichier `clip_001_finale.mp4`,
-   underscores) de `CID` (composition Remotion `clip-001`, tirets). CUSTOS attend `*.mp4`.
-2. `61a9329` — **Police Anton embarquée** : le runner Linux n'a ni Impact ni Arial Black →
-   fallback. `SHARED/IN/fonts/Anton-Regular.ttf` (OFL, Impact-like) chargée via `@font-face`
-   (`src/fonts.css` dans F03+F04), pile `Anton, Impact, Arial Black, sans-serif` quand le codex
-   demande Impact. Le workflow copie `SHARED/IN/fonts/*.ttf` → `public/fonts/` des F03+F04
-   (public/ est gitignoré, la copie est OBLIGATOIRE avant render).
-3. `611f551` — **download_artifact.py corrigé** : l'échec `BadZipFile` venait de la redirection
-   GitHub vers le blob storage (`objects.githubusercontent.com`) qui rejetait le header
-   `Authorization`. Le script suit maintenant les redirects SANS token sur hôtes externes +
-   retries (4) sur 5xx/non-zip. **TESTÉ en local : extraction `lac-clips` OK** (5 clips).
+### COMMITS À CONNAÎTRE (dev3, ordre chronologique)
+1. `9fe7bb0` — **fix(F04) police Anton via staticFile au runtime** : webpack ne résout pas
+   `url('/fonts/…')` du `fonts.css` au bundle → injection `@font-face` via `staticFile()`
+   (`src/fonts.js`) + attente chargement police (`delayRender`). `fonts.css` vidé.
+2. `2cb2ed2` + `c9fca63` — **fix(F04) téléchargement clips** : les `503` transitoires de
+   l'API artifacts GitHub sur `archive_download_url` → `download_artifact.py` retravaillé
+   (mode `find`, 8 retries + backoff exponentiel borné 60s). `download-artifact@v4` avec
+   `run-id` a été testé mais ne trouve pas les artifacts d'autres runs → on reste sur le
+   script python (testé : extraction 5 clips OK).
+3. `dd492a6` — **fix(meme) clip 1 = MAÎTRE** : tout réglage de style validé sur le clip 1
+   (taille tweet/émotion, position, hauteur meme) se répercute à l'identique sur les clips
+   2-5. 3 volets :
+   - codex `F03_PREVIEW/IN/codex.json` normalisé (les 4 params de style copiés clips 1→2-5) ;
+   - rendu : `Root.jsx` passe `masterClip=clips[0]`, `MemeComposition` (F04 + F03 preview)
+     tombe sur `masterClip` AVANT les défauts (`clip.X ?? masterClip.X ?? défaut`) ;
+   - prévention : `exportCodex` dans `F03_PREVIEW/CODEBASE/src/App.jsx` propage les réglages
+     de style du clip édité à TOUS les clips à l'export → plus de codex divergent possible.
 
-### PROCHAINE ACTION EXACTE (pour le chat suivant)
-1. **Relancer F04 forge** sur dev3 (le dernier dispatch a pris des 503 GitHub transitoires) :
-   `POST /repos/kioka8877-ux/LACRIMAE/actions/workflows/lacrimae_orchestrator.yml/dispatches`
-   `{"ref":"dev3","inputs":{"fregate":"F04","mode":"forge"}}` → HTTP 204.
-   Si 503 : réessayer après 30-40s. Récupérer le run via
-   `…/actions/workflows/lacrimae_orchestrator.yml/runs?branch=dev3&per_page=1`.
-2. Attendre la fin du run (~8-10 min). Vérifier que l'étape « F04 - Download clips » passe
-   (c'était le point de blocage), puis « F04 - Render Remotion ».
-3. Donner le lien du run à l'opérateur + le lien direct du clip 1 pour validation Porte IV.
-   Si succès : télécharger l'artifact `lac-video-finale`, extraire `clip_001_finale.mp4`,
-   le déposer dans `F03_PREVIEW/CODEBASE/public/finale/` et le servir via le preview vite
-   (port 5173, voir section preview) pour que l'opérateur puisse le voir direct.
-4. **Attendre la validation Porte IV de l'opérateur AVANT de passer à F05.**
-   Une frégate à la fois, jamais sans feu vert.
-5. Ensuite : F05 CAMOUFLAGE (forge) → F06 LUTHER (forge) → CLOSE, une porte à la fois.
-
-### PREVIEW LOCALE (si encore vivante)
-- Vite sur port 5173, lien https://5173-1bc45b17fed3d465.monkeycode-ai.live
-- Sert `F03_PREVIEW/CODEBASE/public/` : codex, memes, backgrounds, fonts, finale/
-- Le preview charge le codex via `/codex.json` → penser à y copier `F03_PREVIEW/IN/codex.json`.
-
-### DÉTAILS DU RUN F04 (mémo)
-- Codex de vérité : `F03_PREVIEW/IN/codex.json` (validated_by_magos=true, blocs `sig` injectés,
-  sel `LACRIMAE-SIGNE-v1|pack_id`, déterminisme = F04b). Clip 1 : `text_emotion
-  "This Actually Hurts :"`, position 92%, taille 100px — CHOIX OPÉRATEUR, ne pas toucher.
-- Sortie attendue : `F04_RENDER/OUT/clip_001..005_finale.mp4` (~6.5 Mo) + `codex.json`.
+### POUR LA PROCHAINE SESSION
+- La chaîne meme student debt est BOUCLÉE (pack `LOGO-SIEGE-siege_20260815_195037`,
+  sub_mode meme, 5 clips). Rien à relancer.
+- Le pack ORIGINAL chez Perturabo (`kioka8877-ux/PERTURABO`, `MONDES_FORGES/CLIPPING/EXPORT`,
+  `production_pack_meme_student_debt.json`) n'a **PAS** de champ `metadata` (pas de
+  description/tags) — les descriptions venaient du pack local transformé (tronquées).
+  Durée réelle dans l'original : **8s** (le pack local transformé dit 6s) → à surveiller
+  si le bridge re-lit l'original.
+- Mémo de travail : une frégate à la fois, jamais sans feu vert opérateur ; le suivi des
+  runs se fait par l'OPÉRATEUR (lien du run donné, pas de surveillance automatique).
 
 ---
+
+## ⚡ RAPPEL CHRONOLOGIE RUN MEME RÉEL (F01✅ F02✅ → F04 en cours)
 
 ## ⚡ RAPPEL CHRONOLOGIE RUN MEME RÉEL (F01✅ F02✅ → F04 en cours)
 
