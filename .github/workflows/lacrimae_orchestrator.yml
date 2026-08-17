@@ -462,24 +462,11 @@ jobs:
 
       # ─────────────────────────── F04 : RENDER ─────────────────────────────
 
-      - name: F04 - Find run lac-clips
-        if: github.event.inputs.fregate == 'F04'
-        id: find-clips
-        run: |
-          echo "RUN_ID=$(python3 _tools/download_artifact.py find "$WORKFLOW_FILE" lac-clips "$BRANCH")" >> "$GITHUB_OUTPUT"
-
-      - name: F04 - Download clips (download-artifact@v4)
-        if: github.event.inputs.fregate == 'F04'
-        uses: actions/download-artifact@v4
-        with:
-          name: lac-clips
-          path: F04_RENDER/CODEBASE/public/
-          run-id: ${{ steps.find-clips.outputs.RUN_ID }}
-
-      - name: F04 - Stage clips
+      - name: F04 - Download clips
         if: github.event.inputs.fregate == 'F04'
         run: |
-          mkdir -p F04_RENDER/IN/clips
+          mkdir -p F04_RENDER/CODEBASE/public F04_RENDER/IN/clips
+          python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_FILE" lac-clips F04_RENDER/CODEBASE/public/ "$BRANCH"
           cp F04_RENDER/CODEBASE/public/*.mp4 F04_RENDER/IN/clips/
 
       - name: F04 - Copy codex validé + logo + fond PNG
