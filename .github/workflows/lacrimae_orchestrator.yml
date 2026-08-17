@@ -474,9 +474,15 @@ jobs:
         run: |
           cp F03_PREVIEW/IN/codex.json F04_RENDER/IN/codex.json
           cp F03_PREVIEW/IN/codex.json F04_RENDER/CODEBASE/public/codex.json
-          if [ -f SHARED/IN/logos/logo.png ]; then
-            cp SHARED/IN/logos/logo.png F04_RENDER/CODEBASE/public/logo.png
-          fi
+            if [ -f SHARED/IN/logos/logo.png ]; then
+              cp SHARED/IN/logos/logo.png F04_RENDER/CODEBASE/public/logo.png
+            fi
+            # Police embarquée (Anton, Impact-like) → public/fonts des F03+F04
+            if compgen -G "SHARED/IN/fonts/*.ttf" > /dev/null; then
+              mkdir -p F04_RENDER/CODEBASE/public/fonts F03_PREVIEW/CODEBASE/public/fonts
+              cp SHARED/IN/fonts/*.ttf F04_RENDER/CODEBASE/public/fonts/
+              cp SHARED/IN/fonts/*.ttf F03_PREVIEW/CODEBASE/public/fonts/
+            fi
           # Mode forge : les PNG partagés (SHARED/IN/backgrounds/ + logos/, faits
           # une fois pour toutes par l'opérateur) sont re-transités vers public/
           # des F03+F04 (public/ est gitignoré) + manifest.json (menu déroulant)

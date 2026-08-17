@@ -274,7 +274,7 @@ const TitleBlock = ({ content, style, box, offsetPct }) => {
   const boxEnabled = box && box.enabled;
   const textStyle = boxEnabled
     ? {
-        fontFamily: style.font,
+        fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
         fontSize: `${style.size_title}px`,
         color: box.text_color || style.color,
         fontWeight: 900,
@@ -291,7 +291,7 @@ const TitleBlock = ({ content, style, box, offsetPct }) => {
         wordWrap: 'break-word',
       }
     : {
-        fontFamily: style.font,
+        fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
         fontSize: `${style.size_title}px`,
         color: style.color,
         WebkitTextStroke: `${style.stroke_width}px ${style.stroke_color}`,
@@ -327,7 +327,7 @@ const ParagraphBlock = ({ content, style, box, offsetPct }) => {
   const boxEnabled = box && box.enabled;
   const textStyle = boxEnabled
     ? {
-        fontFamily: style.font,
+        fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
         fontSize: `${style.size_paragraph}px`,
         color: box.text_color || style.color,
         fontWeight: 700,
@@ -342,7 +342,7 @@ const ParagraphBlock = ({ content, style, box, offsetPct }) => {
         maxWidth: '88%',
       }
     : {
-        fontFamily: style.font,
+        fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
         fontSize: `${style.size_paragraph}px`,
         color: style.color,
         WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,

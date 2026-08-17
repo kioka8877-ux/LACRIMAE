@@ -304,7 +304,7 @@ const TitleBlock = ({ content, style, offsetPct }) => {
       }}
     >
       <div style={{
-        fontFamily: style.font,
+        fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
         fontSize: `${style.size_title}px`,
         color: style.color,
         WebkitTextStroke: `${style.stroke_width}px ${style.stroke_color}`,
@@ -329,7 +329,7 @@ const EmotionText = ({ content, style, totalFrames, positionPct = 43, fontSize =
   return (
     <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: `${positionPct}%`, pointerEvents: 'none' }}>
       <div style={{
-        fontFamily: style.font,
+        fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
         fontSize: `${fontSize}px`,
         color: style.color,
         WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,
