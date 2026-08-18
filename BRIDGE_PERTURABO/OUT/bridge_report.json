@@ -1,8 +1,8 @@
 {
-  "pack_id": "LOGO-SIEGE-siege_20260815_195037",
+  "pack_id": "LOGO-SIEGE-siege_20260818_134224",
   "mode": "logo",
   "sub_mode": "meme",
-  "videos_count": 5,
+  "videos_count": 8,
   "controle1": "validated",
   "profile_f02": "meme",
   "background": "bg_grid_dark.png",
@@ -16,32 +16,47 @@
     "custom_storm_002.png"
   ],
   "f01_skipped": true,
-  "pack_fetched": false,
+  "pack_fetched": true,
   "source_video": null,
   "clips": [
     {
       "angle_id": "A01",
-      "meme": "meme_001",
+      "meme": "meme_003",
       "duration_sec": 6.0
     },
     {
       "angle_id": "A02",
-      "meme": "meme_001",
+      "meme": "meme_003",
       "duration_sec": 6.0
     },
     {
       "angle_id": "A03",
-      "meme": "meme_001",
+      "meme": "meme_003",
       "duration_sec": 6.0
     },
     {
       "angle_id": "A04",
-      "meme": "meme_002",
+      "meme": "meme_003",
       "duration_sec": 6.0
     },
     {
       "angle_id": "A05",
       "meme": "meme_002",
+      "duration_sec": 6.0
+    },
+    {
+      "angle_id": "A06",
+      "meme": "meme_002",
+      "duration_sec": 6.0
+    },
+    {
+      "angle_id": "A07",
+      "meme": "meme_003",
+      "duration_sec": 6.0
+    },
+    {
+      "angle_id": "A08",
+      "meme": "meme_003",
       "duration_sec": 6.0
     }
   ]

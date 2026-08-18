@@ -7,6 +7,18 @@
 
 ---
 
+## ÉTAT DE PRODUCTION ACTUEL — DOOMSDAY / F02 VALIDÉE — 2026-08-18
+
+La production active est le pack `production_pack_meme_marvel_doomsday.json`, récupéré par l’Oracle depuis `kioka8877-ux/PERTURABO` (`MONDES_FORGES/CLIPPING/EXPORT`). Pack ID : `LOGO-SIEGE-siege_20260818_134224`. Le pack est en `sub_mode: meme`, contient 8 angles A01-A08 et fixe chaque durée à 6 secondes.
+
+Le **gate F00 / Bridge** est validé : contrat MEME présent, pack conforme, `f01_skipped: true`, codex meme v4.1 généré, et références `meme_002` / `meme_003` trouvées dans la méméthèque. Le **gate F02 check-in** puis le **gate F02 check-out** sont validés. F02 a réellement produit 8 clips `clip_001.mp4` à `clip_008.mp4` et `F02_FORMAT/OUT/f02_manifest.json`.
+
+La production est volontairement arrêtée avant la preview F03. **Aucun F03, F04, F05, F06 ou CLOSE n’a été lancé pour ce pack.** La prochaine étape autorisée est la preview F03, puis le gate `--codex` sous validation du Champion.
+
+Fichiers de vérité produits : `BRIDGE_PERTURABO/OUT/bridge_report.json`, `BRIDGE_PERTURABO/OUT/codex.json`, `F02_FORMAT/OUT/f02_manifest.json`, `F02_FORMAT/OUT/codex.json` et `TRACKING/LACRIMAE_LEDGER.json`.
+
+---
+
 ## ✅ ÉTAT FINAL (2026-08-17, fin de session) — CHAÎNE MEME COMPLÈTE VALIDÉE
 
 ### OÙ ON EST (tout est terminé et validé)

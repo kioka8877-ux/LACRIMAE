@@ -4,11 +4,11 @@
   "mode": "meme",
   "sub_mode": "meme",
   "forge": {
-    "pack_id": "LOGO-SIEGE-siege_20260815_195037",
-    "siege_id": "siege_20260815_195037",
+    "pack_id": "LOGO-SIEGE-siege_20260818_134224",
+    "siege_id": "siege_20260818_134224",
     "pack_mode": "logo",
     "campaign_id": null,
-    "montage_guide_ref": "GUIDE_UTILISATION/04_MODE_MEME.md"
+    "montage_guide_ref": null
   },
   "session": {
     "background": {
@@ -63,26 +63,37 @@
         "height": 1920
       },
       "meme": {
-        "source": "meme_001.mp4"
+        "source": "meme_003.mp4"
       },
       "texts": {
         "mode": "title",
-        "title": "Your Degree Was A Trap",
-        "emotion": "This Actually Hurts",
+        "title": "Doom's Real Masterplan Revealed",
+        "emotion": "Students reading this:",
         "title_offset_pct": 4
       },
       "tweet": {
-        "text": "Took out $50K in student loans for a degree\nNobody told me the interest would double it\nNow I owe more than my parents' mortgage",
-        "keywords_style": {},
+        "text": "Okay hear me out guys... what if Doom isn't destroying\nthe multiverse for power but to find a timeline where\nstudent loans just... don't exist? Think about it.",
+        "keywords_style": {
+          "green": [
+            "loans",
+            "exist",
+            "think"
+          ],
+          "red": [
+            "destroying",
+            "multiverse",
+            "power"
+          ]
+        },
         "persona": {
-          "name": "Leo Cross",
-          "handle": "@leocross",
-          "avatar_color": "#794BC4",
+          "name": "Jay Walker",
+          "handle": "@jaywalker",
+          "avatar_color": "#17BF63",
           "verified": false
         },
-        "likes": 22263,
-        "reposts": 1375,
-        "replies": 737
+        "likes": 9121,
+        "reposts": 1180,
+        "replies": 710
       },
       "logo": null,
       "volume": 1.0,
@@ -102,26 +113,39 @@
         "height": 1920
       },
       "meme": {
-        "source": "meme_001.mp4"
+        "source": "meme_003.mp4"
       },
       "texts": {
         "mode": "title",
-        "title": "Student Debt Is A Scam",
-        "emotion": "Bro is cooked forever",
+        "title": "Doom Erased Student Loans",
+        "emotion": "Doom right now:",
         "title_offset_pct": 4
       },
       "tweet": {
-        "text": "My student debt is $87,000.\nThe degree got me a $42K job.\nI make less than my Uber driver cousin.",
-        "keywords_style": {},
+        "text": "Okay hear me out — what if Doom never wanted power?\nWhat if he just wanted a timeline where student loans\nnever existed? That mask hides a broke college kid.",
+        "keywords_style": {
+          "green": [
+            "power",
+            "loans",
+            "existed",
+            "mask",
+            "kid"
+          ],
+          "red": [
+            "Doom",
+            "never",
+            "broke"
+          ]
+        },
         "persona": {
           "name": "Mia Foxx",
           "handle": "@miafoxx",
           "avatar_color": "#E0245E",
           "verified": true
         },
-        "likes": 14379,
-        "reposts": 1945,
-        "replies": 510
+        "likes": 16191,
+        "reposts": 985,
+        "replies": 433
       },
       "logo": null,
       "volume": 1.0,
@@ -141,26 +165,37 @@
         "height": 1920
       },
       "meme": {
-        "source": "meme_001.mp4"
+        "source": "meme_003.mp4"
       },
       "texts": {
         "mode": "title",
-        "title": "They Erased Her Debt",
-        "emotion": "Bro the system is",
+        "title": "Doom hid the truth",
+        "emotion": "Doom right now:",
         "title_offset_pct": 4
       },
       "tweet": {
-        "text": "My university just wiped $47K of my student debt 💀\nI literally cried in the financial aid office\nTurns out they HAD to — here's the loophole nobody talks about 👀",
-        "keywords_style": {},
-        "persona": {
-          "name": "Leo Cross",
-          "handle": "@leocross",
-          "avatar_color": "#794BC4",
-          "verified": false
+        "text": "Okay hear me out — what if Doom's whole \"save my family\" arc is a cover story?\nWhat if the REAL endgame is erasing student debt from every timeline?\nThink about it: Nobody would question a villain motivated by grief...",
+        "keywords_style": {
+          "green": [
+            "save",
+            "family"
+          ],
+          "red": [
+            "cover",
+            "debt",
+            "villain",
+            "grief"
+          ]
         },
-        "likes": 13105,
-        "reposts": 1717,
-        "replies": 733
+        "persona": {
+          "name": "Chad Hunter",
+          "handle": "@chadhunter",
+          "avatar_color": "#1DA1F2",
+          "verified": true
+        },
+        "likes": 24846,
+        "reposts": 1692,
+        "replies": 664
       },
       "logo": null,
       "volume": 1.0,
@@ -180,26 +215,39 @@
         "height": 1920
       },
       "meme": {
-        "source": "meme_002.mp4"
+        "source": "meme_003.mp4"
       },
       "texts": {
         "mode": "title",
-        "title": "Your Degree Was A Trap",
-        "emotion": "We got played",
+        "title": "Doom's Real Villain Origin",
+        "emotion": "Doom right now:",
         "title_offset_pct": 4
       },
       "tweet": {
-        "text": "Took out $50K in student loans for a degree nobody asked for.\nNow I owe more than my car's worth.\nBest financial decision of my life though 💀",
-        "keywords_style": {},
+        "text": "Okay hear me out — what if Doom isn't evil at all?\nWhat if he's just trying to erase student loans\nfrom every timeline simultaneously?",
+        "keywords_style": {
+          "green": [
+            "evil",
+            "erase",
+            "loans",
+            "every",
+            "timeline"
+          ],
+          "red": [
+            "Doom",
+            "trying",
+            "student"
+          ]
+        },
         "persona": {
-          "name": "Chad Hunter",
-          "handle": "@chadhunter",
-          "avatar_color": "#1DA1F2",
+          "name": "Zoe Prime",
+          "handle": "@zoe_prime",
+          "avatar_color": "#F45D22",
           "verified": true
         },
-        "likes": 16962,
-        "reposts": 2023,
-        "replies": 140
+        "likes": 22662,
+        "reposts": 2058,
+        "replies": 775
       },
       "logo": null,
       "volume": 1.0,
@@ -223,22 +271,186 @@
       },
       "texts": {
         "mode": "title",
-        "title": "Your Degree Was A Lesson",
-        "emotion": "that hit different",
+        "title": "Doomsday Is Just Student Loans",
+        "emotion": "Students right now:",
         "title_offset_pct": 4
       },
       "tweet": {
-        "text": "Graduated with $50K student debt and a degree I never used\nBut that debt taught me more about money than any class ever did\nThe real degree was the failure",
-        "keywords_style": {},
+        "text": "Okay hear me out — what if Doomsday isn't about destroying reality?\nWhat if Doom literally just means the end of student loan debt?\nThat's why everyone's so hyped.",
+        "keywords_style": {
+          "green": [
+            "end",
+            "debt",
+            "hyped",
+            "everyone",
+            "reality"
+          ],
+          "red": [
+            "destroying",
+            "Doomsday",
+            "Doom"
+          ]
+        },
+        "persona": {
+          "name": "Chad Hunter",
+          "handle": "@chadhunter",
+          "avatar_color": "#1DA1F2",
+          "verified": true
+        },
+        "likes": 18624,
+        "reposts": 2494,
+        "replies": 202
+      },
+      "logo": null,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
+      "slowmo_start_frame": 0,
+      "slowmo_speed": 1.0,
+      "shake_power": 0
+    },
+    {
+      "id": "clip_006",
+      "angle_id": "A06",
+      "video": {
+        "source": "clip_006.mp4",
+        "fps": 30,
+        "total_frames": 180,
+        "width": 1080,
+        "height": 1920
+      },
+      "meme": {
+        "source": "meme_002.mp4"
+      },
+      "texts": {
+        "mode": "title",
+        "title": "Doom's Real Endgame",
+        "emotion": "Students right now:",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Okay hear me out, what if the Doomsday marketing campaign is actually Doom testing which timeline erases student loans forever?\nHe literally broke the multiverse just to skip tuition.",
+        "keywords_style": {
+          "green": [
+            "testing",
+            "erases",
+            "forever",
+            "skip",
+            "tuition"
+          ],
+          "red": [
+            "Doomsday",
+            "broke",
+            "multiverse",
+            "literally"
+          ]
+        },
+        "persona": {
+          "name": "Zoe Prime",
+          "handle": "@zoe_prime",
+          "avatar_color": "#F45D22",
+          "verified": true
+        },
+        "likes": 15389,
+        "reposts": 1640,
+        "replies": 196
+      },
+      "logo": null,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
+      "slowmo_start_frame": 0,
+      "slowmo_speed": 1.0,
+      "shake_power": 0
+    },
+    {
+      "id": "clip_007",
+      "angle_id": "A07",
+      "video": {
+        "source": "clip_007.mp4",
+        "fps": 30,
+        "total_frames": 180,
+        "width": 1080,
+        "height": 1920
+      },
+      "meme": {
+        "source": "meme_003.mp4"
+      },
+      "texts": {
+        "mode": "title",
+        "title": "Doom Erased Student Debt",
+        "emotion": "Doom running amortization tables:",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Okay hear me out guys, what if Doom isn't destroying universes at all\nWhat if every timeline he collapses is just a simulation running loan amortization tables\nHe's literally deleting student debt one branch at a time",
+        "keywords_style": {
+          "green": [
+            "debt",
+            "simulation"
+          ],
+          "red": [
+            "destroying",
+            "collapses",
+            "doom",
+            "deleting"
+          ]
+        },
+        "persona": {
+          "name": "Chad Hunter",
+          "handle": "@chadhunter",
+          "avatar_color": "#1DA1F2",
+          "verified": true
+        },
+        "likes": 7459,
+        "reposts": 2374,
+        "replies": 48
+      },
+      "logo": null,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
+      "slowmo_start_frame": 0,
+      "slowmo_speed": 1.0,
+      "shake_power": 0
+    },
+    {
+      "id": "clip_008",
+      "angle_id": "A08",
+      "video": {
+        "source": "clip_008.mp4",
+        "fps": 30,
+        "total_frames": 180,
+        "width": 1080,
+        "height": 1920
+      },
+      "meme": {
+        "source": "meme_003.mp4"
+      },
+      "texts": {
+        "mode": "title",
+        "title": "Doom built a time machine",
+        "emotion": "Doom right now:",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Call me crazy but what if Doom's whole time machine is pointless\nIncome-based repayment plans already existed, he just had to call\nHe built a multiverse engine to dodge a phone call",
+        "keywords_style": {
+          "green": [
+            "repayment"
+          ],
+          "red": [
+            "pointless",
+            "machine",
+            "dodge"
+          ]
+        },
         "persona": {
           "name": "Mia Foxx",
           "handle": "@miafoxx",
           "avatar_color": "#E0245E",
           "verified": true
         },
-        "likes": 1477,
-        "reposts": 473,
-        "replies": 321
+        "likes": 5727,
+        "reposts": 575,
+        "replies": 384
       },
       "logo": null,
       "volume": 1.0,
