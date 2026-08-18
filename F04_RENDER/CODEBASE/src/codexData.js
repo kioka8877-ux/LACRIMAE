@@ -1,343 +1,374 @@
 // Généré par lac_signe.py (F04b SIGNE) — ne pas éditer à la main.
 export const codex = {
-  "version": "4.0",
+  "version": "4.1",
   "pipeline": "LACRIMAE_DEV",
-  "mode": "forge",
-  "profile": "background",
+  "mode": "meme",
+  "sub_mode": "meme",
+  "forge": {
+    "pack_id": "LOGO-SIEGE-siege_20260818_134224",
+    "siege_id": "siege_20260818_134224",
+    "pack_mode": "logo",
+    "campaign_id": null,
+    "montage_guide_ref": null
+  },
   "session": {
     "background": {
-      "image": "bg_paper_crumpled.png",
+      "image": "bg_grid_dark.png",
       "color": "#0a0a0a",
-      "scale": 1
+      "scale": 1.0
     },
     "logo": {
       "src": "logo.png",
-      "width_pct": 89,
-      "position": "custom",
-      "opacity": 1,
-      "x_pct": 45.8,
-      "y_pct": 67.5
+      "width_pct": 18,
+      "position": "bottom_right",
+      "opacity": 1.0
+    },
+    "watermark": {
+      "text": "@lacrimae",
+      "opacity": 0.4,
+      "font_size": 36,
+      "position": "bottom_left",
+      "color": "#FFFFFF"
     },
     "texts_style": {
-      "font": "Arial Black, sans-serif",
-      "size_title": 79,
-      "size_paragraph": 44,
-      "color": "#cacd13",
+      "font": "Impact, Arial Black, sans-serif",
+      "size_title": 64,
+      "size_paragraph": 40,
+      "color": "#FFFFFF",
       "stroke_color": "#000000",
       "stroke_width": 4,
       "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
       "glow_intensity": 0,
-      "letter_spacing": "0em",
-      "title_box": {
-        "enabled": true
-      },
-      "paragraph_box": {
-        "enabled": true
-      }
+      "letter_spacing": "0em"
     },
     "presets": {
       "color_preset": "punchy",
-      "color_css_filter": "contrast(1.1) saturate(0.6) brightness(0.95) hue-rotate(-10deg)",
-      "contrast": 1.3,
-      "brightness": 1,
+      "color_css_filter": "contrast(1.3) saturate(1.5) brightness(1.1)",
       "enhance_4k": false,
       "sharpening": 0,
       "denoising": 0,
       "vignette": 0.25,
       "grain_intensity": 0.15
-    },
-    "profile": "background",
-    "video": {
-      "offset_y": -12
     }
   },
-  "validated_by_magos": true,
+  "validated_by_magos": false,
   "clips": [
     {
       "id": "clip_001",
+      "angle_id": "A01",
       "video": {
         "source": "clip_001.mp4",
         "fps": 30,
-        "total_frames": 900,
+        "total_frames": 180,
         "width": 1080,
         "height": 1920
       },
-      "texts": {
-        "mode": "title+paragraph",
-        "title": "SHE KICKED HIM IN FRONT OF HIS BAND",
-        "paragraph": "Tom Sandoval says his ex Victoria kicked him in the groin in front of his band, crew and fans during a Florida tour stop. The insult that came with it, he says, hurt worse than the kick. New court filing is out.",
-        "title_offset_pct": 6,
-        "paragraph_offset_pct": 8
+      "meme": {
+        "source": "meme_003.mp4"
       },
-      "text_overlays": [
-        {
-          "id": "title_00",
-          "content": "SHE KICKED HIM IN FRONT OF HIS BAND",
-          "start_frame": 0,
-          "end_frame": 900,
-          "animation": "fade_in",
-          "font": "Impact, Arial Black, sans-serif",
-          "size": 96,
-          "color": "#FFFFFF",
-          "stroke_color": "#000000",
-          "stroke_width": 4,
-          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-          "position": "top",
-          "letter_spacing": "0em",
-          "glow_intensity": 0,
-          "depth_3d": 0
-        }
-      ],
-      "zoom_keyframes": [],
+      "texts": {
+        "mode": "title",
+        "title": "Doom's Real Masterplan Revealed",
+        "emotion": "Students reading this:",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Okay hear me out guys... what if Doom isn't destroying\nthe multiverse for power but to find a timeline where\nstudent loans just... don't exist? Think about it.",
+        "keywords_style": {
+          "green": [
+            "loans",
+            "exist",
+            "think"
+          ],
+          "red": [
+            "destroying",
+            "multiverse",
+            "power"
+          ]
+        },
+        "persona": {
+          "name": "Jay Walker",
+          "handle": "@jaywalker",
+          "avatar_color": "#17BF63",
+          "verified": false
+        },
+        "likes": 9121,
+        "reposts": 1180,
+        "replies": 710
+      },
       "logo": null,
-      "brutal_cut_interval_frames": 90,
-      "volume": 1,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
-      "slowmo_speed": 1,
+      "slowmo_speed": 1.0,
       "shake_power": 0,
-      "validated_by_magos": true,
       "sig": {
         "grain": {
-          "seed": 7114,
-          "intensity": 0.207
+          "seed": 1671,
+          "intensity": 0.205
         },
         "bg_motion": {
           "base_scale": 1.12,
-          "amp_x": 20.3,
-          "amp_y": 25.9,
-          "freq": 1.14,
-          "phase": 4.607,
-          "drift_x": -12.3,
-          "drift_y": 1.8
+          "amp_x": 18.2,
+          "amp_y": 16.7,
+          "freq": 1.35,
+          "phase": 2.159,
+          "drift_x": 5.9,
+          "drift_y": -9.7
         },
         "mirror": true,
         "cam_drift": {
           "zoom_from": 1.003,
-          "zoom_to": 1.033,
-          "dx": 3.1,
-          "dy": 1.4
+          "zoom_to": 1.069,
+          "dx": -0.3,
+          "dy": 4.9
         },
         "text_anim": {
-          "direction": "ltr",
-          "duration_frames": 38,
+          "direction": "rtl",
+          "duration_frames": 34,
           "ease": "in_out"
         },
         "flash": {
-          "frame": 4,
-          "opacity": 0.133
+          "frame": 3,
+          "opacity": 0.094
         }
       }
     },
     {
       "id": "clip_002",
+      "angle_id": "A02",
       "video": {
         "source": "clip_002.mp4",
         "fps": 30,
-        "total_frames": 900,
+        "total_frames": 180,
         "width": 1080,
         "height": 1920
       },
-      "texts": {
-        "mode": "title+paragraph",
-        "title": "THE WORDS THAT BROKE HIM",
-        "paragraph": "Tom Sandoval says Victoria screamed insults at him in front of witnesses — the kind that left him 'frazzled' and 'anxious' before his America's Got Talent performance. He claims she questioned his manhood in the most humiliating way possible.",
-        "title_offset_pct": 8,
-        "paragraph_offset_pct": 8
+      "meme": {
+        "source": "meme_003.mp4"
       },
-      "text_overlays": [
-        {
-          "id": "title_00",
-          "content": "THE WORDS THAT BROKE HIM",
-          "start_frame": 0,
-          "end_frame": 900,
-          "animation": "fade_in",
-          "font": "Impact, Arial Black, sans-serif",
-          "size": 96,
-          "color": "#FFFFFF",
-          "stroke_color": "#000000",
-          "stroke_width": 4,
-          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-          "position": "top",
-          "letter_spacing": "0em",
-          "glow_intensity": 0,
-          "depth_3d": 0
-        }
-      ],
-      "zoom_keyframes": [],
+      "texts": {
+        "mode": "title",
+        "title": "Doom Erased Student Loans",
+        "emotion": "Doom right now:",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Okay hear me out — what if Doom never wanted power?\nWhat if he just wanted a timeline where student loans\nnever existed? That mask hides a broke college kid.",
+        "keywords_style": {
+          "green": [
+            "power",
+            "loans",
+            "existed",
+            "mask",
+            "kid"
+          ],
+          "red": [
+            "Doom",
+            "never",
+            "broke"
+          ]
+        },
+        "persona": {
+          "name": "Mia Foxx",
+          "handle": "@miafoxx",
+          "avatar_color": "#E0245E",
+          "verified": true
+        },
+        "likes": 16191,
+        "reposts": 985,
+        "replies": 433
+      },
       "logo": null,
-      "brutal_cut_interval_frames": 90,
-      "volume": 1,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
-      "slowmo_speed": 1,
+      "slowmo_speed": 1.0,
       "shake_power": 0,
       "sig": {
         "grain": {
-          "seed": 3322,
-          "intensity": 0.132
+          "seed": 6292,
+          "intensity": 0.192
         },
         "bg_motion": {
           "base_scale": 1.12,
-          "amp_x": 12.7,
-          "amp_y": 22.1,
-          "freq": 1.09,
-          "phase": 1.917,
-          "drift_x": 1.3,
-          "drift_y": 10.7
+          "amp_x": 8.7,
+          "amp_y": 19.4,
+          "freq": 0.83,
+          "phase": 4.975,
+          "drift_x": -1.9,
+          "drift_y": 12.4
         },
-        "mirror": false,
+        "mirror": true,
         "cam_drift": {
-          "zoom_from": 1.004,
-          "zoom_to": 1.075,
-          "dx": -11.8,
-          "dy": 5.2
+          "zoom_from": 1.008,
+          "zoom_to": 1.078,
+          "dx": -8.5,
+          "dy": 3.9
         },
         "text_anim": {
-          "direction": "down",
-          "duration_frames": 27,
+          "direction": "up",
+          "duration_frames": 25,
           "ease": "in_out"
         },
         "flash": {
           "frame": 5,
-          "opacity": 0.09
+          "opacity": 0.08
         }
       }
     },
     {
       "id": "clip_003",
+      "angle_id": "A03",
       "video": {
         "source": "clip_003.mp4",
         "fps": 30,
-        "total_frames": 900,
+        "total_frames": 180,
         "width": 1080,
         "height": 1920
       },
-      "texts": {
-        "mode": "title+paragraph",
-        "title": "'I'LL GET THE ARIANA TREATMENT'",
-        "paragraph": "Tom Sandoval says Victoria repeatedly warned she would 'destroy' his life and 'get the Ariana Madix treatment' — the public attention that followed his ex's breakup with him. He claims that's exactly why he stayed.",
-        "title_offset_pct": 8,
-        "paragraph_offset_pct": 8
+      "meme": {
+        "source": "meme_003.mp4"
       },
-      "text_overlays": [
-        {
-          "id": "title_00",
-          "content": "'I'LL GET THE ARIANA TREATMENT'",
-          "start_frame": 0,
-          "end_frame": 900,
-          "animation": "fade_in",
-          "font": "Impact, Arial Black, sans-serif",
-          "size": 96,
-          "color": "#FFFFFF",
-          "stroke_color": "#000000",
-          "stroke_width": 4,
-          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-          "position": "top",
-          "letter_spacing": "0em",
-          "glow_intensity": 0,
-          "depth_3d": 0
-        }
-      ],
-      "zoom_keyframes": [],
+      "texts": {
+        "mode": "title",
+        "title": "Doom hid the truth",
+        "emotion": "Doom right now:",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Okay hear me out — what if Doom's whole \"save my family\" arc is a cover story?\nWhat if the REAL endgame is erasing student debt from every timeline?\nThink about it: Nobody would question a villain motivated by grief...",
+        "keywords_style": {
+          "green": [
+            "save",
+            "family"
+          ],
+          "red": [
+            "cover",
+            "debt",
+            "villain",
+            "grief"
+          ]
+        },
+        "persona": {
+          "name": "Chad Hunter",
+          "handle": "@chadhunter",
+          "avatar_color": "#1DA1F2",
+          "verified": true
+        },
+        "likes": 24846,
+        "reposts": 1692,
+        "replies": 664
+      },
       "logo": null,
-      "brutal_cut_interval_frames": 90,
-      "volume": 1,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
-      "slowmo_speed": 1,
+      "slowmo_speed": 1.0,
       "shake_power": 0,
       "sig": {
         "grain": {
-          "seed": 4976,
-          "intensity": 0.16
+          "seed": 280,
+          "intensity": 0.173
         },
         "bg_motion": {
           "base_scale": 1.12,
-          "amp_x": 14.8,
-          "amp_y": 26.1,
-          "freq": 0.64,
-          "phase": 1.794,
-          "drift_x": 6.0,
-          "drift_y": -4.9
+          "amp_x": 8.8,
+          "amp_y": 24.6,
+          "freq": 1.19,
+          "phase": 5.293,
+          "drift_x": 0.9,
+          "drift_y": 0.0
         },
         "mirror": false,
         "cam_drift": {
-          "zoom_from": 1.004,
-          "zoom_to": 1.054,
-          "dx": -9.6,
-          "dy": -3.2
+          "zoom_from": 1.001,
+          "zoom_to": 1.065,
+          "dx": -2.1,
+          "dy": -5.8
         },
         "text_anim": {
           "direction": "down",
-          "duration_frames": 25,
+          "duration_frames": 38,
           "ease": "in_out"
         },
         "flash": {
-          "frame": 4,
-          "opacity": 0.06
+          "frame": 2,
+          "opacity": 0.089
         }
       }
     },
     {
       "id": "clip_004",
+      "angle_id": "A04",
       "video": {
         "source": "clip_004.mp4",
         "fps": 30,
-        "total_frames": 900,
+        "total_frames": 180,
         "width": 1080,
         "height": 1920
       },
-      "texts": {
-        "mode": "title+paragraph",
-        "title": "HER AND HER DAD — BOTH NAMED",
-        "paragraph": "A judge granted Tom Sandoval a temporary domestic violence restraining order against Victoria AND her father Will Robinson in June. Victoria's own attempt to get one against Tom was denied pending a future hearing.",
-        "title_offset_pct": 8,
-        "paragraph_offset_pct": 8
+      "meme": {
+        "source": "meme_003.mp4"
       },
-      "text_overlays": [
-        {
-          "id": "title_00",
-          "content": "HER AND HER DAD — BOTH NAMED",
-          "start_frame": 0,
-          "end_frame": 900,
-          "animation": "fade_in",
-          "font": "Impact, Arial Black, sans-serif",
-          "size": 96,
-          "color": "#FFFFFF",
-          "stroke_color": "#000000",
-          "stroke_width": 4,
-          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-          "position": "top",
-          "letter_spacing": "0em",
-          "glow_intensity": 0,
-          "depth_3d": 0
-        }
-      ],
-      "zoom_keyframes": [],
+      "texts": {
+        "mode": "title",
+        "title": "Doom's Real Villain Origin",
+        "emotion": "Doom right now:",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Okay hear me out — what if Doom isn't evil at all?\nWhat if he's just trying to erase student loans\nfrom every timeline simultaneously?",
+        "keywords_style": {
+          "green": [
+            "evil",
+            "erase",
+            "loans",
+            "every",
+            "timeline"
+          ],
+          "red": [
+            "Doom",
+            "trying",
+            "student"
+          ]
+        },
+        "persona": {
+          "name": "Zoe Prime",
+          "handle": "@zoe_prime",
+          "avatar_color": "#F45D22",
+          "verified": true
+        },
+        "likes": 22662,
+        "reposts": 2058,
+        "replies": 775
+      },
       "logo": null,
-      "brutal_cut_interval_frames": 90,
-      "volume": 1,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
-      "slowmo_speed": 1,
+      "slowmo_speed": 1.0,
       "shake_power": 0,
       "sig": {
         "grain": {
-          "seed": 5498,
-          "intensity": 0.156
+          "seed": 1504,
+          "intensity": 0.167
         },
         "bg_motion": {
           "base_scale": 1.12,
-          "amp_x": 19.5,
-          "amp_y": 22.5,
-          "freq": 0.74,
-          "phase": 0.554,
-          "drift_x": 0.2,
-          "drift_y": -2.5
+          "amp_x": 23.9,
+          "amp_y": 10.2,
+          "freq": 1.21,
+          "phase": 3.829,
+          "drift_x": 10.3,
+          "drift_y": 6.0
         },
         "mirror": true,
         "cam_drift": {
           "zoom_from": 1.004,
-          "zoom_to": 1.075,
-          "dx": -6.0,
-          "dy": -10.0
+          "zoom_to": 1.032,
+          "dx": -4.8,
+          "dy": -3.0
         },
         "text_anim": {
           "direction": "up",
@@ -345,90 +376,337 @@ export const codex = {
           "ease": "in_out"
         },
         "flash": {
-          "frame": 2,
-          "opacity": 0.109
+          "frame": 6,
+          "opacity": 0.113
         }
       }
     },
     {
       "id": "clip_005",
+      "angle_id": "A05",
       "video": {
         "source": "clip_005.mp4",
         "fps": 30,
-        "total_frames": 900,
+        "total_frames": 180,
         "width": 1080,
         "height": 1920
       },
-      "texts": {
-        "mode": "title+paragraph",
-        "title": "HER SIDE OF THE STORY",
-        "paragraph": "Victoria Lee Robinson says: 'I did not kick Tom, and I did not touch him.' She claims she took a shot, asked him to take care of her, and went back to bed. Two versions of the same night — only the court can decide.",
-        "title_offset_pct": 8,
-        "paragraph_offset_pct": 8
+      "meme": {
+        "source": "meme_002.mp4"
       },
-      "text_overlays": [
-        {
-          "id": "title_00",
-          "content": "HER SIDE OF THE STORY",
-          "start_frame": 0,
-          "end_frame": 900,
-          "animation": "fade_in",
-          "font": "Impact, Arial Black, sans-serif",
-          "size": 96,
-          "color": "#FFFFFF",
-          "stroke_color": "#000000",
-          "stroke_width": 4,
-          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-          "position": "top",
-          "letter_spacing": "0em",
-          "glow_intensity": 0,
-          "depth_3d": 0
-        }
-      ],
-      "zoom_keyframes": [],
+      "texts": {
+        "mode": "title",
+        "title": "Doomsday Is Just Student Loans",
+        "emotion": "Students right now:",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Okay hear me out — what if Doomsday isn't about destroying reality?\nWhat if Doom literally just means the end of student loan debt?\nThat's why everyone's so hyped.",
+        "keywords_style": {
+          "green": [
+            "end",
+            "debt",
+            "hyped",
+            "everyone",
+            "reality"
+          ],
+          "red": [
+            "destroying",
+            "Doomsday",
+            "Doom"
+          ]
+        },
+        "persona": {
+          "name": "Chad Hunter",
+          "handle": "@chadhunter",
+          "avatar_color": "#1DA1F2",
+          "verified": true
+        },
+        "likes": 18624,
+        "reposts": 2494,
+        "replies": 202
+      },
       "logo": null,
-      "brutal_cut_interval_frames": 90,
-      "volume": 1,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
-      "slowmo_speed": 1,
+      "slowmo_speed": 1.0,
       "shake_power": 0,
       "sig": {
         "grain": {
-          "seed": 1056,
-          "intensity": 0.135
+          "seed": 8819,
+          "intensity": 0.149
         },
         "bg_motion": {
           "base_scale": 1.12,
-          "amp_x": 23.0,
-          "amp_y": 22.1,
-          "freq": 1.21,
-          "phase": 3.363,
-          "drift_x": -2.0,
-          "drift_y": 13.7
+          "amp_x": 16.1,
+          "amp_y": 23.3,
+          "freq": 1.49,
+          "phase": 2.947,
+          "drift_x": -16.6,
+          "drift_y": 1.1
         },
         "mirror": true,
         "cam_drift": {
           "zoom_from": 1.004,
-          "zoom_to": 1.061,
-          "dx": 7.9,
-          "dy": -4.5
+          "zoom_to": 1.07,
+          "dx": -6.6,
+          "dy": 3.5
         },
         "text_anim": {
           "direction": "up",
-          "duration_frames": 32,
+          "duration_frames": 43,
           "ease": "in_out"
         },
         "flash": {
-          "frame": 2,
-          "opacity": 0.12
+          "frame": 4,
+          "opacity": 0.088
+        }
+      }
+    },
+    {
+      "id": "clip_006",
+      "angle_id": "A06",
+      "video": {
+        "source": "clip_006.mp4",
+        "fps": 30,
+        "total_frames": 180,
+        "width": 1080,
+        "height": 1920
+      },
+      "meme": {
+        "source": "meme_002.mp4"
+      },
+      "texts": {
+        "mode": "title",
+        "title": "Doom's Real Endgame",
+        "emotion": "Students right now:",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Okay hear me out, what if the Doomsday marketing campaign is actually Doom testing which timeline erases student loans forever?\nHe literally broke the multiverse just to skip tuition.",
+        "keywords_style": {
+          "green": [
+            "testing",
+            "erases",
+            "forever",
+            "skip",
+            "tuition"
+          ],
+          "red": [
+            "Doomsday",
+            "broke",
+            "multiverse",
+            "literally"
+          ]
+        },
+        "persona": {
+          "name": "Zoe Prime",
+          "handle": "@zoe_prime",
+          "avatar_color": "#F45D22",
+          "verified": true
+        },
+        "likes": 15389,
+        "reposts": 1640,
+        "replies": 196
+      },
+      "logo": null,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
+      "slowmo_start_frame": 0,
+      "slowmo_speed": 1.0,
+      "shake_power": 0,
+      "sig": {
+        "grain": {
+          "seed": 795,
+          "intensity": 0.146
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 17.9,
+          "amp_y": 15.5,
+          "freq": 0.8,
+          "phase": 2.688,
+          "drift_x": -13.9,
+          "drift_y": 1.9
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.006,
+          "zoom_to": 1.062,
+          "dx": 3.9,
+          "dy": 1.3
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 41,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 3,
+          "opacity": 0.067
+        }
+      }
+    },
+    {
+      "id": "clip_007",
+      "angle_id": "A07",
+      "video": {
+        "source": "clip_007.mp4",
+        "fps": 30,
+        "total_frames": 180,
+        "width": 1080,
+        "height": 1920
+      },
+      "meme": {
+        "source": "meme_003.mp4"
+      },
+      "texts": {
+        "mode": "title",
+        "title": "Doom Erased Student Debt",
+        "emotion": "Doom running amortization tables:",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Okay hear me out guys, what if Doom isn't destroying universes at all\nWhat if every timeline he collapses is just a simulation running loan amortization tables\nHe's literally deleting student debt one branch at a time",
+        "keywords_style": {
+          "green": [
+            "debt",
+            "simulation"
+          ],
+          "red": [
+            "destroying",
+            "collapses",
+            "doom",
+            "deleting"
+          ]
+        },
+        "persona": {
+          "name": "Chad Hunter",
+          "handle": "@chadhunter",
+          "avatar_color": "#1DA1F2",
+          "verified": true
+        },
+        "likes": 7459,
+        "reposts": 2374,
+        "replies": 48
+      },
+      "logo": null,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
+      "slowmo_start_frame": 0,
+      "slowmo_speed": 1.0,
+      "shake_power": 0,
+      "sig": {
+        "grain": {
+          "seed": 7828,
+          "intensity": 0.141
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 13.9,
+          "amp_y": 18.4,
+          "freq": 0.63,
+          "phase": 4.927,
+          "drift_x": 8.7,
+          "drift_y": -17.6
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.007,
+          "zoom_to": 1.057,
+          "dx": -7.8,
+          "dy": -4.2
+        },
+        "text_anim": {
+          "direction": "up",
+          "duration_frames": 42,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 5,
+          "opacity": 0.133
+        }
+      }
+    },
+    {
+      "id": "clip_008",
+      "angle_id": "A08",
+      "video": {
+        "source": "clip_008.mp4",
+        "fps": 30,
+        "total_frames": 180,
+        "width": 1080,
+        "height": 1920
+      },
+      "meme": {
+        "source": "meme_003.mp4"
+      },
+      "texts": {
+        "mode": "title",
+        "title": "Doom built a time machine",
+        "emotion": "Doom right now:",
+        "title_offset_pct": 4
+      },
+      "tweet": {
+        "text": "Call me crazy but what if Doom's whole time machine is pointless\nIncome-based repayment plans already existed, he just had to call\nHe built a multiverse engine to dodge a phone call",
+        "keywords_style": {
+          "green": [
+            "repayment"
+          ],
+          "red": [
+            "pointless",
+            "machine",
+            "dodge"
+          ]
+        },
+        "persona": {
+          "name": "Mia Foxx",
+          "handle": "@miafoxx",
+          "avatar_color": "#E0245E",
+          "verified": true
+        },
+        "likes": 5727,
+        "reposts": 575,
+        "replies": 384
+      },
+      "logo": null,
+      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
+      "slowmo_start_frame": 0,
+      "slowmo_speed": 1.0,
+      "shake_power": 0,
+      "sig": {
+        "grain": {
+          "seed": 5298,
+          "intensity": 0.187
+        },
+        "bg_motion": {
+          "base_scale": 1.12,
+          "amp_x": 14.3,
+          "amp_y": 16.8,
+          "freq": 1.31,
+          "phase": 2.337,
+          "drift_x": -15.7,
+          "drift_y": -12.1
+        },
+        "mirror": true,
+        "cam_drift": {
+          "zoom_from": 1.01,
+          "zoom_to": 1.078,
+          "dx": -2.9,
+          "dy": -5.4
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 22,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 4,
+          "opacity": 0.107
         }
       }
     }
-  ],
-  "forge": {
-    "pack_id": "LOGO-TS01_SANDOVAL-SIEGE-LOGO-20260804T174153-SA_VIDEO",
-    "siege_id": "SIEGE-LOGO-20260804T174153",
-    "pack_mode": "logo",
-    "campaign_id": null
-  }
+  ]
 };

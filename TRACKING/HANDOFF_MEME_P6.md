@@ -1,5 +1,21 @@
 # LACRIMAE — HANDOFF MODE MEME (P6 GHA) — reprise par un autre chat
 
+## CONTINUATION OFFICIELLE — DOOMSDAY / SIGNE PRÉ-F04 — 2026-08-19
+
+Le pack actif reste `LOGO-SIEGE-siege_20260818_134224`, en mode MEME, avec 8 clips. F00/Bridge et F02 sont validés. Le travail courant est limité à la préparation F03 avant validation opérateur ; **F04 n’est pas lancé**.
+
+Le patch en cours reprend le générateur SIGNE existant (`F04_RENDER/CODEBASE/lac_signe.py`) avec le sel déterministe `LACRIMAE-SIGNE-v1|pack_id`. Les 8 blocs `sig` sont injectés dans le codex et synchronisés vers les entrées F03/F04. Ils couvrent `bg_motion`, `mirror`, `cam_drift`, `flash` et `grain`.
+
+Le background reste un réglage de session : `bg_paper_crumpled.png` est disponible et peut être choisi par l’opérateur, mais ne doit jamais être considéré comme validé automatiquement. Une fois validé, il doit être hérité par les 8 clips dans F04 avec les paramètres globaux de session.
+
+Anton est embarquée localement depuis `SHARED/IN/fonts/Anton-Regular.ttf` vers les runtimes F03/F04. La preview F03 doit bloquer le rendu si Anton n’est pas réellement chargée. `validated_by_magos` reste `false` jusqu’au gate explicite de l’opérateur.
+
+Prochaine séquence : vérifier le diff, tester uniquement F03, présenter les 8 signatures et l’héritage de session, puis attendre la validation Champion avant tout F04.
+
+Patch local enregistré dans le commit `2e22486` (`feat(meme): préparer SIGNE et Anton avant F04`). Preview F03 construite avec succès ; `validated_by_magos` reste `false`. Aucun F04 lancé.
+
+---
+
 > Note de continuation. Session 2026-08-17 TERMINÉE : chaîne meme réelle ALLER-RETOUR
 > COMPLÈTE et validée par l'opérateur. Branche de travail : **`dev3`**.
 > Dernier SHA poussé : `04c7427` (git log origin/dev3 pour vérifier).

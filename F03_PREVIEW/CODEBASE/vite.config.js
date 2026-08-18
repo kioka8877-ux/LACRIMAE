@@ -6,7 +6,7 @@ export default defineConfig({
   base: './',
   server: {
     host: true,
-    allowedHosts: ['.monkeycode-ai.live'],
+    allowedHosts: ['.monkeycode-ai.live', '.manus.computer'],
   },
   build: {
     outDir: 'dist',

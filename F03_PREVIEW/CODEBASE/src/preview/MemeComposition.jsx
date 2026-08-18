@@ -5,7 +5,6 @@ import {
   useCurrentFrame,
   useVideoConfig,
   interpolate,
-  Video,
   staticFile,
 } from 'remotion';
 
@@ -94,6 +93,8 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp, masterC
   const bgBaseScale = sig.bg_motion?.base_scale ?? 1.0;
   const bgScale = (session.background?.scale ?? 1) * bgBaseScale;
   const bgProgress = frame / Math.max(1, durationInFrames);
+  const grainIntensity = sig.grain?.intensity ?? presets.grain_intensity ?? 0;
+  const grainSeed = sig.grain?.seed ?? 0;
   const bgX = Math.sin(bgProgress * Math.PI * 2 * (sig.bg_motion?.freq ?? 0) + (sig.bg_motion?.phase ?? 0)) * (sig.bg_motion?.amp_x ?? 0)
     + (sig.bg_motion?.drift_x ?? 0) * bgProgress;
   const bgY = Math.cos(bgProgress * Math.PI * 2 * (sig.bg_motion?.freq ?? 0) + (sig.bg_motion?.phase ?? 0)) * (sig.bg_motion?.amp_y ?? 0)
@@ -135,7 +136,7 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp, masterC
 
         {/* ── L2 TWEET (card type tweet) ── */}
         {clip.tweet?.text ? (
-          <TweetCard tweet={clip.tweet} width={width} />
+          <TweetCard tweet={clip.tweet} width={width} masterClip={masterClip} />
         ) : null}
 
         {/* ── L4 TEXTE ÉMOTION ── */}
@@ -146,15 +147,18 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp, masterC
         {/* ── L5 MEME (moitié basse, contain) ── */}
         <AbsoluteFill style={{ justifyContent: 'flex-end', alignItems: 'center' }}>
           <div style={{ width: '100%', height: `${memeHeightPct}%`, overflow: 'hidden', position: 'relative' }}>
-            <Video
+            <video
               src={videoUrl}
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
               loop={shouldLoop}
-              endAt={shouldLoop ? undefined : durationInFrames}
               style={{
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
-                transform: `scaleX(${mirrorFactor}) scale(${camZoom})`,
+                transform: `translate(${cam.dx ?? 0}px, ${cam.dy ?? 0}px) scaleX(${mirrorFactor}) scale(${camZoom})`,
               }}
             />
             {/* ── L6 WATERMARK @chaine ── */}
@@ -186,11 +190,11 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp, masterC
       })()}
 
       {/* Grain + vignette (comme OmniComposition) */}
-      {(presets.grain_intensity || 0) > 0 && (
-        <AbsoluteFill style={{ opacity: presets.grain_intensity, pointerEvents: 'none', mixBlendMode: 'overlay' }}>
+      {grainIntensity > 0 && (
+        <AbsoluteFill style={{ opacity: grainIntensity, pointerEvents: 'none', mixBlendMode: 'overlay' }}>
           <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
             <filter id="memeGrainFilter">
-              <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+              <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" seed={grainSeed} />
               <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0" />
             </filter>
             <rect width="100%" height="100%" filter="url(#memeGrainFilter)" />
@@ -210,7 +214,7 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp, masterC
 };
 
 /* ── L2 TWEET CARD : carte blanche (avatar + @handle + texte + stats) ── */
-const TweetCard = ({ tweet, width }) => {
+const TweetCard = ({ tweet, width, masterClip = {} }) => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: 'clamp' });
 
