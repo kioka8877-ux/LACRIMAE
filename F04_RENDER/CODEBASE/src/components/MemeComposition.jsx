@@ -137,7 +137,7 @@ export const MemeComposition = ({ codex: codexProp, session: sessionProp, master
 
         {/* ── L2 TWEET (card type tweet, milieu-haut) ── */}
         {clip.tweet?.text ? (
-          <TweetCard tweet={clip.tweet} width={width} anim={sig.text_anim} />
+          <TweetCard tweet={clip.tweet} width={width} anim={sig.text_anim} textSize={clip.tweet?.text_size ?? masterClip.tweet?.text_size} />
         ) : null}
 
         {/* ── L4 TEXTE ÉMOTION (milieu) ── */}
@@ -232,7 +232,7 @@ export const MemeComposition = ({ codex: codexProp, session: sessionProp, master
  * L2 — TweetCard : carte blanche type tweet (avatar + @handle + texte + stats)
  * Persona + stats générés par le bridge (seed déterministe), texte du pack.
  * ═══════════════════════════════════════════════════════════════════════════ */
-const TweetCard = ({ tweet, width, anim }) => {
+const TweetCard = ({ tweet, width, anim, textSize }) => {
   const frame = useCurrentFrame();
   const { transform: textTransform, opacity } = getTextAnim(frame, anim, 15);
 
@@ -240,7 +240,7 @@ const TweetCard = ({ tweet, width, anim }) => {
   const cardWidth = Math.round(width * ((tweet.width_pct || 82) / 100));
   const avatarColor = persona.avatar_color || '#1DA1F2';
   const initials = (persona.name || '?').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
-  const textScale = (tweet.text_size || masterClip.tweet?.text_size || 17) / 17;
+  const textScale = (textSize || 17) / 17;
 
   return (
     <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: '16%', pointerEvents: 'none' }}>
