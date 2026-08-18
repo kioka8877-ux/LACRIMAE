@@ -8,11 +8,11 @@ Le patch en cours reprend le générateur SIGNE existant (`F04_RENDER/CODEBASE/l
 
 Le background reste un réglage de session : `bg_paper_crumpled.png` est disponible et peut être choisi par l’opérateur, mais ne doit jamais être considéré comme validé automatiquement. Une fois validé, il doit être hérité par les 8 clips dans F04 avec les paramètres globaux de session.
 
-Anton est embarquée localement depuis `SHARED/IN/fonts/Anton-Regular.ttf` vers les runtimes F03/F04. La preview F03 doit bloquer le rendu si Anton n’est pas réellement chargée. `validated_by_magos` reste `false` jusqu’au gate explicite de l’opérateur.
+Anton est embarquée localement depuis `SHARED/IN/fonts/Anton-Regular.ttf` vers les runtimes F03/F04. La preview F03 doit bloquer le rendu si Anton n’est pas réellement chargée. Après validation explicite du Champion, `validated_by_magos` est passé à `true` pour autoriser F04.
 
 Prochaine séquence : vérifier le diff, tester uniquement F03, présenter les 8 signatures et l’héritage de session, puis attendre la validation Champion avant tout F04.
 
-Patch local enregistré dans le commit `2e22486` (`feat(meme): préparer SIGNE et Anton avant F04`). Preview F03 construite avec succès ; `validated_by_magos` reste `false`. Aucun F04 lancé.
+Patch local enregistré dans le commit `2e22486` (`feat(meme): préparer SIGNE et Anton avant F04`). Preview F03 construite avec succès. Le premier run F04 a été bloqué par CUSTOS car le codex poussé conservait `validated_by_magos: false`; le gate Champion étant maintenant validé, les codex F03/F04 sont corrigés à `true` avant relance. Aucun F05/F06/CLOSE.
 
 ---
 
