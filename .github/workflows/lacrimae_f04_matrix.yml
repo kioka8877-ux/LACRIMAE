@@ -63,7 +63,7 @@ jobs:
       - name: Télécharger les clips exacts depuis le run F02
         run: |
           mkdir -p "$RUNNER_TEMP/f04-input/clips"
-          if python3 tools/download_artifact_run.py "$SOURCE_RUN_ID" lac-clips "$RUNNER_TEMP/f04-input/clips"; then
+          if python3 tools/download_artifact_run.py "$SOURCE_RUN_ID" lac-clips "$RUNNER_TEMP/f04-input/clips" && [ "$(find "$RUNNER_TEMP/f04-input/clips" -maxdepth 1 -name '*.mp4' | wc -l)" -eq "$(python3 -c 'import json; print(len(json.load(open("F03_PREVIEW/IN/codex.json"))["clips"]))')" ]; then
             echo "F02 source artifact chargé depuis le run $SOURCE_RUN_ID"
           else
             echo "AVERTISSEMENT: lac-clips absent du run $SOURCE_RUN_ID; reprise des clips F02 versionnés dans dev3"
@@ -171,7 +171,7 @@ jobs:
   aggregate:
     name: F04 aggregate — vérification finale
     needs: [prepare, render]
-    if: always()
+    if: always() && needs.prepare.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
