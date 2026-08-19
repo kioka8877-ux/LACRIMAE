@@ -342,6 +342,12 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
 /* ═══════════════════════════════════════════════════════════════════════════
  * L3 — TitleBlock : titre en haut, fade-in, style du session.texts_style
  * ═══════════════════════════════════════════════════════════════════════════ */
+export const fitTwoLineFontSize = (content, baseSize, maxChars = 32) => {
+  const length = String(content || '').trim().length;
+  const ratio = length > maxChars ? maxChars / length : 1;
+  return Math.round(baseSize * Math.max(0.8, ratio));
+};
+
 export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, anim }) => {
   const frame = useCurrentFrame();
   const { transform: textTransform, opacity } = getTextAnim(frame, anim, 15);
@@ -351,7 +357,7 @@ export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, a
     ? {
         fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
         fontSynthesis: 'weight',
-        fontSize: `${style.size_title}px`,
+        fontSize: `${fitTwoLineFontSize(content, style.size_title, 32)}px`,
         color: box.text_color || style.color,
         fontWeight: 900,
         textTransform: 'uppercase',
@@ -364,12 +370,17 @@ export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, a
         borderRadius: `${box.radius || 0}px`,
         padding: `${box.padding || 12}px ${(box.padding || 12) * 1.6}px`,
         maxWidth: '88%',
+        display: '-webkit-box',
+        WebkitBoxOrient: 'vertical',
+        WebkitLineClamp: 2,
+        overflow: 'hidden',
+        overflowWrap: 'anywhere',
         wordWrap: 'break-word',
       }
     : {
         fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
         fontSynthesis: 'weight',
-        fontSize: `${style.size_title}px`,
+        fontSize: `${fitTwoLineFontSize(content, style.size_title, 32)}px`,
         color: style.color,
         WebkitTextStroke: `${style.stroke_width}px ${style.stroke_color}`,
         textShadow: style.shadow,
@@ -380,6 +391,11 @@ export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, a
         textAlign: 'center',
         opacity,
         maxWidth: '88%',
+        display: '-webkit-box',
+        WebkitBoxOrient: 'vertical',
+        WebkitLineClamp: 2,
+        overflow: 'hidden',
+        overflowWrap: 'anywhere',
         wordWrap: 'break-word',
       };
 
