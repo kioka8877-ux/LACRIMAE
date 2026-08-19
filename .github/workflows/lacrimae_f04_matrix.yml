@@ -59,6 +59,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/f04-input/codex"
           test -f F03_PREVIEW/IN/codex.json
+          python3 tools/validate_f04_codex.py F03_PREVIEW/IN/codex.json
           cp F03_PREVIEW/IN/codex.json "$RUNNER_TEMP/f04-input/codex/codex.json"
       - name: Télécharger les clips exacts depuis le run F02
         run: |

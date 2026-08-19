@@ -1,4 +1,3 @@
-// Généré par lac_signe.py (F04b SIGNE) — ne pas éditer à la main.
 export const codex = {
   "version": "4.1",
   "pipeline": "LACRIMAE_DEV",
@@ -13,9 +12,9 @@ export const codex = {
   },
   "session": {
     "background": {
-      "image": "bg_grid_dark.png",
+      "image": "bg_paper_crumpled.png",
       "color": "#0a0a0a",
-      "scale": 1.0
+      "scale": 1
     },
     "logo": {
       "src": "logo.png",
@@ -32,9 +31,9 @@ export const codex = {
     },
     "texts_style": {
       "font": "Impact, Arial Black, sans-serif",
-      "size_title": 64,
-      "size_paragraph": 40,
-      "color": "#FFFFFF",
+      "size_title": 91,
+      "size_paragraph": 41,
+      "color": "#8ed30d",
       "stroke_color": "#000000",
       "stroke_width": 4,
       "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
@@ -44,14 +43,16 @@ export const codex = {
     "presets": {
       "color_preset": "punchy",
       "color_css_filter": "contrast(1.3) saturate(1.5) brightness(1.1)",
-      "enhance_4k": false,
+      "enhance_4k": true,
       "sharpening": 0,
       "denoising": 0,
       "vignette": 0.25,
-      "grain_intensity": 0.15
+      "grain_intensity": 0.15,
+      "contrast": 0.95,
+      "brightness": 1.15
     }
   },
-  "validated_by_magos": false,
+  "validated_by_magos": true,
   "clips": [
     {
       "id": "clip_001",
@@ -64,7 +65,8 @@ export const codex = {
         "height": 1920
       },
       "meme": {
-        "source": "meme_003.mp4"
+        "source": "meme_003.mp4",
+        "height_pct": 48
       },
       "texts": {
         "mode": "title",
@@ -94,7 +96,8 @@ export const codex = {
         },
         "likes": 9121,
         "reposts": 1180,
-        "replies": 710
+        "replies": 710,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
@@ -132,7 +135,9 @@ export const codex = {
           "frame": 3,
           "opacity": 0.094
         }
-      }
+      },
+      "text_emotion_position_pct": 92,
+      "text_emotion_size": 100
     },
     {
       "id": "clip_002",
@@ -145,7 +150,8 @@ export const codex = {
         "height": 1920
       },
       "meme": {
-        "source": "meme_003.mp4"
+        "source": "meme_003.mp4",
+        "height_pct": 48
       },
       "texts": {
         "mode": "title",
@@ -177,7 +183,8 @@ export const codex = {
         },
         "likes": 16191,
         "reposts": 985,
-        "replies": 433
+        "replies": 433,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
@@ -215,7 +222,9 @@ export const codex = {
           "frame": 5,
           "opacity": 0.08
         }
-      }
+      },
+      "text_emotion_position_pct": 92,
+      "text_emotion_size": 100
     },
     {
       "id": "clip_003",
@@ -228,7 +237,8 @@ export const codex = {
         "height": 1920
       },
       "meme": {
-        "source": "meme_003.mp4"
+        "source": "meme_003.mp4",
+        "height_pct": 48
       },
       "texts": {
         "mode": "title",
@@ -258,7 +268,8 @@ export const codex = {
         },
         "likes": 24846,
         "reposts": 1692,
-        "replies": 664
+        "replies": 664,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
@@ -296,7 +307,9 @@ export const codex = {
           "frame": 2,
           "opacity": 0.089
         }
-      }
+      },
+      "text_emotion_position_pct": 92,
+      "text_emotion_size": 100
     },
     {
       "id": "clip_004",
@@ -309,7 +322,8 @@ export const codex = {
         "height": 1920
       },
       "meme": {
-        "source": "meme_003.mp4"
+        "source": "meme_003.mp4",
+        "height_pct": 48
       },
       "texts": {
         "mode": "title",
@@ -341,7 +355,8 @@ export const codex = {
         },
         "likes": 22662,
         "reposts": 2058,
-        "replies": 775
+        "replies": 775,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
@@ -379,7 +394,9 @@ export const codex = {
           "frame": 6,
           "opacity": 0.113
         }
-      }
+      },
+      "text_emotion_position_pct": 92,
+      "text_emotion_size": 100
     },
     {
       "id": "clip_005",
@@ -392,7 +409,8 @@ export const codex = {
         "height": 1920
       },
       "meme": {
-        "source": "meme_002.mp4"
+        "source": "meme_002.mp4",
+        "height_pct": 48
       },
       "texts": {
         "mode": "title",
@@ -424,7 +442,8 @@ export const codex = {
         },
         "likes": 18624,
         "reposts": 2494,
-        "replies": 202
+        "replies": 202,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
@@ -462,7 +481,9 @@ export const codex = {
           "frame": 4,
           "opacity": 0.088
         }
-      }
+      },
+      "text_emotion_position_pct": 92,
+      "text_emotion_size": 100
     },
     {
       "id": "clip_006",
@@ -475,7 +496,8 @@ export const codex = {
         "height": 1920
       },
       "meme": {
-        "source": "meme_002.mp4"
+        "source": "meme_002.mp4",
+        "height_pct": 48
       },
       "texts": {
         "mode": "title",
@@ -508,7 +530,8 @@ export const codex = {
         },
         "likes": 15389,
         "reposts": 1640,
-        "replies": 196
+        "replies": 196,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
@@ -546,7 +569,9 @@ export const codex = {
           "frame": 3,
           "opacity": 0.067
         }
-      }
+      },
+      "text_emotion_position_pct": 92,
+      "text_emotion_size": 100
     },
     {
       "id": "clip_007",
@@ -559,7 +584,8 @@ export const codex = {
         "height": 1920
       },
       "meme": {
-        "source": "meme_003.mp4"
+        "source": "meme_003.mp4",
+        "height_pct": 48
       },
       "texts": {
         "mode": "title",
@@ -589,7 +615,8 @@ export const codex = {
         },
         "likes": 7459,
         "reposts": 2374,
-        "replies": 48
+        "replies": 48,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
@@ -627,7 +654,9 @@ export const codex = {
           "frame": 5,
           "opacity": 0.133
         }
-      }
+      },
+      "text_emotion_position_pct": 92,
+      "text_emotion_size": 100
     },
     {
       "id": "clip_008",
@@ -640,7 +669,8 @@ export const codex = {
         "height": 1920
       },
       "meme": {
-        "source": "meme_003.mp4"
+        "source": "meme_003.mp4",
+        "height_pct": 48
       },
       "texts": {
         "mode": "title",
@@ -668,7 +698,8 @@ export const codex = {
         },
         "likes": 5727,
         "reposts": 575,
-        "replies": 384
+        "replies": 384,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
@@ -706,7 +737,9 @@ export const codex = {
           "frame": 4,
           "opacity": 0.107
         }
-      }
+      },
+      "text_emotion_position_pct": 92,
+      "text_emotion_size": 100
     }
   ]
 };
