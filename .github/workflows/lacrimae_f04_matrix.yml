@@ -137,6 +137,7 @@ jobs:
           cp "$RUNNER_TEMP/f04-bundle/codex.json" F04_RENDER/CODEBASE/public/codex.json
           cp "$RUNNER_TEMP/f04-bundle/clips/${{ matrix.filename }}" "F04_RENDER/CODEBASE/public/${{ matrix.filename }}"
           test -s SHARED/IN/fonts/Anton-Regular.ttf
+          fc-scan --format '%{family}\n' SHARED/IN/fonts/Anton-Regular.ttf | grep -Fx 'Anton'
           mkdir -p F04_RENDER/CODEBASE/public/fonts
           cp SHARED/IN/fonts/Anton-Regular.ttf F04_RENDER/CODEBASE/public/fonts/Anton-Regular.ttf
           if [ -d SHARED/IN/backgrounds ]; then mkdir -p F04_RENDER/CODEBASE/public/backgrounds && cp SHARED/IN/backgrounds/* F04_RENDER/CODEBASE/public/backgrounds/ || true; fi
@@ -146,6 +147,7 @@ jobs:
       - name: Vérifier les entrées visuelles sans valider automatiquement le background
         run: |
           test -s F04_RENDER/CODEBASE/public/fonts/Anton-Regular.ttf
+          fc-scan --format '%{family}\n' F04_RENDER/CODEBASE/public/fonts/Anton-Regular.ttf | grep -Fx 'Anton'
           if [ -f F04_RENDER/CODEBASE/public/backgrounds/bg_paper_crumpled.png ]; then echo 'bg_paper_crumpled.png disponible'; fi
       - name: Synchroniser codexData.js
         run: |
