@@ -14,7 +14,7 @@ import {
   TitleBlock,
   LogoOverlay,
   getTextAnim,
-  fitTwoLineFontSize,
+  fitOneLineFontSize,
 } from './OmniComposition';
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -327,16 +327,15 @@ const EmotionText = ({ content, style, totalFrames, anim, positionPct = 43, font
       <div style={{
         fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
         fontSynthesis: 'weight',
-        fontSize: `${fitTwoLineFontSize(content, fontSize, 28)}px`,
+        fontSize: `${fitOneLineFontSize(content, fontSize, 28)}px`,
         color: style.color,
         WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,
         textShadow: style.shadow,
         fontWeight: 700,
         textAlign: 'center',
         maxWidth: '88%',
-        display: '-webkit-box',
-        WebkitBoxOrient: 'vertical',
-        WebkitLineClamp: 2,
+        display: 'block',
+        whiteSpace: 'nowrap',
         overflow: 'hidden',
         overflowWrap: 'anywhere',
         textTransform: 'uppercase',

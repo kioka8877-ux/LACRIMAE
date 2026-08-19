@@ -38,6 +38,8 @@ def main():
         if (session.get(block) or {}).get(key) is None:
             fail(f'paramètre session absent: {block}.{key}')
     master = clips[0]
+    if (session.get('texts_style') or {}).get('size_title') != 55:
+        fail(f"size_title maître inattendu: {(session.get('texts_style') or {}).get('size_title')!r} (attendu 55 après réduction de 40%)")
     expected = {
         'tweet.text_size': (master.get('tweet') or {}).get('text_size'),
         'text_emotion_position_pct': master.get('text_emotion_position_pct'),
@@ -50,8 +52,8 @@ def main():
         fail(f"tweet.text_size maître inattendu: {expected['tweet.text_size']!r}")
     if expected['text_emotion_position_pct'] != 92:
         fail(f"position émotion maître inattendue: {expected['text_emotion_position_pct']!r}")
-    if expected['text_emotion_size'] != 100:
-        fail(f"taille émotion maître inattendue: {expected['text_emotion_size']!r}")
+    if expected['text_emotion_size'] != 60:
+        fail(f"taille émotion maître inattendue: {expected['text_emotion_size']!r} (attendu 60 après réduction de 40%)")
     for index, clip in enumerate(clips, 1):
         if not clip.get('sig'):
             fail(f'SIGNE absent sur clip {index:03d}')

@@ -342,10 +342,10 @@ export const OmniComposition = ({ codex: codexProp, session: sessionProp }) => {
 /* ═══════════════════════════════════════════════════════════════════════════
  * L3 — TitleBlock : titre en haut, fade-in, style du session.texts_style
  * ═══════════════════════════════════════════════════════════════════════════ */
-export const fitTwoLineFontSize = (content, baseSize, maxChars = 32) => {
+export const fitOneLineFontSize = (content, baseSize, maxChars = 32) => {
   const length = String(content || '').trim().length;
   const ratio = length > maxChars ? maxChars / length : 1;
-  return Math.round(baseSize * Math.max(0.8, ratio));
+  return Math.round(baseSize * Math.max(0.6, ratio));
 };
 
 export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, anim }) => {
@@ -357,7 +357,7 @@ export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, a
     ? {
         fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
         fontSynthesis: 'weight',
-        fontSize: `${fitTwoLineFontSize(content, style.size_title, 32)}px`,
+        fontSize: `${fitOneLineFontSize(content, style.size_title, 32)}px`,
         color: box.text_color || style.color,
         fontWeight: 900,
         textTransform: 'uppercase',
@@ -370,9 +370,8 @@ export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, a
         borderRadius: `${box.radius || 0}px`,
         padding: `${box.padding || 12}px ${(box.padding || 12) * 1.6}px`,
         maxWidth: '88%',
-        display: '-webkit-box',
-        WebkitBoxOrient: 'vertical',
-        WebkitLineClamp: 2,
+        display: 'block',
+        whiteSpace: 'nowrap',
         overflow: 'hidden',
         overflowWrap: 'anywhere',
         wordWrap: 'break-word',
@@ -380,7 +379,7 @@ export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, a
     : {
         fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
         fontSynthesis: 'weight',
-        fontSize: `${fitTwoLineFontSize(content, style.size_title, 32)}px`,
+        fontSize: `${fitOneLineFontSize(content, style.size_title, 32)}px`,
         color: style.color,
         WebkitTextStroke: `${style.stroke_width}px ${style.stroke_color}`,
         textShadow: style.shadow,
@@ -391,9 +390,8 @@ export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, a
         textAlign: 'center',
         opacity,
         maxWidth: '88%',
-        display: '-webkit-box',
-        WebkitBoxOrient: 'vertical',
-        WebkitLineClamp: 2,
+        display: 'block',
+        whiteSpace: 'nowrap',
         overflow: 'hidden',
         overflowWrap: 'anywhere',
         wordWrap: 'break-word',
@@ -438,10 +436,9 @@ export const ParagraphBlock = ({ content, style, box, totalFrames, offsetPct, an
         maxWidth: '88%',
         maxHeight: '22%',
         overflow: 'hidden',
-        display: '-webkit-box',
+        display: 'block',
         WebkitLineClamp: 4,
-        WebkitBoxOrient: 'vertical',
-        wordWrap: 'break-word',
+                wordWrap: 'break-word',
       }
     : {
         fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
@@ -456,10 +453,9 @@ export const ParagraphBlock = ({ content, style, box, totalFrames, offsetPct, an
         maxWidth: '88%',
         maxHeight: '22%',
         overflow: 'hidden',
-        display: '-webkit-box',
+        display: 'block',
         WebkitLineClamp: 4,
-        WebkitBoxOrient: 'vertical',
-        wordWrap: 'break-word',
+                wordWrap: 'break-word',
       };
 
   return (

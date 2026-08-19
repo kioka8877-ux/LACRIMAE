@@ -31,7 +31,7 @@
     },
     "texts_style": {
       "font": "Impact, Arial Black, sans-serif",
-      "size_title": 91,
+      "size_title": 55,
       "size_paragraph": 41,
       "color": "#8ed30d",
       "stroke_color": "#000000",
@@ -137,7 +137,7 @@
         }
       },
       "text_emotion_position_pct": 92,
-      "text_emotion_size": 100
+      "text_emotion_size": 60
     },
     {
       "id": "clip_002",
@@ -224,7 +224,7 @@
         }
       },
       "text_emotion_position_pct": 92,
-      "text_emotion_size": 100
+      "text_emotion_size": 60
     },
     {
       "id": "clip_003",
@@ -309,7 +309,7 @@
         }
       },
       "text_emotion_position_pct": 92,
-      "text_emotion_size": 100
+      "text_emotion_size": 60
     },
     {
       "id": "clip_004",
@@ -396,7 +396,7 @@
         }
       },
       "text_emotion_position_pct": 92,
-      "text_emotion_size": 100
+      "text_emotion_size": 60
     },
     {
       "id": "clip_005",
@@ -483,7 +483,7 @@
         }
       },
       "text_emotion_position_pct": 92,
-      "text_emotion_size": 100
+      "text_emotion_size": 60
     },
     {
       "id": "clip_006",
@@ -571,7 +571,7 @@
         }
       },
       "text_emotion_position_pct": 92,
-      "text_emotion_size": 100
+      "text_emotion_size": 60
     },
     {
       "id": "clip_007",
@@ -656,7 +656,7 @@
         }
       },
       "text_emotion_position_pct": 92,
-      "text_emotion_size": 100
+      "text_emotion_size": 60
     },
     {
       "id": "clip_008",
@@ -739,7 +739,7 @@
         }
       },
       "text_emotion_position_pct": 92,
-      "text_emotion_size": 100
+      "text_emotion_size": 60
     }
   ]
 }
