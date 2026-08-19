@@ -404,6 +404,7 @@ export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, a
         alignItems: 'center',
         paddingTop: `${offsetPct}%`,
         pointerEvents: 'none',
+        zIndex: 40,
       }}
     >
       <div style={{ ...textStyle, opacity, transform: textTransform }}>{content}</div>
@@ -465,6 +466,7 @@ export const ParagraphBlock = ({ content, style, box, totalFrames, offsetPct, an
         alignItems: 'center',
         paddingBottom: `${offsetPct}%`,
         pointerEvents: 'none',
+        zIndex: 40,
       }}
     >
       <div style={{ ...textStyle, opacity, transform: textTransform }}>{content}</div>

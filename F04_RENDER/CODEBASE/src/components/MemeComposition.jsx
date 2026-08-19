@@ -154,7 +154,7 @@ export const MemeComposition = ({ codex: codexProp, session: sessionProp, master
         ) : null}
 
         {/* ── L5 MEME (vidéo horizontale, moitié basse, contain) ── */}
-        <AbsoluteFill style={{ justifyContent: 'flex-end', alignItems: 'center' }}>
+        <AbsoluteFill style={{ justifyContent: 'flex-end', alignItems: 'center', zIndex: 10 }}>
           <div style={{ width: '100%', height: `${memeHeightPct}%`, overflow: 'hidden', position: 'relative' }}>
             <OffthreadVideo
               src={memeSrc}
@@ -244,7 +244,7 @@ const TweetCard = ({ tweet, width, anim, textSize }) => {
   const textScale = (textSize || 17) / 17;
 
   return (
-    <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: '16%', pointerEvents: 'none' }}>
+    <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: '16%', pointerEvents: 'none', zIndex: 20 }}>
       <div style={{
         width: cardWidth,
         backgroundColor: '#FFFFFF',
@@ -323,7 +323,7 @@ const EmotionText = ({ content, style, totalFrames, anim, positionPct = 43, font
   const { transform: textTransform, opacity } = getTextAnim(frame, anim, 20);
 
   return (
-    <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: `${positionPct}%`, pointerEvents: 'none' }}>
+    <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: `${positionPct}%`, pointerEvents: 'none', zIndex: 40 }}>
       <div style={{
         fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
         fontSynthesis: 'weight',

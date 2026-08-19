@@ -50,10 +50,10 @@ def main():
             fail(f'paramètre maître absent: {name}')
     if expected['tweet.text_size'] != 51:
         fail(f"tweet.text_size maître inattendu: {expected['tweet.text_size']!r}")
-    if expected['text_emotion_position_pct'] != 92:
-        fail(f"position émotion maître inattendue: {expected['text_emotion_position_pct']!r}")
-    if expected['text_emotion_size'] != 60:
-        fail(f"taille émotion maître inattendue: {expected['text_emotion_size']!r} (attendu 60 après réduction de 40%)")
+    if expected['text_emotion_position_pct'] != 84:
+        fail(f"position émotion maître inattendue: {expected['text_emotion_position_pct']!r} (attendu 84% après remontée)")
+    if expected['text_emotion_size'] != 72:
+        fail(f"taille émotion maître inattendue: {expected['text_emotion_size']!r} (attendu 72 après hausse de 20%)")
     for index, clip in enumerate(clips, 1):
         if not clip.get('sig'):
             fail(f'SIGNE absent sur clip {index:03d}')
