@@ -2,10 +2,16 @@ name: F05-F06 CAMOUFLAGE + LUTHER (dev)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [dev, dev3]
-    paths:
-      - '.github/workflows/f05-f06.yml'
+    inputs:
+      source_run_id:
+        description: 'Run F04 Matrix source de lac-video-finale'
+        required: true
+        type: string
+      source_artifact:
+        description: 'Nom de l’artifact F04 final'
+        required: false
+        default: 'lac-video-finale'
+        type: string
 
 permissions:
   contents: write
@@ -13,8 +19,9 @@ permissions:
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  WORKFLOW_SRC: f04-render.yml
   BRANCH: ${{ github.ref_name }}
+  SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+  SOURCE_ARTIFACT: ${{ inputs.source_artifact || 'lac-video-finale' }}
 
 jobs:
   camoufler:
@@ -37,23 +44,13 @@ jobs:
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: F05 - Download clips rendus (artifacts f04-render)
+      - name: F05 - Download artifact final du F04 Matrix
         run: |
-          mkdir -p F05_CAMOUFLAGE/IN
-          # Clips à récupérer : ceux du codex (mode MEME = N clips) sinon les 5
-          # par défaut (mode stars). Les artifacts absents sont ignorés — le
-          # camouflage traite ce qui est présent.
-          CLIPS=""
-          if [ -f F04_RENDER/IN/codex.json ]; then
-            CLIPS=$(python3 -c "import json; c=json.load(open('F04_RENDER/IN/codex.json')); cs=c.get('clips') or [c]; print(' '.join((x.get('id') or x['video']['source'].replace('.mp4','')).replace('_','-') for x in cs if x.get('video')))")
-          fi
-          if [ -z "$CLIPS" ]; then CLIPS="clip-001 clip-002 clip-003 clip-004 clip-005"; fi
-          echo "  [→] Clips attendus : $CLIPS"
-          for A in $CLIPS; do
-            python3 _tools/download_artifact.py "$GH_TOKEN" "$WORKFLOW_SRC" "$A" F05_CAMOUFLAGE/IN/ "$BRANCH" \
-              || echo "  [!] artifact $A absent (ignoré)"
-          done
-          ls -la F05_CAMOUFLAGE/IN/
+          test -n "$SOURCE_RUN_ID"
+          python3 tools/download_artifact_run.py "$SOURCE_RUN_ID" "$SOURCE_ARTIFACT" F05_CAMOUFLAGE/IN/
+          test -n "$(find F05_CAMOUFLAGE/IN -type f -name '*.mp4' -print -quit)"
+          echo "  [→] Source F04 : run $SOURCE_RUN_ID / artifact $SOURCE_ARTIFACT"
+          find F05_CAMOUFLAGE/IN -maxdepth 2 -type f -printf '%p\n'
 
       - name: F05 - Camouflage (wipe métadonnées + loudnorm -14 LUFS)
         run: |
