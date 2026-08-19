@@ -10,7 +10,9 @@ Le job `aggregate` récupère les artifacts individuels, peut réutiliser les ar
 
 Outils ajoutés : `tools/f04_prepare_matrix.py`, `tools/download_artifact_run.py`, `tools/download_f04_artifacts_run.py` et `tools/f04_aggregate.py`. Le contrôle statique du workflow et la préparation locale non-render ont confirmé une matrix de 8 clips ; aucun rendu local n’a été utilisé comme validation.
 
-Le correctif est prêt à être committé et poussé après vérification du diff. Le prochain run GitHub Actions devra utiliser le `source_run_id` exact du F02 Doomsday ; le lien du run sera fourni après déclenchement. Aucun F05/F06/CLOSE.
+Le run GitHub Actions F04 Matrix `32202328238` est terminé avec succès : `prepare` a validé 8 assets, les 8 jobs `clip-001` à `clip-008` ont rendu et publié leurs artifacts indépendants, puis `aggregate` a validé le pack et publié `lac-video-finale`. La source artifact indiquée `32016600916` contenait un ancien inventaire incomplet ; le fallback contrôlé a donc repris les 8 clips F02 versionnés dans `dev3`, après contrôle du compte attendu. Anton a été vérifiée dans chaque job et `bg_paper_crumpled.png` est resté disponible sans validation automatique.
+
+F04 est validé par le run `32202328238`. Prochaine étape autorisée : gate Champion avant F05. Aucun F05/F06/CLOSE n’a été lancé.
 
 ## CONTINUATION OFFICIELLE — DOOMSDAY / SIGNE PRÉ-F04 — 2026-08-19
 
