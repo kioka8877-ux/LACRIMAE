@@ -350,6 +350,7 @@ export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, a
   const textStyle = boxEnabled
     ? {
         fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
+        fontSynthesis: 'weight',
         fontSize: `${style.size_title}px`,
         color: box.text_color || style.color,
         fontWeight: 900,
@@ -367,6 +368,7 @@ export const TitleBlock = ({ content, style, box, fps, totalFrames, offsetPct, a
       }
     : {
         fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
+        fontSynthesis: 'weight',
         fontSize: `${style.size_title}px`,
         color: style.color,
         WebkitTextStroke: `${style.stroke_width}px ${style.stroke_color}`,
