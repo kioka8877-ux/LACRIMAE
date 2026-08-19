@@ -1,5 +1,17 @@
 # LACRIMAE — HANDOFF MODE MEME (P6 GHA) — reprise par un autre chat
 
+## CONTINUATION OFFICIELLE — DOOMSDAY / F04 MATRIX — 2026-08-19
+
+Le run F04 séquentiel `32198287329` a rendu les clips précédents puis a échoué sur `clip-006` avec un HTTP 404 sur `public/clip_006.mp4`. Le correctif `masterClip` est confirmé fonctionnel ; la cause restante était la préparation incomplète ou ambiguë des artifacts F02.
+
+F04 est désormais réorganisé dans `.github/workflows/lacrimae_f04_matrix.yml` : un job `prepare` télécharge le `lac-clips` depuis un `source_run_id` F02 explicite, lit le codex versionné de `dev3`, calcule les SHA-256 et refuse de démarrer si un asset attendu manque. La matrix crée ensuite un job indépendant par clip avec `fail-fast: false`, `max_parallel` configurable et artifact individuel `f04-clip-XXX`.
+
+Le job `aggregate` récupère les artifacts individuels, peut réutiliser les artifacts réussis d’un `resume_run_id`, refuse toute publication si un clip manque, puis publie `lac-video-finale` uniquement quand les N clips du codex sont présents. Les inputs `source_run_id`, `clip_ids`, `resume_run_id` et `max_parallel` permettent une reprise ciblée sans refaire les clips déjà réussis. F05/F06/CLOSE ne sont pas déclenchés par ce workflow.
+
+Outils ajoutés : `tools/f04_prepare_matrix.py`, `tools/download_artifact_run.py`, `tools/download_f04_artifacts_run.py` et `tools/f04_aggregate.py`. Le contrôle statique du workflow et la préparation locale non-render ont confirmé une matrix de 8 clips ; aucun rendu local n’a été utilisé comme validation.
+
+Le correctif est prêt à être committé et poussé après vérification du diff. Le prochain run GitHub Actions devra utiliser le `source_run_id` exact du F02 Doomsday ; le lien du run sera fourni après déclenchement. Aucun F05/F06/CLOSE.
+
 ## CONTINUATION OFFICIELLE — DOOMSDAY / SIGNE PRÉ-F04 — 2026-08-19
 
 Le pack actif reste `LOGO-SIEGE-siege_20260818_134224`, en mode MEME, avec 8 clips. F00/Bridge et F02 sont validés. Le travail courant est limité à la préparation F03 avant validation opérateur ; **F04 n’est pas lancé**.
