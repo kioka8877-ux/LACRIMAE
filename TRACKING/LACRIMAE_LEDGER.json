@@ -4,10 +4,11 @@
   "fregates": {
     "F00": "2026-08-18T20:44:00Z",
     "BRIDGE": "2026-08-18T20:44:00Z",
-    "F02": "2026-08-18T20:45:10Z"
+    "F02": "2026-08-18T20:45:10Z",
+    "F05": "2026-08-19T01:42:07Z"
   },
-  "fregate_actuelle": "F03_PREVIEW",
-  "derniere_mise_a_jour": "2026-08-18T20:45:10Z",
+  "fregate_actuelle": "F05",
+  "derniere_mise_a_jour": "2026-08-19T01:42:07Z",
   "pack": {
     "pack_id": "LOGO-SIEGE-siege_20260818_134224",
     "source_repo": "kioka8877-ux/PERTURABO",
@@ -15,7 +16,10 @@
     "sub_mode": "meme",
     "videos_count": 8,
     "duration_sec": 6,
-    "memes": ["meme_002", "meme_003"],
+    "memes": [
+      "meme_002",
+      "meme_003"
+    ],
     "background": "bg_grid_dark.png"
   },
   "gates": {
@@ -31,14 +35,14 @@
     "f02_clips": "F02_FORMAT/OUT/clips/clip_001.mp4..clip_008.mp4"
   },
   "brief": {
-    "source": "BRIDGE_PERTURABO/IN/production_pack.json",
+    "source": "",
     "title": "",
-    "sujet": "Marvel Doomsday",
-    "vibe": "meme",
-    "sequences": 8,
+    "sujet": "",
+    "vibe": "",
+    "sequences": 2,
     "min_dur": 3,
     "max_dur": 10,
-    "profile": "meme",
+    "profile": "background",
     "preset": "punchy",
     "model": ""
   },
