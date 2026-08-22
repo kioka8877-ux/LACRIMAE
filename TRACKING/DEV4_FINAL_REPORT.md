@@ -58,4 +58,4 @@ La validation humaine entre la preview et le rendu est représentée par l’exp
 
 ## Commit final
 
-Le commit final sera indiqué après le push de la branche `dev4`. La branche `main` n’a pas été modifiée.
+Commit final : `263d0c848d7b85571ac46fc4467012e4e258cc2b` (`feat(dev4): complete virtual match-cut pipeline`). La branche `dev4` a été poussée sur `origin/dev4` et la branche `main` n’a pas été modifiée.
