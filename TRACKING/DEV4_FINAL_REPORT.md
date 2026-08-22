@@ -26,13 +26,15 @@ PICTOR a été sorti de son ancien chemin Colab/images. Il possède désormais u
 
 La parité de la composition et du résolveur de séquences entre preview et PICTOR a été vérifiée avec `cmp`. Le workflow resynchronise également ces deux fichiers avant le rendu afin d’éviter une divergence future.
 
-### Skip de F01, F02 et F04
+### F05/F06 et skips des frégates
 
-Le workflow `.github/workflows/dev4_pipeline.yml` accepte `skip_f01`, `skip_f02` et `skip_f04`. F04 doit rester ignorée dans dev4 : PICTOR produit déjà le MP4 final et le flux s’arrête volontairement après F03_PICTOR. Lorsque les trois paramètres valent `true`, le chemin direct est F00 → F03_PREVIEW → F03_PICTOR. Les skips sont inscrits dans `TRACKING/dev4_pipeline_state.txt`. Si `skip_f04` est désactivé, le workflow arrête explicitement le job, car la finalisation F04 est hors périmètre dev4.
+F05_CAMOUFLAGE reçoit `short_final.mp4`, réencode en H.264 `yuv420p` avec `+faststart`, supprime les métadonnées et gère correctement les vidéos sans audio. F06_LUTHER reçoit la sortie F05, retire les métadonnées résiduelles en stream copy, normalise le timestamp et produit `short_master.mp4` avec son rapport JSON.
+
+Le workflow accepte `skip_f01`, `skip_f02`, `skip_f04`, `skip_f05` et `skip_f06`. F04 doit rester ignorée dans dev4 : PICTOR produit déjà le rendu. F05 et F06 sont actives par défaut ; leurs skips sont réservés au debug. Lorsque F01, F02 et F04 sont ignorées, le chemin normal est F00 → F03_PREVIEW → F03_PICTOR → F05 → F06. Les décisions sont inscrites dans `TRACKING/dev4_pipeline_state.txt`.
 
 ### GitHub Actions
 
-Un job unique installe FFmpeg, Node.js et les dépendances Remotion, exécute F00, valide le manifeste, prépare les entrées communes, construit la preview, rend PICTOR et publie les JSON, le build de preview et le MP4 comme artifact.
+Un job unique installe FFmpeg, Node.js et les dépendances Remotion, exécute F00, valide le manifeste, prépare les entrées communes, construit la preview, rend PICTOR, exécute F05 puis F06 et publie les JSON, les rapports, le build de preview et `short_master.mp4` comme artifact.
 
 La vidéo source n’est pas commitée. Le runner attend `F00_INGEST/IN/video_source.mp4`. Le support d’une Release GitHub ou d’un stockage externe reste une amélioration ultérieure.
 
@@ -48,6 +50,9 @@ La vidéo source n’est pas commitée. Le runner attend `F00_INGEST/IN/video_so
 | Build Vite de F03_PREVIEW | Réussi |
 | Rendu PICTOR Remotion | Réussi, MP4 de 10,048 secondes |
 | Parité preview / PICTOR | Confirmée |
+| F05 sur vidéo muette | Réussi |
+| F06 en stream copy | Réussi |
+| Métadonnées finales suspectes | Aucune |
 | Contrôle `git diff --check` | Réussi |
 
 ## Limites connues
@@ -58,4 +63,4 @@ La validation humaine entre la preview et le rendu est représentée par l’exp
 
 ## Commit final
 
-Commit fonctionnel : `263d0c848d7b85571ac46fc4467012e4e258cc2b` (`feat(dev4): complete virtual match-cut pipeline`). Le commit de documentation final est `c1db925` et inclut l’exclusion explicite de F04. La branche `dev4` a été poussée sur `origin/dev4` et la branche `main` n’a pas été modifiée.
+Commit fonctionnel : `263d0c848d7b85571ac46fc4467012e4e258cc2b` (`feat(dev4): complete virtual match-cut pipeline`). Le commit de skip F04 est `8909d27`. Le commit d’intégration F05/F06 sera indiqué après le push. La branche `main` n’a pas été modifiée.

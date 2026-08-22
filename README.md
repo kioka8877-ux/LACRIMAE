@@ -22,9 +22,13 @@ visualisation et validation du montage
                 ▼
 F03 PICTOR
 rendu Remotion du Short final
-                │
-                ▼
-short_final.mp4
+        │
+        ▼
+F05 CAMOUFLAGE → F06 LUTHER
+préparation plateforme + nettoyage final
+        │
+        ▼
+short_master.mp4
 ```
 
 F00 produit `sequences.json`. Chaque ligne décrit l’emplacement de départ dans la vidéo source et l’emplacement de la séquence sur la timeline finale. Pour une cible de 10 secondes à 30 fps avec un cut toutes les 7 frames, le manifeste contient environ 43 à 44 séquences utilisées.
@@ -38,7 +42,9 @@ F00 produit `sequences.json`. Chaque ligne décrit l’emplacement de départ da
 | **F02 FORMAT** | Préparer un codex lorsque le mode standard est demandé. | `codex.json` |
 | **F03 PREVIEW** | Lire la vidéo source selon le manifeste et régler les presets. | `codex.json` validé |
 | **F03 PICTOR** | Rendre la composition validée en MP4. | `short_final.mp4` |
-| **F04** | Frégate ignorée : PICTOR fournit déjà le rendu final. | Aucun traitement dev4 |
+| **F04_RENDER** | Frégate ignorée : PICTOR fournit déjà le rendu. | Aucun traitement dev4 |
+| **F05 CAMOUFLAGE** | Réencoder, nettoyer et préparer le fichier pour la livraison. | `short_camouflaged.mp4` |
+| **F06 LUTHER** | Retirer les métadonnées sans réencodage et sceller le livrable. | `short_master.mp4` |
 
 CANTOR n’est pas requis pour ce flux visuel. Il pourra être réintroduit uniquement si une voix off ou des sous-titres synchronisés deviennent nécessaires.
 
@@ -90,19 +96,19 @@ npm install
 npm run render
 ```
 
-## Skip de F01 et F02
+## Skip de F01, F02, F04, F05 et F06
 
-Le workflow `.github/workflows/dev4_pipeline.yml` accepte trois entrées booléennes : `skip_f01`, `skip_f02` et `skip_f04`. `skip_f04` doit rester à `true`, car dev4 s’arrête volontairement après PICTOR. Lorsque les trois valent `true`, le chemin direct est :
+Le workflow `.github/workflows/dev4_pipeline.yml` accepte cinq entrées booléennes : `skip_f01`, `skip_f02`, `skip_f04`, `skip_f05` et `skip_f06`. `skip_f04` doit rester à `true`, car F04_RENDER est remplacée par PICTOR. F05 et F06 sont actives par défaut. Lorsque F01, F02 et F04 sont ignorées, le chemin normal est :
 
 ```text
-F00 → F03_PREVIEW → F03_PICTOR
+F00 → F03_PREVIEW → F03_PICTOR → F05_CAMOUFLAGE → F06_LUTHER
 ```
 
-Le skip est écrit dans `TRACKING/dev4_pipeline_state.txt`. F04 est journalisée comme `skipped_by_design_after_pictor`. Lorsqu’une frégate facultative n’est pas ignorée, le workflow exige sa sortie attendue au lieu de la contourner silencieusement.
+Le skip est écrit dans `TRACKING/dev4_pipeline_state.txt`. F04 est journalisée comme `skipped_by_design_pictor_replacement`. F05 et F06 restent actives par défaut ; leurs skips sont réservés au debug. Lorsqu’une frégate facultative n’est pas ignorée, le workflow exige sa sortie attendue au lieu de la contourner silencieusement.
 
 ## GitHub Actions
 
-Lancement manuel depuis l’onglet Actions : **LACRIMAE dev4 — Virtual Match Cut**. Le runner installe Node.js, FFmpeg et les dépendances Remotion, exécute F00, prépare un bundle commun, construit la preview, rend PICTOR et publie les JSON, le build de preview et le MP4 final comme artifact.
+Lancement manuel depuis l’onglet Actions : **LACRIMAE dev4 — Virtual Match Cut**. Le runner installe Node.js, FFmpeg et les dépendances Remotion, exécute F00, prépare un bundle commun, construit la preview, rend PICTOR, exécute F05 et F06, puis publie les JSON, les rapports, le build de preview et `short_master.mp4` comme artifact.
 
 La vidéo source n’est pas commitée. Elle doit être fournie au runner à l’emplacement `F00_INGEST/IN/video_source.mp4`, ou être téléchargée depuis un mécanisme d’asset externe qui sera ajouté dans une phase ultérieure.
 
