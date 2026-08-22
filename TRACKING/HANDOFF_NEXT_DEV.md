@@ -1,4 +1,17 @@
 # LACRIMAE — HANDOFF AU PROCHAIN DÉVELOPPEUR
+
+> **ÉTAT COURANT — 2026-08-22 — branche `dev3`.** Le cycle New York Bagel MEME est terminé de F01 à F06 sur GitHub Actions. Le pack PERTURABO contient 10 clips de 8 secondes. F04 Matrix `32575412198` a produit `lac-video-finale`; F05/F06 `32575989931` ont produit `lac-youtube` et `lac-clean`. `CLOSE` n’a pas été lancé.
+
+## Reprise immédiate — New York Bagel
+
+Le parcours validé est : `F01 forge → F02 → F03 Preview → gate Champion → F04 Matrix → F05/F06`. Ne pas relancer F00 pour ce type de pack : F00 attend une vidéo source et l’essai `32565891585` a échoué pour cette raison. Le mapping méméthèque validé est `M1 → Release m1 → Zoolander → SHARED/memes/M1.mp4`. Le background approuvé est `bg_paper_crumpled.png`.
+
+Le mode MEME dispose maintenant d’un zoom vidéo `1.00×–3.00×`, d’une couleur de fond Tweet Card, d’une couleur de texte, d’un curseur d’opacité du fond et d’un interrupteur de couleurs automatiques rouge/vert. Lorsque cet interrupteur est désactivé, le texte, le nom et le handle doivent utiliser la même couleur. Les changements F03 doivent toujours être exportés dans `F03_PREVIEW/IN/codex.json` avant F04.
+
+**Travail local à synchroniser :** les modifications des trois fichiers suivants ont été testées dans la preview sandbox mais restent à committer/pousser : `F03_PREVIEW/CODEBASE/src/App.jsx`, `F03_PREVIEW/CODEBASE/src/preview/MemeComposition.jsx` et `F04_RENDER/CODEBASE/src/components/MemeComposition.jsx`. Les guides et le handoff New York Bagel sont également mis à jour dans le même lot.
+
+---
+
 > *"Que l'Empereur protège son output."* — État exact de la forge, à reprendre dans un sandbox neuf.
 
 ---

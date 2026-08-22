@@ -137,7 +137,7 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp, masterC
 
         {/* ── L2 TWEET (card type tweet) ── */}
         {clip.tweet?.text ? (
-          <TweetCard tweet={clip.tweet} width={width} masterClip={masterClip} />
+          <TweetCard tweet={clip.tweet} width={width} masterClip={masterClip} tweetCard={session.tweet_card} />
         ) : null}
 
         {/* ── L4 TEXTE ÉMOTION ── */}
@@ -215,7 +215,18 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp, masterC
 };
 
 /* ── L2 TWEET CARD : carte blanche (avatar + @handle + texte + stats) ── */
-const TweetCard = ({ tweet, width, masterClip = {} }) => {
+const colorWithOpacity = (color, opacity = 1) => {
+  const hex = String(color || '#FFFFFF').replace('#', '');
+  if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, opacity))})`;
+  }
+  return color || '#FFFFFF';
+};
+
+const TweetCard = ({ tweet, width, masterClip = {}, tweetCard = {} }) => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: 'clamp' });
 
@@ -229,7 +240,7 @@ const TweetCard = ({ tweet, width, masterClip = {} }) => {
     <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: '16%', pointerEvents: 'none' }}>
       <div style={{
         width: cardWidth,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: colorWithOpacity(tweetCard.background_color || '#FFFFFF', tweetCard.background_opacity ?? 1),
         borderRadius: 16,
         padding: 18,
         boxShadow: '0 4px 18px rgba(0,0,0,0.4)',
@@ -253,16 +264,16 @@ const TweetCard = ({ tweet, width, masterClip = {} }) => {
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ fontWeight: 700, color: '#000', fontSize: 15 * textScale }}>{persona.name || 'User'}</span>
+              <span style={{ fontWeight: 700, color: tweetCard.text_color || '#000', fontSize: 15 * textScale }}>{persona.name || 'User'}</span>
               {persona.verified ? (
                 <span style={{ color: '#1DA1F2', fontSize: 14 * textScale, lineHeight: 1 }}>✓</span>
               ) : null}
             </div>
-            <div style={{ color: '#657786', fontSize: 13 * textScale }}>{persona.handle || '@user'}</div>
+            <div style={{ color: tweetCard.text_color || '#657786', fontSize: 13 * textScale }}>{persona.handle || '@user'}</div>
           </div>
         </div>
-        <div style={{ color: '#0f1419', fontSize: 17 * textScale, lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>
-          {renderTweetText(tweet.text, tweet.keywords_style)}
+        <div style={{ color: tweetCard.text_color || '#0f1419', fontSize: 17 * textScale, lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>
+          {renderTweetText(tweet.text, tweet.keywords_style, tweetCard.keyword_colors_enabled === true, tweetCard.text_color || '#0f1419')}
         </div>
         <div style={{ display: 'flex', gap: 24, marginTop: 12, color: '#657786', fontSize: 14 * textScale }}>
           <span>Reply {formatCount(tweet.replies)}</span>
@@ -274,8 +285,9 @@ const TweetCard = ({ tweet, width, masterClip = {} }) => {
   );
 };
 
-function renderTweetText(text, keywordsStyle = {}) {
+function renderTweetText(text, keywordsStyle = {}, keywordColorsEnabled = false, baseColor = '#0f1419') {
   if (!text) return null;
+  if (!keywordColorsEnabled) return <span style={{ color: baseColor }}>{text}</span>;
   const greenWords = (keywordsStyle.green || []).map((w) => w.toLowerCase());
   const redWords = (keywordsStyle.red || []).map((w) => w.toLowerCase());
   return text.split(/(\s+)/).map((word, i) => {

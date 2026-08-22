@@ -1,5 +1,22 @@
 # Guide d’utilisation Oracle / Champion — Production MEME
 
+> **Mise à jour New York Bagel — 2026-08-22.** Le cycle PERTURABO New York Bagel a été exécuté sur `dev3` avec 10 clips. Le parcours correct pour un pack PERTURABO MEME est `F01 forge → F02 → F03 Preview → validation Champion → F04 Matrix → F05/F06`; F00 est réservé à une ingestion de vidéo source et ne doit pas être utilisé pour ce type de pack.
+
+## Addendum opératoire — cycle New York Bagel
+
+Le pack `LOGO-SIEGE-siege_20260821_223947` contient 10 clips MEME de 8 secondes, angles A01–A10. F01 doit résoudre les références logiques de méméthèque depuis les Releases : `M1` correspond à la Release `m1` et à l’asset Zoolander, qui est normalisé en `SHARED/memes/M1.mp4` avant le contrôle du Bridge.
+
+F03 doit être utilisé pour vérifier visuellement le background papier froissé, Anton, SIGNE, le zoom vidéo, la Tweet Card et les textes. Le curseur vidéo autorise une échelle de `1.00×` à `3.00×`. La Tweet Card possède une couleur de fond, une couleur de texte et une opacité de fond réglable de `0%` à `100%`. Lorsque les couleurs automatiques sont désactivées, la couleur choisie s’applique uniformément au texte du tweet, au nom et au handle ; les couleurs vert/rouge ne doivent pas réapparaître dans les spans internes.
+
+Les contrôles de F03 ne deviennent des réglages F04 qu’après export dans `F03_PREVIEW/IN/codex.json`. Toute modification de couleur, d’opacité ou de zoom doit donc être exportée, relue et validée avant F04. Le background final de ce cycle est `bg_paper_crumpled.png`, et non `bg_grid_dark.png`.
+
+Le premier lancement F00 du cycle New York Bagel a échoué parce qu’il attendait une vidéo source ; cet incident ne doit pas être reproduit. F01 forge est la bonne entrée pour un pack PERTURABO déjà exporté. Le premier F01 a ensuite été corrigé pour résoudre `M1 → Release m1 → Zoolander`.
+
+Le cycle validé a utilisé les preuves suivantes : F01 `32567824796`, F02 `32568111714`, F03 Preview local sandbox, F04 Matrix `32575412198`, puis F05/F06 `32575989931`. F04 a rendu 10 jobs et publié `lac-video-finale`; F05 a publié `lac-youtube`; F06 a publié `lac-clean`. Aucun F04 ne doit être lancé avec un codex non validé (`validated_by_magos: false`).
+
+---
+
+
 **Projet :** LACRIMAE  
 **Branche de production de référence :** `dev3`  
 **Mode couvert :** `MEME`  
@@ -74,7 +91,7 @@ print('background =', c.get('background') or c.get('session', {}).get('backgroun
 PY
 ```
 
-Le Champion vérifie les huit clips, ou le nombre réel du pack, dans la preview. Tant que le codex exporté n’est pas exactement celui validé, F03 n’est pas validé.
+Le Champion vérifie les clips, ou le nombre réel du pack ; pour New York Bagel, il vérifie les **10 clips A01–A10** dans la preview. Tant que le codex exporté n’est pas exactement celui validé, F03 n’est pas validé.
 
 ### F03 — preview et export du codex
 
@@ -83,7 +100,7 @@ La preview sert à valider le rendu visuel global : background, proportions, cli
 Le contrôle correct est :
 
 1. Ouvrir la preview de `dev3`.
-2. Vérifier que les huit clips correspondent au pack MEME.
+2. Vérifier que les clips correspondent au pack MEME ; pour New York Bagel, contrôler les **10 clips**.
 3. Vérifier le background validé, notamment `bg_paper_crumpled.png` lorsqu’il est demandé.
 4. Vérifier Anton dans l’interface et dans les assets locaux.
 5. Vérifier le clip maître et la propagation de ses réglages.

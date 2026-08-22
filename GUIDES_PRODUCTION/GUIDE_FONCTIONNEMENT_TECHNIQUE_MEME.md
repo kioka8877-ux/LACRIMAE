@@ -1,5 +1,33 @@
 # Guide de fonctionnement technique — Pipeline MEME
 
+> **Mise à jour technique New York Bagel — 2026-08-22.** Le cycle validé sur `dev3` couvre 10 clips MEME et ajoute les contrats persistants de zoom vidéo, de style Tweet Card et de résolution des assets par tag de Release.
+
+## Addendum technique — contrats ajoutés
+
+Pour un pack PERTURABO MEME, F01 forge résout les références logiques de méméthèque. Le tag `M1` est associé à la Release GitHub `m1`, puis l’asset Zoolander est copié sous le nom interne `SHARED/memes/M1.mp4`. F04 ne doit pas supposer que la valeur logique `M1` est le nom physique de l’asset distant.
+
+Le zoom vidéo MEME est stocké dans `clip.video.scale` et borné entre `1.0` et `3.0`. Le renderer calcule `camZoom × video.scale`, afin de conserver les mouvements SIGNE tout en permettant l’agrandissement réglable. Le clip maître reste la source de repli selon la priorité locale → masterClip → session → défaut.
+
+Le bloc global `session.tweet_card` expose désormais :
+
+```json
+{
+  "background_color": "#FFFFFF",
+  "background_opacity": 1,
+  "text_color": "#0F1419",
+  "keyword_colors_enabled": false
+}
+```
+
+L’opacité est appliquée au seul fond par conversion de couleur en RGBA ; elle ne doit jamais être appliquée à l’opacité du conteneur, car cela rendrait le nom, le handle et le texte transparents eux aussi. Lorsque `keyword_colors_enabled` est faux, le renderer retourne un bloc de texte uniforme avec `text_color`. Lorsqu’il est vrai, la coloration rouge/verte des mots-clés est explicitement autorisée. Le nom et le handle utilisent la même `text_color`; le badge vérifié peut conserver sa couleur bleue dédiée.
+
+Ces réglages sont implémentés dans les deux miroirs : `F03_PREVIEW/CODEBASE/src/preview/MemeComposition.jsx` et `F04_RENDER/CODEBASE/src/components/MemeComposition.jsx`, avec les contrôles correspondants dans `F03_PREVIEW/CODEBASE/src/App.jsx`. Ils ne sont reproductibles par F04 qu’après export dans `F03_PREVIEW/IN/codex.json`.
+
+Le background validé du cycle est `bg_paper_crumpled.png`. Le menu peut également afficher `bg_grid_dark.png`, mais ce fichier ne doit pas remplacer silencieusement le choix du Champion dans le codex.
+
+---
+
+
 **Projet :** LACRIMAE  
 **Branche de référence :** `dev3`  
 **Mode :** `MEME`  
@@ -55,7 +83,7 @@ Le fichier `F03_PREVIEW/IN/codex.json` est la source de vérité de la compositi
 
 La génération de `F04_RENDER/CODEBASE/src/codexData.js` doit être dérivée du codex validé. Une copie ancienne ou un codex généré à nouveau par F02 peut contenir les bons clips mais les mauvais styles. C’est exactement le type de divergence qui a produit un F04 techniquement vert mais visuellement incorrect.
 
-Le validateur `tools/validate_f04_codex.py` doit être exécuté avant la construction de la matrix. Il vérifie notamment les huit clips du pack Doomsday, le background `bg_paper_crumpled.png`, le tweet maître à `51px`, l’émotion à `92% / 100px` et l’héritage des réglages.
+Le validateur `tools/validate_f04_codex.py` doit être exécuté avant la construction de la matrix. Il vérifie notamment le nombre réel de clips du pack, le background `bg_paper_crumpled.png`, les styles maître et l’héritage des réglages. Les valeurs « huit clips Doomsday » et « tweet à 51px » sont historiques et ne doivent pas être appliquées au pack New York Bagel.
 
 ## 3. F03 Preview : fonctionnement et export
 

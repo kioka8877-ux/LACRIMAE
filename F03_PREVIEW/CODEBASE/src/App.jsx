@@ -141,6 +141,7 @@ export default function App() {
 
   // ── Mode meme : helpers panneaux (tweet / émotion / watermark / meme) ──
   const updateTweet = (key, value) => setClip({ ...clip, tweet: { ...(clip.tweet || {}), [key]: value } });
+  const updateTweetCard = (key, value) => setSession((current) => ({ ...current, tweet_card: { ...(current.tweet_card || {}), [key]: value } }));
   const updateTweetKeywords = (group, value) => {
     const kw = { ...((clip.tweet || {}).keywords_style || {}), [group]: value.split(',').map((s) => s.trim()).filter(Boolean) };
     setClip({ ...clip, tweet: { ...(clip.tweet || {}), keywords_style: kw } });
@@ -1078,24 +1079,43 @@ export default function App() {
                   value={(clip.tweet || {}).text || ''}
                   onChange={(e) => updateTweet('text', e.target.value)}
                 />
-                <label style={styles.label}>
-                  Mots en vert (virgules) : {(clip.tweet || {}).keywords_style?.green || []}.join(', ')
-                </label>
+                <label style={styles.label}>Fond de la Tweet Card</label>
                 <input
-                  style={styles.input}
-                  type="text"
-                  value={((clip.tweet || {}).keywords_style?.green || []).join(', ')}
-                  onChange={(e) => updateTweetKeywords('green', e.target.value)}
+                  style={styles.colorPicker}
+                  type="color"
+                  value={hexColor(session.tweet_card?.background_color, '#FFFFFF')}
+                  onChange={(e) => updateTweetCard('background_color', e.target.value)}
+                />
+                <label style={styles.label}>Couleur du texte du tweet</label>
+                <input
+                  style={styles.colorPicker}
+                  type="color"
+                  value={hexColor(session.tweet_card?.text_color, '#0F1419')}
+                  onChange={(e) => updateTweetCard('text_color', e.target.value)}
                 />
                 <label style={styles.label}>
-                  Mots en rouge (virgules) : {(clip.tweet || {}).keywords_style?.red || []}.join(', ')
+                  Opacité du fond de la Tweet Card: {Math.round((session.tweet_card?.background_opacity ?? 1) * 100)}%
                 </label>
                 <input
-                  style={styles.input}
-                  type="text"
-                  value={((clip.tweet || {}).keywords_style?.red || []).join(', ')}
-                  onChange={(e) => updateTweetKeywords('red', e.target.value)}
+                  style={styles.slider}
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={session.tweet_card?.background_opacity ?? 1}
+                  onChange={(e) => updateTweetCard('background_opacity', parseFloat(e.target.value))}
                 />
+                <label style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px' }}>
+                  <input
+                    type="checkbox"
+                    checked={session.tweet_card?.keyword_colors_enabled === true}
+                    onChange={(e) => updateTweetCard('keyword_colors_enabled', e.target.checked)}
+                  />
+                  Activer les couleurs automatiques des mots-clés (vert/rouge)
+                </label>
+                <div style={{ marginTop: '6px', padding: '8px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
+                  Désactivé par défaut : tout le tweet utilise une seule couleur personnalisable.
+                </div>
                 <label style={styles.label}>
                   Largeur card: {((clip.tweet || {}).width_pct || 82)}%
                 </label>
