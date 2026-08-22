@@ -1,0 +1,104 @@
+name: LACRIMAE dev4 — F00 Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Tag de la release contenant la vidéo source'
+        required: true
+        default: 'f00'
+      target_duration_seconds:
+        description: 'Durée cible du Short en secondes'
+        required: true
+        default: '10'
+      cut_interval_frames:
+        description: 'Nombre de frames par séquence Fast Match Cut'
+        required: true
+        default: '7'
+      project_title:
+        description: 'Titre de la production'
+        required: true
+        default: 'Lacrimae F00 Gate'
+
+permissions:
+  contents: read
+
+jobs:
+  f00:
+    name: F00 INGEST — génération du manifeste
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      TARGET_DURATION: ${{ inputs.target_duration_seconds }}
+      CUT_INTERVAL: ${{ inputs.cut_interval_frames }}
+      PROJECT_TITLE: ${{ inputs.project_title }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout de la branche dev4
+        uses: actions/checkout@v4
+        with:
+          ref: dev4
+
+      - name: Installer FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Télécharger la vidéo de la release
+        run: |
+          mkdir -p F00_INGEST/IN F00_INGEST/OUT
+          gh release download "$RELEASE_TAG" \
+            --repo "${{ github.repository }}" \
+            --pattern '*.mp4' \
+            --dir F00_INGEST/IN \
+            --clobber
+          SOURCE=$(find F00_INGEST/IN -maxdepth 1 -type f -name '*.mp4' | head -n 1)
+          test -n "$SOURCE"
+          mv "$SOURCE" F00_INGEST/IN/video_source.mp4
+
+      - name: Préparer la demande F00
+        run: |
+          cat > F00_INGEST/IN/production_request.json <<JSON
+          {
+            "project_title": "${PROJECT_TITLE}",
+            "target_duration_seconds": ${TARGET_DURATION},
+            "cut_interval_frames": ${CUT_INTERVAL},
+            "candidate_count": 100,
+            "shuffle_seed": 2026,
+            "short_count": 1
+          }
+          JSON
+
+      - name: Exécuter F00 INGEST uniquement
+        run: |
+          python3 F00_INGEST/CODEBASE/f00_ingest.py \
+            --source F00_INGEST/IN/video_source.mp4 \
+            --request F00_INGEST/IN/production_request.json \
+            --out F00_INGEST/OUT
+
+      - name: Contrôler le Gate F00
+        run: |
+          test -s F00_INGEST/OUT/sequences.json
+          test -s F00_INGEST/OUT/ingest_report.json
+          test ! -e F00_INGEST/OUT/video_source.mp4
+          python3 tools/validate_dev4_contracts.py --sequences F00_INGEST/OUT/sequences.json
+          mkdir -p TRACKING
+          {
+            echo 'F00: completed'
+            echo "release_tag: $RELEASE_TAG"
+            echo "target_duration_seconds: $TARGET_DURATION"
+            echo "cut_interval_frames: $CUT_INTERVAL"
+            echo 'F01: skipped_by_gate_scope'
+            echo 'F02: skipped_by_gate_scope'
+            echo 'gate: awaiting_champion_validation'
+          } | tee TRACKING/dev4_f00_gate_state.txt
+
+      - name: Publier l’artefact du Gate F00
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev4-f00-gate-${{ github.run_id }}
+          path: |
+            F00_INGEST/OUT/sequences.json
+            F00_INGEST/OUT/ingest_report.json
+            TRACKING/dev4_f00_gate_state.txt
+          if-no-files-found: error
+          retention-days: 14
