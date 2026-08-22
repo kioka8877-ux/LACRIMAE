@@ -244,6 +244,32 @@ jobs:
             cp F02_FORMAT/IN/video_source.mp4 F01_SELECT/IN/video_source.mp4
           fi
 
+      # Mode MEME : les références courtes du pack (ex. M1) peuvent pointer
+      # vers une Release LACRIMAE. On résout ici l’asset opérateur avant le
+      # contrôle du Bridge, puis on le normalise sous le nom interne attendu.
+      - name: F01 - Resolve MEME release assets
+        if: github.event.inputs.fregate == 'F01' && github.event.inputs.mode == 'forge'
+        run: |
+          set -e
+          mkdir -p SHARED/memes
+          if [ ! -f SHARED/memes/M1.mp4 ]; then
+            echo "  [→] Résolution MEME M1 : Release m1 / asset Zoolander"
+            TMP_MEME="$(mktemp -d)"
+            gh release download m1 \
+              --repo "$GITHUB_REPOSITORY" \
+              --pattern '*Zoolander*.mp4' \
+              --dir "$TMP_MEME"
+            ASSET="$(find "$TMP_MEME" -maxdepth 1 -type f -name '*.mp4' -print -quit)"
+            if [ -z "$ASSET" ]; then
+              echo "ERREUR: aucun asset MP4 Zoolander trouvé dans la Release m1"
+              exit 1
+            fi
+            cp "$ASSET" SHARED/memes/M1.mp4
+            echo "  [✓] Asset résolu → SHARED/memes/M1.mp4"
+          else
+            echo "  [✓] Asset MEME M1 déjà présent dans SHARED/memes/M1.mp4"
+          fi
+
       # Mode FORGE : l'ORACLE va chercher le pack SEUL dans PERTURABO/EXPORT
       # (production_pack_*.json). Le bridge ne prend RIEN d'autre : la vidéo
       # vient de la Release/artifact, les fonds de SHARED/IN/backgrounds/ (faits
@@ -319,7 +345,7 @@ jobs:
           # auto-récupéré sont commités pour survivre jusqu'à F02 (run séparé —
           # le workspace ne persiste pas)
           if [ "${{ github.event.inputs.mode }}" == "forge" ]; then
-            git add BRIDGE_PERTURABO/OUT/ BRIDGE_PERTURABO/IN/production_pack.json BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json TRACKING/LACRIMAE_LEDGER.json
+            git add BRIDGE_PERTURABO/OUT/ BRIDGE_PERTURABO/IN/production_pack.json BRIDGE_PERTURABO/IN/production_pack_SA_VIDEO.json SHARED/memes/ TRACKING/LACRIMAE_LEDGER.json
             # Mode MEME : pas de cutlist (F02 stage les memes) — add seulement
             # si le bridge en a produit une (le bridge meme n'en écrit pas).
             if [ -f F02_FORMAT/IN/cutlist.json ]; then
