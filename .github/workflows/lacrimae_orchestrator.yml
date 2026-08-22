@@ -3,8 +3,12 @@
 # aux PORTES. Un run GHA = UNE FRÉGATE. Le Champion n'intervient qu'aux
 # 4 portes : I Brief, II Cutlist, III Montage, IV Publication.
 #
+# Choix de production : production_mode=meme|logo. Si meme, meme_variant=pure|stand_up.
+# En stand_up, F00 reçoit un transcript Champion et produit un rapport de sujets;
+# aucune ingestion vidéo et aucun F01/F02/F04 ne sont déclenchés automatiquement.
 # Frégates (input fregate) :
 #   F00  INGEST      — brief + yt-dlp → video_source.mp4 (Porte I)
+#   F00  STAND UP    — transcript Champion → 1-7 sujets (Porte I)
 #   F01  SELECT      — libre : vision OpenRouter → cutlist · forge : BRIDGE
 #                      auto-récupère le pack PERTURABO/EXPORT → cutlist (Porte II)
 #   F02  FORMAT      — blur-pad/reframe/background → codex.json + clips (Porte III)
@@ -72,6 +76,20 @@ on:
         description: 'Mode pipeline (libre|forge)'
         required: false
         default: 'libre'
+      production_mode:
+        description: 'Mode de production (meme|logo)'
+        required: false
+        default: 'meme'
+      meme_variant:
+        description: 'Variante MEME (pure|stand_up)'
+        required: false
+        default: 'pure'
+      transcript:
+        description: 'Transcript Champion (STAND UP uniquement)'
+        required: false
+      subject_id:
+        description: 'Sujet STAND UP sélectionné pour F01 (optionnel)'
+        required: false
 
 permissions:
   contents: write
@@ -105,8 +123,42 @@ jobs:
 
       # ─────────────────────── F00 : BRIEF + INGEST ────────────────────────
 
+      # STAND UP est une voie F00 autonome : transcript Champion → rapport de
+      # sujets. Elle ne tente jamais d’ingérer une vidéo et s’arrête à F00.
+      - name: F00 STAND UP - Extraire les sujets (Porte I)
+        if: github.event.inputs.fregate == 'F00' && github.event.inputs.production_mode == 'meme' && github.event.inputs.meme_variant == 'stand_up'
+        env:
+          TRANSCRIPT: ${{ github.event.inputs.transcript }}
+          TITLE: ${{ github.event.inputs.title }}
+        run: |
+          mkdir -p F00_STAND_UP/IN F00_STAND_UP/OUT TRACKING
+          if [ -z "$TRANSCRIPT" ]; then
+            echo "ERREUR: le transcript Champion est obligatoire en mode STAND UP."
+            exit 1
+          fi
+          printf '%s\n' "$TRANSCRIPT" > F00_STAND_UP/IN/transcript.txt
+          python3 tools/stand_up_f00.py \
+            --transcript F00_STAND_UP/IN/transcript.txt \
+            --output F00_STAND_UP/OUT/stand_up_f00_report.json \
+            --summary F00_STAND_UP/OUT/stand_up_f00_report.md \
+            --title "${TITLE:-New Stand Up Siege}"
+          cp F00_STAND_UP/OUT/stand_up_f00_report.json TRACKING/STAND_UP_F00_REPORT.json
+          cp F00_STAND_UP/OUT/stand_up_f00_report.md TRACKING/STAND_UP_F00_REPORT.md
+          cat F00_STAND_UP/OUT/stand_up_f00_report.md
+
+      - name: F00 STAND UP - Ledger et Porte I
+        if: github.event.inputs.fregate == 'F00' && github.event.inputs.production_mode == 'meme' && github.event.inputs.meme_variant == 'stand_up'
+        run: |
+          python3 _tools/update_ledger.py F00 || true
+          git config user.name "lacrimae-orchestrator"
+          git config user.email "orchestrator@lacrimae"
+          git add F00_STAND_UP/OUT TRACKING/STAND_UP_F00_REPORT.* TRACKING/LACRIMAE_LEDGER.json
+          git commit -m "ledger: F00 STAND UP — sujets transcript [skip ci]" || echo "No change"
+          git push
+          echo "PORTE I: rapport STAND UP produit. Prochaine décision: sélection Champion puis F01"
+
       - name: F00 - Ecrire le brief (Porte I)
-        if: github.event.inputs.fregate == 'F00'
+        if: github.event.inputs.fregate == 'F00' && (github.event.inputs.production_mode != 'meme' || github.event.inputs.meme_variant != 'stand_up')
         env:
           URL: ${{ github.event.inputs.url }}
           TITLE: ${{ github.event.inputs.title }}
@@ -138,7 +190,7 @@ jobs:
           cat TRACKING/LACRIMAE_BRIEF.json
 
       - name: F00 - Ingest
-        if: github.event.inputs.fregate == 'F00'
+        if: github.event.inputs.fregate == 'F00' && (github.event.inputs.production_mode != 'meme' || github.event.inputs.meme_variant != 'stand_up')
         env:
           URL: ${{ github.event.inputs.url }}
           RELEASE_TAG: ${{ github.event.inputs.release_tag }}
@@ -166,7 +218,7 @@ jobs:
           fi
 
       - name: F00 - Gardien CUSTOS
-        if: github.event.inputs.fregate == 'F00'
+        if: github.event.inputs.fregate == 'F00' && (github.event.inputs.production_mode != 'meme' || github.event.inputs.meme_variant != 'stand_up')
         run: python3 LAC_CUSTOS.py --frigate F00 --mode check-out --drive-base .
 
       # F00 - Upload vidéo : SEULEMENT si la vidéo est petite (< 400 Mo).
@@ -175,7 +227,7 @@ jobs:
       # GitHub (2 Go/asset, illimité, gratuit sur repo public) : les frégates
       # F01/F02 la re-téléchargent depuis la Release, PAS depuis l'artifact.
       - name: F00 - Check video size
-        if: github.event.inputs.fregate == 'F00'
+        if: github.event.inputs.fregate == 'F00' && (github.event.inputs.production_mode != 'meme' || github.event.inputs.meme_variant != 'stand_up')
         id: vidsize
         run: |
           SIZE=$(stat -c%s F00_INGEST/OUT/video_source.mp4)
@@ -183,14 +235,14 @@ jobs:
           echo "  [→] Vidéo ingérée : $(( SIZE / 1000000 )) Mo"
 
       - name: F00 - Upload video (petit, < 400 Mo)
-        if: github.event.inputs.fregate == 'F00' && fromJson(steps.vidsize.outputs.size) < 400000000
+        if: github.event.inputs.fregate == 'F00' && (github.event.inputs.production_mode != 'meme' || github.event.inputs.meme_variant != 'stand_up') && fromJson(steps.vidsize.outputs.size) < 400000000
         uses: actions/upload-artifact@v4
         with:
           name: lac-video
           path: F00_INGEST/OUT/
 
       - name: F00 - Ledger + commit
-        if: github.event.inputs.fregate == 'F00'
+        if: github.event.inputs.fregate == 'F00' && (github.event.inputs.production_mode != 'meme' || github.event.inputs.meme_variant != 'stand_up')
         run: |
           python3 _tools/update_ledger.py F00
           git config user.name "lacrimae-orchestrator"
