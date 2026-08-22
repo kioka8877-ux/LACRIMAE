@@ -63,4 +63,4 @@ La validation humaine entre la preview et le rendu est représentée par l’exp
 
 ## Commit final
 
-Commit fonctionnel : `263d0c848d7b85571ac46fc4467012e4e258cc2b` (`feat(dev4): complete virtual match-cut pipeline`). Le commit de skip F04 est `8909d27`. Le commit d’intégration F05/F06 sera indiqué après le push. La branche `main` n’a pas été modifiée.
+Commit fonctionnel : `263d0c848d7b85571ac46fc4467012e4e258cc2b` (`feat(dev4): complete virtual match-cut pipeline`). Le commit de skip F04 est `8909d27`. Le commit d’intégration F05/F06 est `60f000ec1d273d8ce43da332c6edf2426425aff7` (`feat(dev4): add camouflage and luther stages`). La branche `dev4` a été poussée sur `origin/dev4` et la branche `main` n’a pas été modifiée.
