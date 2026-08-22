@@ -80,6 +80,9 @@ jobs:
             --request F00_INGEST/IN/production_request.json \
             --out F00_INGEST/OUT
 
+      - name: Valider le manifeste F00
+        run: python3 tools/validate_dev4_contracts.py --sequences F00_INGEST/OUT/sequences.json
+
       - name: Skip contrôlé de F01 et F02
         run: |
           mkdir -p TRACKING
@@ -100,11 +103,20 @@ jobs:
       - name: Préparer l’entrée commune preview / PICTOR
         run: |
           mkdir -p F03_PREVIEW/CODEBASE/public F03_PICTOR/CODEBASE/src/data F03_PICTOR/CODEBASE/public
-          cp F00_INGEST/OUT/$(basename F00_INGEST/IN/video_source.mp4) F03_PREVIEW/CODEBASE/public/video_source.mp4
-          cp F00_INGEST/OUT/$(basename F00_INGEST/IN/video_source.mp4) F03_PICTOR/CODEBASE/public/video_source.mp4
+          cp F00_INGEST/IN/video_source.mp4 F03_PREVIEW/CODEBASE/public/video_source.mp4
+          cp F00_INGEST/IN/video_source.mp4 F03_PICTOR/CODEBASE/public/video_source.mp4
           cp F00_INGEST/OUT/sequences.json F03_PREVIEW/CODEBASE/public/sequences.json
           cp F00_INGEST/OUT/sequences.json F03_PICTOR/CODEBASE/src/data/sequences.json
-          cp F03_PREVIEW/CODEBASE/public/codex.json F03_PICTOR/CODEBASE/src/data/codex.json
+          cp F03_PREVIEW/CODEBASE/src/preview/OmniComposition.jsx F03_PICTOR/CODEBASE/src/OmniComposition.jsx
+          cp F03_PREVIEW/CODEBASE/src/preview/virtualSequences.js F03_PICTOR/CODEBASE/src/virtualSequences.js
+          if [ "$SKIP_F02" = "true" ]; then
+            cp F03_PREVIEW/CODEBASE/public/codex.json F03_PICTOR/CODEBASE/src/data/codex.json
+          else
+            cp F02_FORMAT/OUT/codex.json F03_PREVIEW/CODEBASE/public/codex.json
+            cp F02_FORMAT/OUT/codex.json F03_PICTOR/CODEBASE/src/data/codex.json
+          fi
+          if [ -d F03_PREVIEW/CODEBASE/public/backgrounds ]; then cp -R F03_PREVIEW/CODEBASE/public/backgrounds F03_PICTOR/CODEBASE/public/; fi
+          if [ -f F03_PREVIEW/CODEBASE/public/logo.png ]; then cp F03_PREVIEW/CODEBASE/public/logo.png F03_PICTOR/CODEBASE/public/logo.png; fi
           python3 - <<'PY'
           import json
           p='F03_PREVIEW/CODEBASE/public/codex.json'
@@ -121,6 +133,9 @@ jobs:
       - name: Construire la preview
         working-directory: F03_PREVIEW/CODEBASE
         run: npm ci && npm run build
+
+      - name: Valider le contrat commun preview / PICTOR
+        run: python3 tools/validate_dev4_contracts.py --sequences F00_INGEST/OUT/sequences.json --codex F03_PICTOR/CODEBASE/src/data/codex.json
 
       - name: Rendre PICTOR avec les mêmes données
         working-directory: F03_PICTOR/CODEBASE

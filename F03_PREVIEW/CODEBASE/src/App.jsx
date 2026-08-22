@@ -239,7 +239,11 @@ export default function App() {
         ? [clip, ...(codex.clips || []).slice(1)]
         : [clip],
     };
-    const finalCodex = validated ? { ...merged, validated_by_magos: true } : merged;
+    const finalCodex = {
+      ...merged,
+      virtual_sequences: sequences || null,
+      validated_by_magos: validated,
+    };
     const blob = new Blob([JSON.stringify(finalCodex, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -355,6 +359,23 @@ export default function App() {
             )}
           </div>
         </div>
+
+        {/* Sequence manifest summary */}
+        {sequences?.sequences?.length > 0 && (
+          <div style={{ ...styles.panel, maxWidth: '360px', marginBottom: '12px' }}>
+            <div style={{ fontWeight: 800, color: '#00ff88', marginBottom: '8px' }}>FAST MATCH CUT — TIMELINE</div>
+            <div style={{ color: '#aaa', fontSize: '12px', marginBottom: '8px' }}>
+              {sequences.sequences.length} séquences virtuelles · {sequences.cut_interval_frames || 7} frames / cut · source muette
+            </div>
+            <div style={{ maxHeight: '130px', overflowY: 'auto', fontFamily: 'monospace', fontSize: '11px', color: '#bbb' }}>
+              {sequences.sequences.slice(0, 60).map((item, index) => (
+                <div key={item.id || index} style={{ padding: '3px 0', borderBottom: '1px solid #222' }}>
+                  {String(index + 1).padStart(2, '0')} · {item.id || `seq_${index + 1}`} · source frame {item.source_start_frame} · timeline {item.timeline_start_frame ?? index * (sequences.cut_interval_frames || 7)}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Right panel */}
         <div style={styles.panel}>

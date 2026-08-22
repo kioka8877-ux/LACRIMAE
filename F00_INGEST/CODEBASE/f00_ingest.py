@@ -10,7 +10,6 @@ import argparse
 import json
 import math
 import random
-import shutil
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -111,8 +110,7 @@ def main() -> int:
     manifest = build_manifest(args.source, request, meta)
     destination = args.out / "sequences.json"
     destination.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    shutil.copy2(args.source, args.out / args.source.name)
-    report = {"status": "ok", "source": str(args.source), "manifest": str(destination), "virtual_only": True, "sequence_count": len(manifest["sequences"])}
+    report = {"status": "ok", "source": str(args.source), "manifest": str(destination), "virtual_only": True, "sequence_count": len(manifest["sequences"]), "intermediate_video_files": 0}
     (args.out / "ingest_report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False))
     return 0

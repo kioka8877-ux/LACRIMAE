@@ -193,3 +193,8 @@ F01, F02, F03 scellées. Trois frégates validées en un seul jour.
 - Workflow `.github/workflows/dev4_pipeline.yml` ajouté avec skip explicite de F01 et F02.
 - Vérifications : F00 OK, build Vite OK, rendu PICTOR OK sur vidéo synthétique.
 - Rapport : `TRACKING/DEV4_PHASE1_REPORT.md`.
+
+
+## 2026-08-22 — Dev4 terminé
+
+Le flux F00 → F03_PREVIEW → F03_PICTOR est opérationnel sur les contrats virtuels. F01 et F02 sont contournables par paramètres explicites dans le workflow GitHub Actions. Tests F00, validation JSON, build Vite, parité de composition et rendu Remotion validés. Rapport final : `TRACKING/DEV4_FINAL_REPORT.md`.

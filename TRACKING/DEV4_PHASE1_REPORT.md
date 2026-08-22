@@ -8,7 +8,7 @@ Mettre en place le socle du nouveau flux vidéo `dev4` : F00 produit un manifest
 
 ## Réalisations
 
-F00 a été créé dans `F00_INGEST/CODEBASE/f00_ingest.py`. Il interroge les métadonnées de la vidéo avec FFprobe, calcule la durée cible et le nombre de frames de la timeline, puis écrit `OUT/sequences.json`. Aucun clip intermédiaire n’est exporté. La source est seulement copiée dans le bundle de sortie pour rendre l’artifact autonome.
+F00 a été créé dans `F00_INGEST/CODEBASE/f00_ingest.py`. Il interroge les métadonnées de la vidéo avec FFprobe, calcule la durée cible et le nombre de frames de la timeline, puis écrit `OUT/sequences.json`. Aucun clip intermédiaire ni aucune copie vidéo n’est produite dans `OUT`.
 
 F03_PREVIEW a été raccordé à `sequences.json`. L’application conserve son interface React/Remotion et ses contrôles visuels, mais la composition peut maintenant afficher les portions référencées par leur frame de départ dans la vidéo source. La vidéo source est muette par défaut. Le manifeste est également passé au Root Remotion utilisé pour le rendu de test.
 
@@ -32,4 +32,4 @@ Le workflow `.github/workflows/dev4_pipeline.yml` exécute un job linéaire F00 
 
 La sélection actuelle de F00 est déterministe et basée sur un échantillonnage de repères temporels ; elle ne réalise pas encore une analyse sémantique des plans. Le Champion peut valider le manifeste, mais l’interface de remplacement séquence par séquence devra être approfondie. Le workflow construit la preview et le rendu dans le même job, mais une étape de validation humaine formelle entre les deux devra être ajoutée si le processus exige un arrêt avant PICTOR.
 
-La vidéo source reste volontairement hors du dépôt et doit être fournie au runner via `F00_INGEST/IN/video_source.mp4` ou un mécanisme d’asset externe à ajouter ultérieurement.
+La vidéo source reste volontairement hors du dépôt et doit être fournie au runner via `F00_INGEST/IN/video_source.mp4` ou un mécanisme d’asset externe à ajouter ultérieurement. F00 OUT ne contient que les JSON de contrôle.
