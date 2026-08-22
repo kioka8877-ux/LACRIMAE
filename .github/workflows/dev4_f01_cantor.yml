@@ -1,0 +1,89 @@
+name: LACRIMAE dev4 — F01 CANTOR
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Tag de la release contenant la vidéo source'
+        required: true
+        default: 'f00'
+      model_size:
+        description: 'Modèle faster-whisper (tiny/base/small/medium)'
+        required: true
+        default: 'tiny'
+      language:
+        description: 'Langue audio ISO ou auto'
+        required: true
+        default: 'fr'
+
+permissions:
+  contents: read
+
+jobs:
+  cantor:
+    name: F01 CANTOR — transcription de la release
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      MODEL_SIZE: ${{ inputs.model_size }}
+      LANGUAGE: ${{ inputs.language }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout dev4
+        uses: actions/checkout@v4
+
+      - name: Installer FFmpeg et Python
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg python3-pip
+
+      - name: Télécharger la vidéo de la release
+        run: |
+          mkdir -p F01_CANTOR/IN F01_CANTOR/OUT
+          gh release download "$RELEASE_TAG" \
+            --repo "${{ github.repository }}" \
+            --pattern '*.mp4' \
+            --dir F01_CANTOR/IN \
+            --clobber
+          SOURCE=$(find F01_CANTOR/IN -maxdepth 1 -type f -name '*.mp4' | head -n 1)
+          test -n "$SOURCE"
+          mv "$SOURCE" F01_CANTOR/IN/video_source.mp4
+
+      - name: Extraire l’audio de la vidéo source
+        run: |
+          ffmpeg -y -i F01_CANTOR/IN/video_source.mp4 -vn -ac 1 -ar 16000 -c:a pcm_s16le F01_CANTOR/IN/audio_clean.wav
+          test -s F01_CANTOR/IN/audio_clean.wav
+
+      - name: Installer faster-whisper
+        run: python3 -m pip install --user faster-whisper
+
+      - name: Exécuter F01 CANTOR
+        run: |
+          python3 tools/run_f01_dev4.py \
+            --audio F01_CANTOR/IN/audio_clean.wav \
+            --output F01_CANTOR/OUT/timing.json \
+            --model "$MODEL_SIZE" \
+            --language "$LANGUAGE"
+
+      - name: Vérifier la sortie F01
+        run: |
+          test -s F01_CANTOR/OUT/timing.json
+          python3 -m json.tool F01_CANTOR/OUT/timing.json >/dev/null
+          mkdir -p TRACKING
+          {
+            echo "F01: completed"
+            echo "release_tag: $RELEASE_TAG"
+            echo "model_size: $MODEL_SIZE"
+            echo "language: $LANGUAGE"
+            echo "gate: awaiting_champion_validation"
+          } | tee TRACKING/dev4_f01_state.txt
+
+      - name: Publier les artefacts du Gate F01
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev4-f01-cantor-${{ github.run_id }}
+          path: |
+            F01_CANTOR/OUT/timing.json
+            F01_CANTOR/IN/video_source.mp4
+            TRACKING/dev4_f01_state.txt
+          if-no-files-found: error
+          retention-days: 14
