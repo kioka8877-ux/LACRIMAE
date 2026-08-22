@@ -90,6 +90,7 @@ export const MemeComposition = ({ codex: codexProp, session: sessionProp, master
   const cam = sig.cam_drift || {};
   const camZoom = interpolate(frame, [0, durationInFrames],
     [cam.zoom_from ?? 1, cam.zoom_to ?? 1], { extrapolateRight: 'clamp' });
+  const videoScale = Math.min(3, Math.max(1, clip.video?.scale ?? masterClip.video?.scale ?? 1));
 
   const texts = clip.texts || {};
   const title = texts.title || null;
@@ -150,6 +151,7 @@ export const MemeComposition = ({ codex: codexProp, session: sessionProp, master
             anim={sig.text_anim}
             positionPct={emotionPositionPct}
             fontSize={emotionFontSize}
+            box={textsStyle.paragraph_box}
           />
         ) : null}
 
@@ -164,7 +166,7 @@ export const MemeComposition = ({ codex: codexProp, session: sessionProp, master
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
-                transform: `scaleX(${mirrorFactor}) scale(${camZoom})`,
+                transform: `scaleX(${mirrorFactor}) scale(${camZoom * videoScale})`,
               }}
             />
             {/* ── L6 WATERMARK @chaine (texte transparent sur le meme) ── */}
@@ -318,33 +320,31 @@ function formatCount(n) {
 /* ═══════════════════════════════════════════════════════════════════════════
  * L4 — EmotionText : texte du milieu qui dit l'émotion du meme
  * ═══════════════════════════════════════════════════════════════════════════ */
-const EmotionText = ({ content, style, totalFrames, anim, positionPct = 43, fontSize = 40 }) => {
+const EmotionText = ({ content, style, totalFrames, anim, positionPct = 43, fontSize = 40, box }) => {
   const frame = useCurrentFrame();
   const { transform: textTransform, opacity } = getTextAnim(frame, anim, 20);
+  const boxEnabled = box?.enabled;
+  const textStyle = boxEnabled ? {
+    fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
+    fontSynthesis: 'weight', fontSize: `${fitOneLineFontSize(content, fontSize, 28)}px`,
+    color: box.text_color || style.color, fontWeight: 700, textAlign: 'center',
+    backgroundColor: box.color || 'rgba(0,0,0,0.7)',
+    border: (box.border_width || 0) > 0 ? `${box.border_width}px solid ${box.border_color || '#FFFFFF'}` : 'none',
+    borderRadius: `${box.radius || 0}px`, padding: `${box.padding || 12}px ${(box.padding || 12) * 1.6}px`,
+    maxWidth: '88%', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden',
+    textTransform: 'uppercase', letterSpacing: style.letter_spacing,
+  } : {
+    fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
+    fontSynthesis: 'weight', fontSize: `${fitOneLineFontSize(content, fontSize, 28)}px`, color: style.color,
+    WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,
+    textShadow: style.shadow, fontWeight: 700, textAlign: 'center', maxWidth: '88%',
+    display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textTransform: 'uppercase',
+    letterSpacing: style.letter_spacing,
+  };
 
   return (
     <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: `${positionPct}%`, pointerEvents: 'none', zIndex: 40 }}>
-      <div style={{
-        fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
-        fontSynthesis: 'weight',
-        fontSize: `${fitOneLineFontSize(content, fontSize, 28)}px`,
-        color: style.color,
-        WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,
-        textShadow: style.shadow,
-        fontWeight: 700,
-        textAlign: 'center',
-        maxWidth: '88%',
-        display: 'block',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        overflowWrap: 'anywhere',
-        textTransform: 'uppercase',
-        letterSpacing: style.letter_spacing,
-        opacity,
-        transform: textTransform,
-      }}>
-        {content}
-      </div>
+      <div style={{ ...textStyle, opacity, transform: textTransform }}>{content}</div>
     </AbsoluteFill>
   );
 };

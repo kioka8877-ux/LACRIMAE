@@ -133,6 +133,7 @@ export default function App() {
     setSession(newSession);
   };
   const updateClip = (key, value) => setClip({ ...clip, [key]: value });
+  const updateVideo = (key, value) => setClip({ ...clip, video: { ...(clip.video || {}), [key]: value } });
   const updateTexts = (key, value) => setClip({ ...clip, texts: { ...(clip.texts || {}), [key]: value } });
   const updateSessionTextsStyle = (key, value) =>
     updateSession('texts_style', key, value);
@@ -335,6 +336,7 @@ export default function App() {
         if (source.text_emotion_position_pct != null) out.text_emotion_position_pct = source.text_emotion_position_pct;
         if (source.meme?.height_pct != null) out.meme = { ...(out.meme || {}), height_pct: source.meme.height_pct };
         if (srcTweet.text_size != null) out.tweet = { ...(out.tweet || {}), text_size: srcTweet.text_size };
+        if (source.video?.scale != null) out.video = { ...(out.video || {}), scale: source.video.scale };
         return out;
       };
     };
@@ -828,8 +830,27 @@ export default function App() {
           {activeTab === 'video' && (
             <div style={styles.panelContent}>
               <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
-                🎬 VIDÉO — centrage vertical
+                🎬 VIDÉO — cadrage MEME
               </label>
+              {isMemeMode && (
+                <>
+                  <label style={styles.label}>
+                    Agrandissement vidéo: {(clip.video?.scale ?? 1).toFixed(2)}×
+                  </label>
+                  <input
+                    style={styles.slider}
+                    type="range"
+                    min="1"
+                    max="3"
+                    step="0.05"
+                    value={clip.video?.scale ?? 1}
+                    onChange={(e) => updateVideo('scale', parseFloat(e.target.value))}
+                  />
+                  <div style={{ marginTop: '4px', fontSize: '11px', color: '#777' }}>
+                    Réglage MEME du clip maître, propagé aux 10 clips lors de l’export du codex.
+                  </div>
+                </>
+              )}
               <label style={styles.label}>
                 Position verticale: {((session.video || {}).offset_y ?? 0) > 0 ? '+' : ''}
                 {((session.video || {}).offset_y ?? 0)}%

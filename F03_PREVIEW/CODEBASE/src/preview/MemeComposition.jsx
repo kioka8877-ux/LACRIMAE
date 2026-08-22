@@ -103,6 +103,7 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp, masterC
   const cam = sig.cam_drift || {};
   const camZoom = interpolate(frame, [0, durationInFrames],
     [cam.zoom_from ?? 1, cam.zoom_to ?? 1], { extrapolateRight: 'clamp' });
+  const videoScale = Math.min(3, Math.max(1, clip.video?.scale ?? masterClip.video?.scale ?? 1));
 
   return (
     <AbsoluteFill style={{ backgroundColor: session.background?.color || '#000' }}>
@@ -131,7 +132,7 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp, masterC
 
         {/* ── L3 TITRE (haut, optionnel) ── */}
         {title ? (
-          <TitleBlock content={title} style={textsStyle} offsetPct={texts.title_offset_pct ?? 4} />
+          <TitleBlock content={title} style={textsStyle} box={textsStyle.title_box} offsetPct={texts.title_offset_pct ?? 4} />
         ) : null}
 
         {/* ── L2 TWEET (card type tweet) ── */}
@@ -141,12 +142,12 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp, masterC
 
         {/* ── L4 TEXTE ÉMOTION ── */}
         {emotionText ? (
-          <EmotionText content={emotionText} style={textsStyle} totalFrames={durationInFrames} positionPct={emotionPositionPct} fontSize={emotionFontSize} />
+          <EmotionText content={emotionText} style={textsStyle} box={textsStyle.paragraph_box} totalFrames={durationInFrames} positionPct={emotionPositionPct} fontSize={emotionFontSize} />
         ) : null}
 
         {/* ── L5 MEME (moitié basse, contain) ── */}
         <AbsoluteFill style={{ justifyContent: 'flex-end', alignItems: 'center' }}>
-          <div style={{ width: '100%', height: `${memeHeightPct}%`, overflow: 'hidden', position: 'relative' }}>
+          <div style={{ width: '100%', height: `${memeHeightPct}%`, overflow: 'hidden', position: 'relative', zIndex: 10 }}>
             <video
               src={videoUrl}
               autoPlay
@@ -158,7 +159,7 @@ export const MemeComposition = ({ codex, videoSrc, session: sessionProp, masterC
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
-                transform: `translate(${cam.dx ?? 0}px, ${cam.dy ?? 0}px) scaleX(${mirrorFactor}) scale(${camZoom})`,
+                transform: `translate(${cam.dx ?? 0}px, ${cam.dy ?? 0}px) scaleX(${mirrorFactor}) scale(${camZoom * videoScale})`,
               }}
             />
             {/* ── L6 WATERMARK @chaine ── */}
@@ -295,59 +296,69 @@ function formatCount(n) {
   return String(n);
 }
 
+const fitOneLineFontSize = (content, baseSize, maxChars = 32) => {
+  const length = String(content || '').trim().length;
+  const ratio = length > maxChars ? maxChars / length : 1;
+  return Math.round(baseSize * Math.max(0.6, ratio));
+};
+
 /* ── L3 TITRE (haut, optionnel) ── */
-const TitleBlock = ({ content, style, offsetPct }) => {
+const TitleBlock = ({ content, style, offsetPct, box }) => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: 'clamp' });
+  const boxEnabled = box?.enabled;
+  const textStyle = boxEnabled ? {
+    fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
+    fontSynthesis: 'weight',
+    fontSize: `${fitOneLineFontSize(content, style.size_title || 64, 32)}px`,
+    color: box.text_color || style.color,
+    fontWeight: 900,
+    textTransform: 'uppercase',
+    lineHeight: 1.1,
+    textAlign: 'center',
+    backgroundColor: box.color || 'rgba(0,0,0,0.7)',
+    border: (box.border_width || 0) > 0 ? `${box.border_width}px solid ${box.border_color || '#FFFFFF'}` : 'none',
+    borderRadius: `${box.radius || 0}px`,
+    padding: `${box.padding || 12}px ${(box.padding || 12) * 1.6}px`,
+    maxWidth: '88%', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden',
+  } : {
+    fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
+    fontSize: `${fitOneLineFontSize(content, style.size_title || 64, 32)}px`,
+    color: style.color, WebkitTextStroke: `${style.stroke_width}px ${style.stroke_color}`,
+    textShadow: style.shadow, letterSpacing: style.letter_spacing, fontWeight: 900,
+    textTransform: 'uppercase', lineHeight: 1.1, textAlign: 'center', maxWidth: '88%',
+    whiteSpace: 'nowrap', overflow: 'hidden',
+  };
   return (
-    <AbsoluteFill
-      style={{
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        paddingTop: `${offsetPct}%`,
-        pointerEvents: 'none',
-      }}
-    >
-      <div style={{
-        fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
-        fontSize: `${style.size_title}px`,
-        color: style.color,
-        WebkitTextStroke: `${style.stroke_width}px ${style.stroke_color}`,
-        textShadow: style.shadow,
-        letterSpacing: style.letter_spacing,
-        fontWeight: 900,
-        textTransform: 'uppercase',
-        lineHeight: 1.1,
-        textAlign: 'center',
-        maxWidth: '88%',
-        wordWrap: 'break-word',
-        opacity,
-      }}>{content}</div>
+    <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: `${offsetPct}%`, pointerEvents: 'none', zIndex: 40 }}>
+      <div style={{ ...textStyle, opacity }}>{content}</div>
     </AbsoluteFill>
   );
 };
 
 /* ── L4 TEXTE ÉMOTION ── */
-const EmotionText = ({ content, style, totalFrames, positionPct = 43, fontSize = 40 }) => {
+const EmotionText = ({ content, style, totalFrames, positionPct = 43, fontSize = 40, box }) => {
   const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 20], [0, 1], { extrapolateRight: 'clamp' });
+  const opacity = interpolate(frame, [0, 20], [0, 1]);
+  const boxEnabled = box?.enabled;
+  const textStyle = boxEnabled ? {
+    fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
+    fontSize: `${fontSize}px`, color: box.text_color || style.color, fontWeight: 700,
+    textAlign: 'center', textTransform: 'uppercase', letterSpacing: style.letter_spacing,
+    backgroundColor: box.color || 'rgba(0,0,0,0.7)',
+    border: (box.border_width || 0) > 0 ? `${box.border_width}px solid ${box.border_color || '#FFFFFF'}` : 'none',
+    borderRadius: `${box.radius || 0}px`, padding: `${box.padding || 12}px ${(box.padding || 12) * 1.6}px`,
+    maxWidth: '88%', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden',
+  } : {
+    fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
+    fontSize: `${fontSize}px`, color: style.color,
+    WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,
+    textShadow: style.shadow, fontWeight: 700, textAlign: 'center', maxWidth: '88%',
+    textTransform: 'uppercase', letterSpacing: style.letter_spacing, whiteSpace: 'nowrap', overflow: 'hidden',
+  };
   return (
-    <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: `${positionPct}%`, pointerEvents: 'none' }}>
-      <div style={{
-        fontFamily: (style.font || '').includes('Impact') ? 'Anton, Impact, Arial Black, sans-serif' : style.font,
-        fontSize: `${fontSize}px`,
-        color: style.color,
-        WebkitTextStroke: `${Math.max(1, style.stroke_width - 1)}px ${style.stroke_color}`,
-        textShadow: style.shadow,
-        fontWeight: 700,
-        textAlign: 'center',
-        maxWidth: '88%',
-        textTransform: 'uppercase',
-        letterSpacing: style.letter_spacing,
-        opacity,
-      }}>
-        {content}
-      </div>
+    <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'center', paddingTop: `${positionPct}%`, pointerEvents: 'none', zIndex: 40 }}>
+      <div style={{ ...textStyle, opacity }}>{content}</div>
     </AbsoluteFill>
   );
 };
