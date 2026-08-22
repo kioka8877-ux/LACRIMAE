@@ -183,3 +183,13 @@ F01, F02, F03 scellées. Trois frégates validées en un seul jour.
 4. **CHECKPOINT SACRÉ** — F03 PICTOR est toujours récupérable après interruption.
 5. **TRANSIT MANUEL** — Le Magos déplace les fichiers. Jamais les scripts.
 6. **DURÉE PAR L'AUDIO** — La durée de la vidéo est dictée par l'audio. Toujours.
+
+
+## 2026-08-22 — Forge dev4 : phase 1
+
+- F00 INGEST ajouté : manifeste de séquences virtuelles, sans extraction de clips.
+- F03_PREVIEW raccordé à `sequences.json` et à la lecture muette des séquences.
+- F03_PICTOR aligné sur la composition Remotion de la preview ; ancien Root Colab conservé comme référence legacy.
+- Workflow `.github/workflows/dev4_pipeline.yml` ajouté avec skip explicite de F01 et F02.
+- Vérifications : F00 OK, build Vite OK, rendu PICTOR OK sur vidéo synthétique.
+- Rapport : `TRACKING/DEV4_PHASE1_REPORT.md`.

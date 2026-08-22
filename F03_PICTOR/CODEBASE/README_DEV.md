@@ -1,100 +1,50 @@
-# F03 PICTOR — README DÉVELOPPEUR
-> *"Le Peintre rend. Frame par frame, les larmes deviennent lumière."*
-
----
+# F03 PICTOR — dev4
 
 ## Mission
 
-Rendre la vidéo verticale 1080x1920 frame par frame via Remotion (React). Intègre les images en fast cut, les sous-titres synchronisés mot par mot, l'overlay grain et les filtres CSS cinématographiques.
+PICTOR est le renderer headless de LACRIMAE. Il rend la même composition Remotion que F03_PREVIEW à partir de la vidéo source, du manifeste de séquences virtuelles et du codex validé. Il ne reçoit pas de petits clips exportés.
 
----
+## Entrées
 
-## Technologie
-
-| Composant | Version cible |
-|-----------|---------------|
-| Node.js | 20 LTS |
-| Remotion | ^4.0.0 |
-| React | ^18.0.0 |
-| @remotion/google-fonts | ^4.0.0 |
-| Colab GPU | T4 (rendu CPU possible mais lent) |
-
----
-
-## Fichiers
-
-```
-CODEBASE/
-├── LAC_F03.ipynb           ← Notebook Colab — point d'entrée
-├── README_DEV.md           ← Ce fichier
-└── src/
-    ├── index.jsx           ← Entry point Remotion (registerRoot)
-    ├── Root.jsx            ← Template — réécrit par le notebook avec les props réels
-    ├── package.json        ← Dépendances npm
-    └── components/
-        └── LacrimaeShort.jsx   ← Composant principal de rendu
+```text
+public/video_source.mp4
+src/data/sequences.json
+src/data/codex.json
 ```
 
----
+`sequences.json` contient les frames de départ dans la source et les positions correspondantes dans la timeline finale. Le moteur lit directement la vidéo source, affiche chaque séquence au moment prévu et met la piste audio source en sourdine. Une voix externe pourra être ajoutée séparément dans une évolution ultérieure.
 
-## Architecture du composant
+## Exécution
 
-```
-LacrimaeShort
-├── Audio (audio_clean.mp3)
-├── ImageBackground
-│   ├── Img (image courante selon cut_interval)
-│   └── micro-zoom scale(1.02 → 1.0) à chaque cut
-├── Overlay gradient sombre (bottom)
-├── GrainOverlay (SVG feTurbulence, mix-blend-mode: screen)
-└── SubtitleLayer
-    ├── Font: Cinzel (mots normaux) | Playfair Display Italic (mots forts)
-    ├── Couleur: #FFF (normal) | #e8c96a or (fort)
-    └── Fade-in par mot (interpolate opacity 0→1 sur 6 frames)
+```bash
+cd F03_PICTOR/CODEBASE
+npm install
+npm run render
 ```
 
----
+La sortie est `out/short_final.mp4`. Le workflow GitHub Actions copie les données générées par F00 avant le rendu.
 
-## Inputs / Outputs
+## Architecture partagée
 
+F03_PREVIEW et F03_PICTOR utilisent `OmniComposition` et `virtualSequences.js`. Cette composition contient la vidéo, les presets de colorimétrie, le grain, la vignette, le logo et les éléments textuels. La preview sert à contrôler la composition ; PICTOR la rend sans interface.
+
+## Compatibilité avec F00
+
+```text
+F00/OUT/sequences.json
+        │
+        ▼
+src/data/sequences.json
+        │
+        ▼
+OmniComposition
+        │
+        ▼
+out/short_final.mp4
 ```
-IN/
-├── timing.json             ← De F01 CANTOR
-├── creative_config.json    ← De F02 VISIO
-├── audio_clean.mp3         ← De SHARED
-└── images/
-    ├── img_01.jpg
-    └── ...
 
-OUT/
-└── short_final.mp4         ← 1080x1920, 30fps, H.264
-```
+Pour une cible de 10 secondes à 30 fps avec 7 frames par séquence, le manifeste contient environ 43 à 44 séquences de timeline.
 
----
+## Ancien moteur Colab
 
-## Spécifications rendu
-
-| Paramètre | Valeur |
-|-----------|--------|
-| Résolution | 1080 × 1920 (9:16) |
-| FPS | 30 (issu de timing.json) |
-| Durée | = timing.audio_duration_s (LOIT D'AUDIO) |
-| Codec | H.264 (défaut Remotion) |
-| Images 1:1 | object-fit: cover (cadrage auto centre) |
-| Images 9:16 | Plein cadre |
-| Fast cut | cut_interval_frames (issu de creative_config.json) |
-
----
-
-## CHECKPOINT SACRÉ
-
-Si Colab se déconnecte pendant le rendu, Remotion utilise son cache interne de frames. En relançant le rendu depuis l'étape 3, il reprend automatiquement là où il s'est arrêté. **Ne jamais supprimer `/content/lacrimae_render/` avant la fin du rendu.**
-
----
-
-## Rites du Sang applicables
-
-- **LOI D'ISOLEMENT** : PICTOR ne lit que `F03/IN/`. Aucun accès aux autres frégates.
-- **CHECKPOINT SACRÉ** : F03 est toujours récupérable après interruption Colab.
-- **DURÉE PAR L'AUDIO** : `durationInFrames = timing.total_frames`. Immuable.
-- **RITE DE VALIDATION** : LAC_CUSTOS check-in avant tout rendu, check-out avant transit.
+`LAC_F03.ipynb`, `components/LacrimaeShort.jsx` et `Root.colab.legacy.jsx` sont conservés comme référence historique. Ils ne font pas partie du chemin de rendu dev4.

@@ -1,0 +1,11 @@
+{
+  "schema_version": "dev4.virtual-sequences.v1",
+  "source": "clip_001.mp4",
+  "fps": 30,
+  "total_frames": 300,
+  "cut_interval_frames": 7,
+  "sequences": [
+    {"id": "seq_0001", "source_start_frame": 0, "timeline_start_frame": 0, "timeline_duration_frames": 7},
+    {"id": "seq_0002", "source_start_frame": 30, "timeline_start_frame": 7, "timeline_duration_frames": 7}
+  ]
+}

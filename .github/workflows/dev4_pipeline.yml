@@ -1,0 +1,139 @@
+name: LACRIMAE dev4 — Virtual Match Cut
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_f01:
+        description: 'Ignorer F01 SELECT (true = utiliser le manifeste de F00)'
+        required: true
+        default: true
+        type: boolean
+      skip_f02:
+        description: 'Ignorer F02 FORMAT (true = générer un codex minimal)'
+        required: true
+        default: true
+        type: boolean
+      target_duration_seconds:
+        description: 'Durée cible du Short'
+        required: true
+        default: '10'
+      cut_interval_frames:
+        description: 'Frames par séquence Fast Match Cut'
+        required: true
+        default: '7'
+      project_title:
+        description: 'Titre de la production'
+        required: true
+        default: 'Lacrimae dev4'
+
+permissions:
+  contents: read
+
+jobs:
+  forge:
+    name: F00 → Preview → PICTOR
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      SKIP_F01: ${{ inputs.skip_f01 }}
+      SKIP_F02: ${{ inputs.skip_f02 }}
+      TARGET_DURATION: ${{ inputs.target_duration_seconds }}
+      CUT_INTERVAL: ${{ inputs.cut_interval_frames }}
+      PROJECT_TITLE: ${{ inputs.project_title }}
+    steps:
+      - name: Checkout dev4
+        uses: actions/checkout@v4
+
+      - name: Setup Python et Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: F03_PREVIEW/CODEBASE/package-lock.json
+
+      - name: Installer FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Installer PICTOR
+        working-directory: F03_PICTOR/CODEBASE
+        run: npm install --no-audit --no-fund
+
+      - name: Préparer la demande F00
+        run: |
+          mkdir -p F00_INGEST/IN F00_INGEST/OUT
+          test -s F00_INGEST/IN/video_source.mp4
+          cat > F00_INGEST/IN/production_request.json <<JSON
+          {
+            "project_title": "${PROJECT_TITLE}",
+            "target_duration_seconds": ${TARGET_DURATION},
+            "cut_interval_frames": ${CUT_INTERVAL},
+            "candidate_count": 100,
+            "shuffle_seed": 2026,
+            "short_count": 1
+          }
+          JSON
+
+      - name: F00 — produire uniquement les références virtuelles
+        run: |
+          python3 F00_INGEST/CODEBASE/f00_ingest.py \
+            --source F00_INGEST/IN/video_source.mp4 \
+            --request F00_INGEST/IN/production_request.json \
+            --out F00_INGEST/OUT
+
+      - name: Skip contrôlé de F01 et F02
+        run: |
+          mkdir -p TRACKING
+          : > TRACKING/dev4_pipeline_state.txt
+          if [ "$SKIP_F01" = "true" ]; then
+            echo 'F01: skipped_by_input_manifest' | tee -a TRACKING/dev4_pipeline_state.txt
+          else
+            test -s F01_SELECT/OUT/cutlist.json || { echo 'F01 non ignoré mais cutlist.json absent'; exit 1; }
+            echo 'F01: reused_existing_cutlist' | tee -a TRACKING/dev4_pipeline_state.txt
+          fi
+          if [ "$SKIP_F02" = "true" ]; then
+            echo 'F02: skipped_by_input_manifest' | tee -a TRACKING/dev4_pipeline_state.txt
+          else
+            test -s F02_FORMAT/OUT/codex.json || { echo 'F02 non ignoré mais codex.json absent'; exit 1; }
+            echo 'F02: reused_existing_codex' | tee -a TRACKING/dev4_pipeline_state.txt
+          fi
+
+      - name: Préparer l’entrée commune preview / PICTOR
+        run: |
+          mkdir -p F03_PREVIEW/CODEBASE/public F03_PICTOR/CODEBASE/src/data F03_PICTOR/CODEBASE/public
+          cp F00_INGEST/OUT/$(basename F00_INGEST/IN/video_source.mp4) F03_PREVIEW/CODEBASE/public/video_source.mp4
+          cp F00_INGEST/OUT/$(basename F00_INGEST/IN/video_source.mp4) F03_PICTOR/CODEBASE/public/video_source.mp4
+          cp F00_INGEST/OUT/sequences.json F03_PREVIEW/CODEBASE/public/sequences.json
+          cp F00_INGEST/OUT/sequences.json F03_PICTOR/CODEBASE/src/data/sequences.json
+          cp F03_PREVIEW/CODEBASE/public/codex.json F03_PICTOR/CODEBASE/src/data/codex.json
+          python3 - <<'PY'
+          import json
+          p='F03_PREVIEW/CODEBASE/public/codex.json'
+          d=json.load(open(p, encoding='utf-8'))
+          clip=(d.get('clips') or [d])[0]
+          clip.setdefault('video', {})['source']='video_source.mp4'
+          clip['video']['fps']=json.load(open('F00_INGEST/OUT/sequences.json'))['fps']
+          clip['video']['total_frames']=json.load(open('F00_INGEST/OUT/sequences.json'))['total_frames']
+          d['clips']=[clip]
+          open(p,'w',encoding='utf-8').write(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+          open('F03_PICTOR/CODEBASE/src/data/codex.json','w',encoding='utf-8').write(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+          PY
+
+      - name: Construire la preview
+        working-directory: F03_PREVIEW/CODEBASE
+        run: npm ci && npm run build
+
+      - name: Rendre PICTOR avec les mêmes données
+        working-directory: F03_PICTOR/CODEBASE
+        run: npm run render
+
+      - name: Publier les artifacts dev4
+        uses: actions/upload-artifact@v4
+        with:
+          name: lacrimae-dev4-${{ github.run_id }}
+          path: |
+            F00_INGEST/OUT/
+            F03_PREVIEW/CODEBASE/dist/
+            F03_PICTOR/CODEBASE/out/short_final.mp4
+            TRACKING/dev4_pipeline_state.txt
+          if-no-files-found: error
+          retention-days: 14

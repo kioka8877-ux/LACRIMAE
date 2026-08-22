@@ -23,6 +23,7 @@ export default function App() {
   const [session, setSession] = useState(null);    // session (style global)
   const [videoSrc, setVideoSrc] = useState('');
   const [backgrounds, setBackgrounds] = useState([]); // liste des fonds PNG
+  const [sequences, setSequences] = useState(null); // manifeste virtuel produit par F00
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [validated, setValidated] = useState(false);
@@ -42,7 +43,13 @@ export default function App() {
         setCodex(full);
         setClip(clipFirst);
         setSession(full.session || {});
-        setVideoSrc(clipFirst.video?.source ? './' + clipFirst.video.source : './clip_001.mp4');
+        setVideoSrc(clipFirst.video?.source ? './' + clipFirst.video.source : './video_source.mp4');
+        try {
+          const seqResp = await fetch('./sequences.json');
+          if (seqResp.ok) setSequences(await seqResp.json());
+        } catch (e) {
+          setSequences(null);
+        }
         // Liste des fonds PNG (écrite par le transit F02 / bridge)
         try {
           const bgResp = await fetch('./backgrounds/manifest.json');
@@ -66,7 +73,7 @@ export default function App() {
     return (
       <div style={styles.loading}>
         <div style={{ fontSize: '24px', marginBottom: '10px' }}>⏳ Chargement...</div>
-        <div style={{ fontSize: '14px', color: '#666' }}>Lecture du codex.json, du clip et des fonds</div>
+        <div style={{ fontSize: '14px', color: '#666' }}>Lecture du codex.json, de la vidéo source, des séquences et des fonds</div>
       </div>
     );
   }
@@ -79,16 +86,17 @@ export default function App() {
         <div style={{ marginTop: '20px', fontSize: '13px', color: '#666', textAlign: 'left' }}>
           <strong>Setup requis:</strong>
           <br />1. Placez <code>codex.json</code> dans <code>public/</code>
-          <br />2. Placez <code>clip_001.mp4</code> dans <code>public/</code>
-          <br />3. Placez vos fonds PNG dans <code>public/backgrounds/</code>
-          <br />4. Lancez <code>npm run dev</code>
+          <br />2. Placez <code>video_source.mp4</code> dans <code>public/</code>
+          <br />3. Placez <code>sequences.json</code> dans <code>public/</code>
+          <br />4. Placez vos fonds PNG dans <code>public/backgrounds/</code>
+          <br />5. Lancez <code>npm run dev</code>
         </div>
       </div>
     );
   }
 
   const fps = clip.video?.fps || 30;
-  const totalFrames = clip.video?.total_frames || 300;
+  const totalFrames = sequences?.total_frames || clip.video?.total_frames || 300;
   const vidWidth = clip.video?.width || 1080;
   const vidHeight = clip.video?.height || 1920;
 
@@ -277,7 +285,7 @@ export default function App() {
             <Player
               ref={playerRef}
               component={OmniComposition}
-              inputProps={{ codex: clip, videoSrc, session }}
+              inputProps={{ codex: clip, videoSrc, session, sequences }}
               durationInFrames={totalFrames}
               fps={fps}
               compositionWidth={vidWidth}

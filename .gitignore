@@ -1,0 +1,19 @@
+# Dependencies and build outputs
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+out/
+**/out/
+
+# Local production media (use GitHub Releases or artifacts)
+F00_INGEST/IN/video_source.mp4
+F00_INGEST/OUT/video_source.mp4
+F03_PICTOR/CODEBASE/public/*.mp4
+F03_PREVIEW/CODEBASE/public/video_source.mp4
+
+# Local logs and caches
+*.log
+.DS_Store
+__pycache__/
+*.pyc
