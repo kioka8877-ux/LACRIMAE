@@ -11,6 +11,7 @@ import {
   staticFile,
 } from 'remotion';
 import { normalizeSequences } from './virtualSequences';
+import { getCompositionConfig, rotationForSequence } from './compositionConfig';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * OmniComposition (F03 PREVIEW) â€” mÃªmes 6 calques que F04 RENDER :
@@ -71,6 +72,10 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
   const session = sessionProp || clip.session || SESSION_FALLBACK;
   const presets = { ...SESSION_FALLBACK.presets, ...(session.presets || {}) };
   const textsStyle = { ...SESSION_FALLBACK.texts_style, ...(session.texts_style || {}) };
+  const composition = getCompositionConfig(clip, session);
+  const sceneRotation = composition.rotation_layer === 'composition'
+    ? rotationForSequence(composition, 0, frame, fps, durationInFrames)
+    : 0;
 
   const src = videoSrc || (clip.video?.source ? './' + clip.video.source : './clip_001.mp4');
   const videoUrl = src.startsWith('./') ? staticFile(src.replace('./', '')) : src;
@@ -146,7 +151,12 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
       )}
 
       {/* CALQUE 6 wrapper : presets globaux sur toute la scÃ¨ne */}
-      <AbsoluteFill style={{ filter: fullFilter || undefined }}>
+      <AbsoluteFill style={{
+        filter: fullFilter || undefined,
+        transform: sceneRotation ? `rotate(${sceneRotation}deg)` : undefined,
+        transformOrigin: 'center center',
+        overflow: 'hidden',
+      }}>
         {/* L1 BACKGROUND */}
         {session.background?.image ? (
           <AbsoluteFill style={{ overflow: 'hidden' }}>
@@ -169,35 +179,39 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
           <AbsoluteFill style={{ backgroundColor: session.background?.color || '#0a0a0a' }} />
         )}
 
-        {/* L2 VIDEO : lecture continue ou séquences virtuelles référencées par F00 */}
-        {virtualSequences.length > 0 ? virtualSequences.map((sequence) => (
-          <Sequence key={sequence.id} from={sequence.timelineStartFrame} durationInFrames={sequence.durationFrames}>
-            <AbsoluteFill>
-              <Video
-                src={videoUrl}
-                startFrom={sequence.sourceStartFrame}
-                muted
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: session.profile === 'background' ? 'contain' : 'cover',
-                  transform: `${zoomTransform} translate(${shakeX}px, ${shakeY}px) translateY(${session.video?.offset_y || 0}%)`,
-                }}
-                playbackRate={playbackRate}
-              />
-            </AbsoluteFill>
-          </Sequence>
-        )) : (
-          <AbsoluteFill>
+        {/* L2 VIDEO : source horizontale, recadrage et séquences virtuelles */}
+        {composition.background_fill === 'blurred_video' && (
+          <AbsoluteFill style={{ overflow: 'hidden', backgroundColor: '#000' }}>
             <Video
               src={videoUrl}
               muted
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: session.profile === 'background' ? 'contain' : 'cover',
-                transform: `${zoomTransform} translate(${shakeX}px, ${shakeY}px) translateY(${session.video?.offset_y || 0}%)`,
-              }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(24px) brightness(0.45)', transform: 'scale(1.18)' }}
+            />
+          </AbsoluteFill>
+        )}
+        {virtualSequences.length > 0 ? virtualSequences.map((sequence, sequenceIndex) => {
+          const sequenceRotation = sequence.rotationDeg ?? rotationForSequence(composition, sequenceIndex, frame, fps, durationInFrames);
+          const fit = sequence.fit || composition.fit || 'cover';
+          const transform = `${zoomTransform} translate(${shakeX}px, ${shakeY}px) translateY(${session.video?.offset_y || 0}%) rotate(${sequenceRotation}deg)`;
+          return (
+            <Sequence key={sequence.id} from={sequence.timelineStartFrame} durationInFrames={sequence.durationFrames}>
+              <AbsoluteFill style={{ overflow: 'hidden' }}>
+                <Video
+                  src={videoUrl}
+                  startFrom={sequence.sourceStartFrame}
+                  muted
+                  style={{ width: '100%', height: '100%', objectFit: fit, transform, transformOrigin: 'center center' }}
+                  playbackRate={playbackRate}
+                />
+              </AbsoluteFill>
+            </Sequence>
+          );
+        }) : (
+          <AbsoluteFill style={{ overflow: 'hidden' }}>
+            <Video
+              src={videoUrl}
+              muted
+              style={{ width: '100%', height: '100%', objectFit: composition.fit || 'cover', transform: `${zoomTransform} rotate(${rotationForSequence(composition, 0, frame, fps, durationInFrames)}deg)`, transformOrigin: 'center center' }}
               playbackRate={playbackRate}
             />
           </AbsoluteFill>

@@ -4,6 +4,18 @@
   "mode": "forge",
   "profile": "background",
   "session": {
+    "composition": {
+      "preset": "vertical",
+      "width": 1080,
+      "height": 1920,
+      "fit": "cover",
+      "background_fill": "blurred_video",
+      "rotation_mode": "per_sequence",
+      "rotation_step_deg": 1,
+      "rotation_total_deg": 360,
+      "rotation_direction": 1,
+      "rotation_layer": "video"
+    },
     "background": {
       "image": "bg_grid_dark.png",
       "color": "#0a0a0a",
@@ -45,10 +57,10 @@
       "id": "clip_001",
       "video": {
         "source": "video_source.mp4",
-        "fps": 30,
-        "total_frames": 300,
-        "width": 1080,
-        "height": 1920
+        "fps": 59.94006,
+        "total_frames": 599,
+        "width": 1920,
+        "height": 1080
       },
       "texts": {
         "mode": "title+paragraph",

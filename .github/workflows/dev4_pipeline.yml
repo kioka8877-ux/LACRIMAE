@@ -76,6 +76,13 @@ jobs:
         working-directory: F03_PICTOR/CODEBASE
         run: npm install --no-audit --no-fund
 
+      - name: Normaliser la source vidéo pour le rendu
+        run: |
+          mkdir -p F00_INGEST/IN F00_INGEST/OUT
+          test -s F00_INGEST/IN/video_source.mp4
+          ffmpeg -y -i F00_INGEST/IN/video_source.mp4 -map 0:v:0 -c:v libx264 -profile:v main -level 4.1 -pix_fmt yuv420p -an -movflags +faststart /tmp/video_source_dev4.mp4
+          mv /tmp/video_source_dev4.mp4 F00_INGEST/IN/video_source.mp4
+
       - name: Préparer la demande F00
         run: |
           mkdir -p F00_INGEST/IN F00_INGEST/OUT
@@ -133,6 +140,7 @@ jobs:
           cp F00_INGEST/OUT/sequences.json F03_PICTOR/CODEBASE/src/data/sequences.json
           cp F03_PREVIEW/CODEBASE/src/preview/OmniComposition.jsx F03_PICTOR/CODEBASE/src/OmniComposition.jsx
           cp F03_PREVIEW/CODEBASE/src/preview/virtualSequences.js F03_PICTOR/CODEBASE/src/virtualSequences.js
+          cp F03_PREVIEW/CODEBASE/src/preview/compositionConfig.js F03_PICTOR/CODEBASE/src/compositionConfig.js
           if [ "$SKIP_F02" = "true" ]; then
             cp F03_PREVIEW/CODEBASE/public/codex.json F03_PICTOR/CODEBASE/src/data/codex.json
           else

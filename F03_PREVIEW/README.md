@@ -40,3 +40,9 @@ F03_PICTOR
 ```
 
 F03_PREVIEW et F03_PICTOR doivent utiliser la même composition Remotion et le même manifeste. La preview sert à visualiser et valider ; PICTOR sert à rendre le MP4 final.
+
+## Composition et transformations
+
+Le codex peut définir une composition `vertical` (1080×1920), `horizontal` (1920×1080) ou `square` (1080×1080). La vidéo source peut être adaptée avec `fit: cover` ou `fit: contain`. Le mode `background_fill: blurred_video` utilise une copie agrandie et floutée de la source pour remplir les zones libres lors du passage d’une source horizontale à une composition verticale.
+
+Les rotations sont définies dans `session.composition`. `rotation_mode: per_sequence` ajoute `rotation_step_deg` à chaque séquence virtuelle ; `rotation_mode: continuous` interpole jusqu’à `rotation_total_deg` sur la durée de la composition. `rotation_layer` vaut `video` pour garder textes et logo droits, ou `composition` pour faire tourner l’ensemble des calques. Ces paramètres sont exportés dans le codex et réutilisés par PICTOR.

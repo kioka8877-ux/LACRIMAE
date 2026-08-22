@@ -64,3 +64,21 @@ La validation humaine entre la preview et le rendu est représentée par l’exp
 ## Commit final
 
 Commit fonctionnel : `263d0c848d7b85571ac46fc4467012e4e258cc2b` (`feat(dev4): complete virtual match-cut pipeline`). Le commit de skip F04 est `8909d27`. Le commit d’intégration F05/F06 est `60f000ec1d273d8ce43da332c6edf2426425aff7` (`feat(dev4): add camouflage and luther stages`). La branche `dev4` a été poussée sur `origin/dev4` et la branche `main` n’a pas été modifiée.
+
+### Composition configurable et transformations
+
+F03_PREVIEW et F03_PICTOR partagent désormais `compositionConfig.js`. Le codex définit le format final (`vertical`, `horizontal` ou `square`), le mode de recadrage (`cover` ou `contain`), le fond de remplissage (`blurred_video`, `solid` ou `none`), ainsi que la rotation (`none`, `per_sequence` ou `continuous`). La rotation peut viser le calque vidéo ou la composition entière.
+
+La source horizontale réelle de la release `f00` a été rendue dans une composition verticale 1080×1920 avec un fond vidéo flouté et une rotation par séquence. Le rendu PICTOR et la preview ont réussi après normalisation de la source en H.264 yuv420p sans audio intermédiaire.
+
+## Vérifications supplémentaires du 22 août 2026
+
+| Vérification | Résultat |
+|---|---|
+| Build F03_PREVIEW avec les nouveaux contrôles | Réussi |
+| Validation des compositions PICTOR | Réussie |
+| Source f00 horizontale 1920×1080 vers canvas vertical | Réussi |
+| Rotation par séquence | Rendue avec succès |
+| Preview réelle de 10 secondes | MP4 vertical 1080×1920 produit |
+| PICTOR réel de 10 secondes | MP4 vertical 1080×1920 produit |
+| Découpage en fichiers intermédiaires | Aucun |

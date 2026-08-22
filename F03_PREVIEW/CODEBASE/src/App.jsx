@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Player } from '@remotion/player';
 import { OmniComposition } from './preview/OmniComposition';
+import { COMPOSITION_PRESETS, getCompositionConfig } from './preview/compositionConfig';
 
 /**
  * App — F03 PREVIEW (v4.0 — session + clips)
@@ -97,8 +98,9 @@ export default function App() {
 
   const fps = clip.video?.fps || 30;
   const totalFrames = sequences?.total_frames || clip.video?.total_frames || 300;
-  const vidWidth = clip.video?.width || 1080;
-  const vidHeight = clip.video?.height || 1920;
+  const composition = getCompositionConfig(clip, session);
+  const vidWidth = composition.width;
+  const vidHeight = composition.height;
 
   // ── Helpers session ──
   const updateSession = (section, key, value) => {
@@ -113,6 +115,10 @@ export default function App() {
   const updateSessionTextsStyle = (key, value) =>
     updateSession('texts_style', key, value);
   const updatePreset = (key, value) => updateSession('presets', key, value);
+  const updateComposition = (key, value) => setSession((s) => ({
+    ...s,
+    composition: { ...(s.composition || {}), [key]: value },
+  }));
 
   // ── Balise logo : double-clic sur la vidéo → poser ici ──
   const handleLogoClick = (e) => {
@@ -273,7 +279,9 @@ export default function App() {
           🎨 {presets.color_preset || 'punchy'}
           {'  |  '}
           🔊 {Math.round((clip.volume ?? 1) * 100)}%
-          {'  |  '}
+                    {'  | '}
+          ⟳ {vidWidth}×{vidHeight}
+          {'  | '}
           ⏱️ {(totalFrames / fps).toFixed(1)}s
         </div>
       </div>
@@ -297,7 +305,7 @@ export default function App() {
               style={{
                 width: '100%',
                 maxWidth: '300px',
-                aspectRatio: '9 / 16',
+                aspectRatio: `${vidWidth} / ${vidHeight}`,
                 borderRadius: '12px',
                 overflow: 'hidden',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
@@ -386,6 +394,9 @@ export default function App() {
             <button style={activeTab === 'fond' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('fond')}>
               🖼 Fond & Logo
             </button>
+            <button style={activeTab === 'composition' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('composition')}>
+              ⟳ Composition
+            </button>
             <button style={activeTab === 'video' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('video')}>
               🎬 Vidéo
             </button>
@@ -396,6 +407,57 @@ export default function App() {
               🔍 Netteté
             </button>
           </div>
+
+          {/* ══════════ COMPOSITION : format, cadrage et rotation ══════════ */}
+          {activeTab === 'composition' && (
+            <div style={styles.panelContent}>
+              <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>FORMAT DE COMPOSITION</label>
+              <select style={styles.select} value={composition.preset} onChange={(e) => {
+                const p = COMPOSITION_PRESETS[e.target.value];
+                setSession((s) => ({
+                  ...s,
+                  composition: { ...(s.composition || {}), preset: e.target.value, ...(p ? { width: p.width, height: p.height } : {}) },
+                }));
+              }}>
+                {Object.entries(COMPOSITION_PRESETS).map(([key, p]) => <option key={key} value={key}>{p.label}</option>)}
+              </select>
+              <label style={styles.label}>Mode d’affichage de la source</label>
+              <select style={styles.select} value={composition.fit} onChange={(e) => updateComposition('fit', e.target.value)}>
+                <option value="cover">Cover — remplir l’écran</option>
+                <option value="contain">Contain — garder toute l’image</option>
+              </select>
+              <label style={styles.label}>Fond de remplissage</label>
+              <select style={styles.select} value={composition.background_fill} onChange={(e) => updateComposition('background_fill', e.target.value)}>
+                <option value="blurred_video">Vidéo agrandie et floutée</option>
+                <option value="solid">Couleur du fond</option>
+                <option value="none">Aucun fond</option>
+              </select>
+              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #333' }}>
+                <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>ROTATION DE LA VIDÉO</label>
+                <select style={styles.select} value={composition.rotation_mode} onChange={(e) => updateComposition('rotation_mode', e.target.value)}>
+                  <option value="none">Aucune</option>
+                  <option value="per_sequence">Par séquence</option>
+                  <option value="continuous">Continue</option>
+                </select>
+                {composition.rotation_mode === 'per_sequence' && <>
+                  <label style={styles.label}>Degrés ajoutés par séquence: {composition.rotation_step_deg}°</label>
+                  <input style={styles.slider} type="range" min="0" max="15" step="0.5" value={composition.rotation_step_deg} onChange={(e) => updateComposition('rotation_step_deg', parseFloat(e.target.value))} />
+                </>}
+                {composition.rotation_mode !== 'none' && <>
+                  <label style={styles.label}>Rotation totale: {composition.rotation_total_deg}°</label>
+                  <input style={styles.slider} type="range" min="0" max="360" step="1" value={composition.rotation_total_deg} onChange={(e) => updateComposition('rotation_total_deg', parseInt(e.target.value))} />
+                  <label style={styles.label}>Sens de rotation</label>
+                  <select style={styles.select} value={composition.rotation_direction} onChange={(e) => updateComposition('rotation_direction', parseInt(e.target.value))}>
+                    <option value="1">Horaire</option><option value="-1">Antihoraire</option>
+                  </select>
+                  <label style={styles.label}>Calque affecté</label>
+                  <select style={styles.select} value={composition.rotation_layer} onChange={(e) => updateComposition('rotation_layer', e.target.value)}>
+                    <option value="video">Vidéo uniquement</option><option value="composition">Composition entière</option>
+                  </select>
+                </>}
+              </div>
+            </div>
+          )}
 
           {/* ══════════ TEXTE : mode titre / titre+paragraphe ══════════ */}
           {activeTab === 'text' && (

@@ -48,3 +48,9 @@ Pour une cible de 10 secondes à 30 fps avec 7 frames par séquence, le manifest
 ## Ancien moteur Colab
 
 `LAC_F03.ipynb`, `components/LacrimaeShort.jsx` et `Root.colab.legacy.jsx` sont conservés comme référence historique. Ils ne font pas partie du chemin de rendu dev4.
+
+## Composition configurable
+
+PICTOR lit `session.composition` dans le codex pour rendre le même canvas que F03_PREVIEW. Les presets `vertical`, `horizontal` et `square` définissent les dimensions finales ; `fit` contrôle le recadrage de la source horizontale ; `background_fill` peut utiliser une copie floutée de la vidéo pour remplir le canvas.
+
+Les modes `rotation_mode: none`, `per_sequence` et `continuous` sont partagés avec la preview. PICTOR applique la rotation au calque vidéo ou à toute la composition selon `rotation_layer`, afin que le fichier `short_final.mp4` corresponde à la preview validée.

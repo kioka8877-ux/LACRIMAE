@@ -115,3 +115,9 @@ La vidéo source n’est pas commitée. Elle doit être fournie au runner à l�
 ## Suivi
 
 Le rapport d’implémentation se trouve dans [`TRACKING/DEV4_PHASE1_REPORT.md`](TRACKING/DEV4_PHASE1_REPORT.md). Le journal de campagne est disponible dans [`TRACKING/LACRIMAE_CAMPAIGN_LOG.md`](TRACKING/LACRIMAE_CAMPAIGN_LOG.md).
+
+## Composition configurable et rotation
+
+La vidéo source peut rester horizontale tandis que la composition finale est sélectionnée dans F03_PREVIEW. Les presets disponibles sont `vertical` (1080×1920), `horizontal` (1920×1080) et `square` (1080×1080). Le recadrage utilise `cover` ou `contain`, avec un fond `blurred_video` pour remplir élégamment une composition verticale à partir d’une source horizontale.
+
+Les transformations sont enregistrées dans `session.composition` du codex et sont consommées à l’identique par F03_PREVIEW et F03_PICTOR. La vidéo peut rester fixe, tourner par séquence ou tourner continuellement. La rotation peut être appliquée au calque vidéo seul ou à toute la composition. Le workflow normalise la source vidéo entière pour garantir le décodage Remotion, sans extraire de clips et sans écrire de vidéo intermédiaire dans `F00_INGEST/OUT`.
