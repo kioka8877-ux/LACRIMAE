@@ -38,6 +38,7 @@ F00 produit `sequences.json`. Chaque ligne décrit l’emplacement de départ da
 | **F02 FORMAT** | Préparer un codex lorsque le mode standard est demandé. | `codex.json` |
 | **F03 PREVIEW** | Lire la vidéo source selon le manifeste et régler les presets. | `codex.json` validé |
 | **F03 PICTOR** | Rendre la composition validée en MP4. | `short_final.mp4` |
+| **F04** | Frégate ignorée : PICTOR fournit déjà le rendu final. | Aucun traitement dev4 |
 
 CANTOR n’est pas requis pour ce flux visuel. Il pourra être réintroduit uniquement si une voix off ou des sous-titres synchronisés deviennent nécessaires.
 
@@ -91,13 +92,13 @@ npm run render
 
 ## Skip de F01 et F02
 
-Le workflow `.github/workflows/dev4_pipeline.yml` accepte deux entrées booléennes : `skip_f01` et `skip_f02`. Lorsque les deux valent `true`, le chemin direct est :
+Le workflow `.github/workflows/dev4_pipeline.yml` accepte trois entrées booléennes : `skip_f01`, `skip_f02` et `skip_f04`. `skip_f04` doit rester à `true`, car dev4 s’arrête volontairement après PICTOR. Lorsque les trois valent `true`, le chemin direct est :
 
 ```text
 F00 → F03_PREVIEW → F03_PICTOR
 ```
 
-Le skip est écrit dans `TRACKING/dev4_pipeline_state.txt`. Lorsqu’une frégate n’est pas ignorée, le workflow exige sa sortie attendue au lieu de la contourner silencieusement.
+Le skip est écrit dans `TRACKING/dev4_pipeline_state.txt`. F04 est journalisée comme `skipped_by_design_after_pictor`. Lorsqu’une frégate facultative n’est pas ignorée, le workflow exige sa sortie attendue au lieu de la contourner silencieusement.
 
 ## GitHub Actions
 

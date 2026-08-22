@@ -26,9 +26,9 @@ PICTOR a été sorti de son ancien chemin Colab/images. Il possède désormais u
 
 La parité de la composition et du résolveur de séquences entre preview et PICTOR a été vérifiée avec `cmp`. Le workflow resynchronise également ces deux fichiers avant le rendu afin d’éviter une divergence future.
 
-### Skip de F01 et F02
+### Skip de F01, F02 et F04
 
-Le workflow `.github/workflows/dev4_pipeline.yml` accepte `skip_f01` et `skip_f02`. Lorsque les deux paramètres valent `true`, le chemin direct est F00 → F03_PREVIEW → F03_PICTOR. Les skips sont inscrits dans `TRACKING/dev4_pipeline_state.txt`. Lorsqu’un skip est désactivé, la sortie attendue de la frégate concernée est exigée.
+Le workflow `.github/workflows/dev4_pipeline.yml` accepte `skip_f01`, `skip_f02` et `skip_f04`. F04 doit rester ignorée dans dev4 : PICTOR produit déjà le MP4 final et le flux s’arrête volontairement après F03_PICTOR. Lorsque les trois paramètres valent `true`, le chemin direct est F00 → F03_PREVIEW → F03_PICTOR. Les skips sont inscrits dans `TRACKING/dev4_pipeline_state.txt`. Si `skip_f04` est désactivé, le workflow arrête explicitement le job, car la finalisation F04 est hors périmètre dev4.
 
 ### GitHub Actions
 
@@ -58,4 +58,4 @@ La validation humaine entre la preview et le rendu est représentée par l’exp
 
 ## Commit final
 
-Commit final : `263d0c848d7b85571ac46fc4467012e4e258cc2b` (`feat(dev4): complete virtual match-cut pipeline`). La branche `dev4` a été poussée sur `origin/dev4` et la branche `main` n’a pas été modifiée.
+Commit fonctionnel : `263d0c848d7b85571ac46fc4467012e4e258cc2b` (`feat(dev4): complete virtual match-cut pipeline`). Le commit de documentation final est `c1db925` et inclut l’exclusion explicite de F04. La branche `dev4` a été poussée sur `origin/dev4` et la branche `main` n’a pas été modifiée.

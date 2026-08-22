@@ -13,6 +13,11 @@ on:
         required: true
         default: true
         type: boolean
+      skip_f04:
+        description: 'Ignorer F04 finalisation (dev4 s’arrête après PICTOR)'
+        required: true
+        default: true
+        type: boolean
       target_duration_seconds:
         description: 'Durée cible du Short'
         required: true
@@ -37,6 +42,7 @@ jobs:
     env:
       SKIP_F01: ${{ inputs.skip_f01 }}
       SKIP_F02: ${{ inputs.skip_f02 }}
+      SKIP_F04: ${{ inputs.skip_f04 }}
       TARGET_DURATION: ${{ inputs.target_duration_seconds }}
       CUT_INTERVAL: ${{ inputs.cut_interval_frames }}
       PROJECT_TITLE: ${{ inputs.project_title }}
@@ -98,6 +104,12 @@ jobs:
           else
             test -s F02_FORMAT/OUT/codex.json || { echo 'F02 non ignoré mais codex.json absent'; exit 1; }
             echo 'F02: reused_existing_codex' | tee -a TRACKING/dev4_pipeline_state.txt
+          fi
+          if [ "$SKIP_F04" = "true" ]; then
+            echo 'F04: skipped_by_design_after_pictor' | tee -a TRACKING/dev4_pipeline_state.txt
+          else
+            echo 'F04 is outside dev4 scope: PICTOR already produces the final MP4' >&2
+            exit 1
           fi
 
       - name: Préparer l’entrée commune preview / PICTOR
