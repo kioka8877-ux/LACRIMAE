@@ -12,7 +12,7 @@
   },
   "session": {
     "background": {
-      "image": "bg_grid_dark.png",
+      "image": "bg_paper_crumpled.png",
       "color": "#0a0a0a",
       "scale": 1.0
     },
@@ -31,8 +31,8 @@
     },
     "texts_style": {
       "font": "Impact, Arial Black, sans-serif",
-      "size_title": 64,
-      "size_paragraph": 40,
+      "size_title": 55,
+      "size_paragraph": 41,
       "color": "#FFFFFF",
       "stroke_color": "#000000",
       "stroke_width": 4,
@@ -60,7 +60,8 @@
         "fps": 30,
         "total_frames": 240,
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "scale": 1.85
       },
       "meme": {
         "source": "M1.mp4"
@@ -93,14 +94,48 @@
         },
         "likes": 12582,
         "reposts": 323,
-        "replies": 179
+        "replies": 179,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
-      "shake_power": 0
+      "shake_power": 0,
+      "text_emotion_position_pct": 84,
+      "text_emotion_size": 72,
+      "sig": {
+        "grain": {
+          "seed": 1601,
+          "intensity": 0.15
+        },
+        "bg_motion": {
+          "base_scale": 1.04,
+          "amp_x": 8.0,
+          "amp_y": 7.0,
+          "freq": 1.1,
+          "phase": 0.37,
+          "drift_x": 1.5,
+          "drift_y": -1.2
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.003,
+          "zoom_to": 1.069,
+          "dx": 0.0,
+          "dy": 2.5
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 34,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 3,
+          "opacity": 0.06
+        }
+      }
     },
     {
       "id": "clip_002",
@@ -110,7 +145,8 @@
         "fps": 30,
         "total_frames": 240,
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "scale": 1.85
       },
       "meme": {
         "source": "M1.mp4"
@@ -141,14 +177,48 @@
         },
         "likes": 19072,
         "reposts": 2072,
-        "replies": 312
+        "replies": 312,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
-      "shake_power": 0
+      "shake_power": 0,
+      "text_emotion_position_pct": 84,
+      "text_emotion_size": 72,
+      "sig": {
+        "grain": {
+          "seed": 1602,
+          "intensity": 0.15
+        },
+        "bg_motion": {
+          "base_scale": 1.04,
+          "amp_x": 8.0,
+          "amp_y": 7.0,
+          "freq": 1.1,
+          "phase": 0.74,
+          "drift_x": 1.5,
+          "drift_y": -1.2
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.003,
+          "zoom_to": 1.069,
+          "dx": 0.0,
+          "dy": 2.5
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 34,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 3,
+          "opacity": 0.06
+        }
+      }
     },
     {
       "id": "clip_003",
@@ -158,7 +228,8 @@
         "fps": 30,
         "total_frames": 240,
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "scale": 1.85
       },
       "meme": {
         "source": "M1.mp4"
@@ -191,14 +262,48 @@
         },
         "likes": 20934,
         "reposts": 2509,
-        "replies": 382
+        "replies": 382,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
-      "shake_power": 0
+      "shake_power": 0,
+      "text_emotion_position_pct": 84,
+      "text_emotion_size": 72,
+      "sig": {
+        "grain": {
+          "seed": 1603,
+          "intensity": 0.15
+        },
+        "bg_motion": {
+          "base_scale": 1.04,
+          "amp_x": 8.0,
+          "amp_y": 7.0,
+          "freq": 1.1,
+          "phase": 1.11,
+          "drift_x": 1.5,
+          "drift_y": -1.2
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.003,
+          "zoom_to": 1.069,
+          "dx": 0.0,
+          "dy": 2.5
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 34,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 3,
+          "opacity": 0.06
+        }
+      }
     },
     {
       "id": "clip_004",
@@ -208,7 +313,8 @@
         "fps": 30,
         "total_frames": 240,
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "scale": 1.85
       },
       "meme": {
         "source": "M1.mp4"
@@ -242,14 +348,48 @@
         },
         "likes": 9147,
         "reposts": 1938,
-        "replies": 264
+        "replies": 264,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
-      "shake_power": 0
+      "shake_power": 0,
+      "text_emotion_position_pct": 84,
+      "text_emotion_size": 72,
+      "sig": {
+        "grain": {
+          "seed": 1604,
+          "intensity": 0.15
+        },
+        "bg_motion": {
+          "base_scale": 1.04,
+          "amp_x": 8.0,
+          "amp_y": 7.0,
+          "freq": 1.1,
+          "phase": 1.48,
+          "drift_x": 1.5,
+          "drift_y": -1.2
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.003,
+          "zoom_to": 1.069,
+          "dx": 0.0,
+          "dy": 2.5
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 34,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 3,
+          "opacity": 0.06
+        }
+      }
     },
     {
       "id": "clip_005",
@@ -259,7 +399,8 @@
         "fps": 30,
         "total_frames": 240,
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "scale": 1.85
       },
       "meme": {
         "source": "M1.mp4"
@@ -289,14 +430,48 @@
         },
         "likes": 9637,
         "reposts": 611,
-        "replies": 235
+        "replies": 235,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
-      "shake_power": 0
+      "shake_power": 0,
+      "text_emotion_position_pct": 84,
+      "text_emotion_size": 72,
+      "sig": {
+        "grain": {
+          "seed": 1605,
+          "intensity": 0.15
+        },
+        "bg_motion": {
+          "base_scale": 1.04,
+          "amp_x": 8.0,
+          "amp_y": 7.0,
+          "freq": 1.1,
+          "phase": 1.85,
+          "drift_x": 1.5,
+          "drift_y": -1.2
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.003,
+          "zoom_to": 1.069,
+          "dx": 0.0,
+          "dy": 2.5
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 34,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 3,
+          "opacity": 0.06
+        }
+      }
     },
     {
       "id": "clip_006",
@@ -306,7 +481,8 @@
         "fps": 30,
         "total_frames": 240,
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "scale": 1.85
       },
       "meme": {
         "source": "M1.mp4"
@@ -339,14 +515,48 @@
         },
         "likes": 20672,
         "reposts": 721,
-        "replies": 375
+        "replies": 375,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
-      "shake_power": 0
+      "shake_power": 0,
+      "text_emotion_position_pct": 84,
+      "text_emotion_size": 72,
+      "sig": {
+        "grain": {
+          "seed": 1606,
+          "intensity": 0.15
+        },
+        "bg_motion": {
+          "base_scale": 1.04,
+          "amp_x": 8.0,
+          "amp_y": 7.0,
+          "freq": 1.1,
+          "phase": 2.22,
+          "drift_x": 1.5,
+          "drift_y": -1.2
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.003,
+          "zoom_to": 1.069,
+          "dx": 0.0,
+          "dy": 2.5
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 34,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 3,
+          "opacity": 0.06
+        }
+      }
     },
     {
       "id": "clip_007",
@@ -356,7 +566,8 @@
         "fps": 30,
         "total_frames": 240,
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "scale": 1.85
       },
       "meme": {
         "source": "M1.mp4"
@@ -389,14 +600,48 @@
         },
         "likes": 23949,
         "reposts": 2169,
-        "replies": 373
+        "replies": 373,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
-      "shake_power": 0
+      "shake_power": 0,
+      "text_emotion_position_pct": 84,
+      "text_emotion_size": 72,
+      "sig": {
+        "grain": {
+          "seed": 1607,
+          "intensity": 0.15
+        },
+        "bg_motion": {
+          "base_scale": 1.04,
+          "amp_x": 8.0,
+          "amp_y": 7.0,
+          "freq": 1.1,
+          "phase": 2.59,
+          "drift_x": 1.5,
+          "drift_y": -1.2
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.003,
+          "zoom_to": 1.069,
+          "dx": 0.0,
+          "dy": 2.5
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 34,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 3,
+          "opacity": 0.06
+        }
+      }
     },
     {
       "id": "clip_008",
@@ -406,7 +651,8 @@
         "fps": 30,
         "total_frames": 240,
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "scale": 1.85
       },
       "meme": {
         "source": "M1.mp4"
@@ -439,14 +685,48 @@
         },
         "likes": 9901,
         "reposts": 234,
-        "replies": 144
+        "replies": 144,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
-      "shake_power": 0
+      "shake_power": 0,
+      "text_emotion_position_pct": 84,
+      "text_emotion_size": 72,
+      "sig": {
+        "grain": {
+          "seed": 1608,
+          "intensity": 0.15
+        },
+        "bg_motion": {
+          "base_scale": 1.04,
+          "amp_x": 8.0,
+          "amp_y": 7.0,
+          "freq": 1.1,
+          "phase": 2.96,
+          "drift_x": 1.5,
+          "drift_y": -1.2
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.003,
+          "zoom_to": 1.069,
+          "dx": 0.0,
+          "dy": 2.5
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 34,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 3,
+          "opacity": 0.06
+        }
+      }
     },
     {
       "id": "clip_009",
@@ -456,7 +736,8 @@
         "fps": 30,
         "total_frames": 240,
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "scale": 1.85
       },
       "meme": {
         "source": "M1.mp4"
@@ -488,14 +769,48 @@
         },
         "likes": 5158,
         "reposts": 2221,
-        "replies": 326
+        "replies": 326,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
-      "shake_power": 0
+      "shake_power": 0,
+      "text_emotion_position_pct": 84,
+      "text_emotion_size": 72,
+      "sig": {
+        "grain": {
+          "seed": 1609,
+          "intensity": 0.15
+        },
+        "bg_motion": {
+          "base_scale": 1.04,
+          "amp_x": 8.0,
+          "amp_y": 7.0,
+          "freq": 1.1,
+          "phase": 3.33,
+          "drift_x": 1.5,
+          "drift_y": -1.2
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.003,
+          "zoom_to": 1.069,
+          "dx": 0.0,
+          "dy": 2.5
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 34,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 3,
+          "opacity": 0.06
+        }
+      }
     },
     {
       "id": "clip_010",
@@ -505,7 +820,8 @@
         "fps": 30,
         "total_frames": 240,
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "scale": 1.85
       },
       "meme": {
         "source": "M1.mp4"
@@ -538,14 +854,48 @@
         },
         "likes": 13936,
         "reposts": 50,
-        "replies": 37
+        "replies": 37,
+        "text_size": 51
       },
       "logo": null,
       "volume": 1.0,
       "brutal_cut_interval_frames": 0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,
-      "shake_power": 0
+      "shake_power": 0,
+      "text_emotion_position_pct": 84,
+      "text_emotion_size": 72,
+      "sig": {
+        "grain": {
+          "seed": 1610,
+          "intensity": 0.15
+        },
+        "bg_motion": {
+          "base_scale": 1.04,
+          "amp_x": 8.0,
+          "amp_y": 7.0,
+          "freq": 1.1,
+          "phase": 3.7,
+          "drift_x": 1.5,
+          "drift_y": -1.2
+        },
+        "mirror": false,
+        "cam_drift": {
+          "zoom_from": 1.003,
+          "zoom_to": 1.069,
+          "dx": 0.0,
+          "dy": 2.5
+        },
+        "text_anim": {
+          "direction": "rtl",
+          "duration_frames": 34,
+          "ease": "in_out"
+        },
+        "flash": {
+          "frame": 3,
+          "opacity": 0.06
+        }
+      }
     }
   ]
 }
