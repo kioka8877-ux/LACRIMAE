@@ -19,6 +19,8 @@ on:
         description: 'Titre de la production'
         required: true
         default: 'Lacrimae F00 Gate'
+  repository_dispatch:
+    types: [dev4-f00-gate]
 
 permissions:
   contents: read
@@ -29,10 +31,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      RELEASE_TAG: ${{ inputs.release_tag }}
-      TARGET_DURATION: ${{ inputs.target_duration_seconds }}
-      CUT_INTERVAL: ${{ inputs.cut_interval_frames }}
-      PROJECT_TITLE: ${{ inputs.project_title }}
+      RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.client_payload.release_tag || 'f00' }}
+      TARGET_DURATION: ${{ github.event.inputs.target_duration_seconds || github.event.client_payload.target_duration_seconds || '10' }}
+      CUT_INTERVAL: ${{ github.event.inputs.cut_interval_frames || github.event.client_payload.cut_interval_frames || '7' }}
+      PROJECT_TITLE: ${{ github.event.inputs.project_title || github.event.client_payload.project_title || 'Lacrimae F00 Gate' }}
       GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout de la branche dev4
