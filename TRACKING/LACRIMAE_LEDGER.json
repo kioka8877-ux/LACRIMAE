@@ -7,10 +7,11 @@
     "F02": "2026-08-18T20:45:10Z",
     "F05": "2026-08-19T12:46:07Z",
     "F06": "2026-08-19T12:46:12Z",
-    "CLOSE": "2026-08-19T01:47:02Z"
+    "CLOSE": "2026-08-19T01:47:02Z",
+    "F01": "2026-08-22T10:32:01Z"
   },
-  "fregate_actuelle": "F06",
-  "derniere_mise_a_jour": "2026-08-19T12:46:12Z",
+  "fregate_actuelle": "F01",
+  "derniere_mise_a_jour": "2026-08-22T10:32:01Z",
   "pack": {
     "pack_id": "LOGO-SIEGE-siege_20260818_134224",
     "source_repo": "kioka8877-ux/PERTURABO",
