@@ -45,6 +45,10 @@ on:
         required: true
         default: false
         type: boolean
+      source_url:
+        description: 'URL de la vidéo source f00 à télécharger sur GitHub Actions'
+        required: true
+        default: 'https://github.com/kioka8877-ux/LACRIMAE/releases/download/f00/YTDown.com_YouTube_La-rage-de-Dark-Vador-Rogue-One-Star-War_Media_QXsPNstxLr0_001_1080p.mp4'
 
 permissions:
   contents: read
@@ -64,6 +68,7 @@ jobs:
       CUT_INTERVAL: ${{ inputs.cut_interval_frames }}
       PROJECT_TITLE: ${{ inputs.project_title }}
       CHAMPION_APPROVED: ${{ inputs.champion_approved }}
+      SOURCE_URL: ${{ inputs.source_url }}
     steps:
       - name: Checkout dev4
         uses: actions/checkout@v4
@@ -81,6 +86,14 @@ jobs:
       - name: Installer PICTOR
         working-directory: F03_PICTOR/CODEBASE
         run: npm install --no-audit --no-fund
+
+      - name: Télécharger la source f00 pour GitHub Actions
+        run: |
+          mkdir -p F00_INGEST/IN F00_INGEST/OUT
+          if [ ! -s F00_INGEST/IN/video_source.mp4 ]; then
+            curl -L --fail --retry 3 "$SOURCE_URL" -o F00_INGEST/IN/video_source.mp4
+          fi
+          test -s F00_INGEST/IN/video_source.mp4
 
       - name: Normaliser la source vidéo pour le rendu
         run: |
