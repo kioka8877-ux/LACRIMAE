@@ -8,8 +8,8 @@
       "preset": "vertical",
       "width": 1080,
       "height": 1920,
-      "fit": "cover",
-      "background_fill": "blurred_video",
+      "fit": "contain",
+      "background_fill": "static",
       "rotation_mode": "per_sequence",
       "rotation_step_deg": 1,
       "rotation_total_deg": 360,
@@ -17,8 +17,8 @@
       "rotation_layer": "video"
     },
     "background": {
-      "image": "bg_grid_dark.png",
-      "color": "#0a0a0a",
+      "image": null,
+      "color": "transparent",
       "scale": 1.0
     },
     "logo": {
@@ -63,34 +63,11 @@
         "height": 1080
       },
       "texts": {
-        "mode": "title+paragraph",
-        "title": "SHE KICKED HIM IN FRONT OF HIS BAND",
-        "paragraph": "Tom Sandoval says his ex Victoria kicked him in the groin in front of his band, crew and fans during a Florida tour stop. The insult that came with it, he says, hurt worse than the kick. New court filing is out.",
-        "title_offset_pct": 8,
-        "paragraph_offset_pct": 8
+        "mode": "none"
       },
-      "text_overlays": [
-        {
-          "id": "title_00",
-          "content": "SHE KICKED HIM IN FRONT OF HIS BAND",
-          "start_frame": 0,
-          "end_frame": 900,
-          "animation": "fade_in",
-          "font": "Impact, Arial Black, sans-serif",
-          "size": 96,
-          "color": "#FFFFFF",
-          "stroke_color": "#000000",
-          "stroke_width": 4,
-          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-          "position": "top",
-          "letter_spacing": "0em",
-          "glow_intensity": 0,
-          "depth_3d": 0
-        }
-      ],
       "zoom_keyframes": [],
       "logo": null,
-      "brutal_cut_interval_frames": 90,
+      "brutal_cut_interval_frames": 0,
       "volume": 1.0,
       "slowmo_start_frame": 0,
       "slowmo_speed": 1.0,

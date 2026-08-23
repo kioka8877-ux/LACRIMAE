@@ -17,8 +17,11 @@ def load(path: Path) -> dict:
 
 
 def validate_sequences(data: dict) -> None:
-    if data.get("schema_version") != "dev4.virtual-sequences.v1":
-        raise ValueError("sequences schema_version must be dev4.virtual-sequences.v1")
+    schema = data.get("schema_version")
+    if schema not in {"dev4.virtual-sequences.v1", "dev4.materialized-sequences.v1"}:
+        raise ValueError("unsupported dev4 sequences schema_version")
+    if schema == "dev4.materialized-sequences.v1" and data.get("materialized") is not True:
+        raise ValueError("materialized manifest must set materialized=true")
     fps = float(data.get("fps", 0))
     total = int(data.get("total_frames", 0))
     interval = int(data.get("cut_interval_frames", 0))
@@ -28,12 +31,16 @@ def validate_sequences(data: dict) -> None:
     previous_end = -1
     for row in rows:
         required = ("id", "source_start_frame", "timeline_start_frame", "timeline_duration_frames")
+        if schema == "dev4.materialized-sequences.v1":
+            required = required + ("file", "validated")
         if any(key not in row for key in required):
             raise ValueError(f"sequence missing required field: {row}")
         start = int(row["timeline_start_frame"])
         duration = int(row["timeline_duration_frames"])
         if start < 0 or duration <= 0 or start < previous_end:
             raise ValueError(f"sequence timeline is not monotonic: {row}")
+        if schema == "dev4.materialized-sequences.v1" and row.get("validated") is not True:
+            raise ValueError(f"materialized sequence is not validated: {row}")
         previous_end = start + duration
     if previous_end < total:
         raise ValueError(f"sequence timeline ends at {previous_end}, before total_frames {total}")

@@ -17,3 +17,13 @@ F03_PREVIEW/CODEBASE/public/video_source.mp4
 .DS_Store
 __pycache__/
 *.pyc
+
+# Generated local pipeline outputs
+F00_INGEST/OUT/
+F03_PREVIEW/CODEBASE/public/sequences/
+F03_PICTOR/CODEBASE/public/sequences/
+F05_CAMOUFLAGE/IN/
+F05_CAMOUFLAGE/OUT/
+F06_LUTHER/IN/
+F06_LUTHER/OUT/
+TRACKING/pre_f00ab_backup/

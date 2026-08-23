@@ -189,33 +189,37 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
             />
           </AbsoluteFill>
         )}
-        {virtualSequences.length > 0 ? virtualSequences.map((sequence, sequenceIndex) => {
-          const sequenceRotation = sequence.rotationDeg ?? rotationForSequence(composition, sequenceIndex, frame, fps, durationInFrames);
-          const fit = sequence.fit || composition.fit || 'cover';
+        {(() => {
+          // Un seul lecteur persistant : monter un nouveau <Video> toutes les 7 frames
+          // empêchait le navigateur de décoder la séquence nette à temps.
+          const activeIndex = virtualSequences.length > 0
+            ? Math.min(
+                virtualSequences.length - 1,
+                Math.max(0, virtualSequences.findIndex((row) =>
+                  frame >= row.timelineStartFrame &&
+                  frame < row.timelineStartFrame + row.durationFrames
+                ))
+              )
+            : -1;
+          const activeSequence = activeIndex >= 0 ? virtualSequences[activeIndex] : null;
+          const materializedUrl = activeSequence?.file
+            ? staticFile(activeSequence.file.replace(/^\.\//, ''))
+            : videoUrl;
+          const sequenceRotation = activeSequence?.rotationDeg ?? rotationForSequence(composition, Math.max(0, activeIndex), frame, fps, durationInFrames);
+          const fit = activeSequence?.fit || composition.fit || 'cover';
           const transform = `${zoomTransform} translate(${shakeX}px, ${shakeY}px) translateY(${session.video?.offset_y || 0}%) rotate(${sequenceRotation}deg)`;
           return (
-            <Sequence key={sequence.id} from={sequence.timelineStartFrame} durationInFrames={sequence.durationFrames}>
-              <AbsoluteFill style={{ overflow: 'hidden' }}>
-                <Video
-                  src={videoUrl}
-                  startFrom={sequence.sourceStartFrame}
-                  muted
-                  style={{ width: '100%', height: '100%', objectFit: fit, transform, transformOrigin: 'center center' }}
-                  playbackRate={playbackRate}
-                />
-              </AbsoluteFill>
-            </Sequence>
+            <AbsoluteFill style={{ overflow: 'hidden' }}>
+              <Video
+                src={materializedUrl}
+                startFrom={activeSequence?.file ? 0 : (activeSequence?.sourceStartFrame || 0)}
+                muted
+                style={{ width: '100%', height: '100%', objectFit: fit, transform, transformOrigin: 'center center' }}
+                playbackRate={playbackRate}
+              />
+            </AbsoluteFill>
           );
-        }) : (
-          <AbsoluteFill style={{ overflow: 'hidden' }}>
-            <Video
-              src={videoUrl}
-              muted
-              style={{ width: '100%', height: '100%', objectFit: composition.fit || 'cover', transform: `${zoomTransform} rotate(${rotationForSequence(composition, 0, frame, fps, durationInFrames)}deg)`, transformOrigin: 'center center' }}
-              playbackRate={playbackRate}
-            />
-          </AbsoluteFill>
-        )}
+        })()}
 
         {/* L3 TITRE */}
         {(textMode === 'title' || textMode === 'title+paragraph') && texts.title ? (

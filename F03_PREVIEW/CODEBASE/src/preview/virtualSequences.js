@@ -5,6 +5,7 @@ export function normalizeSequences(manifest) {
     .map((row, index) => ({
       id: row.id || `seq_${String(index + 1).padStart(4, '0')}`,
       sourceStartFrame: Math.max(0, Number(row.source_start_frame ?? row.start_frame ?? 0)),
+      file: row.file || row.path || null,
       timelineStartFrame: Math.max(0, Number(row.timeline_start_frame ?? index * Number(manifest.cut_interval_frames || 7))),
       durationFrames: Math.max(1, Number(row.timeline_duration_frames ?? row.duration_frames ?? manifest.cut_interval_frames ?? 7)),
       rotationDeg: row.rotation_deg == null ? null : Number(row.rotation_deg),

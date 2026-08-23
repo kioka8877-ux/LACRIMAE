@@ -40,6 +40,11 @@ on:
         description: 'Titre de la production'
         required: true
         default: 'Lacrimae dev4'
+      champion_approved:
+        description: 'Approbation Champion avant le rendu PICTOR'
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -58,6 +63,7 @@ jobs:
       TARGET_DURATION: ${{ inputs.target_duration_seconds }}
       CUT_INTERVAL: ${{ inputs.cut_interval_frames }}
       PROJECT_TITLE: ${{ inputs.project_title }}
+      CHAMPION_APPROVED: ${{ inputs.champion_approved }}
     steps:
       - name: Checkout dev4
         uses: actions/checkout@v4
@@ -98,14 +104,26 @@ jobs:
           }
           JSON
 
-      - name: F00 — produire uniquement les références virtuelles
+      - name: F00-A — SCOUT identifier et classer les passages
         run: |
-          python3 F00_INGEST/CODEBASE/f00_ingest.py \
+          rm -rf F00_INGEST/OUT/scout F00_INGEST/OUT/materialized
+          mkdir -p F00_INGEST/OUT/scout F00_INGEST/OUT/materialized
+          python3 F00_INGEST/CODEBASE/f00_scout.py \
             --source F00_INGEST/IN/video_source.mp4 \
             --request F00_INGEST/IN/production_request.json \
-            --out F00_INGEST/OUT
+            --out F00_INGEST/OUT/scout
 
-      - name: Valider le manifeste F00
+      - name: F00-B — EXTRACT matérialiser et valider avec FFmpeg
+        run: |
+          python3 F00_INGEST/CODEBASE/f00_extract.py \
+            --source F00_INGEST/IN/video_source.mp4 \
+            --plan F00_INGEST/OUT/scout/sequences_plan.json \
+            --out F00_INGEST/OUT/materialized
+          cp F00_INGEST/OUT/materialized/sequences.json F00_INGEST/OUT/sequences.json
+          cp F00_INGEST/OUT/materialized/extract_report.json F00_INGEST/OUT/
+          cp F00_INGEST/OUT/scout/sequences_plan.json F00_INGEST/OUT/
+
+      - name: Valider le manifeste matérialisé F00-B
         run: python3 tools/validate_dev4_contracts.py --sequences F00_INGEST/OUT/sequences.json
 
       - name: Skip contrôlé de F01 et F02
@@ -138,6 +156,9 @@ jobs:
           cp F00_INGEST/IN/video_source.mp4 F03_PICTOR/CODEBASE/public/video_source.mp4
           cp F00_INGEST/OUT/sequences.json F03_PREVIEW/CODEBASE/public/sequences.json
           cp F00_INGEST/OUT/sequences.json F03_PICTOR/CODEBASE/src/data/sequences.json
+          rm -rf F03_PREVIEW/CODEBASE/public/sequences F03_PICTOR/CODEBASE/public/sequences
+          cp -R F00_INGEST/OUT/materialized/sequences F03_PREVIEW/CODEBASE/public/sequences
+          cp -R F00_INGEST/OUT/materialized/sequences F03_PICTOR/CODEBASE/public/sequences
           cp F03_PREVIEW/CODEBASE/src/preview/OmniComposition.jsx F03_PICTOR/CODEBASE/src/OmniComposition.jsx
           cp F03_PREVIEW/CODEBASE/src/preview/virtualSequences.js F03_PICTOR/CODEBASE/src/virtualSequences.js
           cp F03_PREVIEW/CODEBASE/src/preview/compositionConfig.js F03_PICTOR/CODEBASE/src/compositionConfig.js
@@ -168,6 +189,14 @@ jobs:
 
       - name: Valider le contrat commun preview / PICTOR
         run: python3 tools/validate_dev4_contracts.py --sequences F00_INGEST/OUT/sequences.json --codex F03_PICTOR/CODEBASE/src/data/codex.json
+
+      - name: Gate Champion — autoriser le rendu final
+        run: |
+          if [ "$CHAMPION_APPROVED" != "true" ]; then
+            echo 'Champion approval required: set champion_approved=true after reviewing F03 Preview.' >&2
+            exit 1
+          fi
+          echo 'Champion: approved' | tee -a TRACKING/dev4_pipeline_state.txt
 
       - name: Rendre PICTOR avec les mêmes données
         working-directory: F03_PICTOR/CODEBASE
@@ -207,6 +236,7 @@ jobs:
           path: |
             F00_INGEST/OUT/
             F03_PREVIEW/CODEBASE/dist/
+            F03_PREVIEW/CODEBASE/public/sequences/
             F03_PICTOR/CODEBASE/out/short_final.mp4
             F05_CAMOUFLAGE/OUT/
             F06_LUTHER/OUT/
