@@ -54,15 +54,24 @@ on:
         required: true
         default: false
         type: boolean
+      f00a_run_id:
+        description: 'ID du run F00-A validé à utiliser'
+        required: true
+        default: '32672442929'
       f00b_only:
         description: 'Exécuter uniquement F00-B avec un plan F00-A validé'
         required: true
         default: false
         type: boolean
-      f00a_run_id:
-        description: 'ID du run F00-A validé à utiliser'
+      f00b_run_id:
+        description: 'ID du run F00-B validé à utiliser pour F03'
         required: true
-        default: '32672442929'
+        default: '32673111089'
+      f03_only:
+        description: 'Construire uniquement F03 Preview puis s’arrêter'
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -183,8 +192,54 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  f03_preview_only:
+    if: ${{ inputs.f03_only == true }}
+    name: F03 — PREVIEW uniquement
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout dev4
+        uses: actions/checkout@v4
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: F03_PREVIEW/CODEBASE/package-lock.json
+      - name: Télécharger l’artifact F00-B validé
+        uses: actions/download-artifact@v4
+        with:
+          name: lacrimae-dev4-f00b-${{ inputs.f00b_run_id }}
+          path: F00_INGEST/OUT/materialized
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.f00b_run_id }}
+      - name: Télécharger la source f00
+        run: |
+          mkdir -p F03_PREVIEW/CODEBASE/public
+          curl -L --fail --retry 3 "${{ inputs.source_url }}" -o F03_PREVIEW/CODEBASE/public/video_source.mp4
+          test -s F03_PREVIEW/CODEBASE/public/video_source.mp4
+      - name: Préparer les fichiers F03 depuis F00-B
+        run: |
+          cp F00_INGEST/OUT/materialized/sequences.json F03_PREVIEW/CODEBASE/public/sequences.json
+          rm -rf F03_PREVIEW/CODEBASE/public/sequences
+          cp -R F00_INGEST/OUT/materialized/sequences F03_PREVIEW/CODEBASE/public/sequences
+          python3 -c "import json; d=json.load(open('F03_PREVIEW/CODEBASE/public/sequences.json')); assert d['materialized'] is True; print('F03 input:', len(d['sequences']), 'validated materialized sequences')"
+      - name: Construire F03 Preview uniquement
+        working-directory: F03_PREVIEW/CODEBASE
+        run: npm ci && npm run build
+      - name: Publier l’artifact F03 Preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: lacrimae-dev4-f03-preview-${{ github.run_id }}
+          path: |
+            F03_PREVIEW/CODEBASE/dist/
+            F03_PREVIEW/CODEBASE/public/sequences.json
+            F03_PREVIEW/CODEBASE/public/sequences/
+          if-no-files-found: error
+          retention-days: 14
+
   forge:
-    if: ${{ inputs.f00a_only != true && inputs.f00b_only != true }}
+    if: ${{ inputs.f00a_only != true && inputs.f00b_only != true && inputs.f03_only != true }}
     name: F00 → Preview → PICTOR → F05 → F06
     runs-on: ubuntu-latest
     timeout-minutes: 180
