@@ -54,9 +54,19 @@ on:
         required: true
         default: false
         type: boolean
+      f00b_only:
+        description: 'Exécuter uniquement F00-B avec un plan F00-A validé'
+        required: true
+        default: false
+        type: boolean
+      f00a_run_id:
+        description: 'ID du run F00-A validé à utiliser'
+        required: true
+        default: '32672442929'
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   f00a_scout_only:
@@ -120,8 +130,61 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  f00b_extract_only:
+    if: ${{ inputs.f00b_only == true }}
+    name: F00-B — EXTRACT uniquement
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      SOURCE_URL: ${{ inputs.source_url }}
+      F00A_RUN_ID: ${{ inputs.f00a_run_id }}
+    steps:
+      - name: Checkout dev4
+        uses: actions/checkout@v4
+      - name: Installer Python, numpy et FFmpeg
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Installer dépendances
+        run: |
+          python -m pip install --upgrade pip numpy
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+      - name: Télécharger l’artifact F00-A validé
+        uses: actions/download-artifact@v4
+        with:
+          name: lacrimae-dev4-f00a-${{ inputs.f00a_run_id }}
+          path: F00_INGEST/OUT/scout
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.f00a_run_id }}
+      - name: Télécharger la source f00
+        run: |
+          mkdir -p F00_INGEST/IN F00_INGEST/OUT/materialized
+          curl -L --fail --retry 3 "$SOURCE_URL" -o F00_INGEST/IN/video_source.mp4
+          test -s F00_INGEST/IN/video_source.mp4
+      - name: F00-B — EXTRACT uniquement
+        run: |
+          python3 F00_INGEST/CODEBASE/f00_extract.py \
+            --source F00_INGEST/IN/video_source.mp4 \
+            --plan F00_INGEST/OUT/scout/sequences_plan.json \
+            --out F00_INGEST/OUT/materialized
+      - name: Valider le manifeste F00-B
+        run: |
+          cp F00_INGEST/OUT/materialized/sequences.json F00_INGEST/OUT/sequences.json
+          python3 tools/validate_dev4_contracts.py --sequences F00_INGEST/OUT/sequences.json
+      - name: Publier uniquement l’artifact F00-B
+        uses: actions/upload-artifact@v4
+        with:
+          name: lacrimae-dev4-f00b-${{ github.run_id }}
+          path: |
+            F00_INGEST/OUT/materialized/sequences.json
+            F00_INGEST/OUT/materialized/extract_report.json
+            F00_INGEST/OUT/materialized/sequences/
+          if-no-files-found: error
+          retention-days: 14
+
   forge:
-    if: ${{ inputs.f00a_only != true }}
+    if: ${{ inputs.f00a_only != true && inputs.f00b_only != true }}
     name: F00 → Preview → PICTOR → F05 → F06
     runs-on: ubuntu-latest
     timeout-minutes: 180
