@@ -1,6 +1,6 @@
 # LACRIMAE — HANDOFF AU PROCHAIN DÉVELOPPEUR
 
-> **ÉTAT COURANT — 2026-08-24 — branche `dev5`.** Le cycle New York Bagel reste terminé sur `dev3`. `dev5` est maintenant la branche d’évolution dédiée à MEME V2 ; aucun workflow de production n’a encore été lancé pour cette nouvelle version.
+> **ÉTAT COURANT — 2026-08-24 — branche `dev5`.** Le cycle New York Bagel reste terminé sur `dev3`. `dev5` est la branche d’évolution dédiée à MEME V2 ; la production Wayvee/M7 est terminée jusqu’à F06.
 
 ## Reprise immédiate — MEME V2
 
@@ -10,7 +10,7 @@ La timeline par défaut est `0 %`, `15 %`, `33 %` et `41 %`. Le bridge exige `re
 
 Le renderer F04 est `F04_RENDER/CODEBASE/src/components/MemeV2Composition.jsx`; le preview est `F03_PREVIEW/CODEBASE/src/preview/MemeV2Composition.jsx`. Le routage est activé par `sub_mode: "meme_v2"` et laisse MEME V1 inchangé. Les validations sont couvertes par `LAC_CUSTOS.py`, `tools/validate_f04_codex.py` et `tools/test_meme_v2_contract.py`.
 
-**Vérifications déjà passées :** `py_compile`, test de contrat MEME V2, préflight F04, build Vite F03 et bundle statique F04. Le test Oracle réel du pack `production_pack_meme_wayvee_phone_bounce.json` a récupéré 5 angles, résolu le tag Release `M7` vers `M7.mp4` et transité la capture source vers F03/F04. La gate Champion est maintenant ouverte pour contrôler la preview ; aucun workflow F02/F03/F04 n’a été lancé.
+**Vérifications déjà passées :** `py_compile`, test de contrat MEME V2, préflight F04, build Vite F03 et bundle statique F04. Le test Oracle réel du pack `production_pack_meme_wayvee_phone_bounce.json` a récupéré 5 angles, résolu le tag Release `M7` vers `M7.mp4` et transité la capture source vers F03/F04. F04 est réussi via le run `32742959306`, puis F05/F06 sont réussis via le run `32743467732`. Les artifacts `lac-clean` et les métadonnées YouTube officielles ont été récupérés. La session est prête à être fermée opérationnellement ; la gate CLOSE reste distincte d’une validation Champion future.
 
 ---
 
@@ -71,7 +71,7 @@ npx remotion still src/index.jsx clip-001 OUT/f.png --frame=15
 cd F03_PREVIEW/CODEBASE && npm run dev           # http://127.0.0.1:5173
 ```
 
-**HEAD du travail :** `a466e57` (branche `dev`). `main` ne contient que `F03_PREVIEW` + le workflow de rendu — **ne pas coder sur main**.
+**HEAD historique documenté :** `a466e57` (branche `dev`). Pour MEME V2, travailler exclusivement sur `dev5` — **ne pas coder sur main ni dev3**.
 
 ---
 

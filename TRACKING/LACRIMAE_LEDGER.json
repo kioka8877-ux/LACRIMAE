@@ -1,56 +1,67 @@
 {
   "pipeline": "LACRIMAE_DEV",
-  "status": "EN_FORGE_MEME_V2",
+  "status": "EN_ATTENTE_VALIDATION_CHAMPION",
   "fregates": {
-    "F00": "2026-08-18T20:44:00Z",
-    "BRIDGE": "2026-08-18T20:44:00Z",
-    "F02": "2026-08-22T10:38:34Z",
+    "F00": "2026-08-24T09:30:35Z",
+    "BRIDGE": "2026-08-24T09:30:35Z",
+    "F01": "2026-08-22T10:32:01Z",
+    "F02": "2026-08-24T09:30:35Z",
+    "F03": "2026-08-24T15:00:00Z",
+    "F04": "2026-08-24T15:00:00Z",
     "F05": "2026-08-24T15:13:36Z",
-    "F06": "2026-08-24T15:13:39Z",
-    "CLOSE": "2026-08-19T01:47:02Z",
-    "F01": "2026-08-22T10:32:01Z"
+    "F06": "2026-08-24T15:13:39Z"
   },
   "fregate_actuelle": "F06",
   "derniere_mise_a_jour": "2026-08-24T15:13:39Z",
   "pack": {
-    "pack_id": null,
+    "pack_id": "LOGO-SIEGE-siege_20260824_093035_wayvee_meme_v2",
     "source_repo": "kioka8877-ux/PERTURABO",
-    "source_path": "MONDES_FORGES/CLIPPING/EXPORT/production_pack_meme_v2.json",
+    "source_path": "MONDES_FORGES/CLIPPING/EXPORT/production_pack_meme_wayvee_phone_bounce.json",
     "sub_mode": "meme_v2",
-    "videos_count": 0,
-    "duration_sec": 8,
-    "background": "bg_paper_crumpled.png"
+    "videos_count": 5,
+    "duration_sec": 5,
+    "background": "bg_paper_crumpled.png",
+    "meme_tag": "M7"
   },
   "gates": {
-    "F00_BRIDGE_CHECKOUT": "NOT_APPLICABLE",
-    "F02_CHECKIN": "PENDING_REAL_PACK",
-    "F02_CHECKOUT": "PENDING_REAL_PACK",
-    "F03_CODEX": "PENDING_CHAMPION"
+    "F00_BRIDGE_CHECKOUT": "PASSED",
+    "F02_CHECKIN": "PASSED",
+    "F02_CHECKOUT": "PASSED",
+    "F03_CODEX": "PASSED_CHAMPION",
+    "F04_RENDER": "PASSED",
+    "F05_CAMOUFLAGE": "PASSED",
+    "F06_LUTHER": "PASSED",
+    "CLOSE": "PENDING_CHAMPION_REVIEW"
+  },
+  "runs": {
+    "F04": "32742959306",
+    "F05_F06": "32743467732"
   },
   "artifacts": {
-    "bridge_report": "BRIDGE_PERTURABO/OUT/bridge_report.json",
-    "bridge_codex": "BRIDGE_PERTURABO/OUT/codex.json",
-    "f02_manifest": "F02_FORMAT/OUT/f02_manifest.json",
-    "f02_clips": "F02_FORMAT/OUT/clips/clip_001.mp4..clip_N.mp4"
+    "f04": "lac-video-finale",
+    "f05": "lac-youtube",
+    "f06": "lac-clean",
+    "metadata_markdown": "METADATA_YOUTUBE_OFFICIELLES_PACK_WAYVEE.md"
   },
   "brief": {
-    "source": "",
-    "title": "",
-    "sujet": "",
-    "vibe": "",
-    "sequences": 2,
-    "min_dur": 3,
-    "max_dur": 10,
+    "source": "Wayvee phone-bounce social post",
+    "title": "MEME V2 Wayvee Phone Bounce",
+    "sujet": "Reactions Lacrimae à un post social réel",
+    "vibe": "brain rot reaction",
+    "sequences": 4,
+    "min_dur": 5,
+    "max_dur": 5,
     "profile": "background",
     "preset": "punchy",
     "model": ""
   },
   "notes": [
     "Branche de travail : dev5, copie propre de dev3 pour l’évolution MEME V2.",
-    "MEME V2 impose la séquence réaction Lacrimae → capture source → text_emotion → clip MEME.",
-    "Le pack doit fournir reaction_tweet, source_post.screenshot_png, text_emotion et meme pour chaque angle.",
+    "MEME V2 impose la superposition vidéo M7 dès la première frame, puis Tweet Card réaction Lacrimae, capture source et text_emotion.",
+    "Le pack fournit reaction_tweet, source_post.screenshot_png, text_emotion et meme M7 pour chacun des 5 angles.",
     "LACRIMAE ne génère pas de contenu éditorial ; le bridge mappe et transite les assets fournis.",
-    "Implémentation locale validée par py_compile, test de contrat, preflight F04, build Vite F03 et bundle F04.",
-    "Aucun workflow GitHub Actions lancé ; prochaine étape : test d’un vrai pack et gate Champion F03."
+    "F04 Matrix réussi : run 32742959306. F05/F06 réussi dans le workflow combiné : run 32743467732.",
+    "Les métadonnées YouTube officielles doivent être reprises depuis le pack PERTURABO, notamment la mention fair use et les hashtags.",
+    "La production MEME V2 est terminée jusqu’à F06. La session peut être fermée opérationnellement ; la gate CLOSE reste distincte et nécessite la validation Champion."
   ]
 }
