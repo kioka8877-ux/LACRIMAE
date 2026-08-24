@@ -77,6 +77,7 @@ export default function App() {
         setCodex(full);
         setClip(clipFirst);
         setSession(full.session || {});
+        setActiveTab(full.session?.review_mode === 'hybrid_narrative' ? 'hybrid' : 'text');
         setVideoSrc(clipFirst.video?.source ? './' + clipFirst.video.source : './video_source.mp4');
         try {
           const motionResp = await fetch('./motion_slow_manifest.json');
@@ -209,7 +210,10 @@ export default function App() {
     ...s,
     composition: { ...(s.composition || {}), [key]: value },
   }));
-  const updateReviewMode = (value) => setSession((s) => ({ ...s, review_mode: value }));
+  const updateReviewMode = (value) => {
+    setSession((s) => ({ ...s, review_mode: value }));
+    setActiveTab(value === 'hybrid_narrative' ? 'hybrid' : 'text');
+  };
 
   // ── Balise logo : double-clic sur la vidéo → poser ici ──
   const handleLogoClick = (e) => {
@@ -482,6 +486,9 @@ export default function App() {
             <button style={activeTab === 'text' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('text')}>
               📝 Texte
             </button>
+            <button style={activeTab === 'hybrid' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('hybrid')}>
+              ◈ Hybrid / EGO
+            </button>
             <button style={activeTab === 'fond' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('fond')}>
               🖼 Fond & Logo
             </button>
@@ -499,57 +506,65 @@ export default function App() {
             </button>
           </div>
 
-          {/* ══════════ MODE DE REVIEW ══════════ */}
-          <div style={{ marginTop: '12px', padding: '10px', border: '1px solid #303030', borderRadius: '8px', background: '#101010' }}>
-            <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>MODE DE REVIEW</label>
-            <select
-              style={styles.select}
-              value={reviewMode}
-              onChange={(e) => updateReviewMode(e.target.value)}
-            >
-              <option value="match_cut">Mode 1 — Match Cut</option>
-              <option value="hybrid_narrative">Mode 2 — Hybrid / EGO</option>
-            </select>
-            {reviewMode === 'hybrid_narrative' && (
-              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #333' }}>
-                <label style={{ ...styles.label, color: '#ffcc66' }}>INTRO — image ou vidéo</label>
-                <input
-                  style={styles.input}
-                  type="file"
-                  accept="video/*,image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const url = URL.createObjectURL(file);
-                    setHybridIntroSrc(url);
-                    updateSession('hybrid', 'intro', {
-                      ...(session.hybrid?.intro || {}),
-                      source: file.name,
-                      source_type: file.type.startsWith('image/') ? 'image' : 'video',
-                    });
-                  }}
-                />
-                <label style={styles.label}>Découpage vidéo (secondes IN / OUT, optionnel)</label>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.1" placeholder="IN" value={session.hybrid?.intro?.in_seconds ?? 0} onChange={(e) => updateSession('hybrid', 'intro', { ...(session.hybrid?.intro || {}), in_seconds: parseFloat(e.target.value) || 0 })} />
-                  <input style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.1" placeholder="OUT" value={session.hybrid?.intro?.out_seconds ?? 2} onChange={(e) => updateSession('hybrid', 'intro', { ...(session.hybrid?.intro || {}), out_seconds: parseFloat(e.target.value) || 0 })} />
+          {/* ══════════ HYBRID / EGO : mode narratif séparé ══════════ */}
+          {activeTab === 'hybrid' && (
+            <div style={styles.panelContent}>
+              <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>MODE DE REVIEW</label>
+              <select
+                style={styles.select}
+                value={reviewMode}
+                onChange={(e) => updateReviewMode(e.target.value)}
+              >
+                <option value="match_cut">Mode 1 — Match Cut</option>
+                <option value="hybrid_narrative">Mode 2 — Hybrid / EGO</option>
+              </select>
+              {reviewMode === 'hybrid_narrative' && (
+                <div style={{ marginTop: '12px', padding: '12px', border: '1px solid #5a4422', borderRadius: '8px', background: '#16120d' }}>
+                  <label style={{ ...styles.label, color: '#ffcc66' }}>INTRO — image ou vidéo</label>
+                  <input
+                    style={styles.input}
+                    type="file"
+                    accept="video/*,image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const url = URL.createObjectURL(file);
+                      setHybridIntroSrc(url);
+                      updateSession('hybrid', 'intro', {
+                        ...(session.hybrid?.intro || {}),
+                        source: file.name,
+                        source_type: file.type.startsWith('image/') ? 'image' : 'video',
+                      });
+                    }}
+                  />
+                  <label style={styles.label}>Découpage vidéo (secondes IN / OUT, optionnel)</label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.1" placeholder="IN" value={session.hybrid?.intro?.in_seconds ?? 0} onChange={(e) => updateSession('hybrid', 'intro', { ...(session.hybrid?.intro || {}), in_seconds: parseFloat(e.target.value) || 0 })} />
+                    <input style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.1" placeholder="OUT" value={session.hybrid?.intro?.out_seconds ?? 2} onChange={(e) => updateSession('hybrid', 'intro', { ...(session.hybrid?.intro || {}), out_seconds: parseFloat(e.target.value) || 0 })} />
+                  </div>
+                  <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid #4a3920' }}>
+                    <label style={{ ...styles.label, color: '#ffcc66' }}>EGO — texte d’impact</label>
+                    <label style={styles.label}>Texte EGO</label>
+                    <input style={styles.input} value={session.hybrid?.ego?.text || 'EGO'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), text: e.target.value })} />
+                    <label style={styles.label}>Durée EGO</label>
+                    <select style={styles.select} value={session.hybrid?.ego?.duration_mode || 'until_match_cut'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), duration_mode: e.target.value })}>
+                      <option value="until_match_cut">Jusqu’au Match Cut</option>
+                      <option value="until_end">Jusqu’à la fin</option>
+                    </select>
+                    <label style={styles.label}>Scale EGO : {(session.hybrid?.ego?.scale ?? 2).toFixed(1)}×</label>
+                    <input style={styles.slider} type="range" min="1" max="10" step="0.1" value={session.hybrid?.ego?.scale ?? 2} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), scale: parseFloat(e.target.value) })} />
+                    <label style={styles.label}>Angle EGO : {session.hybrid?.ego?.rotation_deg ?? 0}°</label>
+                    <input style={styles.slider} type="range" min="-180" max="180" value={session.hybrid?.ego?.rotation_deg ?? 0} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), rotation_deg: parseInt(e.target.value, 10) })} />
+                    <label style={styles.label}>Couleur EGO</label>
+                    <input style={styles.colorPicker} type="color" value={session.hybrid?.ego?.color || '#FFFFFF'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), color: e.target.value })} />
+                  </div>
+                  <div style={{ marginTop: '12px', padding: '8px', background: '#211b10', border: '1px solid #6b5328', borderRadius: '6px', fontSize: '12px', color: '#ddc58b' }}>
+                    En Mode 2, EGO est un calque indépendant. Les réglages sont immédiats et la tête de lecture conserve sa position.
+                  </div>
                 </div>
-                <label style={styles.label}>Texte EGO</label>
-                <input style={styles.input} value={session.hybrid?.ego?.text || 'EGO'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), text: e.target.value })} />
-                <label style={styles.label}>Durée EGO</label>
-                <select style={styles.select} value={session.hybrid?.ego?.duration_mode || 'until_match_cut'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), duration_mode: e.target.value })}>
-                  <option value="until_match_cut">Jusqu’au Match Cut</option>
-                  <option value="until_end">Jusqu’à la fin</option>
-                </select>
-                <label style={styles.label}>Scale EGO : {(session.hybrid?.ego?.scale ?? 2).toFixed(1)}×</label>
-                <input style={styles.slider} type="range" min="1" max="10" step="0.1" value={session.hybrid?.ego?.scale ?? 2} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), scale: parseFloat(e.target.value) })} />
-                <label style={styles.label}>Angle EGO : {session.hybrid?.ego?.rotation_deg ?? 0}°</label>
-                <input style={styles.slider} type="range" min="-180" max="180" value={session.hybrid?.ego?.rotation_deg ?? 0} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), rotation_deg: parseInt(e.target.value, 10) })} />
-                <label style={styles.label}>Couleur EGO</label>
-                <input style={styles.colorPicker} type="color" value={session.hybrid?.ego?.color || '#FFFFFF'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), color: e.target.value })} />
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* ══════════ COMPOSITION : format, cadrage et rotation ══════════ */}
           {activeTab === 'composition' && (
@@ -972,10 +987,17 @@ export default function App() {
             </div>
           )}
 
-          {/* ══════════ EFFETS : presets globaux (session) ══════════ */}
+          {/* ══════════ EFFETS : colorimétrie par segment en Mode 2 ══════════ */}
           {activeTab === 'effects' && (
             <div style={styles.panelContent}>
-              <label style={styles.label}>Color preset (global)</label>
+              <label style={styles.label}>
+                {reviewMode === 'hybrid_narrative' ? 'Color preset — Match Cut uniquement' : 'Color preset — Mode 1'}
+              </label>
+              {reviewMode === 'hybrid_narrative' && (
+                <div style={{ marginBottom: '12px', padding: '8px', background: '#0f2a1a', border: '1px solid #2a6b45', borderRadius: '7px', fontSize: '12px', color: '#9cffc3' }}>
+                  En Mode 2, les effets colorimétriques, grain et vignette commencent au hard cut et ne touchent pas l’introduction.
+                </div>
+              )}
               <select
                 style={styles.select}
                 value={presets.color_preset || 'punchy'}
@@ -1177,7 +1199,7 @@ export default function App() {
                   onChange={(e) => updatePreset('enhance_4k', e.target.checked)}
                   style={{ marginRight: '8px' }}
                 />
-                Enhance 4K (global)
+                  Enhance 4K — segment actif
               </label>
             </div>
           )}
