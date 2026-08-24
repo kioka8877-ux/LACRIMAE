@@ -26,7 +26,7 @@ def signed_request(method: str, object_key: str, body: bytes | None = None) -> r
     url = f"{endpoint}/{quote(bucket, safe='')}/{quote(object_key, safe='/')}"
     request = AWSRequest(method=method, url=url, data=body, headers={"Host": url.split('/')[2]})
     SigV4Auth(Credentials(access_key, secret_key), "s3", region).add_auth(request)
-    prepared = requests.Request(method, url, data=body, headers=dict(request.headers)).prepare()
+    prepared = request.prepare()
     return requests.Session().send(prepared, timeout=30)
 
 
