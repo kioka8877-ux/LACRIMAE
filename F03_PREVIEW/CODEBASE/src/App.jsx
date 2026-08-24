@@ -557,7 +557,7 @@ export default function App() {
                       <option value="until_end">Jusqu’à la fin</option>
                     </select>
                     <label style={styles.label}>Scale phrase : {(session.hybrid?.intro_text?.scale ?? 1).toFixed(1)}×</label>
-                    <input style={styles.slider} type="range" min="1" max="10" step="0.1" value={session.hybrid?.intro_text?.scale ?? 1} onChange={(e) => updateSession('hybrid', 'intro_text', { ...(session.hybrid?.intro_text || {}), scale: parseFloat(e.target.value) })} />
+                    <input style={styles.slider} type="range" min="0.2" max="10" step="0.1" value={session.hybrid?.intro_text?.scale ?? 1} onChange={(e) => updateSession('hybrid', 'intro_text', { ...(session.hybrid?.intro_text || {}), scale: parseFloat(e.target.value) })} />
                     <label style={styles.label}>Hauteur phrase : {session.hybrid?.intro_text?.position_y ?? 78}%</label>
                     <input style={styles.slider} type="range" min="0" max="100" step="1" value={session.hybrid?.intro_text?.position_y ?? 78} onChange={(e) => updateSession('hybrid', 'intro_text', { ...(session.hybrid?.intro_text || {}), position_y: parseInt(e.target.value, 10) })} />
                     <label style={styles.label}>Angle phrase : {session.hybrid?.intro_text?.rotation_deg ?? 0}°</label>

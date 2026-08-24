@@ -1,4 +1,4 @@
-function normalizeHybridText(value, fallback, defaultScale) {
+function normalizeHybridText(value, fallback, defaultScale, minScale = 1) {
   const text = value || {};
   return {
     text: String(text.text || fallback).toUpperCase(),
@@ -7,7 +7,7 @@ function normalizeHybridText(value, fallback, defaultScale) {
     duration_frames: Math.max(1, Number(text.duration_frames) || 1),
     font_family: text.font_family || 'Impact',
     color: text.color || '#FFFFFF',
-    scale: Math.max(1, Math.min(10, Number(text.scale) || defaultScale)),
+    scale: Math.max(minScale, Math.min(10, Number(text.scale) || defaultScale)),
     rotation_deg: Number(text.rotation_deg) || 0,
     position_x: Number(text.position_x ?? 50),
     position_y: Number(text.position_y ?? 50),
@@ -43,7 +43,7 @@ export function normalizeHybridManifest(manifest, session = {}) {
   const declaredMatchCutFrames = Number(source.match_cut?.total_frames || source.match_cut_total_frames || 0);
   const matchCutFrames = Math.max(0, declaredMatchCutFrames || declaredTotalFrames - introFrames);
   const totalFrames = Math.max(introFrames + matchCutFrames, declaredTotalFrames);
-  const introText = normalizeHybridText(source.intro_text, "C'EST JUSTE UN JOUEUR", 1);
+  const introText = normalizeHybridText(source.intro_text, "C'EST JUSTE UN JOUEUR", 1, 0.2);
   const egoBase = normalizeHybridText(source.ego, 'EGO', 2);
   const egoStartFrame = introFrames;
   const egoDuration = egoBase.duration_mode === 'until_end'

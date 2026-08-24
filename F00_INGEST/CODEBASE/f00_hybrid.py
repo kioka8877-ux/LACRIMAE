@@ -131,7 +131,7 @@ def main() -> int:
     if not args.matchcut_manifest.exists(): raise FileNotFoundError(args.matchcut_manifest)
     if not args.intro.exists(): raise FileNotFoundError(args.intro)
     if not 1 <= args.ego_scale <= 10: raise ValueError("--ego-scale doit être compris entre 1 et 10")
-    if not 1 <= args.intro_text_scale <= 10: raise ValueError("--intro-text-scale doit être compris entre 1 et 10")
+    if not 0.2 <= args.intro_text_scale <= 10: raise ValueError("--intro-text-scale doit être compris entre 0.2 et 10")
     if not -180 <= args.ego_rotation <= 180: raise ValueError("--ego-rotation doit être compris entre -180 et 180")
     if not -180 <= args.intro_text_rotation <= 180: raise ValueError("--intro-text-rotation doit être compris entre -180 et 180")
     args.out.mkdir(parents=True, exist_ok=True)
