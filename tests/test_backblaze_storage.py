@@ -7,6 +7,7 @@ import tempfile
 from pathlib import Path
 
 import boto3
+from botocore.config import Config
 
 endpoint = os.environ["STORAGE_S3_ENDPOINT"]
 region = os.environ.get("STORAGE_S3_REGION", "us-east-005")
@@ -17,6 +18,7 @@ client = boto3.client(
     region_name=region,
     aws_access_key_id=os.environ["STORAGE_S3_ACCESS_KEY_ID"],
     aws_secret_access_key=os.environ["STORAGE_S3_SECRET_ACCESS_KEY"],
+    config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
 )
 
 key = "campaigns/storage_test/dev6_probe.txt"

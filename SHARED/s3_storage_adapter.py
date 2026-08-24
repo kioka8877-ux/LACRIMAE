@@ -13,6 +13,7 @@ from pathlib import Path
 
 try:
     import boto3
+    from botocore.config import Config
 except ImportError as exc:  # pragma: no cover
     boto3 = None
     _IMPORT_ERROR = exc
@@ -35,6 +36,7 @@ class S3StorageAdapter:
             region_name=self.region,
             aws_access_key_id=os.environ["STORAGE_S3_ACCESS_KEY_ID"],
             aws_secret_access_key=os.environ["STORAGE_S3_SECRET_ACCESS_KEY"],
+            config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
         )
 
     def upload(self, local_path: str | Path, key: str) -> str:
