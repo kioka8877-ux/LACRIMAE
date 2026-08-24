@@ -1,0 +1,89 @@
+name: DEV4 — F04 Hybrid Render
+
+on:
+  workflow_dispatch:
+    inputs:
+      codex_path:
+        description: 'Codex Hybrid versionné à rendre'
+        required: false
+        default: 'F03_PREVIEW/IN/codex.json'
+        type: string
+      output_name:
+        description: 'Nom du fichier MP4 final'
+        required: false
+        default: 'lacrimae_hybrid_f04.mp4'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    name: F04 Hybrid — PICTOR render
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout dev4
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: F03_PICTOR/CODEBASE/package-lock.json
+
+      - name: Installer PICTOR
+        working-directory: F03_PICTOR/CODEBASE
+        run: npm ci
+
+      - name: Préparer le codex Hybrid et les assets F00-D
+        env:
+          CODEX_PATH: ${{ inputs.codex_path }}
+        run: |
+          test -f "$CODEX_PATH"
+          test -f F03_PREVIEW/CODEBASE/public/hybrid_manifest.json
+          test -f F03_PREVIEW/CODEBASE/public/sequences.json
+          test -d F03_PREVIEW/CODEBASE/public/intro
+          test -d F03_PREVIEW/CODEBASE/public/match_cut
+          cp "$CODEX_PATH" F03_PICTOR/CODEBASE/src/data/codex.json
+          cp F03_PREVIEW/CODEBASE/public/hybrid_manifest.json F03_PICTOR/CODEBASE/src/data/hybrid_manifest.json
+          cp F03_PREVIEW/CODEBASE/public/sequences.json F03_PICTOR/CODEBASE/src/data/sequences.json
+          mkdir -p F03_PICTOR/CODEBASE/public
+          cp -R F03_PREVIEW/CODEBASE/public/intro F03_PICTOR/CODEBASE/public/
+          cp -R F03_PREVIEW/CODEBASE/public/match_cut F03_PICTOR/CODEBASE/public/
+          if [ -f F03_PREVIEW/CODEBASE/public/logo.png ]; then cp F03_PREVIEW/CODEBASE/public/logo.png F03_PICTOR/CODEBASE/public/; fi
+          if [ -d F03_PREVIEW/CODEBASE/public/backgrounds ]; then cp -R F03_PREVIEW/CODEBASE/public/backgrounds F03_PICTOR/CODEBASE/public/; fi
+
+      - name: Vérifier la durée Hybrid
+        working-directory: F03_PICTOR/CODEBASE
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          codex=json.loads(Path('src/data/codex.json').read_text())
+          hybrid=json.loads(Path('src/data/hybrid_manifest.json').read_text())
+          assert codex.get('session', {}).get('review_mode') == 'hybrid_narrative'
+          assert hybrid.get('mode') == 'hybrid_narrative'
+          assert len(json.loads(Path('src/data/sequences.json').read_text()).get('sequences', [])) == 86
+          print(f"Hybrid frames: {hybrid['total_frames']}")
+          print('Hybrid F04 inputs valid')
+          PY
+
+      - name: Rendre F04 Hybrid
+        working-directory: F03_PICTOR/CODEBASE
+        env:
+          OUTPUT_NAME: ${{ inputs.output_name }}
+        run: |
+          mkdir -p ../OUT
+          npx remotion render src/index.jsx LacrimaeShort "../OUT/$OUTPUT_NAME" --codec h264 --image-format jpeg --concurrency 1
+          test -s "../OUT/$OUTPUT_NAME"
+          sha256sum "../OUT/$OUTPUT_NAME" > "../OUT/$OUTPUT_NAME.sha256"
+
+      - name: Publier le rendu F04
+        uses: actions/upload-artifact@v4
+        with:
+          name: lacrimae-f04-hybrid-${{ github.run_id }}
+          path: F03_PICTOR/OUT/
+          if-no-files-found: error
+          retention-days: 30
