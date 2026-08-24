@@ -79,3 +79,22 @@ Le moteur initial est FFmpeg `minterpolate`. Les vitesses supportées sont 0,75�
 Le workflow isolé `.github/workflows/dev4_f00c.yml` récupère un artifact F00-B validé et accepte les paramètres `off`, `partial` ou `global`. Il s’arrête après l’artifact F00-C : F03, PICTOR, F05 et F06 ne sont pas lancées automatiquement.
 
 RIFE ncnn Vulkan est réservé à une future comparaison qualité. Il n’est pas proposé comme moteur exécutable dans le premier workflow tant que son modèle et son runner ne sont pas validés.
+
+## F00-D Hybrid Narrative / EGO (optionnelle)
+
+F00-D s’exécute uniquement lorsque l’opérateur choisit le **Mode 2 — Hybrid Narrative**. Il ne relance ni F00-A, ni F00-B, ni F00-C et ne sélectionne aucune séquence. Il récupère un manifeste Match Cut déjà validé, matérialise une introduction image ou vidéo, puis produit un artifact autonome contenant la timeline `Intro → hard cut → Match Cut`.
+
+Pour une image, `--intro-type image` et `--image-duration` créent un MP4 H.264 à la durée demandée. Pour une vidéo, `--intro-type video` permet de fournir `--intro-in` et `--intro-out` en secondes ; la portion est découpée avant d’être intégrée. L’introduction est fournie à F00-D via `--intro` en local ou par `intro_source_url` dans le workflow GitHub Actions.
+
+Le texte **EGO** est un réglage de composition transmis dans `hybrid_manifest.json`. Le contrat conserve le texte en majuscules, la police, la couleur, le scale borné de `1` à `10`, la rotation bornée de `-180°` à `180°` et le mode de durée `until_match_cut`, `until_end` ou `custom`. Le rendu typographique reste dans F03 Preview et PICTOR ; F00-D ne dessine pas le texte dans le média d’introduction.
+
+```bash
+python3 CODEBASE/f00_hybrid.py \\
+  --matchcut-manifest OUT/motion_slow/motion_slow_manifest.json \\
+  --intro IN/HYBRID/intro.png --intro-type image --image-duration 2 \\
+  --ego EGO --ego-font Impact --ego-color '#FFFFFF' \\
+  --ego-scale 4 --ego-rotation 12 --ego-duration-mode until_match_cut \\
+  --out OUT/hybrid
+```
+
+Le résultat est `OUT/hybrid/hybrid_manifest.json`, accompagné de `intro/intro.mp4`, de `match_cut/sequences.json`, des séquences copiées et de `hybrid_report.json`. Le workflow isolé `.github/workflows/dev4_f00d.yml` publie uniquement cet artifact et s’arrête avant F03 Preview et PICTOR.

@@ -62,3 +62,13 @@ Le mode Normal reste la référence. Une fois l’artifact F00-C produit, ses fi
 L’onglet **Effets** propose le preset `Dark Luxury Noir` avec un unique curseur d’intensité de `0 %` à `100 %`. À `0 %`, l’effet est désactivé ; à `100 %`, il combine contraste renforcé, désaturation monochrome, chaleur champagne/bronze, noirs profonds et halo sélectif rouge/violet.
 
 La valeur est enregistrée dans `session.presets.dark_luxury_noir` lors de l’export du `codex.json`. La composition PICTOR utilise la même clé et le même calcul de filtre afin que le rendu final corresponde au réglage validé dans F03. Le Motion Slow F00-C reste indépendant.
+
+## Hybrid Narrative — Mode 2
+
+F03 conserve deux modes distincts. **Mode 1 — Pure Match Cut** lit directement le manifeste normal ou Motion Slow validé. **Mode 2 — Hybrid Narrative** charge `hybrid_manifest.json` et affiche une introduction matérialisée par F00-D, le texte EGO, une transition hard cut, puis la timeline Match Cut ; aucune séquence ne disparaît du Mode 1.
+
+Le panneau Hybrid permet de fournir l’introduction image ou vidéo et, pour une vidéo, les secondes `IN` et `OUT`. Le panneau EGO contrôle la police, la taille, la position, l’angle, la couleur, le scale jusqu’à `10×` et la durée jusqu’au début du Match Cut ou jusqu’à la fin de la composition. Le changement de mode met à jour la durée totale et la preview se cale automatiquement sur l’unité ou le mot édité afin que le réglage soit visible immédiatement.
+
+Le fichier partagé `src/preview/hybridNarrative.js` normalise la timeline et les styles EGO. PICTOR reprend le même contrat dans `src/hybridNarrative.js` et `src/OmniComposition.jsx`. `Root.jsx` sélectionne le total de frames du manifeste hybride uniquement lorsque `session.review_mode` vaut `hybrid_narrative`; le rendu Mode 1 reste inchangé.
+
+Le workflow `.github/workflows/dev4_f00d.yml` est isolé : il récupère un artifact F00-C validé, télécharge l’introduction opérateur, exécute F00-D et publie un artifact `lacrimae-dev4-f00d-<run_id>`. Il ne lance ni Preview ni PICTOR automatiquement ; la validation Champion reste une gate manuelle.

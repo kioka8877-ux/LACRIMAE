@@ -1,0 +1,174 @@
+name: DEV4 — F00-D Hybrid EGO
+
+on:
+  workflow_dispatch:
+    inputs:
+      f00c_run_id:
+        description: 'ID du run F00-C validé à réutiliser'
+        required: true
+        default: '32712660893'
+      intro_source_url:
+        description: 'URL publique de l’image ou vidéo d’introduction'
+        required: true
+      intro_type:
+        description: 'Type de source intro'
+        required: true
+        default: 'video'
+        type: choice
+        options:
+          - video
+          - image
+      intro_in:
+        description: 'Seconde IN de l’intro vidéo (vide = 0)'
+        required: false
+        default: '0'
+      intro_out:
+        description: 'Seconde OUT de l’intro vidéo (vide = vidéo entière)'
+        required: false
+        default: ''
+      image_duration:
+        description: 'Durée de l’image intro en secondes'
+        required: false
+        default: '2'
+      ego_text:
+        description: 'Texte EGO'
+        required: true
+        default: 'EGO'
+      ego_duration_mode:
+        description: 'Durée du texte EGO'
+        required: true
+        default: 'until_match_cut'
+        type: choice
+        options:
+          - until_match_cut
+          - until_end
+          - custom
+      ego_duration_frames:
+        description: 'Durée custom EGO en frames'
+        required: false
+        default: '0'
+      ego_color:
+        description: 'Couleur EGO'
+        required: true
+        default: '#FFFFFF'
+      ego_scale:
+        description: 'Scale EGO de 1 à 10'
+        required: true
+        default: '2'
+      ego_rotation:
+        description: 'Rotation EGO de -180 à 180'
+        required: true
+        default: '0'
+      matchcut_color_preset:
+        description: 'Preset colorimétrique de la partie Match Cut'
+        required: true
+        default: 'punchy'
+      matchcut_color_intensity:
+        description: 'Intensité colorimétrique Match Cut'
+        required: true
+        default: '100'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  f00d_hybrid_ego_only:
+    name: F00-D — HYBRID / EGO uniquement
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout dev4
+        uses: actions/checkout@v4
+
+      - name: Installer Python et FFmpeg
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Télécharger l’artifact F00-C validé
+        uses: actions/download-artifact@v4
+        with:
+          name: lacrimae-dev4-f00c-${{ inputs.f00c_run_id }}
+          path: F00_INGEST/OUT/motion_slow
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.f00c_run_id }}
+
+      - name: Télécharger l’introduction fournie par l’opérateur
+        run: |
+          mkdir -p F00_INGEST/IN/HYBRID
+          curl -L --fail --retry 3 "${{ inputs.intro_source_url }}" -o F00_INGEST/IN/HYBRID/intro_source
+          test -s F00_INGEST/IN/HYBRID/intro_source
+
+      - name: Vérifier F00-C
+        run: |
+          test -s F00_INGEST/OUT/motion_slow/motion_slow_manifest.json
+          test -d F00_INGEST/OUT/motion_slow/sequences
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('F00_INGEST/OUT/motion_slow')
+          data = json.loads((root / 'motion_slow_manifest.json').read_text())
+          assert data.get('materialized') is True
+          assert data.get('sequences')
+          assert all((root / row['file']).exists() for row in data['sequences'])
+          print('F00-C validated:', len(data['sequences']), 'sequences')
+          PY
+
+      - name: F00-D — HYBRID / EGO
+        env:
+          INTRO_OUT: ${{ inputs.intro_out }}
+        run: |
+          OUT=F00_INGEST/OUT/hybrid
+          ARGS=(
+            --matchcut-manifest F00_INGEST/OUT/motion_slow/motion_slow_manifest.json
+            --intro F00_INGEST/IN/HYBRID/intro_source
+            --out "$OUT"
+            --intro-in "${{ inputs.intro_in }}"
+            --image-duration "${{ inputs.image_duration }}"
+            --intro-type "${{ inputs.intro_type }}"
+            --ego "${{ inputs.ego_text }}"
+            --ego-duration-mode "${{ inputs.ego_duration_mode }}"
+            --ego-duration-frames "${{ inputs.ego_duration_frames }}"
+            --ego-color "${{ inputs.ego_color }}"
+            --ego-scale "${{ inputs.ego_scale }}"
+            --ego-rotation "${{ inputs.ego_rotation }}"
+            --matchcut-color-preset "${{ inputs.matchcut_color_preset }}"
+            --matchcut-color-intensity "${{ inputs.matchcut_color_intensity }}"
+          )
+          if [ -n "$INTRO_OUT" ]; then ARGS+=(--intro-out "$INTRO_OUT"); fi
+          python3 F00_INGEST/CODEBASE/f00_hybrid.py "${ARGS[@]}"
+
+      - name: Valider le manifeste F00-D
+        run: |
+          test -s F00_INGEST/OUT/hybrid/hybrid_manifest.json
+          test -s F00_INGEST/OUT/hybrid/intro/intro.mp4
+          test -s F00_INGEST/OUT/hybrid/match_cut/sequences.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('F00_INGEST/OUT/hybrid')
+          data = json.loads((root / 'hybrid_manifest.json').read_text())
+          assert data['schema_version'] == 'dev4.hybrid-narrative.v1'
+          assert data['mode'] == 'hybrid_narrative'
+          assert data['validation']['validated'] is True
+          print('F00-D validated:', data['duration_seconds'], 'seconds;', data['match_cut']['sequence_count'], 'Match Cut sequences')
+          PY
+
+      - name: Publier uniquement l’artifact F00-D
+        uses: actions/upload-artifact@v4
+        with:
+          name: lacrimae-dev4-f00d-${{ github.run_id }}
+          path: |
+            F00_INGEST/OUT/hybrid/hybrid_manifest.json
+            F00_INGEST/OUT/hybrid/hybrid_report.json
+            F00_INGEST/OUT/hybrid/intro/
+            F00_INGEST/OUT/hybrid/match_cut/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Résumé F00-D
+        run: cat F00_INGEST/OUT/hybrid/hybrid_report.json >> "$GITHUB_STEP_SUMMARY"

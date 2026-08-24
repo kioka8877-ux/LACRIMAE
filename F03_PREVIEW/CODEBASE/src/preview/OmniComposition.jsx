@@ -15,6 +15,7 @@ import { getCompositionConfig, rotationForSequence } from './compositionConfig';
 import { darkLuxuryNoirFilter, darkLuxuryNoirOverlayStyle } from './darkLuxuryNoir';
 import { sciFiNeonHdrFilter, sciFiNeonHdrOverlayStyle } from './sciFiNeonHdr';
 import { activeFlashTextUnit, flashTextStyle } from './flashText';
+import { hybridTimelineFrame, hybridEgoStyle } from './hybridNarrative';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * OmniComposition (F03 PREVIEW) â€” mÃªmes 6 calques que F04 RENDER :
@@ -67,7 +68,7 @@ const SESSION_FALLBACK = {
   },
 };
 
-export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequences }) => {
+export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequences, hybridManifest, hybridIntroSrc }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames, width, height } = useVideoConfig();
 
@@ -153,6 +154,8 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
   const virtualSequences = normalizeSequences(sequences || clip.sequences_manifest || clip.sequences);
   const texts = clip.texts || {};
   const textMode = texts.mode || (texts.title ? 'title' : 'none');
+  const hybridState = hybridManifest ? hybridTimelineFrame(hybridManifest, frame) : null;
+  const hybridIntroUrl = hybridIntroSrc || (hybridManifest?.intro?.file ? staticFile(hybridManifest.intro.file.replace(/^\.\//, '')) : null);
 
   return (
     <AbsoluteFill style={{ backgroundColor: session.background?.color || '#000' }}>
@@ -191,6 +194,16 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
         )}
 
         {/* L2 VIDEO : source horizontale, recadrage et séquences virtuelles */}
+        {hybridState?.isIntro && hybridIntroUrl && (
+          <AbsoluteFill style={{ overflow: 'hidden', zIndex: 2 }}>
+            <Video
+              src={hybridIntroUrl}
+              muted
+              startFrom={0}
+              style={{ width: '100%', height: '100%', objectFit: composition.fit || 'cover' }}
+            />
+          </AbsoluteFill>
+        )}
         {composition.background_fill === 'blurred_video' && (
           <AbsoluteFill style={{ overflow: 'hidden', backgroundColor: '#000' }}>
             <Video
@@ -203,12 +216,13 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
         {(() => {
           // Un seul lecteur persistant : monter un nouveau <Video> toutes les 7 frames
           // empêchait le navigateur de décoder la séquence nette à temps.
+          const sequenceFrame = hybridState && !hybridState.isIntro ? hybridState.matchCutFrame : frame;
           const activeIndex = virtualSequences.length > 0
             ? Math.min(
                 virtualSequences.length - 1,
                 Math.max(0, virtualSequences.findIndex((row) =>
-                  frame >= row.timelineStartFrame &&
-                  frame < row.timelineStartFrame + row.durationFrames
+                  sequenceFrame >= row.timelineStartFrame &&
+                  sequenceFrame < row.timelineStartFrame + row.durationFrames
                 ))
               )
             : -1;
@@ -228,7 +242,7 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
                 src={materializedUrl}
                 startFrom={activeSequence?.file ? 0 : (activeSequence?.sourceStartFrame || 0)}
                 muted
-                style={{ width: '100%', height: '100%', objectFit: fit, transform, transformOrigin: 'center center' }}
+                style={{ width: '100%', height: '100%', objectFit: fit, transform, transformOrigin: 'center center', opacity: hybridState?.isIntro ? 0 : 1 }}
                 playbackRate={playbackRate}
               />
             </AbsoluteFill>
@@ -246,6 +260,9 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
             offsetPct={texts.title_offset_pct ?? 8}
           />
         ) : null}
+        {hybridState?.isEgo && (
+          <div style={hybridEgoStyle(hybridManifest, frame)}>{hybridManifest.ego.text}</div>
+        )}
 
         {/* L4 PARAGRAPHE */}
         {textMode === 'title+paragraph' && texts.paragraph ? (

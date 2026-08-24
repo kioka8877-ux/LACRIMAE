@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Player } from '@remotion/player';
 import { OmniComposition } from './preview/OmniComposition';
 import { COMPOSITION_PRESETS, getCompositionConfig } from './preview/compositionConfig';
+import { normalizeHybridManifest } from './preview/hybridNarrative';
 
 /**
  * App — F03 PREVIEW (v4.0 — session + clips)
@@ -38,6 +39,8 @@ export default function App() {
   const [videoSrc, setVideoSrc] = useState('');
   const [backgrounds, setBackgrounds] = useState([]); // liste des fonds PNG
   const [sequences, setSequences] = useState(null); // manifeste virtuel produit par F00
+  const [hybridManifest, setHybridManifest] = useState(null);
+  const [hybridIntroSrc, setHybridIntroSrc] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [validated, setValidated] = useState(false);
@@ -91,6 +94,20 @@ export default function App() {
             setSequences(null);
           }
         }
+        try {
+          const hybridResp = await fetch('./hybrid_manifest.json');
+          if (hybridResp.ok) {
+            const hybrid = await hybridResp.json();
+            setHybridManifest(hybrid);
+            const matchRef = hybrid.match_cut?.manifest;
+            if (matchRef) {
+              const matchResp = await fetch('./' + matchRef.replace(/^\.\//, ''));
+              if (matchResp.ok) setSequences(await matchResp.json());
+            }
+          }
+        } catch (_) {
+          setHybridManifest(null);
+        }
         // Liste des fonds PNG (écrite par le transit F02 / bridge)
         try {
           const bgResp = await fetch('./backgrounds/manifest.json');
@@ -137,7 +154,18 @@ export default function App() {
   }
 
   const fps = clip.video?.fps || 30;
-  const totalFrames = sequences?.total_frames || clip.video?.total_frames || 300;
+  const baseTotalFrames = sequences?.total_frames || clip.video?.total_frames || 300;
+  const reviewMode = session.review_mode || 'match_cut';
+  const activeHybrid = reviewMode === 'hybrid_narrative' ? normalizeHybridManifest(
+    hybridManifest || {
+      mode: 'hybrid_narrative',
+      fps,
+      match_cut: { total_frames: baseTotalFrames },
+      intro: session.hybrid?.intro || {},
+      ego: session.hybrid?.ego || {},
+    }, session
+  ) : null;
+  const totalFrames = activeHybrid?.total_frames || baseTotalFrames;
   const composition = getCompositionConfig(clip, session);
   const motionSlow = {
     enabled: false,
@@ -181,6 +209,7 @@ export default function App() {
     ...s,
     composition: { ...(s.composition || {}), [key]: value },
   }));
+  const updateReviewMode = (value) => setSession((s) => ({ ...s, review_mode: value }));
 
   // ── Balise logo : double-clic sur la vidéo → poser ici ──
   const handleLogoClick = (e) => {
@@ -359,7 +388,7 @@ export default function App() {
             <Player
               ref={playerRef}
               component={OmniComposition}
-              inputProps={{ codex: clip, videoSrc, session, sequences }}
+              inputProps={{ codex: clip, videoSrc, session, sequences, hybridManifest: activeHybrid, hybridIntroSrc }}
               durationInFrames={totalFrames}
               fps={fps}
               compositionWidth={vidWidth}
@@ -468,6 +497,58 @@ export default function App() {
             <button style={activeTab === 'sharp' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('sharp')}>
               🔍 Netteté
             </button>
+          </div>
+
+          {/* ══════════ MODE DE REVIEW ══════════ */}
+          <div style={{ marginTop: '12px', padding: '10px', border: '1px solid #303030', borderRadius: '8px', background: '#101010' }}>
+            <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>MODE DE REVIEW</label>
+            <select
+              style={styles.select}
+              value={reviewMode}
+              onChange={(e) => updateReviewMode(e.target.value)}
+            >
+              <option value="match_cut">Mode 1 — Match Cut</option>
+              <option value="hybrid_narrative">Mode 2 — Hybrid / EGO</option>
+            </select>
+            {reviewMode === 'hybrid_narrative' && (
+              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #333' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>INTRO — image ou vidéo</label>
+                <input
+                  style={styles.input}
+                  type="file"
+                  accept="video/*,image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const url = URL.createObjectURL(file);
+                    setHybridIntroSrc(url);
+                    updateSession('hybrid', 'intro', {
+                      ...(session.hybrid?.intro || {}),
+                      source: file.name,
+                      source_type: file.type.startsWith('image/') ? 'image' : 'video',
+                    });
+                  }}
+                />
+                <label style={styles.label}>Découpage vidéo (secondes IN / OUT, optionnel)</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.1" placeholder="IN" value={session.hybrid?.intro?.in_seconds ?? 0} onChange={(e) => updateSession('hybrid', 'intro', { ...(session.hybrid?.intro || {}), in_seconds: parseFloat(e.target.value) || 0 })} />
+                  <input style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.1" placeholder="OUT" value={session.hybrid?.intro?.out_seconds ?? 2} onChange={(e) => updateSession('hybrid', 'intro', { ...(session.hybrid?.intro || {}), out_seconds: parseFloat(e.target.value) || 0 })} />
+                </div>
+                <label style={styles.label}>Texte EGO</label>
+                <input style={styles.input} value={session.hybrid?.ego?.text || 'EGO'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), text: e.target.value })} />
+                <label style={styles.label}>Durée EGO</label>
+                <select style={styles.select} value={session.hybrid?.ego?.duration_mode || 'until_match_cut'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), duration_mode: e.target.value })}>
+                  <option value="until_match_cut">Jusqu’au Match Cut</option>
+                  <option value="until_end">Jusqu’à la fin</option>
+                </select>
+                <label style={styles.label}>Scale EGO : {(session.hybrid?.ego?.scale ?? 2).toFixed(1)}×</label>
+                <input style={styles.slider} type="range" min="1" max="10" step="0.1" value={session.hybrid?.ego?.scale ?? 2} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), scale: parseFloat(e.target.value) })} />
+                <label style={styles.label}>Angle EGO : {session.hybrid?.ego?.rotation_deg ?? 0}°</label>
+                <input style={styles.slider} type="range" min="-180" max="180" value={session.hybrid?.ego?.rotation_deg ?? 0} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), rotation_deg: parseInt(e.target.value, 10) })} />
+                <label style={styles.label}>Couleur EGO</label>
+                <input style={styles.colorPicker} type="color" value={session.hybrid?.ego?.color || '#FFFFFF'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), color: e.target.value })} />
+              </div>
+            )}
           </div>
 
           {/* ══════════ COMPOSITION : format, cadrage et rotation ══════════ */}
