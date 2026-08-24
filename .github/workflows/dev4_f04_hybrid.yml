@@ -52,6 +52,7 @@ jobs:
           mkdir -p F03_PICTOR/CODEBASE/public
           cp -R F03_PREVIEW/CODEBASE/public/intro F03_PICTOR/CODEBASE/public/
           cp -R F03_PREVIEW/CODEBASE/public/match_cut F03_PICTOR/CODEBASE/public/
+          cp F03_PREVIEW/CODEBASE/public/match_cut/sequences/seq_0001_normal.mp4 F03_PICTOR/CODEBASE/public/video_source.mp4
           if [ -f F03_PREVIEW/CODEBASE/public/logo.png ]; then cp F03_PREVIEW/CODEBASE/public/logo.png F03_PICTOR/CODEBASE/public/; fi
           if [ -d F03_PREVIEW/CODEBASE/public/backgrounds ]; then cp -R F03_PREVIEW/CODEBASE/public/backgrounds F03_PICTOR/CODEBASE/public/; fi
 
