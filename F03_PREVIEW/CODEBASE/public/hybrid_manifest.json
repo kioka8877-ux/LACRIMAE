@@ -25,6 +25,18 @@
     "type": "hard_cut",
     "match_cut_start_frame": 120
   },
+  "intro_text": {
+    "text": "C'EST JUSTE UN JOUEUR",
+    "duration_mode": "until_match_cut",
+    "start_frame": 0,
+    "font_family": "Impact",
+    "color": "#FFFFFF",
+    "scale": 1.0,
+    "rotation_deg": 0.0,
+    "position_x": 50,
+    "position_y": 78,
+    "blur_frames": 0
+  },
   "ego": {
     "text": "EGO",
     "duration_mode": "until_match_cut",

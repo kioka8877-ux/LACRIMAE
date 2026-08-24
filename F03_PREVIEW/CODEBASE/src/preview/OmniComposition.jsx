@@ -15,7 +15,7 @@ import { getCompositionConfig, rotationForSequence } from './compositionConfig';
 import { darkLuxuryNoirFilter, darkLuxuryNoirOverlayStyle } from './darkLuxuryNoir';
 import { sciFiNeonHdrFilter, sciFiNeonHdrOverlayStyle } from './sciFiNeonHdr';
 import { activeFlashTextUnit, flashTextStyle } from './flashText';
-import { hybridTimelineFrame, hybridEgoStyle } from './hybridNarrative';
+import { hybridTimelineFrame, hybridEgoStyle, hybridTextStyle } from './hybridNarrative';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * OmniComposition (F03 PREVIEW) â€” mÃªmes 6 calques que F04 RENDER :
@@ -262,6 +262,9 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
             offsetPct={texts.title_offset_pct ?? 8}
           />
         ) : null}
+        {hybridState?.isIntroText && (
+          <div style={hybridTextStyle(hybridState.hybrid.intro_text, frame)}>{hybridState.hybrid.intro_text.text}</div>
+        )}
         {hybridState?.isEgo && (
           <div style={hybridEgoStyle(hybridManifest, frame, session)}>{hybridState.hybrid.ego.text}</div>
         )}

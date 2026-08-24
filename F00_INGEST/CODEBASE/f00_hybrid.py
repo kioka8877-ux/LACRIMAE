@@ -111,6 +111,13 @@ def main() -> int:
     parser.add_argument("--intro-out", type=float, default=None)
     parser.add_argument("--image-duration", type=float, default=2.0)
     parser.add_argument("--intro-type", choices=["auto", "image", "video"], default="auto")
+    parser.add_argument("--intro-text", default="C'EST JUSTE UN JOUEUR")
+    parser.add_argument("--intro-text-duration-mode", choices=["until_match_cut", "until_end", "custom"], default="until_match_cut")
+    parser.add_argument("--intro-text-duration-frames", type=int, default=0)
+    parser.add_argument("--intro-text-color", default="#FFFFFF")
+    parser.add_argument("--intro-text-font", default="Impact")
+    parser.add_argument("--intro-text-scale", type=float, default=1.0)
+    parser.add_argument("--intro-text-rotation", type=float, default=0.0)
     parser.add_argument("--ego", default="EGO")
     parser.add_argument("--ego-duration-mode", choices=["until_match_cut", "until_end", "custom"], default="until_match_cut")
     parser.add_argument("--ego-duration-frames", type=int, default=0)
@@ -124,7 +131,9 @@ def main() -> int:
     if not args.matchcut_manifest.exists(): raise FileNotFoundError(args.matchcut_manifest)
     if not args.intro.exists(): raise FileNotFoundError(args.intro)
     if not 1 <= args.ego_scale <= 10: raise ValueError("--ego-scale doit être compris entre 1 et 10")
+    if not 1 <= args.intro_text_scale <= 10: raise ValueError("--intro-text-scale doit être compris entre 1 et 10")
     if not -180 <= args.ego_rotation <= 180: raise ValueError("--ego-rotation doit être compris entre -180 et 180")
+    if not -180 <= args.intro_text_rotation <= 180: raise ValueError("--intro-text-rotation doit être compris entre -180 et 180")
     args.out.mkdir(parents=True, exist_ok=True)
     matchcut, matchcut_ref = copy_matchcut(args.matchcut_manifest, args.out)
     fps = float(matchcut.get("fps") or 30)
@@ -132,6 +141,12 @@ def main() -> int:
     intro_frames = int(intro["duration_frames"])
     matchcut_frames = int(matchcut.get("total_frames") or 0)
     total_frames = intro_frames + matchcut_frames
+    if args.intro_text_duration_mode == "until_match_cut":
+        intro_text_start, intro_text_duration = 0, intro_frames
+    elif args.intro_text_duration_mode == "until_end":
+        intro_text_start, intro_text_duration = 0, total_frames
+    else:
+        intro_text_start, intro_text_duration = 0, max(1, args.intro_text_duration_frames)
     if args.ego_duration_mode == "until_match_cut":
         ego_start, ego_duration = 0, intro_frames
     elif args.ego_duration_mode == "until_end":
@@ -147,6 +162,13 @@ def main() -> int:
         "duration_seconds": round(total_frames / fps, 6),
         "intro": intro,
         "transition": {"type": "hard_cut", "match_cut_start_frame": intro_frames},
+        "intro_text": {
+            "text": args.intro_text.upper(), "duration_mode": args.intro_text_duration_mode,
+            "start_frame": intro_text_start, "duration_frames": intro_text_duration,
+            "font_family": args.intro_text_font, "color": args.intro_text_color,
+            "scale": args.intro_text_scale, "rotation_deg": args.intro_text_rotation,
+            "position_x": 50, "position_y": 78, "blur_frames": 0,
+        },
         "ego": {
             "text": args.ego.upper(), "duration_mode": args.ego_duration_mode,
             "start_frame": ego_start, "duration_frames": ego_duration,

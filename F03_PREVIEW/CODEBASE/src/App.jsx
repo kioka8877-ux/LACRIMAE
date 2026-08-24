@@ -163,6 +163,7 @@ export default function App() {
       fps,
       match_cut: { total_frames: baseTotalFrames },
       intro: session.hybrid?.intro || {},
+      intro_text: session.hybrid?.intro_text || {},
       ego: session.hybrid?.ego || {},
     }, session
   ) : null;
@@ -541,6 +542,26 @@ export default function App() {
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <input style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.1" placeholder="IN" value={session.hybrid?.intro?.in_seconds ?? 0} onChange={(e) => updateSession('hybrid', 'intro', { ...(session.hybrid?.intro || {}), in_seconds: parseFloat(e.target.value) || 0 })} />
                     <input style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.1" placeholder="OUT" value={session.hybrid?.intro?.out_seconds ?? 2} onChange={(e) => updateSession('hybrid', 'intro', { ...(session.hybrid?.intro || {}), out_seconds: parseFloat(e.target.value) || 0 })} />
+                  </div>
+                  <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid #4a3920' }}>
+                    <label style={{ ...styles.label, color: '#ffcc66' }}>PHRASE FIXE — introduction</label>
+                    <label style={styles.label}>Texte fixe</label>
+                    <input
+                      style={styles.input}
+                      value={session.hybrid?.intro_text?.text || "C'EST JUSTE UN JOUEUR"}
+                      onChange={(e) => updateSession('hybrid', 'intro_text', { ...(session.hybrid?.intro_text || {}), text: e.target.value })}
+                    />
+                    <label style={styles.label}>Durée de la phrase</label>
+                    <select style={styles.select} value={session.hybrid?.intro_text?.duration_mode || 'until_match_cut'} onChange={(e) => updateSession('hybrid', 'intro_text', { ...(session.hybrid?.intro_text || {}), duration_mode: e.target.value })}>
+                      <option value="until_match_cut">Jusqu’au Match Cut</option>
+                      <option value="until_end">Jusqu’à la fin</option>
+                    </select>
+                    <label style={styles.label}>Scale phrase : {(session.hybrid?.intro_text?.scale ?? 1).toFixed(1)}×</label>
+                    <input style={styles.slider} type="range" min="1" max="10" step="0.1" value={session.hybrid?.intro_text?.scale ?? 1} onChange={(e) => updateSession('hybrid', 'intro_text', { ...(session.hybrid?.intro_text || {}), scale: parseFloat(e.target.value) })} />
+                    <label style={styles.label}>Angle phrase : {session.hybrid?.intro_text?.rotation_deg ?? 0}°</label>
+                    <input style={styles.slider} type="range" min="-180" max="180" value={session.hybrid?.intro_text?.rotation_deg ?? 0} onChange={(e) => updateSession('hybrid', 'intro_text', { ...(session.hybrid?.intro_text || {}), rotation_deg: parseInt(e.target.value, 10) })} />
+                    <label style={styles.label}>Couleur phrase</label>
+                    <input style={styles.colorPicker} type="color" value={session.hybrid?.intro_text?.color || '#FFFFFF'} onChange={(e) => updateSession('hybrid', 'intro_text', { ...(session.hybrid?.intro_text || {}), color: e.target.value })} />
                   </div>
                   <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid #4a3920' }}>
                     <label style={{ ...styles.label, color: '#ffcc66' }}>EGO — texte d’impact</label>
