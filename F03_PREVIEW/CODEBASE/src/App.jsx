@@ -51,7 +51,8 @@ export default function App() {
         setCodex(full);
         setClip(clipFirst);
         setSession(full.session || {});
-        setVideoSrc(clipFirst.video?.source ? './' + clipFirst.video.source : './clip_001.mp4');
+        const initialVideo = full.sub_mode === 'meme_v2' && clipFirst.meme?.source ? './memes/' + clipFirst.meme.source : (clipFirst.video?.source ? './' + clipFirst.video.source : './clip_001.mp4');
+        setVideoSrc(initialVideo);
         // Liste des fonds PNG (écrite par le transit F02 / bridge)
         try {
           const bgResp = await fetch('./backgrounds/manifest.json');
@@ -149,6 +150,9 @@ export default function App() {
     setClip({ ...clip, tweet: { ...(clip.tweet || {}), keywords_style: kw } });
   };
   const updateEmotion = (value) => setClip({ ...clip, text_emotion: value, texts: { ...(clip.texts || {}), emotion: value } });
+  const updateV2Field = (key, value) => setClip({ ...clip, [key]: value });
+  const updateV2Timeline = (key, value) => setClip({ ...clip, meme_v2: { ...(clip.meme_v2 || {}), timeline: { ...((clip.meme_v2 || {}).timeline || {}), [key]: value } } });
+  const updateV2Layout = (key, value) => setClip({ ...clip, meme_v2: { ...(clip.meme_v2 || {}), layout: { ...((clip.meme_v2 || {}).layout || {}), [key]: value } } });
   const updateWatermark = (key, value) => updateSession('watermark', key, value);
   const selectMeme = (memeName) => {
     const memeFile = memeName.endsWith('.mp4') ? memeName : `${memeName}.mp4`;
@@ -340,6 +344,9 @@ export default function App() {
         if (source.meme?.height_pct != null) out.meme = { ...(out.meme || {}), height_pct: source.meme.height_pct };
         if (srcTweet.text_size != null) out.tweet = { ...(out.tweet || {}), text_size: srcTweet.text_size };
         if (source.video?.scale != null) out.video = { ...(out.video || {}), scale: source.video.scale };
+        if (source.meme_v2) out.meme_v2 = { ...(out.meme_v2 || {}), timeline: { ...((source.meme_v2 || {}).timeline || {}) }, layout: { ...((source.meme_v2 || {}).layout || {}) } };
+        if (source.reaction_width_pct != null) out.reaction_width_pct = source.reaction_width_pct;
+        if (source.reaction_text_size != null) out.reaction_text_size = source.reaction_text_size;
         return out;
       };
     };
@@ -1070,6 +1077,37 @@ export default function App() {
                 🧩 MODE MEME — panneaux par calque
               </label>
 
+              {isMemeV2Mode && (
+                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #333' }}>
+                  <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>MEME V2 — TIMELINE RÉACTION → SOURCE → ÉMOTION → CLIP</label>
+                  {[
+                    ['reaction_start_pct', 'Réaction — début', 0],
+                    ['source_start_pct', 'Capture source — début', 15],
+                    ['emotion_start_pct', 'Text emotion — début', 33],
+                  ].map(([key, label, fallback]) => (
+                    <div key={key}>
+                      <label style={styles.label}>{label}: {clip.meme_v2?.timeline?.[key] ?? fallback}%</label>
+                      <input style={styles.slider} type="range" min="0" max="95" step="1" value={clip.meme_v2?.timeline?.[key] ?? fallback} onChange={(e) => updateV2Timeline(key, parseInt(e.target.value))} />
+                    </div>
+                  ))}
+                  <label style={styles.label}>Hauteur du clip MEME: {clip.meme_v2?.layout?.clip_height_pct ?? 36}%</label>
+                  <input style={styles.slider} type="range" min="20" max="55" value={clip.meme_v2?.layout?.clip_height_pct ?? 36} onChange={(e) => updateV2Layout('clip_height_pct', parseInt(e.target.value))} />
+                  <div style={{ marginTop: '6px', padding: '8px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#aaa' }}>Chaque couche apparaît à son seuil puis reste visible. La capture source ne doit pas être confondue avec le tweet Lacrimae.</div>
+                  <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #333' }}>
+                    <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>CAPTURE DU POST SOURCE</label>
+                    <label style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px' }}><input type="checkbox" checked={clip.meme_v2?.layout?.capture_enabled !== false} onChange={(e) => updateV2Layout('capture_enabled', e.target.checked)} /> Afficher la capture source</label>
+                    <label style={styles.label}>Taille: {clip.meme_v2?.layout?.capture_width_pct ?? 98}%</label>
+                    <input style={styles.slider} type="range" min="40" max="100" value={clip.meme_v2?.layout?.capture_width_pct ?? 98} onChange={(e) => updateV2Layout('capture_width_pct', parseInt(e.target.value))} />
+                    <label style={styles.label}>Hauteur: {clip.meme_v2?.layout?.capture_height_pct ?? 30}%</label>
+                    <input style={styles.slider} type="range" min="12" max="45" value={clip.meme_v2?.layout?.capture_height_pct ?? 30} onChange={(e) => updateV2Layout('capture_height_pct', parseInt(e.target.value))} />
+                    <label style={styles.label}>Position verticale: {clip.meme_v2?.layout?.capture_top_pct ?? 25}%</label>
+                    <input style={styles.slider} type="range" min="18" max="60" value={clip.meme_v2?.layout?.capture_top_pct ?? 25} onChange={(e) => updateV2Layout('capture_top_pct', parseInt(e.target.value))} />
+                    <label style={styles.label}>Mode d’affichage</label>
+                    <select style={styles.select} value={clip.meme_v2?.layout?.capture_fit || 'contain'} onChange={(e) => updateV2Layout('capture_fit', e.target.value)}><option value="contain">Contain — capture entière</option><option value="cover">Cover — remplissage et recadrage</option></select>
+                  </div>
+                </div>
+              )}
+
               {/* ── L2 TWEET (card) ── */}
               <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #333' }}>
                 <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
@@ -1078,8 +1116,8 @@ export default function App() {
                 <label style={styles.label}>Texte du tweet</label>
                 <textarea
                   style={{ ...styles.input, minHeight: '70px', resize: 'vertical', fontFamily: 'inherit' }}
-                  value={(clip.tweet || {}).text || ''}
-                  onChange={(e) => updateTweet('text', e.target.value)}
+                  value={isMemeV2Mode ? (clip.reaction_tweet || '') : ((clip.tweet || {}).text || '')}
+                  onChange={(e) => isMemeV2Mode ? updateV2Field('reaction_tweet', e.target.value) : updateTweet('text', e.target.value)}
                 />
                 <label style={styles.label}>Fond de la Tweet Card</label>
                 <input
@@ -1119,26 +1157,26 @@ export default function App() {
                   Désactivé par défaut : tout le tweet utilise une seule couleur personnalisable.
                 </div>
                 <label style={styles.label}>
-                  Largeur card: {((clip.tweet || {}).width_pct || 82)}%
+                  Largeur card: {(isMemeV2Mode ? (clip.reaction_width_pct || 88) : ((clip.tweet || {}).width_pct || 82))}%
                 </label>
                 <input
                   style={styles.slider}
                   type="range"
-                  min="60"
-                  max="98"
-                  value={(clip.tweet || {}).width_pct || 82}
-                  onChange={(e) => updateTweet('width_pct', parseInt(e.target.value))}
+                  min={isMemeV2Mode ? 40 : 60}
+                  max="100"
+                  value={isMemeV2Mode ? (clip.reaction_width_pct || 88) : ((clip.tweet || {}).width_pct || 82)}
+                  onChange={(e) => isMemeV2Mode ? updateV2Field('reaction_width_pct', parseInt(e.target.value)) : updateTweet('width_pct', parseInt(e.target.value))}
                 />
                 <label style={styles.label}>
-                  Taille textes tweet: {((clip.tweet || {}).text_size || 17)}px
+                  Taille textes tweet: {(isMemeV2Mode ? (clip.reaction_text_size || 17) : ((clip.tweet || {}).text_size || 17))}px
                 </label>
                 <input
                   style={styles.slider}
                   type="range"
                   min="12"
-                  max="60"
-                  value={(clip.tweet || {}).text_size || 17}
-                  onChange={(e) => updateTweet('text_size', parseInt(e.target.value))}
+                  max={isMemeV2Mode ? 120 : 60}
+                  value={isMemeV2Mode ? (clip.reaction_text_size || 17) : ((clip.tweet || {}).text_size || 17)}
+                  onChange={(e) => isMemeV2Mode ? updateV2Field('reaction_text_size', parseInt(e.target.value)) : updateTweet('text_size', parseInt(e.target.value))}
                 />
                 <div style={{ marginTop: '6px', padding: '8px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
                   Persona + likes/partages : générés par le bridge (seed déterministe
@@ -1158,18 +1196,19 @@ export default function App() {
                   onChange={(e) => updateEmotion(e.target.value)}
                 />
                 <label style={styles.label}>
-                  Position (haut → bas): {(clip.text_emotion_position_pct ?? 43)}%
+                  Position (haut → bas): {(isMemeV2Mode ? (clip.meme_v2?.layout?.emotion_top_pct ?? 58) : (clip.text_emotion_position_pct ?? 43))}%
                 </label>
                 <input
                   style={styles.slider}
                   type="range"
                   min="10"
                   max="95"
-                  value={clip.text_emotion_position_pct ?? 43}
-                  onChange={(e) => updateClip('text_emotion_position_pct', parseInt(e.target.value))}
+                  value={isMemeV2Mode ? (clip.meme_v2?.layout?.emotion_top_pct ?? 58) : (clip.text_emotion_position_pct ?? 43)}
+                  onChange={(e) => isMemeV2Mode ? updateV2Layout('emotion_top_pct', parseInt(e.target.value)) : updateClip('text_emotion_position_pct', parseInt(e.target.value))}
                 />
-                <label style={styles.label}>
+                                  <label style={styles.label}>
                   Taille: {(clip.text_emotion_size ?? 40)}px
+
                 </label>
                 <input
                   style={styles.slider}
@@ -1179,6 +1218,10 @@ export default function App() {
                   value={clip.text_emotion_size ?? 40}
                   onChange={(e) => updateClip('text_emotion_size', parseInt(e.target.value))}
                 />
+                <label style={styles.label}>Épaisseur du contour: {(session.texts_style?.stroke_width ?? 4)}px</label>
+                <input style={styles.slider} type="range" min="0" max="16" step="1" value={session.texts_style?.stroke_width ?? 4} onChange={(e) => updateSessionTextsStyle('stroke_width', parseInt(e.target.value))} />
+                <label style={styles.label}>Couleur du contour</label>
+                <input style={styles.colorPicker} type="color" value={session.texts_style?.stroke_color || '#000000'} onChange={(e) => updateSessionTextsStyle('stroke_color', e.target.value)} />
               </div>
 
               {/* ── L6 WATERMARK @chaine ── */}

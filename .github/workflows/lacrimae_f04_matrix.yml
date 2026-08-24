@@ -142,6 +142,8 @@ jobs:
           cp SHARED/IN/fonts/Anton-Regular.ttf F04_RENDER/CODEBASE/public/fonts/Anton-Regular.ttf
           if [ -d SHARED/IN/backgrounds ]; then mkdir -p F04_RENDER/CODEBASE/public/backgrounds && cp SHARED/IN/backgrounds/* F04_RENDER/CODEBASE/public/backgrounds/ || true; fi
           if [ -d SHARED/IN/logos ] && [ -f SHARED/IN/logos/logo.png ]; then cp SHARED/IN/logos/logo.png F04_RENDER/CODEBASE/public/logo.png; fi
+          if [ -d SHARED/memes ]; then mkdir -p F04_RENDER/CODEBASE/public/memes && cp SHARED/memes/*.mp4 F04_RENDER/CODEBASE/public/memes/ 2>/dev/null || true; fi
+          if [ -d F03_PREVIEW/CODEBASE/public/source_posts ]; then mkdir -p F04_RENDER/CODEBASE/public/source_posts && cp F03_PREVIEW/CODEBASE/public/source_posts/*.png F04_RENDER/CODEBASE/public/source_posts/; fi
       - name: Installer Remotion
         run: cd F04_RENDER/CODEBASE && npm install
       - name: Vérifier les entrées visuelles sans valider automatiquement le background
