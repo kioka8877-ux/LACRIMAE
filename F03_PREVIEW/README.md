@@ -8,10 +8,14 @@ F03_PREVIEW est la salle de contrôle interactive qui permet de voir le Short av
 CODEBASE/public/video_source.mp4
 CODEBASE/public/sequences.json
 CODEBASE/public/sequences/seq_XXXX.mp4
+CODEBASE/public/hybrid_manifest.json
+CODEBASE/public/intro/intro.mp4
+CODEBASE/public/match_cut/sequences.json
+CODEBASE/public/match_cut/sequences/seq_XXXX_normal.mp4
 CODEBASE/public/codex.json
 ```
 
-Lorsque `sequences.json` possède `schema_version: dev4.materialized-sequences.v1` et `materialized: true`, chaque cut utilise le fichier indiqué par son champ `file`. F03 ne recherche donc pas une position distante dans la vidéo source pendant la lecture. La vidéo source reste disponible pour les anciens manifestes `dev4.virtual-sequences.v1`.
+Lorsque `sequences.json` possède `schema_version: dev4.materialized-sequences.v1` et `materialized: true`, chaque cut utilise le fichier indiqué par son champ `file`. En Mode 2, F03 charge le manifeste `match_cut/sequences.json`, dont les chemins `file` pointent vers `match_cut/sequences/seq_XXXX_normal.mp4` ou les variantes Motion Slow. F03 ne recherche donc pas une position distante dans la vidéo source lorsqu’un fichier matérialisé existe. La vidéo source reste disponible pour les anciens manifestes `dev4.virtual-sequences.v1`.
 
 ## Lancement
 
@@ -67,8 +71,8 @@ La valeur est enregistrée dans `session.presets.dark_luxury_noir` lors de l’e
 
 F03 conserve deux modes distincts. **Mode 1 — Pure Match Cut** lit directement le manifeste normal ou Motion Slow validé. **Mode 2 — Hybrid Narrative** charge `hybrid_manifest.json` et affiche une introduction matérialisée par F00-D, le texte EGO, une transition hard cut, puis la timeline Match Cut ; aucune séquence ne disparaît du Mode 1.
 
-Le panneau Hybrid permet de fournir l’introduction image ou vidéo et, pour une vidéo, les secondes `IN` et `OUT`. Le panneau EGO contrôle la police, la taille, la position, l’angle, la couleur, le scale jusqu’à `10×` et la durée jusqu’au début du Match Cut ou jusqu’à la fin de la composition. Le changement de mode met à jour la durée totale et la preview se cale automatiquement sur l’unité ou le mot édité afin que le réglage soit visible immédiatement.
+Le panneau Hybrid permet de fournir l’introduction image ou vidéo et, pour une vidéo, les secondes `IN` et `OUT`. Le panneau EGO contrôle la police, la taille, la position, l’angle, la couleur, le scale jusqu’à `10×` et la durée de la partie Match Cut. EGO est strictement masqué pendant l’introduction et démarre au hard cut. La phrase fixe `C’EST JUSTE UN JOUEUR` est un calque distinct, avec un scale de `0,2×` à `10×`, un réglage de hauteur et une durée configurable. Les modifications sont immédiates et la tête de lecture conserve sa position courante.
 
-Le fichier partagé `src/preview/hybridNarrative.js` normalise la timeline et les styles EGO. PICTOR reprend le même contrat dans `src/hybridNarrative.js` et `src/OmniComposition.jsx`. `Root.jsx` sélectionne le total de frames du manifeste hybride uniquement lorsque `session.review_mode` vaut `hybrid_narrative`; le rendu Mode 1 reste inchangé.
+Le fichier partagé `src/preview/hybridNarrative.js` normalise la timeline, les styles EGO et la phrase fixe. `virtualSequences.js` conserve le champ `file` afin que chaque MP4 matérialisé soit lu individuellement. PICTOR reprend le même contrat dans `src/hybridNarrative.js`, `src/virtualSequences.js` et `src/OmniComposition.jsx`. `Root.jsx` sélectionne le total de frames du manifeste hybride uniquement lorsque `session.review_mode` vaut `hybrid_narrative`; le rendu Mode 1 reste inchangé.
 
-Le workflow `.github/workflows/dev4_f00d.yml` est isolé : il récupère un artifact F00-C validé, télécharge l’introduction opérateur, exécute F00-D et publie un artifact `lacrimae-dev4-f00d-<run_id>`. Il ne lance ni Preview ni PICTOR automatiquement ; la validation Champion reste une gate manuelle.
+Le workflow `.github/workflows/dev4_f00d.yml` est isolé : il récupère un artifact F00-C validé, télécharge l’introduction opérateur, exécute F00-D et publie un artifact `lacrimae-dev4-f00d-<run_id>`. Le workflow `.github/workflows/dev4_f04_hybrid.yml` injecte ensuite `match_cut/sequences.json` et rend chaque fichier matérialisé avec PICTOR. Aucun workflow Camouflage ou Luther n’est nécessaire pour cette validation visuelle ; la validation Champion reste une gate manuelle.

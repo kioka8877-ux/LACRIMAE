@@ -86,15 +86,19 @@ F00-D s’exécute uniquement lorsque l’opérateur choisit le **Mode 2 — Hyb
 
 Pour une image, `--intro-type image` et `--image-duration` créent un MP4 H.264 à la durée demandée. Pour une vidéo, `--intro-type video` permet de fournir `--intro-in` et `--intro-out` en secondes ; la portion est découpée avant d’être intégrée. L’introduction est fournie à F00-D via `--intro` en local ou par `intro_source_url` dans le workflow GitHub Actions.
 
-Le texte **EGO** est un réglage de composition transmis dans `hybrid_manifest.json`. Le contrat conserve le texte en majuscules, la police, la couleur, le scale borné de `1` à `10`, la rotation bornée de `-180°` à `180°` et le mode de durée `until_match_cut`, `until_end` ou `custom`. Le rendu typographique reste dans F03 Preview et PICTOR ; F00-D ne dessine pas le texte dans le média d’introduction.
+Le texte **EGO** est un réglage de composition transmis dans `hybrid_manifest.json`. Il est strictement masqué pendant l’introduction et démarre au hard cut du Match Cut. Le contrat conserve le texte en majuscules, la police, la couleur, le scale borné de `1` à `10`, la rotation bornée de `-180°` à `180°` et le mode de durée `until_match_cut`, `until_end` ou `custom`. Le rendu typographique reste dans F03 Preview et PICTOR ; F00-D ne dessine pas le texte dans le média d’introduction.
+
+Le calque **Intro Text** est une phrase fixe indépendante, par défaut `C’EST JUSTE UN JOUEUR`. Il ne fonctionne pas mot par mot. Il possède ses propres réglages de style et de durée ; son scale est borné de `0,2` à `10`, afin de permettre une taille cinq fois plus petite que la base. F00-D transporte ces paramètres dans le manifeste, tandis que F03 Preview et PICTOR rendent le calque au-dessus de l’introduction.
 
 ```bash
 python3 CODEBASE/f00_hybrid.py \\
   --matchcut-manifest OUT/motion_slow/motion_slow_manifest.json \\
   --intro IN/HYBRID/intro.png --intro-type image --image-duration 2 \\
   --ego EGO --ego-font Impact --ego-color '#FFFFFF' \\
-  --ego-scale 4 --ego-rotation 12 --ego-duration-mode until_match_cut \\
+      --ego-scale 4 --ego-rotation 12 --ego-duration-mode until_match_cut \\
   --out OUT/hybrid
 ```
+
+Le champ `intro_text` peut être ajouté au manifeste pour fournir la phrase fixe d’introduction. Les fichiers Match Cut matérialisés restent référencés par leur chemin `file` relatif, sans retomber sur un fallback unique lorsque le chemin existe.
 
 Le résultat est `OUT/hybrid/hybrid_manifest.json`, accompagné de `intro/intro.mp4`, de `match_cut/sequences.json`, des séquences copiées et de `hybrid_report.json`. Le workflow isolé `.github/workflows/dev4_f00d.yml` publie uniquement cet artifact et s’arrête avant F03 Preview et PICTOR.
