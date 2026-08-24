@@ -1,6 +1,12 @@
 name: LACRIMAE dev6 — Backblaze storage test
 
 on:
+  push:
+    branches: [dev6]
+    paths:
+      - '.github/workflows/dev6_storage_test.yml'
+      - 'tests/test_backblaze_storage.py'
+      - 'SHARED/**'
   workflow_dispatch:
   repository_dispatch:
     types: [dev6-storage-test]
