@@ -46,10 +46,20 @@ export default function App() {
         setSession(full.session || {});
         setVideoSrc(clipFirst.video?.source ? './' + clipFirst.video.source : './video_source.mp4');
         try {
-          const seqResp = await fetch('./sequences.json');
-          if (seqResp.ok) setSequences(await seqResp.json());
+          const motionResp = await fetch('./motion_slow_manifest.json');
+          if (motionResp.ok) {
+            setSequences(await motionResp.json());
+          } else {
+            const seqResp = await fetch('./sequences.json');
+            if (seqResp.ok) setSequences(await seqResp.json());
+          }
         } catch (e) {
-          setSequences(null);
+          try {
+            const seqResp = await fetch('./sequences.json');
+            if (seqResp.ok) setSequences(await seqResp.json());
+          } catch (_) {
+            setSequences(null);
+          }
         }
         // Liste des fonds PNG (écrite par le transit F02 / bridge)
         try {
@@ -99,6 +109,14 @@ export default function App() {
   const fps = clip.video?.fps || 30;
   const totalFrames = sequences?.total_frames || clip.video?.total_frames || 300;
   const composition = getCompositionConfig(clip, session);
+  const motionSlow = {
+    enabled: false,
+    mode: 'off',
+    speed: 0.5,
+    ranges: '',
+    engine: 'ffmpeg_minterpolate',
+    ...(session.motion_slow || {}),
+  };
   const vidWidth = composition.width;
   const vidHeight = composition.height;
 
@@ -433,23 +451,40 @@ export default function App() {
                 <option value="none">Aucun fond</option>
               </select>
               <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #333' }}>
+                <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>POSITION ET ÉCHELLE DE LA VIDÉO</label>
+                <label style={styles.label}>Zoom : {(composition.video_scale ?? 1).toFixed(2)}×</label>
+                <input style={styles.slider} type="range" min="1" max="7" step="0.05" value={composition.video_scale ?? 1} onChange={(e) => updateComposition('video_scale', parseFloat(e.target.value))} />
+                <label style={styles.label}>Position horizontale : {composition.video_position_x ?? 0}%</label>
+                <input style={styles.slider} type="range" min="-100" max="100" step="1" value={composition.video_position_x ?? 0} onChange={(e) => updateComposition('video_position_x', parseInt(e.target.value))} />
+                <label style={styles.label}>Position verticale : {composition.video_position_y ?? 0}%</label>
+                <input style={styles.slider} type="range" min="-100" max="100" step="1" value={composition.video_position_y ?? 0} onChange={(e) => updateComposition('video_position_y', parseInt(e.target.value))} />
+              </div>
+              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #333' }}>
                 <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>ROTATION DE LA VIDÉO</label>
                 <select style={styles.select} value={composition.rotation_mode} onChange={(e) => updateComposition('rotation_mode', e.target.value)}>
+                  <option value="static">Fixe — angle opérateur</option>
                   <option value="none">Aucune</option>
                   <option value="per_sequence">Par séquence</option>
                   <option value="continuous">Continue</option>
                 </select>
+                {composition.rotation_mode === 'static' && <>
+                  <label style={styles.label}>Angle fixe : {composition.rotation_deg ?? 0}°</label>
+                  <input style={styles.slider} type="range" min="-360" max="360" step="1" value={composition.rotation_deg ?? 0} onChange={(e) => updateComposition('rotation_deg', parseInt(e.target.value))} />
+                  <input style={{ ...styles.input, marginTop: '4px' }} type="number" min="-360" max="360" step="1" value={composition.rotation_deg ?? 0} onChange={(e) => updateComposition('rotation_deg', parseInt(e.target.value) || 0)} />
+                </>}
                 {composition.rotation_mode === 'per_sequence' && <>
-                  <label style={styles.label}>Degrés ajoutés par séquence: {composition.rotation_step_deg}°</label>
+                  <label style={styles.label}>Degrés ajoutés par séquence : {composition.rotation_step_deg}°</label>
                   <input style={styles.slider} type="range" min="0" max="15" step="0.5" value={composition.rotation_step_deg} onChange={(e) => updateComposition('rotation_step_deg', parseFloat(e.target.value))} />
                 </>}
-                {composition.rotation_mode !== 'none' && <>
-                  <label style={styles.label}>Rotation totale: {composition.rotation_total_deg}°</label>
+                {composition.rotation_mode === 'continuous' && <>
+                  <label style={styles.label}>Rotation totale : {composition.rotation_total_deg}°</label>
                   <input style={styles.slider} type="range" min="0" max="360" step="1" value={composition.rotation_total_deg} onChange={(e) => updateComposition('rotation_total_deg', parseInt(e.target.value))} />
                   <label style={styles.label}>Sens de rotation</label>
                   <select style={styles.select} value={composition.rotation_direction} onChange={(e) => updateComposition('rotation_direction', parseInt(e.target.value))}>
                     <option value="1">Horaire</option><option value="-1">Antihoraire</option>
                   </select>
+                </>}
+                {composition.rotation_mode !== 'none' && <>
                   <label style={styles.label}>Calque affecté</label>
                   <select style={styles.select} value={composition.rotation_layer} onChange={(e) => updateComposition('rotation_layer', e.target.value)}>
                     <option value="video">Vidéo uniquement</option><option value="composition">Composition entière</option>
@@ -733,6 +768,39 @@ export default function App() {
               <div style={{ marginTop: '8px', padding: '8px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
                 Réglage appliqué à tous les clips (session). <strong>+</strong> = vers le bas,
                 <strong> −</strong> = vers le haut. Les particularités vidéo s'ajouteront ici.
+              </div>
+              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #333' }}>
+                <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>MOTION SLOW — INTERPOLATION</label>
+                <label style={styles.label}>Activation</label>
+                <select style={styles.select} value={motionSlow.enabled ? motionSlow.mode : 'off'} onChange={(e) => {
+                  const mode = e.target.value;
+                  updateSession('motion_slow', 'enabled', mode !== 'off');
+                  updateSession('motion_slow', 'mode', mode);
+                }}>
+                  <option value="off">Désactivé — Normal</option>
+                  <option value="partial">Partiel — plages choisies</option>
+                  <option value="global">Global — toute la vidéo</option>
+                </select>
+                {motionSlow.enabled && <>
+                  <label style={styles.label}>Vitesse : {motionSlow.speed}×</label>
+                  <select style={styles.select} value={motionSlow.speed} onChange={(e) => updateSession('motion_slow', 'speed', parseFloat(e.target.value))}>
+                    <option value="0.75">0,75×</option>
+                    <option value="0.5">0,5×</option>
+                    <option value="0.25">0,25×</option>
+                  </select>
+                  {motionSlow.mode === 'partial' && <>
+                    <label style={styles.label}>Plages en secondes (ex. 3-7,8-9)</label>
+                    <input style={styles.input} type="text" value={motionSlow.ranges || ''} placeholder="3-7" onChange={(e) => updateSession('motion_slow', 'ranges', e.target.value)} />
+                  </>}
+                  <label style={styles.label}>Moteur</label>
+                  <select style={styles.select} value={motionSlow.engine} onChange={(e) => updateSession('motion_slow', 'engine', e.target.value)}>
+                    <option value="ffmpeg_minterpolate">FFmpeg — minterpolate</option>
+                    <option value="rife_ncnn" disabled>RIFE ncnn — futur moteur qualité (bientôt)</option>
+                  </select>
+                </>}
+                <div style={{ marginTop: '8px', padding: '8px', background: '#0f2a1a', borderRadius: '8px', fontSize: '12px', color: '#88ff88' }}>
+                  F00-C est optionnelle. Le mode Normal ne lance aucun traitement d’interpolation.
+                </div>
               </div>
             </div>
           )}

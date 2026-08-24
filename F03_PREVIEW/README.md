@@ -48,3 +48,11 @@ F03_PREVIEW et F03_PICTOR utilisent la même composition Remotion, le même code
 Le codex peut définir une composition `vertical` (1080×1920), `horizontal` (1920×1080) ou `square` (1080×1080). La vidéo peut être adaptée avec `fit: cover` ou `fit: contain`. Le background est optionnel et peut être désactivé ; dans le preset de test actuel, seul le contenu vidéo et le logo sont visibles.
 
 Les rotations sont définies dans `session.composition`. `rotation_mode: per_sequence` ajoute `rotation_step_deg` à chaque séquence ; `rotation_mode: continuous` interpole jusqu’à `rotation_total_deg` sur la durée. `rotation_layer` vaut `video` pour garder textes et logo droits, ou `composition` pour faire tourner l’ensemble des calques. Ces paramètres sont exportés dans le codex et réutilisés par PICTOR.
+
+## Motion Slow optionnel
+
+F03 peut charger automatiquement `public/motion_slow_manifest.json` lorsqu’il est présent. Ce manifeste est prioritaire sur `sequences.json` et permet de visualiser les séquences normales et les séquences interpolées produites par F00-C. En son absence, F03 revient automatiquement au manifeste normal de F00-B.
+
+Le panneau **Vidéo** expose les choix `Normal`, `Partiel` et `Global`, la vitesse 0,75×, 0,5× ou 0,25×, les plages en secondes et le moteur sélectionné. Ces réglages sont enregistrés dans le `codex.json` exporté ; ils ne lancent pas F00-C depuis le navigateur. Le traitement est déclenché séparément par le workflow GitHub Actions F00-C, uniquement à la demande de l’opérateur.
+
+Le mode Normal reste la référence. Une fois l’artifact F00-C produit, ses fichiers `sequences/*.mp4` peuvent être copiés dans `public/sequences/` avec `motion_slow_manifest.json` pour effectuer la revue visuelle dans F03 avant PICTOR.
