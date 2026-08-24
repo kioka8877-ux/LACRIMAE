@@ -1,0 +1,4 @@
+# Versions minimales de la MVP ; les poids et moteurs TensorRT sont gérés séparément.
+modal>=1.0,<2
+numpy==1.26.4
+opencv-python-headless==4.10.0.84

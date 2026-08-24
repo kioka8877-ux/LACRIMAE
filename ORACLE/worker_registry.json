@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "active_worker": "local_simulation",
+  "storage": {
+    "backend": "filesystem",
+    "root": "./.campaign_storage",
+    "production_backend": "s3"
+  },
+  "workers": {
+    "local_simulation": {
+      "provider": "local",
+      "enabled": true,
+      "stages": ["F00_INGEST", "F01_ANALYSIS", "F02_MOTUS", "F03_RESTAURA", "F04_UPSCALE", "F05_LUMEN", "F06_AUDIO", "F07_CUSTOS_VIDEO", "F08_CAMOUFLAGE", "F09_LUTHER"]
+    },
+    "modal_gpu_primary": {
+      "provider": "modal",
+      "workspace_env": "compute",
+      "function_prefix": "lacrimae_dev6",
+      "enabled": false,
+      "stages": ["F02_MOTUS", "F03_RESTAURA", "F04_UPSCALE", "F05_LUMEN"]
+    },
+    "modal_gpu_backup": {
+      "provider": "modal",
+      "workspace_env": "compute_backup",
+      "function_prefix": "lacrimae_dev6",
+      "enabled": false,
+      "stages": ["F02_MOTUS", "F03_RESTAURA", "F04_UPSCALE", "F05_LUMEN"]
+    }
+  }
+}
