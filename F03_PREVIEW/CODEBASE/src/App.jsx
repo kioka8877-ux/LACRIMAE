@@ -15,8 +15,21 @@ import { COMPOSITION_PRESETS, getCompositionConfig } from './preview/composition
  *  - Logo : taille (pas déplaçable — le pack impose le placement)
  *  - Textes : mode titre seul / titre+paragraphe (titre haut, paragraphe bas)
  *  - Presets : couleurs, 4K, netteté, grain, vignette, volume, coup brutal
- *  - Export codex.json validé (validated_by_magos: true)
+  *  - Export codex.json validé (validated_by_magos: true)
  */
+function buildFlashUnits(content, previous = []) {
+  const words = String(content || '').trim().split(/\s+/).filter(Boolean);
+  return words.map((word, index) => ({
+    id: previous[index]?.id || `word_${String(index + 1).padStart(3, '0')}`,
+    text: word,
+    start_frame: previous[index]?.start_frame ?? 0,
+    duration_frames: previous[index]?.duration_frames ?? 8,
+    impact: previous[index]?.impact ?? false,
+    rotation_deg: previous[index]?.rotation_deg ?? 0,
+    scale: previous[index]?.scale ?? 1,
+    blur_frames: previous[index]?.blur_frames ?? 0,
+  }));
+}
 
 export default function App() {
   const [codex, setCodex] = useState(null);        // codex complet (session + clips)
@@ -29,9 +42,26 @@ export default function App() {
   const [error, setError] = useState(null);
   const [validated, setValidated] = useState(false);
   const [activeTab, setActiveTab] = useState('text');
+  const [flashSelectedIndex, setFlashSelectedIndex] = useState(0);
   const [logoPending, setLogoPending] = useState(null); // {x_pct, y_pct} balise double-clic
   const playerRef = useRef(null);
   const lastClickRef = useRef({ t: 0, x: 0, y: 0 });
+
+  // En mode Flash Text, l’édition doit être immédiatement visible : pause et
+  // retour au début de l’unité sélectionnée pour régler son style sans attendre.
+  useEffect(() => {
+    if (!clip?.texts || clip.texts.mode !== 'dark_luxury_flash_text') return;
+    const units = clip.texts.units?.length
+      ? clip.texts.units
+      : buildFlashUnits(clip.texts.content || clip.texts.title || '', []);
+    if (!units.length || !playerRef.current) return;
+    const selected = units[Math.min(flashSelectedIndex, units.length - 1)];
+    const startFrame = units
+      .slice(0, Math.min(flashSelectedIndex, units.length - 1))
+      .reduce((sum, unit) => sum + Math.max(1, Number(unit.duration_frames) || 8), 0);
+    playerRef.current.pause();
+    playerRef.current.seekTo(selected?.start_frame > 0 ? selected.start_frame : startFrame);
+  }, [clip?.texts?.mode, clip?.texts?.content, clip?.texts?.units, flashSelectedIndex]);
 
   // Charger le codex.json (v4 : session + clips), la vidéo et les fonds
   useEffect(() => {
@@ -129,7 +159,21 @@ export default function App() {
     setSession(newSession);
   };
   const updateClip = (key, value) => setClip({ ...clip, [key]: value });
-  const updateTexts = (key, value) => setClip({ ...clip, texts: { ...(clip.texts || {}), [key]: value } });
+  const updateTexts = (key, value) => setClip((current) => ({
+    ...current,
+    texts: { ...(current?.texts || {}), [key]: value },
+  }));
+  const updateFlashUnits = (units) => updateTexts('units', units);
+  const updateFlashUnit = (index, patch) => setClip((currentClip) => {
+    const current = currentClip?.texts?.units || [];
+    return {
+      ...currentClip,
+      texts: {
+        ...(currentClip?.texts || {}),
+        units: current.map((unit, i) => i === index ? { ...unit, ...patch } : unit),
+      },
+    };
+  });
   const updateSessionTextsStyle = (key, value) =>
     updateSession('texts_style', key, value);
   const updatePreset = (key, value) => updateSession('presets', key, value);
@@ -501,51 +545,93 @@ export default function App() {
               <select
                 style={styles.select}
                 value={textMode}
-                onChange={(e) => updateTexts('mode', e.target.value)}
+                onChange={(e) => {
+                  const mode = e.target.value;
+                  if (mode === 'dark_luxury_flash_text') {
+                    const content = texts.content || texts.title || 'TO IS HIM';
+                    updateTexts('mode', mode);
+                    updateTexts('content', content);
+                    updateFlashUnits(buildFlashUnits(content, texts.units || []));
+                    setFlashSelectedIndex(0);
+                  } else {
+                    updateTexts('mode', mode);
+                  }
+                }}
               >
                 <option value="title">Titre seul</option>
                 <option value="title+paragraph">Titre + paragraphe</option>
+                <option value="dark_luxury_flash_text">Dark Luxury Flash Text</option>
                 <option value="none">Aucun texte</option>
               </select>
 
-              <label style={styles.label}>Titre (haut)</label>
-              <input
-                style={styles.input}
-                type="text"
-                value={texts.title || ''}
-                onChange={(e) => updateTexts('title', e.target.value)}
-              />
-              <label style={styles.label}>
-                Position titre (haut): {(texts.title_offset_pct ?? 8)}%
-              </label>
-              <input
-                style={styles.slider}
-                type="range"
-                min="2"
-                max="30"
-                value={texts.title_offset_pct ?? 8}
-                onChange={(e) => updateTexts('title_offset_pct', parseInt(e.target.value))}
-              />
-
-              {(textMode === 'title+paragraph') && (
+              {textMode === 'dark_luxury_flash_text' ? (
                 <>
-                  <label style={styles.label}>Paragraphe (bas, 4 lignes max)</label>
+                  <label style={styles.label}>Phrase Flash Text — affichage mot par mot</label>
                   <textarea
-                    style={{ ...styles.input, minHeight: '80px', resize: 'vertical', fontFamily: 'inherit' }}
-                    value={texts.paragraph || ''}
-                    onChange={(e) => updateTexts('paragraph', e.target.value)}
+                    style={{ ...styles.input, minHeight: '70px', resize: 'vertical', fontFamily: 'inherit' }}
+                    value={texts.content || ''}
+                    placeholder="TO IS HIM"
+                    onChange={(e) => {
+                      const content = e.target.value;
+                      updateTexts('content', content);
+                      updateFlashUnits(buildFlashUnits(content, texts.units || []));
+                      setFlashSelectedIndex(0);
+                    }}
                   />
-                  <label style={styles.label}>
-                    Position paragraphe (bas): {(texts.paragraph_offset_pct ?? 8)}%
-                  </label>
-                  <input
-                    style={styles.slider}
-                    type="range"
-                    min="2"
-                    max="30"
-                    value={texts.paragraph_offset_pct ?? 8}
-                    onChange={(e) => updateTexts('paragraph_offset_pct', parseInt(e.target.value))}
-                  />
+                  <div style={{ margin: '8px 0', color: '#aaa', fontSize: '12px' }}>
+                    Un seul mot à l’écran. Double-cliquez sur un mot pour le passer en rouge.
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
+                    {(texts.units || buildFlashUnits(texts.content || texts.title || '', [])).map((unit, index) => (
+                      <button
+                        key={unit.id || index}
+                        type="button"
+                        onClick={() => setFlashSelectedIndex(index)}
+                        onDoubleClick={() => updateFlashUnit(index, { impact: !unit.impact })}
+                        style={{
+                          ...styles.button,
+                          padding: '7px 9px',
+                          color: unit.impact ? '#FF0000' : '#FFFFFF',
+                          border: index === flashSelectedIndex ? '1px solid #00ff88' : '1px solid #444',
+                        }}
+                      >
+                        {String(unit.text || '').toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                  {(() => {
+                    const units = texts.units || buildFlashUnits(texts.content || texts.title || '', []);
+                    const unit = units[flashSelectedIndex] || units[0];
+                    if (!unit) return null;
+                    return (
+                      <div style={{ padding: '10px', background: '#17100f', border: '1px solid #6b2424', borderRadius: '8px' }}>
+                        <label style={styles.label}>Mot sélectionné : {String(unit.text).toUpperCase()}</label>
+                        <label style={styles.label}>Durée : {unit.duration_frames ?? 8} frames</label>
+                        <input style={styles.slider} type="range" min="1" max="120" value={unit.duration_frames ?? 8} onChange={(e) => updateFlashUnit(flashSelectedIndex, { duration_frames: parseInt(e.target.value, 10) })} />
+                        <label style={styles.label}>Rotation : {unit.rotation_deg ?? 0}°</label>
+                        <input style={styles.slider} type="range" min="-180" max="180" value={unit.rotation_deg ?? 0} onChange={(e) => updateFlashUnit(flashSelectedIndex, { rotation_deg: parseInt(e.target.value, 10) })} />
+                        <label style={styles.label}>Scale : {(unit.scale ?? 1).toFixed(1)}×</label>
+                        <input style={styles.slider} type="range" min="1" max="10" step="0.1" value={unit.scale ?? 1} onChange={(e) => updateFlashUnit(flashSelectedIndex, { scale: parseFloat(e.target.value) })} />
+                        <label style={styles.label}>Flou à l’apparition : {unit.blur_frames ?? 0} frames</label>
+                        <input style={styles.slider} type="range" min="0" max="3" value={unit.blur_frames ?? 0} onChange={(e) => updateFlashUnit(flashSelectedIndex, { blur_frames: parseInt(e.target.value, 10) })} />
+                      </div>
+                    );
+                  })()}
+                </>
+              ) : (
+                <>
+                  <label style={styles.label}>Titre (haut)</label>
+                  <input style={styles.input} type="text" value={texts.title || ''} onChange={(e) => updateTexts('title', e.target.value)} />
+                  <label style={styles.label}>Position titre (haut): {(texts.title_offset_pct ?? 8)}%</label>
+                  <input style={styles.slider} type="range" min="2" max="30" value={texts.title_offset_pct ?? 8} onChange={(e) => updateTexts('title_offset_pct', parseInt(e.target.value))} />
+                  {(textMode === 'title+paragraph') && (
+                    <>
+                      <label style={styles.label}>Paragraphe (bas, 4 lignes max)</label>
+                      <textarea style={{ ...styles.input, minHeight: '80px', resize: 'vertical', fontFamily: 'inherit' }} value={texts.paragraph || ''} onChange={(e) => updateTexts('paragraph', e.target.value)} />
+                      <label style={styles.label}>Position paragraphe (bas): {(texts.paragraph_offset_pct ?? 8)}%</label>
+                      <input style={styles.slider} type="range" min="2" max="30" value={texts.paragraph_offset_pct ?? 8} onChange={(e) => updateTexts('paragraph_offset_pct', parseInt(e.target.value))} />
+                    </>
+                  )}
                 </>
               )}
 

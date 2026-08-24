@@ -14,6 +14,7 @@ import { normalizeSequences } from './virtualSequences';
 import { getCompositionConfig, rotationForSequence } from './compositionConfig';
 import { darkLuxuryNoirFilter, darkLuxuryNoirOverlayStyle } from './darkLuxuryNoir';
 import { sciFiNeonHdrFilter, sciFiNeonHdrOverlayStyle } from './sciFiNeonHdr';
+import { activeFlashTextUnit, flashTextStyle } from './flashText';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * OmniComposition (F03 PREVIEW) â€” mÃªmes 6 calques que F04 RENDER :
@@ -227,8 +228,10 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
           </AbsoluteFill>
         )}
 
-        {/* L3 TITRE */}
-        {(textMode === 'title' || textMode === 'title+paragraph') && texts.title ? (
+        {/* L3 TITRE / DARK LUXURY FLASH TEXT */}
+        {textMode === 'dark_luxury_flash_text' ? (
+          <FlashTextBlock texts={texts} style={textsStyle} frame={frame} />
+        ) : (textMode === 'title' || textMode === 'title+paragraph') && texts.title ? (
           <TitleBlock
             content={texts.title}
             style={textsStyle}
@@ -321,6 +324,12 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
 };
 
 /* â”€â”€ L3 TITRE â”€â”€ */
+const FlashTextBlock = ({ texts, style, frame }) => {
+  const unit = activeFlashTextUnit(texts, frame);
+  if (!unit) return null;
+  return <div style={flashTextStyle(unit, frame, style)}>{unit.text}</div>;
+};
+
 const TitleBlock = ({ content, style, box, offsetPct }) => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: 'clamp' });
