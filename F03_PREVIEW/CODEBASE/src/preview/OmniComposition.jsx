@@ -13,6 +13,7 @@ import {
 import { normalizeSequences } from './virtualSequences';
 import { getCompositionConfig, rotationForSequence } from './compositionConfig';
 import { darkLuxuryNoirFilter, darkLuxuryNoirOverlayStyle } from './darkLuxuryNoir';
+import { sciFiNeonHdrFilter, sciFiNeonHdrOverlayStyle } from './sciFiNeonHdr';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * OmniComposition (F03 PREVIEW) â€” mÃªmes 6 calques que F04 RENDER :
@@ -115,7 +116,11 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
   const darkLuxuryFilter = darkLuxuryNoir.enabled
     ? darkLuxuryNoirFilter(darkLuxuryNoir.intensity)
     : '';
-  const fullFilter = (brightnessFilter + enhanceFilter + sharpFilter + ` ${darkLuxuryFilter}`).trim();
+  const sciFiNeonHdr = presets.scifi_neon_hdr || {};
+  const sciFiFilter = sciFiNeonHdr.enabled
+    ? sciFiNeonHdrFilter(sciFiNeonHdr.intensity)
+    : '';
+  const fullFilter = (brightnessFilter + enhanceFilter + sharpFilter + ` ${darkLuxuryFilter} ${sciFiFilter}`).trim();
 
   const slowmoStart = clip.slowmo_start_frame || 0;
   const slowmoSpeed = clip.slowmo_speed || 1.0;
@@ -291,6 +296,11 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
       {/* Dark Luxury Noir : halo champagne et accents chauds au-dessus de l’image */}
       {darkLuxuryNoir.enabled && (
         <AbsoluteFill style={darkLuxuryNoirOverlayStyle(darkLuxuryNoir.intensity)} />
+      )}
+
+      {/* Sci-Fi Neon HDR : accents cyan, vert néon et rouge/orange */}
+      {sciFiNeonHdr.enabled && (
+        <AbsoluteFill style={sciFiNeonHdrOverlayStyle(sciFiNeonHdr.intensity)} />
       )}
 
       {/* Finitions : grain + vignette au-dessus de tout */}
