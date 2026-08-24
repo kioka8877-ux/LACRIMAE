@@ -2,10 +2,12 @@ import React from 'react';
 import { AbsoluteFill, Img, OffthreadVideo, staticFile, useCurrentFrame, useVideoConfig, interpolate } from 'remotion';
 import { codex as codexData } from '../codexData';
 
-const resolveAsset = (value) => {
+const resolveAsset = (value, kind = 'generic') => {
   if (!value) return '';
   if (/^(https?:|data:|blob:|file:)/i.test(String(value))) return value;
-  return staticFile(String(value).replace(/^\.?\//, '').replace(/^public\//, ''));
+  const normalized = String(value).replace(/^\.?\//, '').replace(/^public\//, '');
+  const assetPath = kind === 'meme' && !normalized.includes('/') ? `memes/${normalized}` : normalized;
+  return staticFile(assetPath);
 };
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const appear = (frame, start, duration = 10) => {
@@ -38,7 +40,8 @@ export const MemeV2Composition = ({ codex: codexProp, session: sessionProp, vide
   const reactionPersona = clip.reaction_tweet_persona || clip.reaction?.persona || {};
   const emotion = clip.text_emotion || clip.texts?.emotion || '';
   const screenshotSrc = resolveAsset(source.screenshot_png);
-  const memeSrc = resolveAsset(clip.meme?.source || videoSrc || clip.video?.source);
+  const memeSource = clip.meme?.source || videoSrc || clip.video?.source;
+  const memeSrc = resolveAsset(memeSource, 'meme');
   const videoFrames = clip.meme?.total_frames || clip.video?.total_frames || durationInFrames;
   const timeline = clip.meme_v2?.timeline || {};
   const starts = { reaction: Math.round(durationInFrames * ((timeline.reaction_start_pct ?? 0) / 100)), source: Math.round(durationInFrames * ((timeline.source_start_pct ?? 15) / 100)), emotion: Math.round(durationInFrames * ((timeline.emotion_start_pct ?? 33) / 100)), clip: Math.round(durationInFrames * ((timeline.clip_start_pct ?? 41) / 100)) };
