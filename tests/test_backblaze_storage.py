@@ -5,37 +5,47 @@ import hashlib
 import os
 import tempfile
 from pathlib import Path
+from urllib.parse import quote
 
-import boto3
-from botocore.config import Config
+import requests
+from botocore.awsrequest import AWSRequest
+from botocore.auth import SigV4Auth
+from botocore.credentials import Credentials
 
-endpoint = os.environ["STORAGE_S3_ENDPOINT"]
+endpoint = os.environ["STORAGE_S3_ENDPOINT"].rstrip("/")
 region = os.environ.get("STORAGE_S3_REGION", "us-east-005")
 bucket = os.environ["STORAGE_S3_BUCKET"]
-client = boto3.client(
-    "s3",
-    endpoint_url=endpoint,
-    region_name=region,
-    aws_access_key_id=os.environ["STORAGE_S3_ACCESS_KEY_ID"],
-    aws_secret_access_key=os.environ["STORAGE_S3_SECRET_ACCESS_KEY"],
-    config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
-)
-
+access_key = os.environ["STORAGE_S3_ACCESS_KEY_ID"]
+secret_key = os.environ["STORAGE_S3_SECRET_ACCESS_KEY"]
 key = "campaigns/storage_test/dev6_probe.txt"
 payload = b"LACRIMAE dev6 Backblaze storage probe\n"
 expected = hashlib.sha256(payload).hexdigest()
 
+
+def signed_request(method: str, object_key: str, body: bytes | None = None) -> requests.Response:
+    url = f"{endpoint}/{quote(bucket, safe='')}/{quote(object_key, safe='/')}"
+    request = AWSRequest(method=method, url=url, data=body, headers={"Host": url.split('/')[2]})
+    SigV4Auth(Credentials(access_key, secret_key), "s3", region).add_auth(request)
+    prepared = requests.Request(method, url, data=body, headers=dict(request.headers)).prepare()
+    return requests.Session().send(prepared, timeout=30)
+
+
 with tempfile.TemporaryDirectory() as temp:
-    local = Path(temp) / "probe.txt"
     downloaded = Path(temp) / "downloaded.txt"
-    local.write_bytes(payload)
-    client.upload_file(str(local), bucket, key)
+    put = signed_request("PUT", key, payload)
+    if put.status_code not in (200, 201):
+        raise RuntimeError(f"upload failed: HTTP {put.status_code} {put.text[:300]}")
     try:
-        client.download_file(bucket, key, str(downloaded))
+        get = signed_request("GET", key)
+        if get.status_code != 200:
+            raise RuntimeError(f"download failed: HTTP {get.status_code} {get.text[:300]}")
+        downloaded.write_bytes(get.content)
         actual = hashlib.sha256(downloaded.read_bytes()).hexdigest()
         if actual != expected:
             raise RuntimeError("hash mismatch on downloaded probe")
         print(f"BACKBLAZE_STORAGE_TEST=OK bucket={bucket} key={key} sha256={actual}")
     finally:
-        client.delete_object(Bucket=bucket, Key=key)
+        delete = signed_request("DELETE", key)
+        if delete.status_code not in (200, 204):
+            raise RuntimeError(f"cleanup failed: HTTP {delete.status_code} {delete.text[:300]}")
         print("BACKBLAZE_STORAGE_TEST_CLEANUP=OK")
