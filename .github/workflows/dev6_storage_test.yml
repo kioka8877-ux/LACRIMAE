@@ -2,6 +2,8 @@ name: LACRIMAE dev6 — Backblaze storage test
 
 on:
   workflow_dispatch:
+  repository_dispatch:
+    types: [dev6-storage-test]
 
 permissions:
   contents: read
