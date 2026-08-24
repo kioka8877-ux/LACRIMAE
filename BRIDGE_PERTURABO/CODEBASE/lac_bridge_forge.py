@@ -60,6 +60,7 @@ import random
 import shutil
 import subprocess
 import sys
+import tempfile
 import urllib.request
 from pathlib import Path
 
@@ -382,6 +383,38 @@ def is_meme_pack(pack: dict) -> bool:
     return pack.get("sub_mode") == "meme" and not is_meme_v2_pack(pack)
 
 
+def ensure_release_meme_asset(meme_ref: str) -> str | None:
+    """Résout un tag de Release (ex. M7/m7) en asset MP4 local normalisé."""
+    if not meme_ref:
+        return None
+    meme_name = meme_ref if str(meme_ref).lower().endswith('.mp4') else f"{meme_ref}.mp4"
+    target = MEMES_DIR / meme_name
+    if target.exists():
+        return meme_name
+    ref = Path(str(meme_ref)).stem
+    if not ref.lower().startswith('m') or not ref[1:].isdigit():
+        return None
+    repo = os.environ.get('GITHUB_REPOSITORY', 'kioka8877-ux/LACRIMAE')
+    with tempfile.TemporaryDirectory(prefix='lacrimae-release-') as tmp:
+        try:
+            subprocess.run([
+                'gh', 'release', 'download', ref.lower(), '--repo', repo,
+                '--pattern', '*.mp4', '--dir', tmp, '--clobber',
+            ], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        except (FileNotFoundError, subprocess.CalledProcessError) as exc:
+            detail = getattr(exc, 'stderr', '') or str(exc)
+            print(f"  [!] Release {ref.lower()} non résolue : {detail.strip()}")
+            return None
+        assets = sorted(Path(tmp).glob('*.mp4'))
+        if len(assets) != 1:
+            print(f"  [!] Release {ref.lower()} : {len(assets)} asset(s) MP4 trouvé(s), attendu 1")
+            return None
+        MEMES_DIR.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(assets[0], target)
+        print(f"  [✓] Tag Release {ref} → {target.name} ({assets[0].name})")
+    return meme_name
+
+
 def validate_meme_v2_pack(pack: dict) -> list:
     """Validation stricte du contrat MEME V2 : PERTURABO fournit tout l’éditorial."""
     errors = []
@@ -403,9 +436,10 @@ def validate_meme_v2_pack(pack: dict) -> list:
         if not meme:
             errors.append(f"video {angle} : meme manquant")
         else:
-            meme_name = meme if meme.endswith(".mp4") else f"{meme}.mp4"
-            if not (MEMES_DIR / meme_name).exists():
-                errors.append(f"video {angle} : meme '{meme_name}' ABSENT de la méméthèque {MEMES_DIR}/")
+            meme_name = ensure_release_meme_asset(str(meme))
+            if not meme_name or not (MEMES_DIR / meme_name).exists():
+                expected = meme if str(meme).endswith(".mp4") else f"{meme}.mp4"
+                errors.append(f"video {angle} : meme '{expected}' absent et tag Release non résolu")
         dur = v.get("duration_sec")
         if dur is not None:
             try:
@@ -536,6 +570,16 @@ def transit_meme_v2_sources(pack: dict, pack_dir: Path) -> dict:
         src = Path(src_ref)
         candidates = [src if src.is_absolute() else pack_dir / src, Path(src_ref)]
         found = next((c for c in candidates if c.exists()), None)
+        if not found and "MONDES_FORGES/CLIPPING/EXPORT/" in str(src_ref):
+            relative = str(src_ref).split("MONDES_FORGES/CLIPPING/EXPORT/", 1)[1].lstrip("/")
+            url = "https://raw.githubusercontent.com/kioka8877-ux/PERTURABO/main/MONDES_FORGES/CLIPPING/EXPORT/" + relative
+            with tempfile.NamedTemporaryFile(prefix="source-post-", suffix=Path(relative).suffix or ".png", delete=False) as tmp:
+                try:
+                    urllib.request.urlretrieve(url, tmp.name)
+                    found = Path(tmp.name)
+                    print(f"  [✓] Capture PERTURABO téléchargée : {Path(relative).name}")
+                except Exception as exc:
+                    print(f"  [!] Capture PERTURABO non résolue : {url} ({exc})")
         if not found:
             continue
         filename = f"source_{len(sources)+1:03d}{found.suffix.lower() or '.png'}"

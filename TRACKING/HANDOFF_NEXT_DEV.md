@@ -10,7 +10,7 @@ La timeline par défaut est `0 %`, `15 %`, `33 %` et `41 %`. Le bridge exige `re
 
 Le renderer F04 est `F04_RENDER/CODEBASE/src/components/MemeV2Composition.jsx`; le preview est `F03_PREVIEW/CODEBASE/src/preview/MemeV2Composition.jsx`. Le routage est activé par `sub_mode: "meme_v2"` et laisse MEME V1 inchangé. Les validations sont couvertes par `LAC_CUSTOS.py`, `tools/validate_f04_codex.py` et `tools/test_meme_v2_contract.py`.
 
-**Vérifications déjà passées :** `py_compile`, test de contrat MEME V2, préflight F04, build Vite F03 et bundle statique F04. Aucun commit ni workflow ne doit être considéré comme une validation Champion ; la prochaine étape est de contrôler un vrai pack V2 dans la preview, puis seulement d’autoriser F04 Matrix.
+**Vérifications déjà passées :** `py_compile`, test de contrat MEME V2, préflight F04, build Vite F03 et bundle statique F04. Le test Oracle réel du pack `production_pack_meme_wayvee_phone_bounce.json` a récupéré 5 angles, résolu le tag Release `M7` vers `M7.mp4` et transité la capture source vers F03/F04. La gate Champion est maintenant ouverte pour contrôler la preview ; aucun workflow F02/F03/F04 n’a été lancé.
 
 ---
 

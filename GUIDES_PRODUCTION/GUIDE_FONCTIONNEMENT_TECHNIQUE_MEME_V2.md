@@ -33,7 +33,7 @@ Le test `tools/test_meme_v2_contract.py` vérifie la présence des champs et l�
 
 ## 5. Risques connus et garde-fous
 
-Les chemins de capture relatifs sont résolus depuis le dossier du pack ; les chemins déjà transités utilisent `source_posts/`. Les URLs distantes sont conservées comme références, mais ne sont pas téléchargées automatiquement par LACRIMAE. Toute absence de capture locale doit donc être traitée par l’éditeur du pack avant la production.
+Les chemins de capture relatifs sont résolus depuis le dossier du pack ; les chemins PERTURABO sous `MONDES_FORGES/CLIPPING/EXPORT/` sont téléchargés vers `public/source_posts/` par le bridge. Les memes référencés par un tag de Release, par exemple `M7`, sont résolus via la Release GitHub correspondante puis normalisés en `SHARED/memes/M7.mp4`. Une Release doit fournir exactement un asset MP4 pour éviter toute ambiguïté.
 
 Le mode V1 reste routé vers `MemeComposition`. Aucun changement de style ou de comportement V1 ne doit être déduit d’un patch V2. Le renderer ne doit pas ajouter de texte de substitution dans un codex validé ; les libellés d’erreur visibles servent uniquement à rendre l’absence diagnostiquable pendant le développement.
 
