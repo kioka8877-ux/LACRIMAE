@@ -197,7 +197,7 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
 
         {/* L2 VIDEO : source horizontale, recadrage et séquences virtuelles */}
         {hybridState?.isIntro && hybridIntroUrl && (
-          <AbsoluteFill style={{ overflow: 'hidden', zIndex: 2 }}>
+          <AbsoluteFill style={{ overflow: 'hidden', zIndex: 1 }}>
             <Video
               src={hybridIntroUrl}
               muted
@@ -263,10 +263,10 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
           />
         ) : null}
         {hybridState?.isIntroText && (
-          <div style={hybridTextStyle(hybridState.hybrid.intro_text, frame)}>{hybridState.hybrid.intro_text.text}</div>
+          <div style={{ ...hybridTextStyle(hybridState.hybrid.intro_text, frame), zIndex: 100 }}>{hybridState.hybrid.intro_text.text}</div>
         )}
         {hybridState?.isEgo && (
-          <div style={hybridEgoStyle(hybridManifest, frame, session)}>{hybridState.hybrid.ego.text}</div>
+          <div style={{ ...hybridEgoStyle(hybridManifest, frame, session), zIndex: 101 }}>{hybridState.hybrid.ego.text}</div>
         )}
 
         {/* L4 PARAGRAPHE */}
