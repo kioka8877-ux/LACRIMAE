@@ -66,24 +66,6 @@ export default function App() {
     playerRef.current.seekTo(selected?.start_frame > 0 ? selected.start_frame : startFrame);
   }, [clip?.texts?.mode, clip?.texts?.content, clip?.texts?.units, flashSelectedIndex]);
 
-  // En Mode 2, toute modification EGO doit être visible immédiatement dans le Player.
-  // On revient à la frame de début d’EGO pour éviter d’éditer un calque hors champ.
-  useEffect(() => {
-    if (session?.review_mode !== 'hybrid_narrative' || !playerRef.current) return;
-    playerRef.current.pause();
-    playerRef.current.seekTo(Math.max(0, Number(session.hybrid?.ego?.start_frame) || 0));
-  }, [
-    session?.review_mode,
-    session?.hybrid?.ego?.text,
-    session?.hybrid?.ego?.duration_mode,
-    session?.hybrid?.ego?.scale,
-    session?.hybrid?.ego?.rotation_deg,
-    session?.hybrid?.ego?.color,
-    session?.hybrid?.ego?.font_family,
-    session?.hybrid?.ego?.position_x,
-    session?.hybrid?.ego?.position_y,
-  ]);
-
   // Charger le codex.json (v4 : session + clips), la vidéo et les fonds
   useEffect(() => {
     async function loadAssets() {
