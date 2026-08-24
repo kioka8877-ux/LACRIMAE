@@ -59,7 +59,12 @@
         "intensity": 39
       }
     },
-    "profile": "background"
+    "profile": "background",
+    "review_mode": "hybrid_narrative",
+    "hybrid": {
+      "intro": {},
+      "ego": {}
+    }
   },
   "validated_by_magos": true,
   "clips": [

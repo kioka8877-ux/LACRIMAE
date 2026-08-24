@@ -1,11 +1,33 @@
 export function normalizeHybridManifest(manifest, session = {}) {
-  const source = manifest || session.hybrid || {};
-  const intro = source.intro || {};
-  const ego = source.ego || {};
+  const base = manifest || {};
+  const overrides = session.hybrid || {};
+  const source = {
+    ...base,
+    ...overrides,
+    intro: { ...(base.intro || {}), ...(overrides.intro || {}) },
+    ego: { ...(base.ego || {}), ...(overrides.ego || {}) },
+    transition: { ...(base.transition || {}), ...(overrides.transition || {}) },
+    match_cut: { ...(base.match_cut || {}), ...(overrides.match_cut || {}) },
+  };
   const fps = Number(source.fps || 30);
-  const introFrames = Math.max(0, Number(intro.duration_frames) || Math.round(Number(intro.duration_seconds || 0) * fps));
-  const matchCutFrames = Math.max(0, Number(source.match_cut?.total_frames || source.match_cut_total_frames || 0));
-  const totalFrames = Math.max(introFrames + matchCutFrames, Number(source.total_frames) || 0);
+  const intro = source.intro || {};
+  const introFrames = Math.max(
+    0,
+    Number(intro.duration_frames) || Math.round(Number(intro.duration_seconds || 0) * fps),
+  );
+  const declaredTotalFrames = Number(source.total_frames) || 0;
+  const declaredMatchCutFrames = Number(source.match_cut?.total_frames || source.match_cut_total_frames || 0);
+  const matchCutFrames = Math.max(0, declaredMatchCutFrames || declaredTotalFrames - introFrames);
+  const totalFrames = Math.max(introFrames + matchCutFrames, declaredTotalFrames);
+  const ego = source.ego || {};
+  const durationMode = ego.duration_mode || 'until_match_cut';
+  const requestedDuration = Number(ego.duration_frames) || 0;
+  const durationFrames = durationMode === 'until_end'
+    ? Math.max(1, totalFrames - Number(ego.start_frame || 0))
+    : durationMode === 'custom'
+      ? Math.max(1, requestedDuration)
+      : Math.max(1, introFrames - Number(ego.start_frame || 0));
+
   return {
     ...source,
     mode: source.mode || 'hybrid_narrative',
@@ -13,9 +35,9 @@ export function normalizeHybridManifest(manifest, session = {}) {
     intro: { ...intro, duration_frames: introFrames },
     ego: {
       text: String(ego.text || 'EGO').toUpperCase(),
-      duration_mode: ego.duration_mode || 'until_match_cut',
-      start_frame: Number(ego.start_frame || 0),
-      duration_frames: Number(ego.duration_frames || introFrames),
+      duration_mode: durationMode,
+      start_frame: Math.max(0, Number(ego.start_frame) || 0),
+      duration_frames: durationFrames,
       font_family: ego.font_family || 'Impact',
       color: ego.color || '#FFFFFF',
       scale: Math.max(1, Math.min(10, Number(ego.scale) || 2)),
@@ -24,13 +46,14 @@ export function normalizeHybridManifest(manifest, session = {}) {
       position_y: Number(ego.position_y ?? 50),
       blur_frames: Math.max(0, Math.min(3, Number(ego.blur_frames) || 0)),
     },
-    transition: { type: 'hard_cut', ...(source.transition || {}), match_cut_start_frame: introFrames },
+    transition: { type: 'hard_cut', ...source.transition, match_cut_start_frame: introFrames },
+    match_cut: { ...source.match_cut, total_frames: matchCutFrames },
     total_frames: totalFrames,
   };
 }
 
-export function hybridTimelineFrame(manifest, frame) {
-  const hybrid = normalizeHybridManifest(manifest);
+export function hybridTimelineFrame(manifest, frame, session = {}) {
+  const hybrid = normalizeHybridManifest(manifest, session);
   const introFrames = hybrid.intro.duration_frames;
   const matchCutFrame = frame - introFrames;
   return {
@@ -41,8 +64,8 @@ export function hybridTimelineFrame(manifest, frame) {
   };
 }
 
-export function hybridEgoStyle(manifest, frame) {
-  const { hybrid, isEgo } = hybridTimelineFrame(manifest, frame);
+export function hybridEgoStyle(manifest, frame, session = {}) {
+  const { hybrid, isEgo } = hybridTimelineFrame(manifest, frame, session);
   if (!isEgo) return null;
   const localFrame = frame - hybrid.ego.start_frame;
   const blur = localFrame < hybrid.ego.blur_frames ? (hybrid.ego.blur_frames - localFrame) * 1.5 : 0;

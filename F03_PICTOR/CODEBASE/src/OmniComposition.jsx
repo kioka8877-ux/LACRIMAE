@@ -123,6 +123,9 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
     ? sciFiNeonHdrFilter(sciFiNeonHdr.intensity)
     : '';
   const fullFilter = (brightnessFilter + enhanceFilter + sharpFilter + ` ${darkLuxuryFilter} ${sciFiFilter}`).trim();
+  const hybridState = hybridManifest ? hybridTimelineFrame(hybridManifest, frame, session) : null;
+  const matchCutEffectsActive = !hybridState || !hybridState.isIntro;
+  const activeSceneFilter = matchCutEffectsActive ? fullFilter : '';
 
   const slowmoStart = clip.slowmo_start_frame || 0;
   const slowmoSpeed = clip.slowmo_speed || 1.0;
@@ -154,7 +157,6 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
   const virtualSequences = normalizeSequences(sequences || clip.sequences_manifest || clip.sequences);
   const texts = clip.texts || {};
   const textMode = texts.mode || (texts.title ? 'title' : 'none');
-  const hybridState = hybridManifest?.mode === 'hybrid_narrative' ? hybridTimelineFrame(hybridManifest, frame) : null;
   const hybridIntroUrl = hybridIntroSrc || (hybridManifest?.intro?.file ? staticFile(hybridManifest.intro.file.replace(/^\.\//, '')) : null);
 
   return (
@@ -166,7 +168,7 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
 
       {/* CALQUE 6 wrapper : presets globaux sur toute la scÃ¨ne */}
       <AbsoluteFill style={{
-        filter: fullFilter || undefined,
+        filter: activeSceneFilter || undefined,
         transform: sceneRotation ? `rotate(${sceneRotation}deg)` : undefined,
         transformOrigin: 'center center',
         overflow: 'hidden',
@@ -249,7 +251,7 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
           />
         ) : null}
         {hybridState?.isEgo && (
-          <div style={hybridEgoStyle(hybridManifest, frame)}>{hybridManifest.ego.text}</div>
+          <div style={hybridEgoStyle(hybridManifest, frame, session)}>{hybridState.hybrid.ego.text}</div>
         )}
 
         {/* L4 PARAGRAPHE */}
@@ -302,17 +304,17 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
       </AbsoluteFill>
 
       {/* Dark Luxury Noir : halo champagne et accents chauds au-dessus de l’image */}
-      {darkLuxuryNoir.enabled && (
+      {matchCutEffectsActive && darkLuxuryNoir.enabled && (
         <AbsoluteFill style={darkLuxuryNoirOverlayStyle(darkLuxuryNoir.intensity)} />
       )}
 
       {/* Sci-Fi Neon HDR : accents cyan, vert néon et rouge/orange */}
-      {sciFiNeonHdr.enabled && (
+      {matchCutEffectsActive && sciFiNeonHdr.enabled && (
         <AbsoluteFill style={sciFiNeonHdrOverlayStyle(sciFiNeonHdr.intensity)} />
       )}
 
       {/* Finitions : grain + vignette au-dessus de tout */}
-      {(presets.grain_intensity || 0) > 0 && (
+      {matchCutEffectsActive && (presets.grain_intensity || 0) > 0 && (
         <AbsoluteFill style={{ opacity: presets.grain_intensity, pointerEvents: 'none', mixBlendMode: 'overlay' }}>
           <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
             <filter id="grainFilter">
@@ -323,7 +325,7 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
           </svg>
         </AbsoluteFill>
       )}
-      {(presets.vignette || 0) > 0 && (
+      {matchCutEffectsActive && (presets.vignette || 0) > 0 && (
         <AbsoluteFill
           style={{
             background: `radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,${presets.vignette}) 100%)`,
