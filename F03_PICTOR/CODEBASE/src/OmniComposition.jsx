@@ -214,13 +214,17 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
           const sequenceRotation = sequence.rotationDeg ?? rotationForSequence(composition, sequenceIndex, frame, fps, durationInFrames);
           const introOffset = hybridState ? hybridState.hybrid.intro.duration_frames : 0;
           const fit = sequence.fit || composition.fit || 'cover';
+          const sequenceUrl = sequence.file
+            ? staticFile(sequence.file.replace(/^\.\//, ''))
+            : videoUrl;
+          const sequenceStartFrom = sequence.file ? 0 : sequence.sourceStartFrame;
           const transform = `${zoomTransform} translate(${shakeX}px, ${shakeY}px) translateY(${session.video?.offset_y || 0}%) rotate(${sequenceRotation}deg)`;
           return (
             <Sequence key={sequence.id} from={sequence.timelineStartFrame + introOffset} durationInFrames={sequence.durationFrames}>
               <AbsoluteFill style={{ overflow: 'hidden' }}>
                 <Video
-                  src={videoUrl}
-                  startFrom={sequence.sourceStartFrame}
+                  src={sequenceUrl}
+                  startFrom={sequenceStartFrom}
                   muted
                   style={{ width: '100%', height: '100%', objectFit: fit, transform, transformOrigin: 'center center', opacity: hybridState?.isIntro ? 0 : 1 }}
                   playbackRate={playbackRate}
