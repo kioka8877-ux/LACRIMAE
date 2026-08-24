@@ -1,14 +1,16 @@
 {
   "version": "1.0.0",
-  "active_worker": "local_simulation",
+  "active_worker": "modal_gpu_primary",
   "storage": {
-    "backend": "s3",
+    "backend": "modal_volume",
     "root": "./.campaign_storage",
-    "production_backend": "s3",
-    "provider": "backblaze",
-    "endpoint": "https://s3.us-east-005.backblazeb2.com",
-    "region": "us-east-005",
-    "bucket": "lacrimae-video-dev"
+    "production_backend": "modal_volume",
+    "provider": "modal",
+    "endpoint": "",
+    "region": "",
+    "bucket": "",
+    "volume": "lacrimae-dev6-video",
+    "model_volume": "lacrimae-dev6-models"
   },
   "workers": {
     "local_simulation": {
@@ -18,9 +20,9 @@
     },
     "modal_gpu_primary": {
       "provider": "modal",
-      "workspace_env": "compute",
+      "workspace_env": "main",
       "function_prefix": "lacrimae_dev6",
-      "enabled": false,
+      "enabled": true,
       "stages": ["F02_MOTUS", "F03_RESTAURA", "F04_UPSCALE", "F05_LUMEN"]
     },
     "modal_gpu_backup": {
