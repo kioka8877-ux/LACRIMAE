@@ -54,3 +54,18 @@ Les vidéos doivent être placées dans un stockage indépendant. Les poids des 
 ## Test réel
 
 Le test en conditions réelles commencera par une courte séquence de 5 à 10 secondes. Il faudra fournir une vidéo source autorisée, configurer le stockage objet, préparer les poids des modèles et choisir le worker Modal actif. Le test sera ensuite chronométré et contrôlé avant d’être étendu à 30 secondes.
+
+## Backend Backblaze B2
+
+Le backend S3-compatible est disponible dans `SHARED/s3_storage_adapter.py`. Il est configuré uniquement par variables d’environnement ; les clés ne doivent jamais être ajoutées au dépôt.
+
+```bash
+export STORAGE_BACKEND=s3
+export STORAGE_S3_ENDPOINT=https://s3.us-east-005.backblazeb2.com
+export STORAGE_S3_REGION=us-east-005
+export STORAGE_S3_BUCKET='NOM_EXACT_DU_BUCKET'
+export STORAGE_S3_ACCESS_KEY_ID='KEY_ID'
+export STORAGE_S3_SECRET_ACCESS_KEY='APPLICATION_KEY'
+```
+
+Le fichier `SHARED/storage.env.example` sert de modèle. Le premier test doit utiliser un petit fichier dans `campaigns/storage_test/`, puis vérifier upload, existence, hash, téléchargement et URL temporaire.
