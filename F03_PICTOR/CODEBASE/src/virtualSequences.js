@@ -10,6 +10,7 @@ export function normalizeSequences(manifest) {
       rotationDeg: row.rotation_deg == null ? null : Number(row.rotation_deg),
       fit: row.fit || null,
       rotationLayer: row.rotation_layer || row.layer || null,
+      file: row.file || row.path || null,
       muted: row.muted !== false,
     }))
     .filter((row) => Number.isFinite(row.sourceStartFrame) && Number.isFinite(row.timelineStartFrame));

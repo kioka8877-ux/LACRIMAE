@@ -48,7 +48,7 @@ jobs:
           test -d F03_PREVIEW/CODEBASE/public/match_cut
           cp "$CODEX_PATH" F03_PICTOR/CODEBASE/src/data/codex.json
           cp F03_PREVIEW/CODEBASE/public/hybrid_manifest.json F03_PICTOR/CODEBASE/src/data/hybrid_manifest.json
-          cp F03_PREVIEW/CODEBASE/public/sequences.json F03_PICTOR/CODEBASE/src/data/sequences.json
+          cp F03_PREVIEW/CODEBASE/public/match_cut/sequences.json F03_PICTOR/CODEBASE/src/data/sequences.json
           mkdir -p F03_PICTOR/CODEBASE/public
           cp -R F03_PREVIEW/CODEBASE/public/intro F03_PICTOR/CODEBASE/public/
           cp -R F03_PREVIEW/CODEBASE/public/match_cut F03_PICTOR/CODEBASE/public/
