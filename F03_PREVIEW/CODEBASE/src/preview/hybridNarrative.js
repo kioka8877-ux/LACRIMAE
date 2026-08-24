@@ -67,15 +67,19 @@ export function normalizeHybridManifest(manifest, session = {}) {
 
 export function hybridTimelineFrame(manifest, frame, session = {}) {
   const hybrid = normalizeHybridManifest(manifest, session);
-  const introFrames = hybrid.intro.duration_frames;
+  const introFrames = hybrid.intro.duration_frames || hybrid.transition.match_cut_start_frame || 0;
   const matchCutFrame = frame - introFrames;
+  const isIntro = frame < introFrames;
   const isActive = (text) => frame >= text.start_frame && frame < text.start_frame + text.duration_frames;
+  const isTextActive = (text) => text.duration_mode === 'until_match_cut'
+    ? isIntro && isActive(text)
+    : isActive(text);
   return {
     hybrid,
-    isIntro: frame < introFrames,
+    isIntro,
     matchCutFrame,
-    isIntroText: isActive(hybrid.intro_text),
-    isEgo: isActive(hybrid.ego),
+    isIntroText: isTextActive(hybrid.intro_text),
+    isEgo: isTextActive(hybrid.ego),
   };
 }
 
