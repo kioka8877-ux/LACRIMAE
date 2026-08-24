@@ -558,6 +558,8 @@ export default function App() {
                     </select>
                     <label style={styles.label}>Scale phrase : {(session.hybrid?.intro_text?.scale ?? 1).toFixed(1)}×</label>
                     <input style={styles.slider} type="range" min="1" max="10" step="0.1" value={session.hybrid?.intro_text?.scale ?? 1} onChange={(e) => updateSession('hybrid', 'intro_text', { ...(session.hybrid?.intro_text || {}), scale: parseFloat(e.target.value) })} />
+                    <label style={styles.label}>Hauteur phrase : {session.hybrid?.intro_text?.position_y ?? 78}%</label>
+                    <input style={styles.slider} type="range" min="0" max="100" step="1" value={session.hybrid?.intro_text?.position_y ?? 78} onChange={(e) => updateSession('hybrid', 'intro_text', { ...(session.hybrid?.intro_text || {}), position_y: parseInt(e.target.value, 10) })} />
                     <label style={styles.label}>Angle phrase : {session.hybrid?.intro_text?.rotation_deg ?? 0}°</label>
                     <input style={styles.slider} type="range" min="-180" max="180" value={session.hybrid?.intro_text?.rotation_deg ?? 0} onChange={(e) => updateSession('hybrid', 'intro_text', { ...(session.hybrid?.intro_text || {}), rotation_deg: parseInt(e.target.value, 10) })} />
                     <label style={styles.label}>Couleur phrase</label>
@@ -574,6 +576,8 @@ export default function App() {
                     </select>
                     <label style={styles.label}>Scale EGO : {(session.hybrid?.ego?.scale ?? 2).toFixed(1)}×</label>
                     <input style={styles.slider} type="range" min="1" max="10" step="0.1" value={session.hybrid?.ego?.scale ?? 2} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), scale: parseFloat(e.target.value) })} />
+                    <label style={styles.label}>Hauteur EGO : {session.hybrid?.ego?.position_y ?? 50}%</label>
+                    <input style={styles.slider} type="range" min="0" max="100" step="1" value={session.hybrid?.ego?.position_y ?? 50} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), position_y: parseInt(e.target.value, 10) })} />
                     <label style={styles.label}>Angle EGO : {session.hybrid?.ego?.rotation_deg ?? 0}°</label>
                     <input style={styles.slider} type="range" min="-180" max="180" value={session.hybrid?.ego?.rotation_deg ?? 0} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), rotation_deg: parseInt(e.target.value, 10) })} />
                     <label style={styles.label}>Couleur EGO</label>

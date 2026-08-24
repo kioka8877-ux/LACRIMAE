@@ -84,6 +84,7 @@ export function hybridTextStyle(text, frame) {
   const blur = localFrame < text.blur_frames ? (text.blur_frames - localFrame) * 1.5 : 0;
   return {
     position: 'absolute',
+    zIndex: 20,
     left: `${text.position_x}%`,
     top: `${text.position_y}%`,
     transform: `translate(-50%, -50%) rotate(${text.rotation_deg}deg) scale(${text.scale})`,

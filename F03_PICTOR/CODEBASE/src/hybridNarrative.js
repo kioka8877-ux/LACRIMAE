@@ -81,7 +81,7 @@ export function hybridTextStyle(text, frame) {
   const localFrame = frame - text.start_frame;
   const blur = localFrame < text.blur_frames ? (text.blur_frames - localFrame) * 1.5 : 0;
   return {
-    position: 'absolute', left: `${text.position_x}%`, top: `${text.position_y}%`,
+    position: 'absolute', zIndex: 20, left: `${text.position_x}%`, top: `${text.position_y}%`,
     transform: `translate(-50%, -50%) rotate(${text.rotation_deg}deg) scale(${text.scale})`,
     transformOrigin: 'center center', width: '92%', textAlign: 'center',
     fontFamily: text.font_family, fontSize: `${Math.min(220, 110 * text.scale)}px`,
