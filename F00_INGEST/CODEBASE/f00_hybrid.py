@@ -148,11 +148,11 @@ def main() -> int:
     else:
         intro_text_start, intro_text_duration = 0, max(1, args.intro_text_duration_frames)
     if args.ego_duration_mode == "until_match_cut":
-        ego_start, ego_duration = 0, intro_frames
+        ego_start, ego_duration = intro_frames, max(1, min(intro_frames, matchcut_frames or intro_frames))
     elif args.ego_duration_mode == "until_end":
-        ego_start, ego_duration = 0, total_frames
+        ego_start, ego_duration = intro_frames, max(1, total_frames - intro_frames)
     else:
-        ego_start, ego_duration = 0, max(1, args.ego_duration_frames)
+        ego_start, ego_duration = intro_frames, max(1, args.ego_duration_frames)
     output = {
         "schema_version": "dev4.hybrid-narrative.v1",
         "created_at": datetime.now(timezone.utc).isoformat(),

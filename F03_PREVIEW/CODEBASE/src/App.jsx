@@ -571,8 +571,8 @@ export default function App() {
                     <input style={styles.input} value={session.hybrid?.ego?.text || 'EGO'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), text: e.target.value })} />
                     <label style={styles.label}>Durée EGO</label>
                     <select style={styles.select} value={session.hybrid?.ego?.duration_mode || 'until_match_cut'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), duration_mode: e.target.value })}>
-                      <option value="until_match_cut">Jusqu’au Match Cut</option>
-                      <option value="until_end">Jusqu’à la fin</option>
+                      <option value="until_match_cut">À partir du Match Cut</option>
+                      <option value="until_end">À partir du Match Cut jusqu’à la fin</option>
                     </select>
                     <label style={styles.label}>Scale EGO : {(session.hybrid?.ego?.scale ?? 2).toFixed(1)}×</label>
                     <input style={styles.slider} type="range" min="1" max="10" step="0.1" value={session.hybrid?.ego?.scale ?? 2} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), scale: parseFloat(e.target.value) })} />
@@ -584,7 +584,7 @@ export default function App() {
                     <input style={styles.colorPicker} type="color" value={session.hybrid?.ego?.color || '#FFFFFF'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), color: e.target.value })} />
                   </div>
                   <div style={{ marginTop: '12px', padding: '8px', background: '#211b10', border: '1px solid #6b5328', borderRadius: '6px', fontSize: '12px', color: '#ddc58b' }}>
-                    En Mode 2, EGO est un calque indépendant. Les réglages sont immédiats et la tête de lecture conserve sa position.
+                    En Mode 2, EGO est réservé au Match Cut : il est masqué pendant toute l’introduction et démarre uniquement au hard cut. Les réglages sont immédiats et la tête de lecture conserve sa position.
                   </div>
                 </div>
               )}

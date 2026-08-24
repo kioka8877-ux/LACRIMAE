@@ -44,7 +44,14 @@ export function normalizeHybridManifest(manifest, session = {}) {
   const matchCutFrames = Math.max(0, declaredMatchCutFrames || declaredTotalFrames - introFrames);
   const totalFrames = Math.max(introFrames + matchCutFrames, declaredTotalFrames);
   const introText = normalizeHybridText(source.intro_text, "C'EST JUSTE UN JOUEUR", 1);
-  const ego = normalizeHybridText(source.ego, 'EGO', 2);
+  const egoBase = normalizeHybridText(source.ego, 'EGO', 2);
+  const egoStartFrame = introFrames;
+  const egoDuration = egoBase.duration_mode === 'until_end'
+    ? Math.max(1, totalFrames - egoStartFrame)
+    : egoBase.duration_mode === 'custom'
+      ? Math.max(1, egoBase.duration_frames)
+      : Math.max(1, matchCutFrames);
+  const ego = { ...egoBase, start_frame: egoStartFrame, duration_frames: egoDuration };
 
   return {
     ...source,
@@ -57,7 +64,7 @@ export function normalizeHybridManifest(manifest, session = {}) {
     },
     ego: {
       ...ego,
-      duration_frames: durationForText(ego, introFrames, totalFrames),
+      duration_frames: ego.duration_frames,
     },
     transition: { type: 'hard_cut', ...source.transition, match_cut_start_frame: introFrames },
     match_cut: { ...source.match_cut, total_frames: matchCutFrames },
@@ -79,7 +86,7 @@ export function hybridTimelineFrame(manifest, frame, session = {}) {
     isIntro,
     matchCutFrame,
     isIntroText: isTextActive(hybrid.intro_text),
-    isEgo: isTextActive(hybrid.ego),
+    isEgo: !isIntro && isActive(hybrid.ego),
   };
 }
 
