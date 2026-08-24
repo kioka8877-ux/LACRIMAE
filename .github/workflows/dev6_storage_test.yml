@@ -32,6 +32,6 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install S3 client
-        run: python -m pip install boto3==1.35.99
+        run: python -m pip install boto3==1.35.99 requests==2.32.3
       - name: Run isolated storage test
         run: python tests/test_backblaze_storage.py
