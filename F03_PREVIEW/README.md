@@ -56,3 +56,9 @@ F03 peut charger automatiquement `public/motion_slow_manifest.json` lorsqu’il 
 Le panneau **Vidéo** expose les choix `Normal`, `Partiel` et `Global`, la vitesse 0,75×, 0,5× ou 0,25×, les plages en secondes et le moteur sélectionné. Ces réglages sont enregistrés dans le `codex.json` exporté ; ils ne lancent pas F00-C depuis le navigateur. Le traitement est déclenché séparément par le workflow GitHub Actions F00-C, uniquement à la demande de l’opérateur.
 
 Le mode Normal reste la référence. Une fois l’artifact F00-C produit, ses fichiers `sequences/*.mp4` peuvent être copiés dans `public/sequences/` avec `motion_slow_manifest.json` pour effectuer la revue visuelle dans F03 avant PICTOR.
+
+## Preset Dark Luxury Noir
+
+L’onglet **Effets** propose le preset `Dark Luxury Noir` avec un unique curseur d’intensité de `0 %` à `100 %`. À `0 %`, l’effet est désactivé ; à `100 %`, il combine contraste renforcé, désaturation monochrome, chaleur champagne/bronze, noirs profonds et halo sélectif rouge/violet.
+
+La valeur est enregistrée dans `session.presets.dark_luxury_noir` lors de l’export du `codex.json`. La composition PICTOR utilise la même clé et le même calcul de filtre afin que le rendu final corresponde au réglage validé dans F03. Le Motion Slow F00-C reste indépendant.

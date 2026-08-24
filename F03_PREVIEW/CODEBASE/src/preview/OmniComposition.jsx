@@ -12,6 +12,7 @@ import {
 } from 'remotion';
 import { normalizeSequences } from './virtualSequences';
 import { getCompositionConfig, rotationForSequence } from './compositionConfig';
+import { darkLuxuryNoirFilter, darkLuxuryNoirOverlayStyle } from './darkLuxuryNoir';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * OmniComposition (F03 PREVIEW) â€” mÃªmes 6 calques que F04 RENDER :
@@ -110,7 +111,11 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
     const s = sharpening / 100;
     sharpFilter = ` contrast(${1 + s * 0.15}) drop-shadow(0 0 ${s * 0.5}px rgba(255,255,255,${s * 0.15}))`;
   }
-  const fullFilter = (brightnessFilter + enhanceFilter + sharpFilter).trim();
+  const darkLuxuryNoir = presets.dark_luxury_noir || {};
+  const darkLuxuryFilter = darkLuxuryNoir.enabled
+    ? darkLuxuryNoirFilter(darkLuxuryNoir.intensity)
+    : '';
+  const fullFilter = (brightnessFilter + enhanceFilter + sharpFilter + ` ${darkLuxuryFilter}`).trim();
 
   const slowmoStart = clip.slowmo_start_frame || 0;
   const slowmoSpeed = clip.slowmo_speed || 1.0;
@@ -282,6 +287,11 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
           <AbsoluteFill style={{ backgroundColor: '#fff', opacity: brutalFlash, pointerEvents: 'none' }} />
         )}
       </AbsoluteFill>
+
+      {/* Dark Luxury Noir : halo champagne et accents chauds au-dessus de l’image */}
+      {darkLuxuryNoir.enabled && (
+        <AbsoluteFill style={darkLuxuryNoirOverlayStyle(darkLuxuryNoir.intensity)} />
+      )}
 
       {/* Finitions : grain + vignette au-dessus de tout */}
       {(presets.grain_intensity || 0) > 0 && (

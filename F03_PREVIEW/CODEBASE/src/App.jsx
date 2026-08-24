@@ -820,9 +820,22 @@ export default function App() {
                     high_contrast: 'contrast(1.5) saturate(1.3) brightness(1.0)',
                     punchy: 'contrast(1.3) saturate(1.5) brightness(1.1)',
                     sepia_soft: 'sepia(0.3) contrast(1.1) saturate(0.9) brightness(1.05)',
+                    dark_luxury_noir: 'contrast(1.3) saturate(0.32) brightness(0.96)',
                   };
-                  updatePreset('color_preset', preset);
-                  updatePreset('color_css_filter', filters[preset] || '');
+                  setSession((s) => ({
+                    ...s,
+                    presets: {
+                      ...(s.presets || {}),
+                      color_preset: preset,
+                      color_css_filter: filters[preset] || '',
+                      dark_luxury_noir: {
+                        enabled: preset === 'dark_luxury_noir',
+                        intensity: preset === 'dark_luxury_noir'
+                          ? (s.presets?.dark_luxury_noir?.intensity ?? 100)
+                          : 0,
+                      },
+                    },
+                  }));
                 }}
               >
                 <option value="warm_vibrant">Warm Vibrant</option>
@@ -830,7 +843,34 @@ export default function App() {
                 <option value="high_contrast">High Contrast</option>
                 <option value="punchy">Punchy</option>
                 <option value="sepia_soft">Sepia Soft</option>
+                <option value="dark_luxury_noir">Dark Luxury Noir</option>
               </select>
+
+              <label style={styles.label}>
+                Dark Luxury Noir : {presets.dark_luxury_noir?.enabled ? `${presets.dark_luxury_noir.intensity ?? 0}%` : 'désactivé'}
+              </label>
+              <input
+                style={styles.slider}
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value={presets.dark_luxury_noir?.enabled ? (presets.dark_luxury_noir.intensity ?? 0) : 0}
+                onChange={(e) => {
+                  const intensity = parseInt(e.target.value, 10);
+                  setSession((s) => ({
+                    ...s,
+                    presets: {
+                      ...(s.presets || {}),
+                      color_preset: intensity > 0 ? 'dark_luxury_noir' : (s.presets?.color_preset || 'punchy'),
+                      dark_luxury_noir: { enabled: intensity > 0, intensity },
+                    },
+                  }));
+                }}
+              />
+              <div style={{ margin: '6px 0 12px', padding: '8px', background: '#241b12', border: '1px solid #80652c', borderRadius: '8px', fontSize: '12px', color: '#e5c77b' }}>
+                Un seul réglage : noir profond, monochrome chaud, accents champagne/bronze, rouge/violet sélectifs et halo lumineux. La valeur est exportée dans le codex pour PICTOR.
+              </div>
 
               <label style={styles.label}>
                 Contraste: {(presets.contrast ?? 1.3).toFixed(2)}x
