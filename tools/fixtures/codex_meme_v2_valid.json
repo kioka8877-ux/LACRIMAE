@@ -1,0 +1,16 @@
+{
+  "version": "5.0",
+  "pipeline": "LACRIMAE_DEV",
+  "mode": "meme",
+  "sub_mode": "meme_v2",
+  "validated_by_magos": true,
+  "session": {"background": {"image": "bg_paper_crumpled.png", "color": "#0a0a0a"}},
+  "clips": [{
+    "id": "clip_001",
+    "video": {"source": "clip_001.mp4", "fps": 30, "total_frames": 240, "width": 1080, "height": 1920},
+    "meme": {"source": "meme_001.mp4"},
+    "reaction_tweet": "J'imagine les étudiants avec des dettes qui voient ça.",
+    "source_post": {"platform": "x", "post_url": "https://example.invalid/post/1", "screenshot_png": "source_posts/source_001.png"},
+    "text_emotion": "QUAND TU FAIS SEMBLANT D'ÊTRE RICHE"
+  }]
+}

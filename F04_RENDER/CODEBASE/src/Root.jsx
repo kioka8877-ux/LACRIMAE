@@ -2,6 +2,7 @@ import React from 'react';
 import { Composition } from 'remotion';
 import { OmniComposition } from './components/OmniComposition';
 import { MemeComposition } from './components/MemeComposition';
+import { MemeV2Composition } from './components/MemeV2Composition';
 import { codex } from './codexData';
 
 // Codex multi-clips : une Composition par clip — jusqu'à N Shorts par session.
@@ -14,8 +15,9 @@ import { codex } from './codexData';
 export const Root = () => {
   const clips = codex.clips && codex.clips.length > 0 ? codex.clips : [codex];
   const session = codex.session || {};
+  const isMemeV2Mode = codex.mode === 'meme_v2' || codex.sub_mode === 'meme_v2' || (codex.mode === 'meme' && codex.version === 2);
   const isMemeMode = codex.mode === 'meme' || codex.sub_mode === 'meme';
-  const Comp = isMemeMode ? MemeComposition : OmniComposition;
+  const Comp = isMemeV2Mode ? MemeV2Composition : (isMemeMode ? MemeComposition : OmniComposition);
   const masterClip = clips[0];
 
   return (

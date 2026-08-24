@@ -372,9 +372,50 @@ def check_cuts_within_duration(pack: dict, video_path) -> list:
 
 # ─── MODE MEME : validation + mapping pack → codex ───────────────────────────
 
+def is_meme_v2_pack(pack: dict) -> bool:
+    """True pour le contrat réaction MEME V2 préparé par PERTURABO."""
+    return pack.get("sub_mode") == "meme_v2" or pack.get("mode") == "meme_v2"
+
+
 def is_meme_pack(pack: dict) -> bool:
-    """True si le pack est en mode meme (sub_mode: meme, contrat 04_MODE_MEME.md)."""
-    return pack.get("sub_mode") == "meme"
+    """True si le pack est en mode meme classique (contrat MEME V1)."""
+    return pack.get("sub_mode") == "meme" and not is_meme_v2_pack(pack)
+
+
+def validate_meme_v2_pack(pack: dict) -> list:
+    """Validation stricte du contrat MEME V2 : PERTURABO fournit tout l’éditorial."""
+    errors = []
+    videos = pack.get("videos")
+    if not isinstance(videos, list) or not videos:
+        return ["pack.videos doit être une liste non vide (mode meme_v2)"]
+    for v in videos:
+        angle = v.get("angle_id", "?")
+        reaction = v.get("reaction_tweet") or (v.get("reaction") or {}).get("text")
+        source = v.get("source_post") or {}
+        screenshot = source.get("screenshot_png") or source.get("screenshot")
+        if not reaction:
+            errors.append(f"video {angle} : reaction_tweet manquant")
+        if not screenshot:
+            errors.append(f"video {angle} : source_post.screenshot_png manquant")
+        if not v.get("text_emotion"):
+            errors.append(f"video {angle} : text_emotion manquant")
+        meme = v.get("meme")
+        if not meme:
+            errors.append(f"video {angle} : meme manquant")
+        else:
+            meme_name = meme if meme.endswith(".mp4") else f"{meme}.mp4"
+            if not (MEMES_DIR / meme_name).exists():
+                errors.append(f"video {angle} : meme '{meme_name}' ABSENT de la méméthèque {MEMES_DIR}/")
+        dur = v.get("duration_sec")
+        if dur is not None:
+            try:
+                dur = float(dur)
+            except (TypeError, ValueError):
+                errors.append(f"video {angle} : duration_sec invalide ({dur})")
+                continue
+            if not (3.0 <= dur <= 10.0):
+                errors.append(f"video {angle} : duration_sec hors range autorisée 3-10s ({dur}s)")
+    return errors
 
 
 def validate_meme_pack(pack: dict) -> list:
@@ -450,6 +491,62 @@ def gen_tweet_card(pack: dict, clip_id: str) -> dict:
         "reposts": reposts,
         "replies": replies,
     }
+
+
+def build_meme_v2_codex(pack: dict, background_name, source_map=None, fps=30) -> dict:
+    """Codex MEME V2 : aucun contenu éditorial généré, tout vient du pack."""
+    source_map = source_map or {}
+    clips = []
+    for i, v in enumerate(pack.get("videos", [])):
+        duration = meme_duration_sec(v)
+        meme_name = v.get("meme")
+        meme_file = meme_name if meme_name.endswith(".mp4") else f"{meme_name}.mp4"
+        source = v.get("source_post") or {}
+        original_screenshot = source.get("screenshot_png") or source.get("screenshot")
+        clips.append({
+            "id": f"clip_{i + 1:03d}",
+            "angle_id": v.get("angle_id", f"A{i + 1:02d}"),
+            "video": {"source": f"clip_{i + 1:03d}.mp4", "fps": fps, "total_frames": int(duration * fps), "width": 1080, "height": 1920},
+            "meme": {"source": meme_file},
+            "reaction_tweet": v.get("reaction_tweet") or (v.get("reaction") or {}).get("text", ""),
+            "source_post": {
+                "platform": source.get("platform", "social"),
+                "post_url": source.get("post_url") or source.get("url", ""),
+                "screenshot_png": source_map.get(original_screenshot, original_screenshot),
+            },
+            "text_emotion": v.get("text_emotion", ""),
+            "meme_v2": {"timeline": {"reaction_start_pct": 0, "source_start_pct": 15, "emotion_start_pct": 33, "clip_start_pct": 41}},
+        })
+    return {
+        "version": "5.0", "pipeline": "LACRIMAE_DEV", "mode": "meme", "sub_mode": "meme_v2",
+        "forge": {"pack_id": pack.get("pack_id"), "siege_id": pack.get("siege_id"), "pack_mode": "meme_v2"},
+        "session": {"background": {"image": background_name or None, "color": "#0a0a0a", "scale": 1.0}},
+        "validated_by_magos": False, "clips": clips,
+    }
+
+
+def transit_meme_v2_sources(pack: dict, pack_dir: Path) -> dict:
+    """Copie les captures locales fournies par PERTURABO vers public/source_posts/."""
+    mapping = {}
+    sources = []
+    for v in pack.get("videos", []):
+        src_ref = (v.get("source_post") or {}).get("screenshot_png") or (v.get("source_post") or {}).get("screenshot")
+        if not src_ref or str(src_ref).startswith(("http://", "https://", "data:")):
+            continue
+        src = Path(src_ref)
+        candidates = [src if src.is_absolute() else pack_dir / src, Path(src_ref)]
+        found = next((c for c in candidates if c.exists()), None)
+        if not found:
+            continue
+        filename = f"source_{len(sources)+1:03d}{found.suffix.lower() or '.png'}"
+        for name in ("F03", "F04"):
+            dest_dir = FRIGATES[name] / "CODEBASE" / "public" / "source_posts"
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(found, dest_dir / filename)
+        mapping[str(src_ref)] = f"source_posts/{filename}"
+        sources.append(found)
+    log_ok(f"captures MEME V2 : {len(sources)} transitées vers F03 + F04")
+    return mapping
 
 
 def build_meme_codex(pack: dict, background_name, fps=30) -> dict:
@@ -786,6 +883,38 @@ def main():
         log_ok(f"Pack auto-récupéré : {pack_path}")
 
     pack = json.loads(pack_path.read_text(encoding="utf-8"))
+
+    # ════════════════ MODE MEME V2 (reaction + capture source) ════════════════
+    if is_meme_v2_pack(pack):
+        if not MEME_GUIDE_PATH.exists():
+            log_err(f"Guide mode MEME absent : {MEME_GUIDE_PATH}")
+            sys.exit(1)
+        errors = validate_meme_v2_pack(pack)
+        if errors:
+            for e in errors:
+                log_err(e)
+            print("\n  ══ CONTRÔLE 1 : ✗ ÉCHOUÉ — pack meme_v2 invalide ══")
+            sys.exit(1)
+        shared_backgrounds = sorted(SHARED_BACKGROUNDS_DIR.glob("*.png")) if SHARED_BACKGROUNDS_DIR.exists() else []
+        background_name = shared_backgrounds[0].name if shared_backgrounds else None
+        if args.dry_run:
+            print(f"\n[DRY-RUN] Plan meme_v2 : {len(pack.get('videos', []))} angle(s), captures source obligatoires")
+            sys.exit(0)
+        BRIDGE_OUT.mkdir(parents=True, exist_ok=True)
+        source_map = transit_meme_v2_sources(pack, pack_path.parent)
+        codex = build_meme_v2_codex(pack, background_name, source_map)
+        codex_path = BRIDGE_OUT / "codex.json"
+        codex_path.write_text(json.dumps(codex, ensure_ascii=False, indent=2), encoding="utf-8")
+        transit_memes_to_f02()
+        transit_memes_to_preview_render()
+        transit_backgrounds_to_preview_render()
+        transit_codex(codex_path)
+        f02_in = FRIGATES["F02"] / "IN"
+        f02_in.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(codex_path, f02_in / "codex.json")
+        print("\n  ══ BRIDGE FORGE (MODE MEME V2) — MISSION ACCOMPLIE ══")
+        print(f"  Angles : {len(codex['clips'])} | captures : {len(source_map)}")
+        sys.exit(0)
 
     # ════════════════ MODE MEME (sub_mode: meme) ════════════════
     # Aucune découpe : les memes sont déjà coupés dans la méméthèque

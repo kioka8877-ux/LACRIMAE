@@ -219,8 +219,25 @@ def check_json_content(path: Path, require_validation: bool = True) -> bool:
             if texts.get("mode") in ("title", "title+paragraph") and not texts.get("title"):
                 log_err(f"codex.json — texts.title manquant sur {clip.get('id', '?')}")
                 return False
-        # Mode MEME (sub_mode/mode meme) : règles spécifiques 04_MODE_MEME.md
-        if data.get("sub_mode") == "meme" or data.get("mode") == "meme":
+        # Mode MEME V2 : réaction + capture source + émotion + meme.
+        if data.get("sub_mode") == "meme_v2" or data.get("mode") == "meme_v2":
+            for clip in clips:
+                if not clip.get("reaction_tweet"):
+                    log_err(f"codex.json — reaction_tweet manquant sur {clip.get('id', '?')}")
+                    return False
+                source_post = clip.get("source_post") or {}
+                if not source_post.get("screenshot_png"):
+                    log_err(f"codex.json — source_post.screenshot_png manquant sur {clip.get('id', '?')}")
+                    return False
+                if not clip.get("text_emotion"):
+                    log_err(f"codex.json — text_emotion manquant sur {clip.get('id', '?')}")
+                    return False
+                if not (clip.get("meme") or {}).get("source"):
+                    log_err(f"codex.json — meme.source manquant sur {clip.get('id', '?')}")
+                    return False
+            log_ok(f"codex.json — MODE MEME V2 OK ({len(clips)} clip(s))")
+        # Mode MEME V1 (sub_mode/mode meme) : règles spécifiques 04_MODE_MEME.md
+        elif data.get("sub_mode") == "meme" or data.get("mode") == "meme":
             session = data.get("session") or {}
             if "watermark" not in session:
                 log_err("codex.json — session.watermark manquant (mode meme)")

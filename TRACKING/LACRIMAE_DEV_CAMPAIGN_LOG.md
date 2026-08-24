@@ -84,3 +84,9 @@
 - [ ] **Mode libre** : configurer secret GitHub `ORACLE_API_KEY` (+ vars `ORACLE_MODEL`/`ORACLE_BASE_URL`) — non exécuté (flux forge utilisé)
 - [x] Valider le flux complet jusqu'à `lac-clean` (clean_final.mp4) — **fait** (run `31326992043`)
 - [x] **Preview en ligne** : Pages activé (Source = GitHub Actions) + branche `dev` autorisée sur l'environnement `github-pages` — URL : `https://kioka8877-ux.github.io/LACRIMAE/`
+
+## 2026-08-24 — MEME V2 sur dev5
+
+MEME V2 a été implémenté sur la branche `dev5` comme évolution isolée de MEME V1. Le renderer F03/F04 applique l’ordre strict **réaction Lacrimae → capture source → text_emotion → clip MEME**, avec seuils par défaut à `0 %`, `15 %`, `33 %` et `41 %`. Le bridge et les validateurs exigent les champs éditoriaux fournis par le pack et ne génèrent pas de contenu.
+
+La compilation Python, le test contractuel, le préflight F04, le build Vite F03 et le bundle statique F04 sont passés. La production réelle et la validation Champion restent ouvertes ; aucun workflow GitHub Actions n’a été lancé.

@@ -16,7 +16,8 @@ def main():
     args = parser.parse_args()
     data = json.loads(args.codex.read_text(encoding='utf-8'))
     clips = data.get('clips') or []
-    if data.get('mode') != 'meme' and data.get('sub_mode') != 'meme':
+    is_v2 = data.get('sub_mode') == 'meme_v2' or data.get('mode') == 'meme_v2'
+    if not is_v2 and data.get('mode') != 'meme' and data.get('sub_mode') != 'meme':
         fail('mode meme absent')
     if data.get('validated_by_magos') is not True:
         fail('validated_by_magos doit être true')
@@ -24,6 +25,18 @@ def main():
         fail(f'nombre de clips hors limite: {len(clips)}')
     session = data.get('session') or {}
     background = session.get('background') or {}
+    if is_v2:
+        for index, clip in enumerate(clips, 1):
+            if not clip.get('reaction_tweet'):
+                fail(f'reaction_tweet absent sur clip {index:03d}')
+            if not (clip.get('source_post') or {}).get('screenshot_png'):
+                fail(f'source_post.screenshot_png absent sur clip {index:03d}')
+            if not clip.get('text_emotion'):
+                fail(f'text_emotion absent sur clip {index:03d}')
+            if not (clip.get('meme') or {}).get('source'):
+                fail(f'meme.source absent sur clip {index:03d}')
+        print(f'F04 CODEX MEME V2 OK: {len(clips)} clips, séquence réaction → source → émotion → meme')
+        return
     if background.get('image') != 'bg_paper_crumpled.png':
         fail(f"background validé absent: {background.get('image')!r}")
     required_session = {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Player } from '@remotion/player';
 import { OmniComposition } from './preview/OmniComposition';
 import { MemeComposition } from './preview/MemeComposition';
+import { MemeV2Composition } from './preview/MemeV2Composition';
 
 /**
  * App — F03 PREVIEW (v4.1 — session + clips, mode meme)
@@ -121,8 +122,9 @@ export default function App() {
   const vidHeight = clip.video?.height || 1920;
 
   // Mode meme : codex.sub_mode === 'meme' → MemeComposition + panneaux meme
+  const isMemeV2Mode = codex?.mode === 'meme_v2' || codex?.sub_mode === 'meme_v2' || (codex?.mode === 'meme' && codex?.version === 2);
   const isMemeMode = codex?.sub_mode === 'meme' || codex?.mode === 'meme' || !!clip.tweet;
-  const PreviewComposition = isMemeMode ? MemeComposition : OmniComposition;
+  const PreviewComposition = isMemeV2Mode ? MemeV2Composition : (isMemeMode ? MemeComposition : OmniComposition);
 
   // ── Helpers session ──
   const updateSession = (section, key, value) => {
