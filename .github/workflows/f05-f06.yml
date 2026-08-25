@@ -54,8 +54,9 @@ jobs:
 
       - name: F05 - Camouflage (wipe métadonnées + loudnorm -14 LUFS)
         run: |
-          cd F05_CAMOUFLAGE/CODEBASE
-          python3 lac_f05_camouflage.py --input ../IN/ --output ../OUT/
+          INPUT_MP4=$(find F05_CAMOUFLAGE/IN -type f -name '*.mp4' -print -quit)
+          test -n "$INPUT_MP4"
+          python3 F05_CAMOUFLAGE/CODEBASE/lac_f05_camouflage.py --input "$INPUT_MP4" --output F05_CAMOUFLAGE/OUT/
 
       - name: F05 - Gardien CUSTOS
         run: python3 LAC_CUSTOS.py --frigate F05 --mode check-out --drive-base .
