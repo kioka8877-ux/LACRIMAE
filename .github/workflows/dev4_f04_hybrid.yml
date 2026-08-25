@@ -39,6 +39,11 @@ jobs:
           cache: npm
           cache-dependency-path: F03_PICTOR/CODEBASE/package-lock.json
 
+      - name: Installer FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
       - name: Installer PICTOR
         working-directory: F03_PICTOR/CODEBASE
         run: npm ci
