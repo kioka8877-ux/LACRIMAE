@@ -60,6 +60,22 @@ MANIFEST = {
             "IN": ["short_final.mp4", "timing.json"],
         },
     },
+    "F05": {
+        "check-out": {
+            "OUT": ["short_camouflaged.mp4"],
+        },
+        "check-in": {
+            "IN": ["short_final.mp4"],
+        },
+    },
+    "F06": {
+        "check-out": {
+            "OUT": ["short_master.mp4"],
+        },
+        "check-in": {
+            "IN": ["short_camouflaged.mp4"],
+        },
+    },
 }
 
 # Validateurs de contenu JSON par fichier
@@ -186,6 +202,8 @@ def run_custos(frigate: str, mode: str, drive_base: Path) -> bool:
         "F02": drive_base / "F02_VISIO",
         "F03": drive_base / "F03_PICTOR",
         "F04": drive_base / "F04_SIGNUM",
+        "F05": drive_base / "F05_CAMOUFLAGE",
+        "F06": drive_base / "F06_LUTHER",
     }
 
     frigate_base = frigate_dirs[frigate]
@@ -236,7 +254,7 @@ def main():
         description="LAC_CUSTOS — Gardien de la Flotte LACRIMAE"
     )
     parser.add_argument(
-        "--frigate", required=True, choices=["F01", "F02", "F03", "F04"],
+        "--frigate", required=True, choices=["F01", "F02", "F03", "F04", "F05", "F06"],
         help="Frégate à valider"
     )
     parser.add_argument(
