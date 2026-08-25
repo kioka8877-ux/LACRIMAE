@@ -68,14 +68,18 @@ jobs:
           path: F05_CAMOUFLAGE/OUT/
           retention-days: 14
 
-      - name: F05 - Ledger + commit
+      - name: F05 - Ledger + commit (optionnel)
         run: |
-          python3 _tools/update_ledger.py F05
-          git config user.name "lacrimae-orchestrator"
-          git config user.email "orchestrator@lacrimae"
-          git add TRACKING/LACRIMAE_LEDGER.json
-          git commit -m "ledger: fregate F05 — camouflage [skip ci]" || echo "No change"
-          git push
+          if [ -f tools/update_ledger.py ]; then
+            python3 tools/update_ledger.py F05
+            git config user.name "lacrimae-orchestrator"
+            git config user.email "orchestrator@lacrimae"
+            git add TRACKING/LACRIMAE_LEDGER.json
+            git commit -m "ledger: fregate F05 — camouflage [skip ci]" || echo "No change"
+            git push
+          else
+            echo "Ledger F05 absent dans ce dépôt — étape ignorée, traitement vidéo conservé."
+          fi
 
       - name: F06 - Luther (stream copy, empreinte zéro) sur l'OUT de F05
         run: |
@@ -93,11 +97,15 @@ jobs:
           path: F06_LUTHER/OUT/
           retention-days: 14
 
-      - name: F06 - Ledger + commit
+      - name: F06 - Ledger + commit (optionnel)
         run: |
-          python3 _tools/update_ledger.py F06
-          git config user.name "lacrimae-orchestrator"
-          git config user.email "orchestrator@lacrimae"
-          git add TRACKING/LACRIMAE_LEDGER.json
-          git commit -m "ledger: fregate F06 — production complète [skip ci]" || echo "No change"
-          git push
+          if [ -f tools/update_ledger.py ]; then
+            python3 tools/update_ledger.py F06
+            git config user.name "lacrimae-orchestrator"
+            git config user.email "orchestrator@lacrimae"
+            git add TRACKING/LACRIMAE_LEDGER.json
+            git commit -m "ledger: fregate F06 — production complète [skip ci]" || echo "No change"
+            git push
+          else
+            echo "Ledger F06 absent dans ce dépôt — étape ignorée, traitement vidéo conservé."
+          fi
