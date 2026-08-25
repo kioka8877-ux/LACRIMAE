@@ -79,10 +79,10 @@
         "blur_frames": 0
       },
       "ego": {
-        "scale": 1,
-        "color": "#bf1212",
+        "scale": 0.6,
+        "color": "#ff0a0a",
         "text": "whereas the guy has the right.....",
-        "position_y": 81
+        "position_y": 53
       }
     }
   },
@@ -99,39 +99,8 @@
       },
       "texts": {
         "mode": "dark_luxury_flash_text",
-        "content": "TO IS HIM",
-        "units": [
-          {
-            "id": "word_001",
-            "text": "TO",
-            "start_frame": 0,
-            "duration_frames": 8,
-            "impact": false,
-            "rotation_deg": 0,
-            "scale": 1,
-            "blur_frames": 0
-          },
-          {
-            "id": "word_002",
-            "text": "IS",
-            "start_frame": 0,
-            "duration_frames": 8,
-            "impact": false,
-            "rotation_deg": 0,
-            "scale": 1,
-            "blur_frames": 0
-          },
-          {
-            "id": "word_003",
-            "text": "HIM",
-            "start_frame": 0,
-            "duration_frames": 8,
-            "impact": true,
-            "rotation_deg": 91,
-            "scale": 1.4,
-            "blur_frames": 0
-          }
-        ]
+        "content": "",
+        "units": []
       },
       "zoom_keyframes": [],
       "logo": null,
