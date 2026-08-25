@@ -83,9 +83,10 @@ jobs:
 
       - name: F06 - Luther (stream copy, empreinte zéro) sur l'OUT de F05
         run: |
+          INPUT_MP4=$(find F05_CAMOUFLAGE/OUT -type f -name '*.mp4' -print -quit)
+          test -n "$INPUT_MP4"
           mkdir -p F06_LUTHER/OUT
-          cd F06_LUTHER/CODEBASE
-          python3 lac_f06_luther.py --input ../../F05_CAMOUFLAGE/OUT/ --output ../OUT/
+          python3 F06_LUTHER/CODEBASE/lac_f06_luther.py --input "$INPUT_MP4" --output F06_LUTHER/OUT/
 
       - name: F06 - Gardien CUSTOS
         run: python3 LAC_CUSTOS.py --frigate F06 --mode check-out --drive-base .
