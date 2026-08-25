@@ -1,0 +1,16 @@
+{
+  "schema_version": "dev7.music-timeline.v1",
+  "enabled": false,
+  "sync_mode": "off",
+  "audio_file": "",
+  "audio_src": "",
+  "beats": [],
+  "loop_in": 0,
+  "loop_out": 4,
+  "loop_enabled": true,
+  "climax_time": null,
+  "match_cut_start_frame": 0,
+  "intro_volume": 1,
+  "match_cut_volume": 1,
+  "offset_frames": 0
+}

@@ -3,6 +3,7 @@ import { Player } from '@remotion/player';
 import { OmniComposition } from './preview/OmniComposition';
 import { COMPOSITION_PRESETS, getCompositionConfig } from './preview/compositionConfig';
 import { normalizeHybridManifest } from './preview/hybridNarrative';
+import { normalizeMusicTimeline, musicWaveformPoints } from './preview/audioTimeline';
 
 /**
  * App — F03 PREVIEW (v4.0 — session + clips)
@@ -41,6 +42,8 @@ export default function App() {
   const [sequences, setSequences] = useState(null); // manifeste virtuel produit par F00
   const [hybridManifest, setHybridManifest] = useState(null);
   const [hybridIntroSrc, setHybridIntroSrc] = useState('');
+  const [audioSrc, setAudioSrc] = useState('');
+  const [musicTimeline, setMusicTimeline] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [validated, setValidated] = useState(false);
@@ -77,6 +80,8 @@ export default function App() {
         setCodex(full);
         setClip(clipFirst);
         setSession(full.session || {});
+        setMusicTimeline(normalizeMusicTimeline(full.session?.music || clipFirst.music || {}, Number(clipFirst.video?.fps || 30), Number(clipFirst.video?.total_frames || 300)));
+        if (full.session?.music?.audio_src) setAudioSrc(full.session.music.audio_src);
         setActiveTab(full.session?.review_mode === 'hybrid_narrative' ? 'hybrid' : 'text');
         setVideoSrc(clipFirst.video?.source ? './' + clipFirst.video.source : './video_source.mp4');
         try {
@@ -169,6 +174,14 @@ export default function App() {
   ) : null;
   const totalFrames = activeHybrid?.total_frames || baseTotalFrames;
   const composition = getCompositionConfig(clip, session);
+  const music = normalizeMusicTimeline(musicTimeline || session.music || {}, fps, totalFrames);
+  const waveform = musicWaveformPoints(music.beats, 600, 54);
+  const updateMusic = (key, value) => {
+    const next = normalizeMusicTimeline({ ...music, [key]: value }, fps, totalFrames);
+    setMusicTimeline(next);
+    setSession((s) => ({ ...s, music: next }));
+  };
+
   const motionSlow = {
     enabled: false,
     mode: 'off',
@@ -393,7 +406,7 @@ export default function App() {
             <Player
               ref={playerRef}
               component={OmniComposition}
-              inputProps={{ codex: clip, videoSrc, session, sequences, hybridManifest: activeHybrid, hybridIntroSrc }}
+              inputProps={{ codex: clip, videoSrc, session, sequences, hybridManifest: activeHybrid, hybridIntroSrc, musicTimeline: music }}
               durationInFrames={totalFrames}
               fps={fps}
               compositionWidth={vidWidth}
@@ -408,7 +421,7 @@ export default function App() {
               }}
               controls
               autoPlay
-              muted
+              muted={false}
               loop
             />
 
@@ -499,7 +512,10 @@ export default function App() {
             <button style={activeTab === 'video' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('video')}>
               🎬 Vidéo
             </button>
-            <button style={activeTab === 'effects' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('effects')}>
+              <button style={activeTab === 'audio' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('audio')}>
+                ♪ Audio Sync
+              </button>
+              <button style={activeTab === 'effects' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('effects')}>
               🎨 Effets
             </button>
             <button style={activeTab === 'sharp' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('sharp')}>
@@ -588,6 +604,40 @@ export default function App() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ══════════ AUDIO : musique, boucle et climax ══════════ */}
+          {activeTab === 'audio' && (
+            <div style={styles.panelContent}>
+              <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>AUDIO SYNC</label>
+              <input style={styles.input} type="file" accept="audio/*" onChange={(e) => {
+                const file = e.target.files?.[0]; if (!file) return;
+                const url = URL.createObjectURL(file); setAudioSrc(url);
+                updateMusic('enabled', true); updateMusic('audio_file', file.name); updateMusic('audio_src', url);
+              }} />
+              <label style={styles.label}>Mode de synchronisation</label>
+              <select style={styles.select} value={music.sync_mode} onChange={(e) => updateMusic('sync_mode', e.target.value)}>
+                <option value="off">Désactivé</option><option value="manual">Manuel</option><option value="assisted">Assisté</option><option value="beat_locked">Verrouillé sur les beats</option>
+              </select>
+              <label style={styles.label}>Musique : {music.audio_file || 'aucun fichier sélectionné'}</label>
+              {waveform && <svg viewBox="0 0 600 54" style={{ width: '100%', height: 54, background: '#0d1512', border: '1px solid #214b3a', borderRadius: 6 }}><polyline points={waveform} fill="none" stroke="#00ff88" strokeWidth="2" /></svg>}
+              <label style={styles.label}>Décalage : {music.offset_frames} frames</label>
+              <input style={styles.slider} type="range" min="-30" max="30" step="1" value={music.offset_frames} onChange={(e) => updateMusic('offset_frames', parseInt(e.target.value, 10))} />
+              <label style={styles.label}>Loop musical : {music.loop_in.toFixed(2)}s → {music.loop_out.toFixed(2)}s</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.05" value={music.loop_in} onChange={(e) => updateMusic('loop_in', parseFloat(e.target.value) || 0)} />
+                <input style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.05" value={music.loop_out} onChange={(e) => updateMusic('loop_out', parseFloat(e.target.value) || 0)} />
+              </div>
+              <label style={styles.label}>Climax / drop : {music.climax_time == null ? 'fin de l’intro' : `${music.climax_time.toFixed(2)}s`}</label>
+              <input style={styles.input} type="number" min="0" step="0.05" value={music.climax_time ?? ''} placeholder="ex. 2.50" onChange={(e) => updateMusic('climax_time', e.target.value === '' ? null : parseFloat(e.target.value))} />
+              <label style={styles.label}>Volume intro : {Math.round(music.intro_volume * 100)}%</label>
+              <input style={styles.slider} type="range" min="0" max="1.5" step="0.05" value={music.intro_volume} onChange={(e) => updateMusic('intro_volume', parseFloat(e.target.value))} />
+              <label style={styles.label}>Volume Match Cut : {Math.round(music.match_cut_volume * 100)}%</label>
+              <input style={styles.slider} type="range" min="0" max="1.5" step="0.05" value={music.match_cut_volume} onChange={(e) => updateMusic('match_cut_volume', parseFloat(e.target.value))} />
+              <div style={{ marginTop: 10, padding: 8, background: '#101a15', border: '1px solid #23543e', borderRadius: 6, fontSize: 12, color: '#a7e9c2' }}>
+                La boucle reste active avant le climax. Le climax déclenche la sortie de boucle et le début du Match Cut.
+              </div>
             </div>
           )}
 

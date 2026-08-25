@@ -35,10 +35,14 @@ export function normalizeHybridManifest(manifest, session = {}) {
   };
   const fps = Number(source.fps || 30);
   const intro = source.intro || {};
-  const introFrames = Math.max(
+  const declaredIntroFrames = Math.max(
     0,
     Number(intro.duration_frames) || Math.round(Number(intro.duration_seconds || 0) * fps),
   );
+  const musicClimaxFrame = session.music?.climax_time == null
+    ? 0
+    : Math.max(0, Math.round(Number(session.music.climax_time) * fps));
+  const introFrames = Math.max(declaredIntroFrames, musicClimaxFrame);
   const declaredTotalFrames = Number(source.total_frames) || 0;
   const declaredMatchCutFrames = Number(source.match_cut?.total_frames || source.match_cut_total_frames || 0);
   const matchCutFrames = Math.max(0, declaredMatchCutFrames || declaredTotalFrames - introFrames);

@@ -18,6 +18,11 @@ on:
         required: false
         default: '32790039440'
         type: string
+      music_run_id:
+        description: 'Run F00-MUSIC optionnel contenant music_timeline.json et l’audio'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -57,7 +62,18 @@ jobs:
           run-id: ${{ inputs.f00b_run_id }}
           path: /tmp/f00b
 
+      - name: Télécharger l’artifact F00-MUSIC optionnel
+        if: ${{ inputs.music_run_id != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: lacrimae-dev7-f00-music-${{ inputs.music_run_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.music_run_id }}
+          path: /tmp/music
+
       - name: Préparer le codex Hybrid et les assets F00-D
+
         env:
           CODEX_PATH: ${{ inputs.codex_path }}
         run: |
@@ -78,6 +94,13 @@ jobs:
           cp -R F00_INGEST/OUT/f04_hybrid/intro F03_PICTOR/CODEBASE/public/
           cp -R F00_INGEST/OUT/f04_hybrid/match_cut F03_PICTOR/CODEBASE/public/
           cp F00_INGEST/OUT/f04_hybrid/match_cut/sequences/seq_0001.mp4 F03_PICTOR/CODEBASE/public/video_source.mp4
+          if [ -n '${{ inputs.music_run_id }}' ]; then
+            test -f /tmp/music/music_timeline.json
+            test -f /tmp/music/source_audio
+            cp /tmp/music/music_timeline.json F03_PICTOR/CODEBASE/src/data/music_timeline.json
+            mkdir -p F03_PICTOR/CODEBASE/public/audio
+            cp /tmp/music/source_audio F03_PICTOR/CODEBASE/public/audio/source_audio
+          fi
           if [ -f F03_PREVIEW/CODEBASE/public/logo.png ]; then cp F03_PREVIEW/CODEBASE/public/logo.png F03_PICTOR/CODEBASE/public/; fi
           if [ -d F03_PREVIEW/CODEBASE/public/backgrounds ]; then cp -R F03_PREVIEW/CODEBASE/public/backgrounds F03_PICTOR/CODEBASE/public/; fi
 

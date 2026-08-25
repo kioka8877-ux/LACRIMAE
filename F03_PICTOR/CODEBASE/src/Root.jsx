@@ -4,6 +4,7 @@ import { OmniComposition } from './OmniComposition';
 import codex from './data/codex.json';
 import sequences from './data/sequences.json';
 import hybridManifest from './data/hybrid_manifest.json';
+import musicTimeline from './data/music_timeline.json';
 import { getCompositionConfig } from './compositionConfig';
 
 const clip = codex.clips?.[0] || codex;
@@ -31,6 +32,7 @@ export const LacrimaeRoot = () => (
       sequences,
       hybridManifest: hybridActive ? hybridManifest : null,
       videoSrc: staticFile(video.source || sequences.source || 'video_source.mp4'),
+      musicTimeline,
     }}
   />
 );

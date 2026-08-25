@@ -16,6 +16,7 @@ import { darkLuxuryNoirFilter, darkLuxuryNoirOverlayStyle } from './darkLuxuryNo
 import { sciFiNeonHdrFilter, sciFiNeonHdrOverlayStyle } from './sciFiNeonHdr';
 import { activeFlashTextUnit, flashTextStyle } from './flashText';
 import { hybridTimelineFrame, hybridEgoStyle, hybridTextStyle } from './hybridNarrative';
+import { buildAudioSegments, normalizeMusicTimeline } from './audioTimeline';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * OmniComposition (F03 PREVIEW) â€” mÃªmes 6 calques que F04 RENDER :
@@ -68,7 +69,7 @@ const SESSION_FALLBACK = {
   },
 };
 
-export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequences, hybridManifest, hybridIntroSrc }) => {
+export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequences, hybridManifest, hybridIntroSrc, musicTimeline }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames, width, height } = useVideoConfig();
 
@@ -158,11 +159,19 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
   const texts = clip.texts || {};
   const textMode = texts.mode || (texts.title ? 'title' : 'none');
   const hybridIntroUrl = hybridIntroSrc || (hybridManifest?.intro?.file ? staticFile(hybridManifest.intro.file.replace(/^\.\//, '')) : null);
+  const music = normalizeMusicTimeline(musicTimeline || session.music || clip.music || {}, fps, durationInFrames);
+  const musicUrl = music.audio_src ? (music.audio_src.startsWith('./') ? staticFile(music.audio_src.replace(/^\.\//, '')) : music.audio_src) : null;
+  const musicSegments = musicUrl ? buildAudioSegments({ ...music, audio_src: musicUrl }, fps, durationInFrames) : [];
 
   return (
     <AbsoluteFill style={{ backgroundColor: session.background?.color || '#000' }}>
-      {/* Audio */}
-      {clip.audio_enabled === true && clip.audioSrc && (
+      {/* Audio : même timeline que F03, avec loop intro et sortie au climax */}
+      {musicUrl && musicSegments.map((segment, index) => (
+        <Sequence key={`music_${index}`} from={segment.from} durationInFrames={segment.duration}>
+          <Audio src={musicUrl} startFrom={segment.startFrom} volume={segment.volume} />
+        </Sequence>
+      ))}
+      {!musicUrl && clip.audio_enabled === true && clip.audioSrc && (
         <Audio src={staticFile(clip.audioSrc)} volume={clip.volume ?? 1} />
       )}
 
