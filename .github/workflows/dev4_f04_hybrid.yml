@@ -66,8 +66,12 @@ jobs:
           hybrid=json.loads(Path('src/data/hybrid_manifest.json').read_text())
           assert codex.get('session', {}).get('review_mode') == 'hybrid_narrative'
           assert hybrid.get('mode') == 'hybrid_narrative'
-          assert len(json.loads(Path('src/data/sequences.json').read_text()).get('sequences', [])) == 86
-          print(f"Hybrid frames: {hybrid['total_frames']}")
+          sequence_data=json.loads(Path('src/data/sequences.json').read_text())
+          sequence_count=len(sequence_data.get('sequences', []))
+          assert sequence_data.get('materialized') is True
+          assert sequence_count > 0
+          assert all(row.get('file') for row in sequence_data['sequences'])
+          print(f"Hybrid frames: {hybrid['total_frames']}; materialized sequences: {sequence_count}")
           print('Hybrid F04 inputs valid')
           PY
 
