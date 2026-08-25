@@ -1,10 +1,42 @@
 {
   "schema_version": "1.0.0",
-  "models": [],
+  "models": [
+    {
+      "id": "rife-4.25-hdv3",
+      "family": "RIFE",
+      "version": "4.25",
+      "variant": "HDv3",
+      "license": "MIT",
+      "source_url": "https://drive.google.com/file/d/1ZKjcbmt1hypiFprJPIKW0Tt0lr_2i7bg/view?usp=sharing",
+      "archive_filename": "rife_4.25.zip",
+      "archive_sha256": "e63d481b7ae5d4a4e6ad7ac5b410ff78f3bf7be3b51b2e38ca8152747abde5b4",
+      "object_key": "models/RIFE/4.25/train_log/flownet.pkl",
+      "sha256": "6615790efd627772917205db291f51cd392528a157ecbb2ecaeec3bff8eb6de2",
+      "destination": "models/RIFE/4.25/train_log/flownet.pkl",
+      "companion_files": [
+        {
+          "object_key": "models/RIFE/4.25/train_log/IFNet_HDv3.py",
+          "sha256": "655b4c772b037967b86c2dd31c8fa3b5323b79dd9a0e0088708d89149bbc8a32",
+          "destination": "models/RIFE/4.25/train_log/IFNet_HDv3.py"
+        },
+        {
+          "object_key": "models/RIFE/4.25/train_log/RIFE_HDv3.py",
+          "sha256": "81bbd0648e499de79e44768d284005d9d57d0f6eb7c30adae407f22675055730",
+          "destination": "models/RIFE/4.25/train_log/RIFE_HDv3.py"
+        },
+        {
+          "object_key": "models/RIFE/4.25/train_log/refine.py",
+          "sha256": "0c5698b4a05b9f6ab551740575c1c35e248e5b1829bab6445186081ebe15f032",
+          "destination": "models/RIFE/4.25/train_log/refine.py"
+        }
+      ],
+      "notes": "RIFE 4.25 est recommandé par Practical-RIFE pour la plupart des scènes. Le manifeste principal pointe le poids et déclare les trois fichiers Python compagnons nécessaires au chargement HDv3."
+    }
+  ],
   "policy": {
     "require_sha256": true,
     "require_pinned_version": true,
-    "allow_empty_manifest_in_contract_mode": true
+    "allow_empty_manifest_in_contract_mode": false
   },
-  "notes": "Ajouter les modèles validés avec object_key, destination et SHA-256 avant le premier rendu IA."
+  "notes": "Source officielle Practical-RIFE ; les fichiers sont installés dans le Volume Modal lacrimae-dev6-models sous models/RIFE/4.25/train_log/. La publication des mêmes objets dans le stockage indépendant doit précéder un bootstrap sur un nouveau compte Modal."
 }

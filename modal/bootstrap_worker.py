@@ -1,8 +1,4 @@
-"""Bootstrap portable d'un worker Modal.
-
-Le worker récupère une liste de modèles versionnés depuis le stockage objet
-indépendant vers le Volume Modal local. Aucun secret n'est écrit dans le dépôt.
-"""
+"""Bootstrap des poids depuis le stockage objet indépendant vers un Volume Modal."""
 from __future__ import annotations
 
 import hashlib
@@ -23,19 +19,29 @@ def load_manifest(path: str | Path = "models_manifest.json") -> dict:
     manifest = json.loads(Path(path).read_text(encoding="utf-8"))
     if manifest.get("schema_version") != "1.0.0":
         raise ValueError("version de manifeste de modèles non supportée")
+    expanded = []
     for item in manifest.get("models", []):
         for field in ("id", "object_key", "sha256", "destination"):
             if not item.get(field):
                 raise ValueError(f"champ modèle absent: {field}")
-    return manifest
+        expanded.append({k: item[k] for k in ("id", "object_key", "sha256", "destination")})
+        for index, companion in enumerate(item.get("companion_files", []), start=1):
+            for field in ("object_key", "sha256", "destination"):
+                if not companion.get(field):
+                    raise ValueError(f"champ fichier compagnon absent: {field}")
+            expanded.append(
+                {
+                    "id": f"{item['id']}-companion-{index}",
+                    "object_key": companion["object_key"],
+                    "sha256": companion["sha256"],
+                    "destination": companion["destination"],
+                }
+            )
+    return {**manifest, "models": expanded}
 
 
 def ensure_models(manifest_path: str | Path, destination_root: str | Path) -> list[dict]:
-    """Télécharge les modèles absents ou invalides depuis le backend S3.
-
-    Cette fonction est appelée dans le worker Modal après montage du Volume
-    modèles. Les credentials sont lus uniquement depuis l'environnement.
-    """
+    """Télécharge les modèles absents ou invalides depuis le backend S3."""
     try:
         import boto3
         from botocore.config import Config
