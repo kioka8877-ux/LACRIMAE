@@ -31,6 +31,20 @@
         }
       ],
       "notes": "RIFE 4.25 est recommandé par Practical-RIFE pour la plupart des scènes. Le manifeste principal pointe le poids et déclare les trois fichiers Python compagnons nécessaires au chargement HDv3."
+    },
+    {
+      "id": "realesrgan-x4plus-0.1.0",
+      "family": "Real-ESRGAN",
+      "version": "0.1.0",
+      "variant": "x4plus",
+      "license": "BSD-3-Clause",
+      "source_url": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth",
+      "object_key": "models/RealESRGAN/0.1.0/RealESRGAN_x4plus.pth",
+      "sha256": "4fa0d38905f75ac06eb49a7951b426670021be3018265fd191d2125df9d682f1",
+      "destination": "models/RealESRGAN/0.1.0/RealESRGAN_x4plus.pth",
+      "scale": 4,
+      "output_policy": "outscale_2_for_1080p_to_4k",
+      "notes": "Le modèle x4plus est exécuté avec outscale=2 pour convertir 1920x1080 en 3840x2160 sans dépasser la cible 4K."
     }
   ],
   "policy": {

@@ -175,6 +175,68 @@ def _run_rife(source: Path, destination: Path, target_fps: int) -> dict:
     }
 
 
+def _run_realesrgan(source: Path, destination: Path) -> dict:
+    import cv2
+    import torch
+    import torchvision.transforms.functional as tv_functional
+    sys.modules.setdefault("torchvision.transforms.functional_tensor", tv_functional)
+    from basicsr.archs.rrdbnet_arch import RRDBNet
+    from realesrgan import RealESRGANer
+
+    weights = Path(MODEL_DIR) / "models" / "RealESRGAN" / "0.1.0" / "RealESRGAN_x4plus.pth"
+    if not weights.is_file():
+        raise FileNotFoundError(f"poids Real-ESRGAN absents du Volume modèles: {weights}")
+    capture = cv2.VideoCapture(str(source))
+    source_fps = float(capture.get(cv2.CAP_PROP_FPS) or 0.0)
+    frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+    width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH) or 0)
+    height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT) or 0)
+    if source_fps <= 0 or width <= 0 or height <= 0:
+        capture.release()
+        raise ValueError("métadonnées vidéo invalides pour F04")
+    model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
+    upsampler = RealESRGANer(
+        scale=4, model_path=str(weights), model=model, tile=512, tile_pad=16,
+        pre_pad=0, half=torch.cuda.is_available(), gpu_id=0 if torch.cuda.is_available() else None,
+    )
+    out_w, out_h = width * 2, height * 2
+    tmp = destination.with_suffix(destination.suffix + ".upscale.tmp.mp4")
+    tmp.parent.mkdir(parents=True, exist_ok=True)
+    writer = cv2.VideoWriter(str(tmp), cv2.VideoWriter_fourcc(*"mp4v"), source_fps, (out_w, out_h))
+    if not writer.isOpened():
+        capture.release()
+        raise RuntimeError("VideoWriter 4K indisponible")
+    started = time.monotonic()
+    processed = 0
+    while True:
+        ok, frame = capture.read()
+        if not ok:
+            break
+        output, _ = upsampler.enhance(frame, outscale=2)
+        if output.shape[1] != out_w or output.shape[0] != out_h:
+            output = cv2.resize(output, (out_w, out_h), interpolation=cv2.INTER_LANCZOS4)
+        writer.write(output)
+        processed += 1
+    capture.release()
+    writer.release()
+    if processed != frame_count:
+        raise RuntimeError(f"nombre d'images inattendu dans F04: {processed}/{frame_count}")
+    tmp.replace(destination)
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    return {
+        "implementation": "realesrgan_x4plus_outscale_2",
+        "source_fps": source_fps,
+        "target_fps": source_fps,
+        "input_frames": frame_count,
+        "output_frames": processed,
+        "input_resolution": [width, height],
+        "output_resolution": [out_w, out_h],
+        "audio": "not_copied_in_f04_mvp",
+        "inference_seconds": round(time.monotonic() - started, 3),
+    }
+
+
 @app.function(
     image=image,
     gpu=os.environ.get("LACRIMAE_GPU", "L4"),
@@ -204,6 +266,8 @@ def run_stage(
     started = time.monotonic()
     if stage == "F02_MOTUS":
         metrics = _run_rife(source, destination, target_fps)
+    elif stage == "F04_UPSCALE":
+        metrics = _run_realesrgan(source, destination)
     else:
         import shutil
         shutil.copy2(source, destination)
@@ -215,8 +279,8 @@ def run_stage(
         "input_uri": input_uri,
         "output_uri": output_uri,
         "profile": profile,
-        "model": "rife-4.25-hdv3" if stage == "F02_MOTUS" else None,
-        "model_dir": str(RIFE_MODEL_DIR) if stage == "F02_MOTUS" else MODEL_DIR,
+        "model": ("rife-4.25-hdv3" if stage == "F02_MOTUS" else "realesrgan-x4plus-0.1.0" if stage == "F04_UPSCALE" else None),
+        "model_dir": str(RIFE_MODEL_DIR) if stage == "F02_MOTUS" else str(Path(MODEL_DIR) / "models" / "RealESRGAN" / "0.1.0") if stage == "F04_UPSCALE" else MODEL_DIR,
         "output_size_bytes": destination.stat().st_size,
         "output_sha256": sha256(destination),
         "elapsed_seconds": round(time.monotonic() - started, 3),

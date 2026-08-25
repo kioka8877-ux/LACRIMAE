@@ -4,3 +4,5 @@ opencv-python-headless==4.10.0.84
 boto3==1.35.99
 torch==2.5.1
 torchvision==0.20.1
+basicsr==1.4.2
+realesrgan==0.3.0
