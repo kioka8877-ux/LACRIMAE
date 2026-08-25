@@ -44,7 +44,7 @@ export function normalizeHybridManifest(manifest, session = {}) {
   const matchCutFrames = Math.max(0, declaredMatchCutFrames || declaredTotalFrames - introFrames);
   const totalFrames = Math.max(introFrames + matchCutFrames, declaredTotalFrames);
   const introText = normalizeHybridText(source.intro_text, "C'EST JUSTE UN JOUEUR", 1, 0.2);
-  const egoBase = normalizeHybridText(source.ego, 'EGO', 2);
+  const egoBase = normalizeHybridText(source.ego, 'EGO', 2, 0.2);
   const egoStartFrame = introFrames;
   const egoDuration = egoBase.duration_mode === 'until_end'
     ? Math.max(1, totalFrames - egoStartFrame)
