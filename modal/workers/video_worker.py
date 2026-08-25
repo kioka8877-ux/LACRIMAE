@@ -18,11 +18,7 @@ VIDEO_DIR = "/data"
 MODEL_DIR = "/models"
 GPU_STAGES = {"F02_MOTUS", "F03_RESTAURA", "F04_UPSCALE", "F05_LUMEN"}
 
-image = (
-    modal.Image.debian_slim(python_version="3.11")
-    .apt_install("ffmpeg", "git")
-    .pip_install("numpy", "opencv-python-headless")
-)
+image = modal.Image.from_dockerfile("modal/images/Dockerfile.video-gpu")
 
 app = modal.App(APP_NAME)
 video_volume = modal.Volume.from_name(

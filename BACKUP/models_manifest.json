@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0.0",
+  "models": [],
+  "policy": {
+    "require_sha256": true,
+    "require_pinned_version": true,
+    "allow_empty_manifest_in_contract_mode": true
+  },
+  "notes": "Ajouter les modèles validés avec object_key, destination et SHA-256 avant le premier rendu IA."
+}
