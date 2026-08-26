@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 import os
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -54,13 +55,43 @@ def load_state(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def probe_video(source: Path) -> dict[str, Any]:
+    """Retourne les métadonnées utiles sans imposer une orientation ou une résolution."""
+    command = [
+        "ffprobe", "-v", "error", "-show_entries",
+        "stream=index,codec_type,width,height,avg_frame_rate,channels,sample_rate:format=duration",
+        "-of", "json", str(source),
+    ]
+    try:
+        raw = subprocess.run(command, check=True, capture_output=True, text=True).stdout
+        payload = json.loads(raw)
+    except (OSError, subprocess.CalledProcessError, json.JSONDecodeError) as exc:
+        raise ValueError(f"impossible de lire les métadonnées vidéo: {exc}") from exc
+    streams = payload.get("streams", [])
+    video = next((item for item in streams if item.get("codec_type") == "video"), None)
+    if not video or not video.get("width") or not video.get("height"):
+        raise ValueError("la source ne contient pas de flux vidéo exploitable")
+    rate = video.get("avg_frame_rate", "0/0")
+    numerator, denominator = (int(value) for value in rate.split("/", 1))
+    fps = numerator / denominator if denominator else 0.0
+    return {
+        "width": int(video["width"]),
+        "height": int(video["height"]),
+        "fps": round(fps, 6),
+        "duration_seconds": float(payload.get("format", {}).get("duration") or 0.0),
+        "orientation": "portrait" if video["height"] > video["width"] else "landscape" if video["width"] > video["height"] else "square",
+        "audio_streams": sum(1 for item in streams if item.get("codec_type") == "audio"),
+    }
+
+
 def create_campaign(root: Path, campaign_id: str, source: Path, target_fps: int, profile: str) -> Path:
-    if target_fps not in (60, 120):
-        raise ValueError("target_fps doit être 60 ou 120")
+    if target_fps != 120:
+        raise ValueError("target_fps doit être 120 pour le MVP")
     if profile not in ("fast", "balanced", "quality_ultimate"):
         raise ValueError("profil inconnu")
     if not source.is_file():
         raise FileNotFoundError(source)
+    metadata = probe_video(source)
     base = campaign_dir(root, campaign_id)
     for stage in STAGES:
         (base / stage).mkdir(parents=True, exist_ok=True)
@@ -70,15 +101,17 @@ def create_campaign(root: Path, campaign_id: str, source: Path, target_fps: int,
         "source": {
             "uri": str(source.resolve()),
             "sha256": sha256_file(source),
-            "width": None,
-            "height": None,
-            "fps": None,
-            "duration_seconds": None,
+            "width": metadata["width"],
+            "height": metadata["height"],
+            "fps": metadata["fps"],
+            "duration_seconds": metadata["duration_seconds"],
+            "orientation": metadata["orientation"],
+            "audio_streams": metadata["audio_streams"],
             "rotation": 0,
         },
         "target": {
-            "width": 3840,
-            "height": 2160,
+            "width": metadata["width"],
+            "height": metadata["height"],
             "fps": target_fps,
             "audio": "preserve",
             "profile": profile,
