@@ -55,7 +55,7 @@ def main() -> int:
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--app", default="lacrimae-dev6-video")
     parser.add_argument("--video-volume", default="lacrimae-dev6-video")
-    parser.add_argument("--profile", default="balanced")
+    parser.add_argument("--profile", default="cinematic_hyper_detail")
     parser.add_argument("--target-fps", type=int, default=120)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()

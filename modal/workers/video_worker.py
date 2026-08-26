@@ -21,6 +21,7 @@ VIDEO_DIR = "/data"
 MODEL_DIR = "/models"
 RIFE_VERSION = "4.25"
 RIFE_MODEL_DIR = Path(MODEL_DIR) / "models" / "RIFE" / RIFE_VERSION / "train_log"
+ATOM_CONFIG_PATH = Path("/app/CONFIG/atom_ic_profiles.json")
 GPU_STAGES = {
     "F02_MOTUS", "F02_MOTUS_RIFE",
     "F03_RESTAURA", "F03_APOTHECA_RESTAURA",
@@ -265,8 +266,25 @@ def _run_gfpgan(source: Path, destination: Path, profile: str) -> dict:
     }
 
 
+def _load_atom_profile(profile: str) -> dict:
+    """Charge un profil ATOM-IC embarqué dans l’image, avec repli sûr."""
+    if ATOM_CONFIG_PATH.is_file():
+        payload = json.loads(ATOM_CONFIG_PATH.read_text(encoding="utf-8"))
+        profiles = payload.get("profiles", {})
+        if profile in profiles:
+            return profiles[profile]
+        default_name = payload.get("default_profile", "balanced")
+        if default_name in profiles:
+            return profiles[default_name]
+    return {
+        "restaura": {"denoise_luma": 0.8, "denoise_chroma": 0.65, "unsharp_amount": 0.30, "unsharp_radius": 5},
+        "textura": {"contrast": 1.08, "saturation": 1.06, "unsharp_amount": 0.40, "unsharp_radius": 5, "local_detail": 0.12},
+        "lumen": {"contrast": 1.08, "saturation": 1.06, "brightness": 0.0, "unsharp_amount": 0.34, "unsharp_radius": 5, "highlight_bloom": 0.0},
+    }
+
+
 def _run_ffmpeg_filter(source: Path, destination: Path, stage: str, profile: str) -> dict:
-    """Restauration/finalisation à résolution native, avec audio conservé."""
+    """Restauration/finalisation ATOM-IC à résolution native, avec audio conservé."""
     import cv2
 
     probe = subprocess.run(
@@ -281,14 +299,31 @@ def _run_ffmpeg_filter(source: Path, destination: Path, stage: str, profile: str
     if not width or not height:
         raise ValueError(f"métadonnées invalides pour {stage}")
 
+    atom = _load_atom_profile(profile)
     if stage == "F03_RESTAURA":
-        # Nettoyage léger, sans agrandissement ni modification de géométrie.
-        video_filter = "hqdn3d=1.0:1.0:3.0:3.0,unsharp=5:5:0.30:5:5:0"
-        implementation = "ffmpeg_hqdn3d_unsharp_native"
+        cfg = atom["restaura"]
+        video_filter = (
+            f"hqdn3d={cfg['denoise_luma']}:{cfg['denoise_chroma']}:3:3,"
+            f"unsharp={cfg['unsharp_radius']}:{cfg['unsharp_radius']}:{cfg['unsharp_amount']}:"
+            f"{cfg['unsharp_radius']}:{cfg['unsharp_radius']}:0"
+        )
+        implementation = "atom_ic_restaura_native"
+    elif stage == "F04_FORGE_TEXTURA":
+        cfg = atom["textura"]
+        video_filter = (
+            f"eq=contrast={cfg['contrast']}:saturation={cfg['saturation']},"
+            f"unsharp={cfg['unsharp_radius']}:{cfg['unsharp_radius']}:{cfg['unsharp_amount']}:"
+            f"{cfg['unsharp_radius']}:{cfg['unsharp_radius']}:0"
+        )
+        implementation = "atom_ic_textura_native"
     else:
-        strength = "0.28" if profile == "fast" else "0.40" if profile == "balanced" else "0.52"
-        video_filter = f"eq=contrast=1.08:saturation=1.06,unsharp=5:5:{strength}:5:5:0"
-        implementation = "ffmpeg_eq_unsharp_native"
+        cfg = atom["lumen"]
+        video_filter = (
+            f"eq=contrast={cfg['contrast']}:saturation={cfg['saturation']}:brightness={cfg['brightness']},"
+            f"unsharp={cfg['unsharp_radius']}:{cfg['unsharp_radius']}:{cfg['unsharp_amount']}:"
+            f"{cfg['unsharp_radius']}:{cfg['unsharp_radius']}:0"
+        )
+        implementation = "atom_ic_lumen_native"
 
     tmp = destination.with_suffix(destination.suffix + f".{stage.lower()}.tmp.mp4")
     tmp.parent.mkdir(parents=True, exist_ok=True)

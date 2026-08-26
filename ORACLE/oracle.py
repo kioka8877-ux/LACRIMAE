@@ -93,7 +93,7 @@ def probe_video(source: Path) -> dict[str, Any]:
 def create_campaign(root: Path, campaign_id: str, source: Path, target_fps: int, profile: str) -> Path:
     if target_fps != 120:
         raise ValueError("target_fps doit être 120 pour le MVP")
-    if profile not in ("fast", "balanced", "quality_ultimate"):
+    if profile not in ("fast", "balanced", "quality_ultimate", "cinematic_hyper_detail"):
         raise ValueError("profil inconnu")
     if not source.is_file():
         raise FileNotFoundError(source)
@@ -175,7 +175,7 @@ def main() -> int:
     create.add_argument("--campaign-id", required=True)
     create.add_argument("--source", type=Path, required=True)
     create.add_argument("--target-fps", type=int, default=120)
-    create.add_argument("--profile", default="quality_ultimate")
+    create.add_argument("--profile", default="cinematic_hyper_detail")
     simulate = sub.add_parser("simulate", help="avancer une frégate sans GPU")
     simulate.add_argument("--root", default=".")
     simulate.add_argument("--campaign-id", required=True)

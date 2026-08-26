@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0.0",
+  "default_profile": "cinematic_hyper_detail",
+  "profiles": {
+    "cinematic_hyper_detail": {
+      "description": "Rendu cinématique stylisé, contours lisibles, couleurs fortes et hautes lumières maîtrisées.",
+      "restaura": {
+        "denoise_luma": 0.55,
+        "denoise_chroma": 0.45,
+        "unsharp_amount": 0.42,
+        "unsharp_radius": 5
+      },
+      "textura": {
+        "contrast": 1.12,
+        "saturation": 1.12,
+        "unsharp_amount": 0.58,
+        "unsharp_radius": 5,
+        "local_detail": 0.22
+      },
+      "lumen": {
+        "contrast": 1.10,
+        "saturation": 1.10,
+        "brightness": 0.0,
+        "unsharp_amount": 0.46,
+        "unsharp_radius": 5,
+        "highlight_bloom": 0.0
+      },
+      "face": {
+        "enabled": true,
+        "weight": 0.70,
+        "min_face_size": 48
+      }
+    },
+    "balanced": {
+      "description": "Profil prudent pour les vidéos naturelles.",
+      "restaura": {
+        "denoise_luma": 0.8,
+        "denoise_chroma": 0.65,
+        "unsharp_amount": 0.30,
+        "unsharp_radius": 5
+      },
+      "textura": {
+        "contrast": 1.08,
+        "saturation": 1.06,
+        "unsharp_amount": 0.40,
+        "unsharp_radius": 5,
+        "local_detail": 0.12
+      },
+      "lumen": {
+        "contrast": 1.08,
+        "saturation": 1.06,
+        "brightness": 0.0,
+        "unsharp_amount": 0.34,
+        "unsharp_radius": 5,
+        "highlight_bloom": 0.0
+      },
+      "face": {
+        "enabled": true,
+        "weight": 0.55,
+        "min_face_size": 64
+      }
+    }
+  }
+}

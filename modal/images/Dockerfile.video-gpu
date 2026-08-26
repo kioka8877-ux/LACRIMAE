@@ -20,3 +20,4 @@ COPY modal/workers /app/workers
 COPY modal/rife_runtime /app/rife_runtime
 COPY modal/bootstrap_worker.py /app/bootstrap_worker.py
 COPY BACKUP /app/BACKUP
+COPY CONFIG /app/CONFIG
