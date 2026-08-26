@@ -190,6 +190,81 @@ def _run_rife(source: Path, destination: Path, target_fps: int) -> dict:
     }
 
 
+def _run_gfpgan(source: Path, destination: Path, profile: str) -> dict:
+    """Restaure les visages détectés sans agrandir l’image et remuxe l’audio."""
+    import cv2
+    import torch
+    import torchvision.transforms.functional as tv_functional
+    sys.modules.setdefault("torchvision.transforms.functional_tensor", tv_functional)
+    from gfpgan import GFPGANer
+
+    weights = Path(MODEL_DIR) / "models" / "GFPGAN" / "1.3" / "GFPGANv1.3.pth"
+    if not weights.is_file():
+        raise FileNotFoundError(f"poids GFPGAN absents du Volume modèles: {weights}")
+    capture = cv2.VideoCapture(str(source))
+    fps = float(capture.get(cv2.CAP_PROP_FPS) or 0.0)
+    width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH) or 0)
+    height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT) or 0)
+    frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+    if fps <= 0 or width <= 0 or height <= 0:
+        capture.release()
+        raise ValueError("métadonnées vidéo invalides pour F05")
+    strength = 0.55 if profile == "fast" else 0.70 if profile == "balanced" else 0.82
+    restorer = GFPGANer(
+        model_path=str(weights), upscale=1, arch="clean", channel_multiplier=2,
+        bg_upsampler=None, device="cuda" if torch.cuda.is_available() else "cpu",
+    )
+    silent = destination.with_suffix(destination.suffix + ".faces.tmp.mp4")
+    writer = cv2.VideoWriter(str(silent), cv2.VideoWriter_fourcc(*"mp4v"), fps, (width, height))
+    if not writer.isOpened():
+        capture.release()
+        raise RuntimeError("impossible d’ouvrir l’encodeur temporaire F05")
+    started = time.monotonic()
+    processed = 0
+    detected_faces = 0
+    while True:
+        ok, frame = capture.read()
+        if not ok:
+            break
+        cropped_faces, _, restored = restorer.enhance(
+            frame, has_aligned=False, only_center_face=False, paste_back=True,
+            weight=strength,
+        )
+        detected_faces += len(cropped_faces or [])
+        if restored is None:
+            restored = frame
+        writer.write(restored)
+        processed += 1
+    capture.release()
+    writer.release()
+    if processed != frame_count:
+        raise RuntimeError(f"F05 a traité {processed}/{frame_count} images")
+    muxed = destination.with_suffix(destination.suffix + ".mux.tmp.mp4")
+    subprocess.run(
+        ["ffmpeg", "-y", "-loglevel", "error", "-i", str(silent), "-i", str(source),
+         "-map", "0:v:0", "-map", "1:a?", "-c:v", "libx264", "-preset", "fast",
+         "-crf", "18", "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart",
+         str(muxed)], check=True,
+    )
+    muxed.replace(destination)
+    silent.unlink(missing_ok=True)
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    return {
+        "implementation": "gfpgan_v1.3_face_restore_native",
+        "model": "GFPGANv1.3",
+        "input_resolution": [width, height],
+        "output_resolution": [width, height],
+        "source_fps": fps,
+        "target_fps": fps,
+        "input_frames": frame_count,
+        "output_frames": processed,
+        "faces_detected": detected_faces,
+        "audio": "copied_stream_copy",
+        "inference_seconds": round(time.monotonic() - started, 3),
+    }
+
+
 def _run_ffmpeg_filter(source: Path, destination: Path, stage: str, profile: str) -> dict:
     """Restauration/finalisation à résolution native, avec audio conservé."""
     import cv2
@@ -340,9 +415,7 @@ def run_stage(
     elif stage == "F04_FORGE_TEXTURA":
         metrics = _run_ffmpeg_filter(source, destination, "F04_FORGE_TEXTURA", profile)
     elif stage == "F05_LIBRARIUS_FACIES":
-        import shutil
-        shutil.copy2(source, destination)
-        metrics = {"implementation": "face_restore_disabled_no_model", "warning": "no_face_model_installed"}
+        metrics = _run_gfpgan(source, destination, profile)
     elif stage in ("F06_LUMEN", "F06_LUMEN_IGNIS"):
         metrics = _run_ffmpeg_filter(source, destination, "F06_LUMEN", profile)
     else:
@@ -356,8 +429,8 @@ def run_stage(
         "input_uri": input_uri,
         "output_uri": output_uri,
         "profile": profile,
-        "model": ("rife-4.25-hdv3" if stage in ("F02_MOTUS", "F02_MOTUS_RIFE") else "realesrgan-x4plus-0.1.0" if stage == "F04_UPSCALE" else None),
-        "model_dir": str(RIFE_MODEL_DIR) if stage in ("F02_MOTUS", "F02_MOTUS_RIFE") else str(Path(MODEL_DIR) / "models" / "RealESRGAN" / "0.1.0") if stage == "F04_UPSCALE" else MODEL_DIR,
+        "model": ("rife-4.25-hdv3" if stage in ("F02_MOTUS", "F02_MOTUS_RIFE") else "realesrgan-x4plus-0.1.0" if stage == "F04_UPSCALE" else "gfpgan-v1.3" if stage == "F05_LIBRARIUS_FACIES" else None),
+        "model_dir": str(RIFE_MODEL_DIR) if stage in ("F02_MOTUS", "F02_MOTUS_RIFE") else str(Path(MODEL_DIR) / "models" / "RealESRGAN" / "0.1.0") if stage == "F04_UPSCALE" else str(Path(MODEL_DIR) / "models" / "GFPGAN" / "1.3") if stage == "F05_LIBRARIUS_FACIES" else MODEL_DIR,
         "output_size_bytes": destination.stat().st_size,
         "output_sha256": sha256(destination),
         "elapsed_seconds": round(time.monotonic() - started, 3),

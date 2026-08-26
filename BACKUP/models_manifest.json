@@ -45,6 +45,20 @@
       "scale": 4,
       "output_policy": "outscale_2_for_1080p_to_4k",
       "notes": "Le modèle x4plus est exécuté avec outscale=2 pour convertir 1920x1080 en 3840x2160 sans dépasser la cible 4K."
+    },
+    {
+      "id": "gfpgan-v1.3",
+      "family": "GFPGAN",
+      "version": "1.3",
+      "variant": "clean",
+      "license": "Apache-2.0",
+      "source_url": "https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.3.pth",
+      "object_key": "models/GFPGAN/1.3/GFPGANv1.3.pth",
+      "sha256": "c953a88f2727c85c3d9ae72e2bd4846bbaf59fe6972ad94130e23e7017524a70",
+      "destination": "models/GFPGAN/1.3/GFPGANv1.3.pth",
+      "scale": 1,
+      "output_policy": "face_only_native_resolution",
+      "notes": "GFPGAN v1.3 est activé uniquement sur les visages détectés ; il ne remplace pas la restauration générale des textures."
     }
   ],
   "policy": {

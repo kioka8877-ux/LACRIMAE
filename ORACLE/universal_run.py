@@ -92,13 +92,6 @@ def main() -> int:
 
     current_input = input_uri
     for stage, remote_stage in REMOTE_STAGES.items():
-        if stage == "F05_LIBRARIUS_FACIES":
-            report = {"status": "SKIPPED", "stage": stage, "warning": "no_face_model_installed", "created_at": now()}
-            report_path = write_stage_report(base, stage, report)
-            state["completed_stages"].append(stage)
-            state["artifacts"][stage] = str(report_path)
-            save_state(state_file, state)
-            continue
         output_uri = f"{remote_root}/{stage.lower()}.mp4"
         command = [sys.executable, "modal/invoke_remote.py", "--app", args.app,
                    "--stage", remote_stage, "--input-uri", current_input,
