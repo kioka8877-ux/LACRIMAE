@@ -25,7 +25,8 @@ STAGES = [
     "F04_FORGE_TEXTURA",
     "F05_LIBRARIUS_FACIES",
     "F06_LUMEN_IGNIS",
-    "F07_VOX_PERSISTENS",
+    "F07_CHROMA_DOMINATUS",
+    "F08_TEMPORALIS_CONSISTENTIA",
     "F10_CUSTOS_RESTITUTIO",
 ]
 
@@ -93,7 +94,7 @@ def probe_video(source: Path) -> dict[str, Any]:
 def create_campaign(root: Path, campaign_id: str, source: Path, target_fps: int, profile: str) -> Path:
     if target_fps != 120:
         raise ValueError("target_fps doit être 120 pour le MVP")
-    if profile not in ("fast", "balanced", "quality_ultimate", "cinematic_hyper_detail"):
+    if profile not in ("fast", "balanced", "quality_ultimate", "cinematic_hyper_detail", "hdr_imperator", "realistic_aurea", "old_main_noctis"):
         raise ValueError("profil inconnu")
     if not source.is_file():
         raise FileNotFoundError(source)
