@@ -21,7 +21,13 @@ VIDEO_DIR = "/data"
 MODEL_DIR = "/models"
 RIFE_VERSION = "4.25"
 RIFE_MODEL_DIR = Path(MODEL_DIR) / "models" / "RIFE" / RIFE_VERSION / "train_log"
-GPU_STAGES = {"F02_MOTUS", "F03_RESTAURA", "F04_UPSCALE", "F05_LIBRARIUS_FACIES", "F06_LUMEN"}
+GPU_STAGES = {
+    "F02_MOTUS", "F02_MOTUS_RIFE",
+    "F03_RESTAURA", "F03_APOTHECA_RESTAURA",
+    "F04_UPSCALE", "F04_FORGE_TEXTURA",
+    "F05_LIBRARIUS_FACIES",
+    "F06_LUMEN", "F06_LUMEN_IGNIS",
+}
 
 image = modal.Image.from_dockerfile("modal/images/Dockerfile.video-gpu")
 app = modal.App(APP_NAME)
@@ -325,18 +331,20 @@ def run_stage(
         raise FileNotFoundError(f"entrée absente du Volume vidéo: {input_uri}")
     destination.parent.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
-    if stage == "F02_MOTUS":
+    if stage in ("F02_MOTUS", "F02_MOTUS_RIFE"):
         metrics = _run_rife(source, destination, target_fps)
-    elif stage == "F03_RESTAURA":
-        metrics = _run_ffmpeg_filter(source, destination, stage, profile)
+    elif stage in ("F03_RESTAURA", "F03_APOTHECA_RESTAURA"):
+        metrics = _run_ffmpeg_filter(source, destination, "F03_RESTAURA", profile)
     elif stage == "F04_UPSCALE":
         metrics = _run_realesrgan(source, destination)
+    elif stage == "F04_FORGE_TEXTURA":
+        metrics = _run_ffmpeg_filter(source, destination, "F04_FORGE_TEXTURA", profile)
     elif stage == "F05_LIBRARIUS_FACIES":
         import shutil
         shutil.copy2(source, destination)
         metrics = {"implementation": "face_restore_disabled_no_model", "warning": "no_face_model_installed"}
-    elif stage == "F06_LUMEN":
-        metrics = _run_ffmpeg_filter(source, destination, stage, profile)
+    elif stage in ("F06_LUMEN", "F06_LUMEN_IGNIS"):
+        metrics = _run_ffmpeg_filter(source, destination, "F06_LUMEN", profile)
     else:
         import shutil
         shutil.copy2(source, destination)
@@ -348,8 +356,8 @@ def run_stage(
         "input_uri": input_uri,
         "output_uri": output_uri,
         "profile": profile,
-        "model": ("rife-4.25-hdv3" if stage == "F02_MOTUS" else "realesrgan-x4plus-0.1.0" if stage == "F04_UPSCALE" else None),
-        "model_dir": str(RIFE_MODEL_DIR) if stage == "F02_MOTUS" else str(Path(MODEL_DIR) / "models" / "RealESRGAN" / "0.1.0") if stage == "F04_UPSCALE" else MODEL_DIR,
+        "model": ("rife-4.25-hdv3" if stage in ("F02_MOTUS", "F02_MOTUS_RIFE") else "realesrgan-x4plus-0.1.0" if stage == "F04_UPSCALE" else None),
+        "model_dir": str(RIFE_MODEL_DIR) if stage in ("F02_MOTUS", "F02_MOTUS_RIFE") else str(Path(MODEL_DIR) / "models" / "RealESRGAN" / "0.1.0") if stage == "F04_UPSCALE" else MODEL_DIR,
         "output_size_bytes": destination.stat().st_size,
         "output_sha256": sha256(destination),
         "elapsed_seconds": round(time.monotonic() - started, 3),

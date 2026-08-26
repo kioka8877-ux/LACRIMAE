@@ -18,9 +18,15 @@ from pathlib import Path
 from typing import Any
 
 STAGES = [
-    "F00_INGEST", "F01_ANALYSIS", "F02_MOTUS", "F03_RESTAURA",
-    "F04_UPSCALE", "F05_LUMEN", "F06_AUDIO", "F07_CUSTOS_VIDEO",
-    "F08_CAMOUFLAGE", "F09_LUTHER",
+    "F00_PORTA_INGRESSUS",
+    "F01_AUSPEX_OCULUS",
+    "F02_MOTUS_RIFE",
+    "F03_APOTHECA_RESTAURA",
+    "F04_FORGE_TEXTURA",
+    "F05_LIBRARIUS_FACIES",
+    "F06_LUMEN_IGNIS",
+    "F07_VOX_PERSISTENS",
+    "F10_CUSTOS_RESTITUTIO",
 ]
 
 
@@ -116,7 +122,7 @@ def create_campaign(root: Path, campaign_id: str, source: Path, target_fps: int,
             "audio": "preserve",
             "profile": profile,
         },
-        "current_stage": "F00_INGEST",
+        "current_stage": "F00_PORTA_INGRESSUS",
         "completed_stages": [],
         "artifacts": {"source": str(source.resolve())},
         "worker_profile": os.environ.get("LACRIMAE_WORKER", "local_simulation"),
