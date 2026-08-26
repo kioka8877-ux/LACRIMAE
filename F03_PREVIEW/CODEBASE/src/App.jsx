@@ -673,7 +673,7 @@ export default function App() {
                 <div style={{ margin: '8px 0 12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6, fontSize: 10, color: '#b8c9c1', marginBottom: 4 }}>
                     <span><b style={{ color: '#00ff88' }}>VERT</b> = boucle intro</span>
-                    <span><b style={{ color: '#ff4d6d' }}>ROUGE</b> = climax / Match Cut</span>
+                    <span><b style={{ color: '#ff4d6d' }}>ROUGE</b> = partie forte Match Cut</span>
                   </div>
                   <svg
                     ref={waveformRef}
@@ -684,6 +684,12 @@ export default function App() {
                     onPointerUp={() => setWaveDrag(null)}
                     onPointerCancel={() => setWaveDrag(null)}
                   >
+                    {Array.from({ length: Math.ceil(waveformDuration / 5) + 1 }, (_, index) => index * 5).filter((seconds) => seconds <= waveformDuration).map((seconds) => (
+                      <g key={`tick_${seconds}`}>
+                        <line x1={waveformX(seconds)} x2={waveformX(seconds)} y1="0" y2={waveformHeight} stroke="#284638" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                        <text x={Math.min(waveformWidth - 20, Math.max(2, waveformX(seconds) + 2))} y="78" fill="#71867b" fontSize="9">{seconds}s</text>
+                      </g>
+                    ))}
                     <rect x={waveformX(music.intro_in)} y="0" width={Math.max(1, waveformX(music.intro_out) - waveformX(music.intro_in))} height={waveformHeight} fill="#00ff88" opacity="0.18" />
                     <rect x={waveformX(music.match_cut_in)} y="0" width={Math.max(1, waveformX(music.match_cut_out) - waveformX(music.match_cut_in))} height={waveformHeight} fill="#ff4d6d" opacity="0.14" />
                     <polyline points={waveform} fill="none" stroke="#00ff88" strokeWidth="2" vectorEffect="non-scaling-stroke" />
@@ -712,7 +718,7 @@ export default function App() {
                     <text x={waveformWidth - 42} y={waveformHeight - 3} fill="#71867b" fontSize="9">{waveformDuration.toFixed(1)}s</text>
                   </svg>
                   <div style={{ marginTop: 5, fontSize: 11, color: '#d4e3dc' }}>
-                    Glisse <b style={{ color: '#00ff88' }}>IN</b> et <b style={{ color: '#00ff88' }}>OUT</b> pour choisir la portion répétée pendant l’introduction. Glisse <b style={{ color: '#ff4d6d' }}>CLIMAX</b> pour choisir le passage au Match Cut + EGO.
+                    Glisse <b style={{ color: '#00ff88' }}>IN</b>/<b style={{ color: '#00ff88' }}>OUT</b> pour choisir la portion répétée de l’introduction, puis <b style={{ color: '#ff4d6d' }}>DROP</b>/<b style={{ color: '#ff4d6d' }}>FIN</b> pour choisir toute la partie forte du Match Cut.
                   </div>
                 </div>
               )}
