@@ -8,24 +8,26 @@
       "preset": "vertical",
       "width": 1080,
       "height": 1920,
-      "fit": "cover",
-      "background_fill": "blurred_video",
-      "rotation_mode": "per_sequence",
+      "fit": "contain",
+      "background_fill": "static",
+      "rotation_mode": "static",
+      "rotation_deg": 90,
       "rotation_step_deg": 1,
       "rotation_total_deg": 360,
       "rotation_direction": 1,
-      "rotation_layer": "video"
+      "rotation_layer": "video",
+      "video_scale": 2.4
     },
     "background": {
-      "image": "bg_grid_dark.png",
-      "color": "#0a0a0a",
-      "scale": 1.0
+      "image": null,
+      "color": "transparent",
+      "scale": 1
     },
     "logo": {
       "src": "logo.png",
       "width_pct": 20,
       "position": "top_right",
-      "opacity": 1.0
+      "opacity": 1
     },
     "texts_style": {
       "font": "Impact, Arial Black, sans-serif",
@@ -39,19 +41,4291 @@
       "letter_spacing": "0em"
     },
     "presets": {
-      "color_preset": "punchy",
-      "color_css_filter": "contrast(1.3) saturate(1.5) brightness(1.1)",
-      "contrast": 1.3,
+      "color_preset": "scifi_neon_hdr",
+      "color_css_filter": "contrast(1.35) saturate(1.45) brightness(0.97)",
+      "contrast": 1,
       "brightness": 1.1,
       "enhance_4k": false,
       "sharpening": 0,
       "denoising": 0,
       "vignette": 0.25,
-      "grain_intensity": 0.15
+      "grain_intensity": 0.15,
+      "dark_luxury_noir": {
+        "enabled": false,
+        "intensity": 0
+      },
+      "scifi_neon_hdr": {
+        "enabled": true,
+        "intensity": 39
+      }
     },
-    "profile": "background"
+    "profile": "background",
+    "review_mode": "hybrid_narrative",
+    "hybrid": {
+      "intro": {},
+      "intro_text": {
+        "text": "C'EST JUSTE UN JOUEUR",
+        "duration_mode": "until_match_cut",
+        "start_frame": 0,
+        "font_family": "Impact",
+        "color": "#FFFFFF",
+        "scale": 0.8,
+        "rotation_deg": 0,
+        "position_x": 50,
+        "position_y": 78,
+        "blur_frames": 0
+      },
+      "ego": {
+        "scale": 1.3,
+        "color": "#da1b1b"
+      }
+    },
+    "music": {
+      "enabled": true,
+      "audio_file": "sia_elastic_heart.mp3",
+      "audio_src": "./audio/sia_elastic_heart.mp3",
+      "duration_seconds": 255.242,
+      "sample_rate": 48000,
+      "bpm": 134.7,
+      "sync_mode": "manual",
+      "offset_frames": 0,
+      "beats": [
+        {
+          "id": "beat_0001",
+          "time_seconds": 10.85,
+          "frame": 271,
+          "strength": 1.586,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0002",
+          "time_seconds": 11.55,
+          "frame": 289,
+          "strength": 1.587,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0003",
+          "time_seconds": 11.8,
+          "frame": 295,
+          "strength": 1.284,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0004",
+          "time_seconds": 12.5,
+          "frame": 312,
+          "strength": 1.236,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0005",
+          "time_seconds": 12.75,
+          "frame": 319,
+          "strength": 1.491,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0006",
+          "time_seconds": 13.4,
+          "frame": 335,
+          "strength": 1.669,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0007",
+          "time_seconds": 13.65,
+          "frame": 341,
+          "strength": 1.365,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0008",
+          "time_seconds": 13.9,
+          "frame": 348,
+          "strength": 1.228,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0009",
+          "time_seconds": 14.35,
+          "frame": 359,
+          "strength": 1.35,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0010",
+          "time_seconds": 14.55,
+          "frame": 364,
+          "strength": 1.748,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0011",
+          "time_seconds": 14.7,
+          "frame": 368,
+          "strength": 1.201,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0012",
+          "time_seconds": 15.25,
+          "frame": 381,
+          "strength": 1.99,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0013",
+          "time_seconds": 16.4,
+          "frame": 410,
+          "strength": 1.823,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0014",
+          "time_seconds": 17.3,
+          "frame": 432,
+          "strength": 1.278,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0015",
+          "time_seconds": 17.55,
+          "frame": 439,
+          "strength": 1.602,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0016",
+          "time_seconds": 17.8,
+          "frame": 445,
+          "strength": 1.68,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0017",
+          "time_seconds": 18.05,
+          "frame": 451,
+          "strength": 1.714,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0018",
+          "time_seconds": 18.25,
+          "frame": 456,
+          "strength": 1.541,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0019",
+          "time_seconds": 18.95,
+          "frame": 474,
+          "strength": 1.775,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0020",
+          "time_seconds": 19.15,
+          "frame": 479,
+          "strength": 1.392,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0021",
+          "time_seconds": 20.1,
+          "frame": 503,
+          "strength": 1.864,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0022",
+          "time_seconds": 20.8,
+          "frame": 520,
+          "strength": 1.938,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0023",
+          "time_seconds": 21,
+          "frame": 525,
+          "strength": 1.412,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0024",
+          "time_seconds": 21.25,
+          "frame": 531,
+          "strength": 1.202,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0025",
+          "time_seconds": 21.95,
+          "frame": 549,
+          "strength": 1.954,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0026",
+          "time_seconds": 22.65,
+          "frame": 566,
+          "strength": 1.901,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0027",
+          "time_seconds": 22.85,
+          "frame": 571,
+          "strength": 1.335,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0028",
+          "time_seconds": 23.8,
+          "frame": 595,
+          "strength": 1.908,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0029",
+          "time_seconds": 24.7,
+          "frame": 618,
+          "strength": 1.395,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0030",
+          "time_seconds": 24.95,
+          "frame": 624,
+          "strength": 1.856,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0031",
+          "time_seconds": 25.2,
+          "frame": 630,
+          "strength": 1.496,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0032",
+          "time_seconds": 25.4,
+          "frame": 635,
+          "strength": 1.701,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0033",
+          "time_seconds": 25.65,
+          "frame": 641,
+          "strength": 1.721,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0034",
+          "time_seconds": 26.35,
+          "frame": 659,
+          "strength": 1.628,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0035",
+          "time_seconds": 26.55,
+          "frame": 664,
+          "strength": 1.432,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0036",
+          "time_seconds": 27.25,
+          "frame": 681,
+          "strength": 1.204,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0037",
+          "time_seconds": 27.5,
+          "frame": 688,
+          "strength": 1.693,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0038",
+          "time_seconds": 28.2,
+          "frame": 705,
+          "strength": 1.599,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0039",
+          "time_seconds": 28.4,
+          "frame": 710,
+          "strength": 1.509,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0040",
+          "time_seconds": 29.1,
+          "frame": 728,
+          "strength": 1.302,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0041",
+          "time_seconds": 29.35,
+          "frame": 734,
+          "strength": 1.794,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0042",
+          "time_seconds": 30.05,
+          "frame": 751,
+          "strength": 1.416,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0043",
+          "time_seconds": 30.25,
+          "frame": 756,
+          "strength": 1.41,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0044",
+          "time_seconds": 30.95,
+          "frame": 774,
+          "strength": 1.278,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0045",
+          "time_seconds": 31.2,
+          "frame": 780,
+          "strength": 1.811,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0046",
+          "time_seconds": 32.1,
+          "frame": 802,
+          "strength": 1.582,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0047",
+          "time_seconds": 32.35,
+          "frame": 809,
+          "strength": 1.821,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0048",
+          "time_seconds": 32.55,
+          "frame": 814,
+          "strength": 1.506,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0049",
+          "time_seconds": 32.8,
+          "frame": 820,
+          "strength": 1.823,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0050",
+          "time_seconds": 33.05,
+          "frame": 826,
+          "strength": 1.425,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0051",
+          "time_seconds": 33.75,
+          "frame": 844,
+          "strength": 1.449,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0052",
+          "time_seconds": 33.95,
+          "frame": 849,
+          "strength": 1.531,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0053",
+          "time_seconds": 34.65,
+          "frame": 866,
+          "strength": 1.237,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0054",
+          "time_seconds": 34.9,
+          "frame": 872,
+          "strength": 1.537,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0055",
+          "time_seconds": 35.6,
+          "frame": 890,
+          "strength": 1.619,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0056",
+          "time_seconds": 35.8,
+          "frame": 895,
+          "strength": 1.498,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0057",
+          "time_seconds": 36.05,
+          "frame": 901,
+          "strength": 1.354,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0058",
+          "time_seconds": 36.25,
+          "frame": 906,
+          "strength": 1.259,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0059",
+          "time_seconds": 36.5,
+          "frame": 912,
+          "strength": 1.393,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0060",
+          "time_seconds": 36.75,
+          "frame": 919,
+          "strength": 1.635,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0061",
+          "time_seconds": 37.4,
+          "frame": 935,
+          "strength": 1.533,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0062",
+          "time_seconds": 37.65,
+          "frame": 941,
+          "strength": 1.395,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0063",
+          "time_seconds": 38.35,
+          "frame": 959,
+          "strength": 1.25,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0064",
+          "time_seconds": 38.6,
+          "frame": 965,
+          "strength": 1.713,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0065",
+          "time_seconds": 38.8,
+          "frame": 970,
+          "strength": 1.702,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0066",
+          "time_seconds": 39.05,
+          "frame": 976,
+          "strength": 1.811,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0067",
+          "time_seconds": 39.25,
+          "frame": 981,
+          "strength": 1.5,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0068",
+          "time_seconds": 39.75,
+          "frame": 994,
+          "strength": 1.677,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0069",
+          "time_seconds": 39.95,
+          "frame": 999,
+          "strength": 1.648,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0070",
+          "time_seconds": 40.4,
+          "frame": 1010,
+          "strength": 1.567,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0071",
+          "time_seconds": 41.1,
+          "frame": 1028,
+          "strength": 1.863,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0072",
+          "time_seconds": 41.35,
+          "frame": 1034,
+          "strength": 1.311,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0073",
+          "time_seconds": 42.3,
+          "frame": 1058,
+          "strength": 1.681,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0074",
+          "time_seconds": 42.95,
+          "frame": 1074,
+          "strength": 1.778,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0075",
+          "time_seconds": 43.2,
+          "frame": 1080,
+          "strength": 1.279,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0076",
+          "time_seconds": 43.9,
+          "frame": 1098,
+          "strength": 1.239,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0077",
+          "time_seconds": 44.1,
+          "frame": 1102,
+          "strength": 1.561,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0078",
+          "time_seconds": 44.8,
+          "frame": 1120,
+          "strength": 1.845,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0079",
+          "time_seconds": 45.05,
+          "frame": 1126,
+          "strength": 1.299,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0080",
+          "time_seconds": 45.95,
+          "frame": 1149,
+          "strength": 1.581,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0081",
+          "time_seconds": 46.85,
+          "frame": 1171,
+          "strength": 1.341,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0082",
+          "time_seconds": 47.1,
+          "frame": 1178,
+          "strength": 1.453,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0083",
+          "time_seconds": 47.25,
+          "frame": 1181,
+          "strength": 1.308,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0084",
+          "time_seconds": 47.6,
+          "frame": 1190,
+          "strength": 1.777,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0085",
+          "time_seconds": 47.8,
+          "frame": 1195,
+          "strength": 1.553,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0086",
+          "time_seconds": 48.5,
+          "frame": 1212,
+          "strength": 1.646,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0087",
+          "time_seconds": 48.7,
+          "frame": 1218,
+          "strength": 1.441,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0088",
+          "time_seconds": 49.65,
+          "frame": 1241,
+          "strength": 1.953,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0089",
+          "time_seconds": 50.35,
+          "frame": 1259,
+          "strength": 1.857,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0090",
+          "time_seconds": 50.55,
+          "frame": 1264,
+          "strength": 1.292,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0091",
+          "time_seconds": 51.25,
+          "frame": 1281,
+          "strength": 1.209,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0092",
+          "time_seconds": 51.5,
+          "frame": 1288,
+          "strength": 1.934,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0093",
+          "time_seconds": 52.4,
+          "frame": 1310,
+          "strength": 1.3,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0094",
+          "time_seconds": 53.1,
+          "frame": 1328,
+          "strength": 1.358,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0095",
+          "time_seconds": 53.55,
+          "frame": 1339,
+          "strength": 1.2,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0096",
+          "time_seconds": 53.7,
+          "frame": 1342,
+          "strength": 1.227,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0097",
+          "time_seconds": 54.25,
+          "frame": 1356,
+          "strength": 1.23,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0098",
+          "time_seconds": 54.6,
+          "frame": 1365,
+          "strength": 1.264,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0099",
+          "time_seconds": 55.2,
+          "frame": 1380,
+          "strength": 1.792,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0100",
+          "time_seconds": 55.4,
+          "frame": 1385,
+          "strength": 1.321,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0101",
+          "time_seconds": 55.9,
+          "frame": 1398,
+          "strength": 1.788,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0102",
+          "time_seconds": 56.1,
+          "frame": 1402,
+          "strength": 1.255,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0103",
+          "time_seconds": 56.55,
+          "frame": 1414,
+          "strength": 1.269,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0104",
+          "time_seconds": 57.05,
+          "frame": 1426,
+          "strength": 1.87,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0105",
+          "time_seconds": 57.75,
+          "frame": 1444,
+          "strength": 1.808,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0106",
+          "time_seconds": 58,
+          "frame": 1450,
+          "strength": 1.275,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0107",
+          "time_seconds": 58.4,
+          "frame": 1460,
+          "strength": 1.447,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0108",
+          "time_seconds": 58.65,
+          "frame": 1466,
+          "strength": 1.279,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0109",
+          "time_seconds": 58.9,
+          "frame": 1473,
+          "strength": 1.746,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0110",
+          "time_seconds": 59.25,
+          "frame": 1481,
+          "strength": 1.21,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0111",
+          "time_seconds": 59.6,
+          "frame": 1490,
+          "strength": 1.807,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0112",
+          "time_seconds": 59.8,
+          "frame": 1495,
+          "strength": 1.32,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0113",
+          "time_seconds": 60.25,
+          "frame": 1506,
+          "strength": 1.339,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0114",
+          "time_seconds": 60.5,
+          "frame": 1512,
+          "strength": 1.504,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0115",
+          "time_seconds": 60.75,
+          "frame": 1519,
+          "strength": 1.462,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0116",
+          "time_seconds": 61.4,
+          "frame": 1535,
+          "strength": 1.561,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0117",
+          "time_seconds": 61.55,
+          "frame": 1539,
+          "strength": 1.515,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0118",
+          "time_seconds": 61.7,
+          "frame": 1542,
+          "strength": 1.257,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0119",
+          "time_seconds": 61.9,
+          "frame": 1548,
+          "strength": 1.787,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0120",
+          "time_seconds": 62.15,
+          "frame": 1554,
+          "strength": 1.583,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0121",
+          "time_seconds": 62.35,
+          "frame": 1559,
+          "strength": 1.596,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0122",
+          "time_seconds": 62.6,
+          "frame": 1565,
+          "strength": 1.709,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0123",
+          "time_seconds": 63.3,
+          "frame": 1582,
+          "strength": 1.59,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0124",
+          "time_seconds": 63.5,
+          "frame": 1588,
+          "strength": 1.286,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0125",
+          "time_seconds": 63.95,
+          "frame": 1599,
+          "strength": 1.452,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0126",
+          "time_seconds": 64.45,
+          "frame": 1611,
+          "strength": 1.781,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0127",
+          "time_seconds": 65.15,
+          "frame": 1629,
+          "strength": 1.718,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0128",
+          "time_seconds": 65.35,
+          "frame": 1634,
+          "strength": 1.313,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0129",
+          "time_seconds": 65.8,
+          "frame": 1645,
+          "strength": 1.477,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0130",
+          "time_seconds": 66.3,
+          "frame": 1658,
+          "strength": 1.63,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0131",
+          "time_seconds": 67,
+          "frame": 1675,
+          "strength": 1.619,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0132",
+          "time_seconds": 67.2,
+          "frame": 1680,
+          "strength": 1.307,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0133",
+          "time_seconds": 67.65,
+          "frame": 1691,
+          "strength": 1.589,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0134",
+          "time_seconds": 67.9,
+          "frame": 1698,
+          "strength": 1.368,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0135",
+          "time_seconds": 68.15,
+          "frame": 1704,
+          "strength": 1.536,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0136",
+          "time_seconds": 68.7,
+          "frame": 1718,
+          "strength": 1.217,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0137",
+          "time_seconds": 68.85,
+          "frame": 1721,
+          "strength": 1.774,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0138",
+          "time_seconds": 69.1,
+          "frame": 1728,
+          "strength": 1.197,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0139",
+          "time_seconds": 69.25,
+          "frame": 1731,
+          "strength": 1.438,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0140",
+          "time_seconds": 69.5,
+          "frame": 1738,
+          "strength": 1.867,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0141",
+          "time_seconds": 69.75,
+          "frame": 1744,
+          "strength": 1.645,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0142",
+          "time_seconds": 69.95,
+          "frame": 1749,
+          "strength": 1.505,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0143",
+          "time_seconds": 70.65,
+          "frame": 1766,
+          "strength": 1.655,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0144",
+          "time_seconds": 70.9,
+          "frame": 1773,
+          "strength": 1.256,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0145",
+          "time_seconds": 71.15,
+          "frame": 1779,
+          "strength": 1.319,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0146",
+          "time_seconds": 71.35,
+          "frame": 1784,
+          "strength": 1.458,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0147",
+          "time_seconds": 71.5,
+          "frame": 1788,
+          "strength": 1.245,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0148",
+          "time_seconds": 71.85,
+          "frame": 1796,
+          "strength": 1.697,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0149",
+          "time_seconds": 72,
+          "frame": 1800,
+          "strength": 1.321,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0150",
+          "time_seconds": 72.15,
+          "frame": 1804,
+          "strength": 1.224,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0151",
+          "time_seconds": 72.35,
+          "frame": 1809,
+          "strength": 1.305,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0152",
+          "time_seconds": 72.5,
+          "frame": 1812,
+          "strength": 1.821,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0153",
+          "time_seconds": 72.7,
+          "frame": 1818,
+          "strength": 1.352,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0154",
+          "time_seconds": 73.1,
+          "frame": 1828,
+          "strength": 1.221,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0155",
+          "time_seconds": 73.3,
+          "frame": 1832,
+          "strength": 1.327,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0156",
+          "time_seconds": 73.5,
+          "frame": 1838,
+          "strength": 1.288,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0157",
+          "time_seconds": 73.65,
+          "frame": 1841,
+          "strength": 1.53,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0158",
+          "time_seconds": 73.85,
+          "frame": 1846,
+          "strength": 1.29,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0159",
+          "time_seconds": 74.35,
+          "frame": 1859,
+          "strength": 1.544,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0160",
+          "time_seconds": 74.65,
+          "frame": 1866,
+          "strength": 1.213,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0161",
+          "time_seconds": 75.05,
+          "frame": 1876,
+          "strength": 1.36,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0162",
+          "time_seconds": 75.25,
+          "frame": 1881,
+          "strength": 1.28,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0163",
+          "time_seconds": 75.55,
+          "frame": 1889,
+          "strength": 1.581,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0164",
+          "time_seconds": 75.75,
+          "frame": 1894,
+          "strength": 1.255,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0165",
+          "time_seconds": 75.9,
+          "frame": 1898,
+          "strength": 1.308,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0166",
+          "time_seconds": 76.2,
+          "frame": 1905,
+          "strength": 1.678,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0167",
+          "time_seconds": 76.45,
+          "frame": 1911,
+          "strength": 1.314,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0168",
+          "time_seconds": 76.65,
+          "frame": 1916,
+          "strength": 1.632,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0169",
+          "time_seconds": 76.9,
+          "frame": 1923,
+          "strength": 1.606,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0170",
+          "time_seconds": 77.15,
+          "frame": 1929,
+          "strength": 1.575,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0171",
+          "time_seconds": 77.35,
+          "frame": 1934,
+          "strength": 1.576,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0172",
+          "time_seconds": 77.95,
+          "frame": 1949,
+          "strength": 1.278,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0173",
+          "time_seconds": 78.25,
+          "frame": 1956,
+          "strength": 1.198,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0174",
+          "time_seconds": 78.75,
+          "frame": 1969,
+          "strength": 1.459,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0175",
+          "time_seconds": 78.9,
+          "frame": 1973,
+          "strength": 1.279,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0176",
+          "time_seconds": 79.2,
+          "frame": 1980,
+          "strength": 1.699,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0177",
+          "time_seconds": 79.45,
+          "frame": 1986,
+          "strength": 1.226,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0178",
+          "time_seconds": 79.9,
+          "frame": 1998,
+          "strength": 1.917,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0179",
+          "time_seconds": 80.25,
+          "frame": 2006,
+          "strength": 1.251,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0180",
+          "time_seconds": 80.45,
+          "frame": 2011,
+          "strength": 1.24,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0181",
+          "time_seconds": 80.6,
+          "frame": 2015,
+          "strength": 1.497,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0182",
+          "time_seconds": 80.85,
+          "frame": 2021,
+          "strength": 1.213,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0183",
+          "time_seconds": 81.05,
+          "frame": 2026,
+          "strength": 1.762,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0184",
+          "time_seconds": 81.75,
+          "frame": 2044,
+          "strength": 1.567,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0185",
+          "time_seconds": 82,
+          "frame": 2050,
+          "strength": 1.302,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0186",
+          "time_seconds": 82.45,
+          "frame": 2061,
+          "strength": 1.505,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0187",
+          "time_seconds": 82.65,
+          "frame": 2066,
+          "strength": 1.352,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0188",
+          "time_seconds": 82.9,
+          "frame": 2072,
+          "strength": 1.727,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0189",
+          "time_seconds": 83.05,
+          "frame": 2076,
+          "strength": 1.293,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0190",
+          "time_seconds": 83.6,
+          "frame": 2090,
+          "strength": 1.77,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0191",
+          "time_seconds": 84.05,
+          "frame": 2101,
+          "strength": 1.603,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0192",
+          "time_seconds": 84.2,
+          "frame": 2105,
+          "strength": 1.232,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0193",
+          "time_seconds": 84.4,
+          "frame": 2110,
+          "strength": 1.427,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0194",
+          "time_seconds": 84.6,
+          "frame": 2115,
+          "strength": 1.338,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0195",
+          "time_seconds": 84.9,
+          "frame": 2122,
+          "strength": 1.258,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0196",
+          "time_seconds": 85.45,
+          "frame": 2136,
+          "strength": 1.207,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0197",
+          "time_seconds": 85.65,
+          "frame": 2141,
+          "strength": 1.273,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0198",
+          "time_seconds": 86.15,
+          "frame": 2154,
+          "strength": 1.23,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0199",
+          "time_seconds": 86.35,
+          "frame": 2159,
+          "strength": 1.292,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0200",
+          "time_seconds": 86.6,
+          "frame": 2165,
+          "strength": 1.295,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0201",
+          "time_seconds": 88,
+          "frame": 2200,
+          "strength": 1.319,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0202",
+          "time_seconds": 93.75,
+          "frame": 2344,
+          "strength": 1.223,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0203",
+          "time_seconds": 94,
+          "frame": 2350,
+          "strength": 1.231,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0204",
+          "time_seconds": 94.9,
+          "frame": 2372,
+          "strength": 1.197,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0205",
+          "time_seconds": 98.6,
+          "frame": 2465,
+          "strength": 1.209,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0206",
+          "time_seconds": 99.55,
+          "frame": 2489,
+          "strength": 1.543,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0207",
+          "time_seconds": 100.25,
+          "frame": 2506,
+          "strength": 1.486,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0208",
+          "time_seconds": 100.45,
+          "frame": 2511,
+          "strength": 1.368,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0209",
+          "time_seconds": 101.15,
+          "frame": 2529,
+          "strength": 1.388,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0210",
+          "time_seconds": 101.4,
+          "frame": 2535,
+          "strength": 1.51,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0211",
+          "time_seconds": 101.9,
+          "frame": 2548,
+          "strength": 1.285,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0212",
+          "time_seconds": 102.05,
+          "frame": 2551,
+          "strength": 1.698,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0213",
+          "time_seconds": 102.3,
+          "frame": 2558,
+          "strength": 1.39,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0214",
+          "time_seconds": 103,
+          "frame": 2575,
+          "strength": 1.47,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0215",
+          "time_seconds": 103.2,
+          "frame": 2580,
+          "strength": 1.691,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0216",
+          "time_seconds": 103.35,
+          "frame": 2584,
+          "strength": 1.43,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0217",
+          "time_seconds": 103.9,
+          "frame": 2598,
+          "strength": 1.84,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0218",
+          "time_seconds": 104.15,
+          "frame": 2604,
+          "strength": 1.224,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0219",
+          "time_seconds": 104.85,
+          "frame": 2621,
+          "strength": 1.28,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0220",
+          "time_seconds": 105.1,
+          "frame": 2628,
+          "strength": 1.777,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0221",
+          "time_seconds": 105.8,
+          "frame": 2645,
+          "strength": 1.256,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0222",
+          "time_seconds": 106,
+          "frame": 2650,
+          "strength": 1.438,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0223",
+          "time_seconds": 106.25,
+          "frame": 2656,
+          "strength": 1.566,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0224",
+          "time_seconds": 106.45,
+          "frame": 2661,
+          "strength": 1.649,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0225",
+          "time_seconds": 106.7,
+          "frame": 2668,
+          "strength": 1.748,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0226",
+          "time_seconds": 106.95,
+          "frame": 2674,
+          "strength": 1.447,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0227",
+          "time_seconds": 107.6,
+          "frame": 2690,
+          "strength": 1.726,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0228",
+          "time_seconds": 107.8,
+          "frame": 2695,
+          "strength": 1.212,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0229",
+          "time_seconds": 108.75,
+          "frame": 2719,
+          "strength": 1.711,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0230",
+          "time_seconds": 109.45,
+          "frame": 2736,
+          "strength": 1.92,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0231",
+          "time_seconds": 109.7,
+          "frame": 2742,
+          "strength": 1.305,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0232",
+          "time_seconds": 110.4,
+          "frame": 2760,
+          "strength": 1.298,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0233",
+          "time_seconds": 110.6,
+          "frame": 2765,
+          "strength": 1.879,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0234",
+          "time_seconds": 110.9,
+          "frame": 2772,
+          "strength": 1.329,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0235",
+          "time_seconds": 111.05,
+          "frame": 2776,
+          "strength": 1.227,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0236",
+          "time_seconds": 111.3,
+          "frame": 2783,
+          "strength": 1.963,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0237",
+          "time_seconds": 111.5,
+          "frame": 2788,
+          "strength": 1.349,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0238",
+          "time_seconds": 112.45,
+          "frame": 2811,
+          "strength": 1.862,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0239",
+          "time_seconds": 113.35,
+          "frame": 2834,
+          "strength": 1.367,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0240",
+          "time_seconds": 113.5,
+          "frame": 2838,
+          "strength": 1.243,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0241",
+          "time_seconds": 113.85,
+          "frame": 2846,
+          "strength": 1.649,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0242",
+          "time_seconds": 114.05,
+          "frame": 2851,
+          "strength": 1.597,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0243",
+          "time_seconds": 114.3,
+          "frame": 2858,
+          "strength": 1.796,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0244",
+          "time_seconds": 115,
+          "frame": 2875,
+          "strength": 1.762,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0245",
+          "time_seconds": 115.2,
+          "frame": 2880,
+          "strength": 1.41,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0246",
+          "time_seconds": 116.15,
+          "frame": 2904,
+          "strength": 1.8,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0247",
+          "time_seconds": 116.85,
+          "frame": 2921,
+          "strength": 1.646,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0248",
+          "time_seconds": 117.05,
+          "frame": 2926,
+          "strength": 1.42,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0249",
+          "time_seconds": 117.5,
+          "frame": 2938,
+          "strength": 1.255,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0250",
+          "time_seconds": 117.75,
+          "frame": 2944,
+          "strength": 1.304,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0251",
+          "time_seconds": 118,
+          "frame": 2950,
+          "strength": 1.775,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0252",
+          "time_seconds": 118.7,
+          "frame": 2968,
+          "strength": 1.501,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0253",
+          "time_seconds": 118.9,
+          "frame": 2972,
+          "strength": 1.344,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0254",
+          "time_seconds": 119.6,
+          "frame": 2990,
+          "strength": 1.335,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0255",
+          "time_seconds": 119.85,
+          "frame": 2996,
+          "strength": 1.903,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0256",
+          "time_seconds": 120.05,
+          "frame": 3001,
+          "strength": 1.22,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0257",
+          "time_seconds": 120.75,
+          "frame": 3019,
+          "strength": 1.52,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0258",
+          "time_seconds": 121,
+          "frame": 3025,
+          "strength": 1.836,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0259",
+          "time_seconds": 121.25,
+          "frame": 3031,
+          "strength": 1.731,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0260",
+          "time_seconds": 121.45,
+          "frame": 3036,
+          "strength": 1.861,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0261",
+          "time_seconds": 121.7,
+          "frame": 3042,
+          "strength": 1.567,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0262",
+          "time_seconds": 122.4,
+          "frame": 3060,
+          "strength": 1.471,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0263",
+          "time_seconds": 122.6,
+          "frame": 3065,
+          "strength": 1.416,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0264",
+          "time_seconds": 123.3,
+          "frame": 3083,
+          "strength": 1.315,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0265",
+          "time_seconds": 123.55,
+          "frame": 3089,
+          "strength": 1.539,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0266",
+          "time_seconds": 123.85,
+          "frame": 3096,
+          "strength": 1.217,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0267",
+          "time_seconds": 124.25,
+          "frame": 3106,
+          "strength": 1.688,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0268",
+          "time_seconds": 124.45,
+          "frame": 3111,
+          "strength": 1.514,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0269",
+          "time_seconds": 124.75,
+          "frame": 3119,
+          "strength": 1.534,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0270",
+          "time_seconds": 124.9,
+          "frame": 3122,
+          "strength": 1.428,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0271",
+          "time_seconds": 125.15,
+          "frame": 3129,
+          "strength": 1.416,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0272",
+          "time_seconds": 125.4,
+          "frame": 3135,
+          "strength": 1.722,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0273",
+          "time_seconds": 126.1,
+          "frame": 3152,
+          "strength": 1.588,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0274",
+          "time_seconds": 126.3,
+          "frame": 3158,
+          "strength": 1.485,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0275",
+          "time_seconds": 127,
+          "frame": 3175,
+          "strength": 1.315,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0276",
+          "time_seconds": 127.25,
+          "frame": 3181,
+          "strength": 1.881,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0277",
+          "time_seconds": 127.45,
+          "frame": 3186,
+          "strength": 1.697,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0278",
+          "time_seconds": 127.7,
+          "frame": 3192,
+          "strength": 1.848,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0279",
+          "time_seconds": 127.9,
+          "frame": 3198,
+          "strength": 1.42,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0280",
+          "time_seconds": 128.2,
+          "frame": 3205,
+          "strength": 1.197,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0281",
+          "time_seconds": 128.4,
+          "frame": 3210,
+          "strength": 1.719,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0282",
+          "time_seconds": 128.6,
+          "frame": 3215,
+          "strength": 1.622,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0283",
+          "time_seconds": 128.9,
+          "frame": 3222,
+          "strength": 1.55,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0284",
+          "time_seconds": 129.05,
+          "frame": 3226,
+          "strength": 1.622,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0285",
+          "time_seconds": 129.2,
+          "frame": 3230,
+          "strength": 1.523,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0286",
+          "time_seconds": 129.75,
+          "frame": 3244,
+          "strength": 1.753,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0287",
+          "time_seconds": 130,
+          "frame": 3250,
+          "strength": 1.37,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0288",
+          "time_seconds": 130.95,
+          "frame": 3274,
+          "strength": 1.688,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0289",
+          "time_seconds": 131.6,
+          "frame": 3290,
+          "strength": 1.679,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0290",
+          "time_seconds": 131.85,
+          "frame": 3296,
+          "strength": 1.321,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0291",
+          "time_seconds": 132.55,
+          "frame": 3314,
+          "strength": 1.311,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0292",
+          "time_seconds": 132.75,
+          "frame": 3319,
+          "strength": 1.458,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0293",
+          "time_seconds": 133.45,
+          "frame": 3336,
+          "strength": 1.763,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0294",
+          "time_seconds": 133.7,
+          "frame": 3343,
+          "strength": 1.28,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0295",
+          "time_seconds": 134.4,
+          "frame": 3360,
+          "strength": 1.208,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0296",
+          "time_seconds": 134.6,
+          "frame": 3365,
+          "strength": 1.521,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0297",
+          "time_seconds": 135.35,
+          "frame": 3384,
+          "strength": 1.22,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0298",
+          "time_seconds": 135.55,
+          "frame": 3389,
+          "strength": 1.224,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0299",
+          "time_seconds": 135.75,
+          "frame": 3394,
+          "strength": 1.38,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0300",
+          "time_seconds": 135.9,
+          "frame": 3398,
+          "strength": 1.26,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0301",
+          "time_seconds": 136.25,
+          "frame": 3406,
+          "strength": 1.795,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0302",
+          "time_seconds": 136.45,
+          "frame": 3411,
+          "strength": 1.528,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0303",
+          "time_seconds": 137.2,
+          "frame": 3430,
+          "strength": 1.547,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0304",
+          "time_seconds": 137.35,
+          "frame": 3434,
+          "strength": 1.381,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0305",
+          "time_seconds": 138.1,
+          "frame": 3452,
+          "strength": 1.196,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0306",
+          "time_seconds": 138.3,
+          "frame": 3458,
+          "strength": 1.801,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0307",
+          "time_seconds": 139,
+          "frame": 3475,
+          "strength": 1.845,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0308",
+          "time_seconds": 140.15,
+          "frame": 3504,
+          "strength": 1.843,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0309",
+          "time_seconds": 140.85,
+          "frame": 3521,
+          "strength": 1.6,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0310",
+          "time_seconds": 141.05,
+          "frame": 3526,
+          "strength": 1.324,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0311",
+          "time_seconds": 141.3,
+          "frame": 3533,
+          "strength": 1.209,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0312",
+          "time_seconds": 141.75,
+          "frame": 3544,
+          "strength": 1.407,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0313",
+          "time_seconds": 142,
+          "frame": 3550,
+          "strength": 1.714,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0314",
+          "time_seconds": 142.2,
+          "frame": 3555,
+          "strength": 1.263,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0315",
+          "time_seconds": 142.35,
+          "frame": 3559,
+          "strength": 1.302,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0316",
+          "time_seconds": 142.5,
+          "frame": 3562,
+          "strength": 1.36,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0317",
+          "time_seconds": 142.7,
+          "frame": 3568,
+          "strength": 1.652,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0318",
+          "time_seconds": 142.9,
+          "frame": 3572,
+          "strength": 1.214,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0319",
+          "time_seconds": 143.15,
+          "frame": 3579,
+          "strength": 1.595,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0320",
+          "time_seconds": 143.3,
+          "frame": 3583,
+          "strength": 1.293,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0321",
+          "time_seconds": 143.5,
+          "frame": 3588,
+          "strength": 1.338,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0322",
+          "time_seconds": 143.85,
+          "frame": 3596,
+          "strength": 1.761,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0323",
+          "time_seconds": 144.55,
+          "frame": 3614,
+          "strength": 1.45,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0324",
+          "time_seconds": 144.8,
+          "frame": 3620,
+          "strength": 1.275,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0325",
+          "time_seconds": 145.25,
+          "frame": 3631,
+          "strength": 1.431,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0326",
+          "time_seconds": 145.5,
+          "frame": 3638,
+          "strength": 1.206,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0327",
+          "time_seconds": 145.7,
+          "frame": 3643,
+          "strength": 1.658,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0328",
+          "time_seconds": 146.4,
+          "frame": 3660,
+          "strength": 1.669,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0329",
+          "time_seconds": 146.65,
+          "frame": 3666,
+          "strength": 1.298,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0330",
+          "time_seconds": 147.05,
+          "frame": 3676,
+          "strength": 1.388,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0331",
+          "time_seconds": 147.55,
+          "frame": 3689,
+          "strength": 1.802,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0332",
+          "time_seconds": 148.25,
+          "frame": 3706,
+          "strength": 1.632,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0333",
+          "time_seconds": 148.5,
+          "frame": 3712,
+          "strength": 1.236,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0334",
+          "time_seconds": 148.95,
+          "frame": 3724,
+          "strength": 1.27,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0335",
+          "time_seconds": 149.15,
+          "frame": 3729,
+          "strength": 1.381,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0336",
+          "time_seconds": 149.4,
+          "frame": 3735,
+          "strength": 1.825,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0337",
+          "time_seconds": 149.75,
+          "frame": 3744,
+          "strength": 1.247,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0338",
+          "time_seconds": 150.1,
+          "frame": 3752,
+          "strength": 1.853,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0339",
+          "time_seconds": 150.35,
+          "frame": 3759,
+          "strength": 1.279,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0340",
+          "time_seconds": 150.55,
+          "frame": 3764,
+          "strength": 1.776,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0341",
+          "time_seconds": 150.8,
+          "frame": 3770,
+          "strength": 1.819,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0342",
+          "time_seconds": 151,
+          "frame": 3775,
+          "strength": 1.608,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0343",
+          "time_seconds": 151.25,
+          "frame": 3781,
+          "strength": 1.865,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0344",
+          "time_seconds": 151.8,
+          "frame": 3795,
+          "strength": 1.281,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0345",
+          "time_seconds": 151.95,
+          "frame": 3799,
+          "strength": 1.612,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0346",
+          "time_seconds": 152.2,
+          "frame": 3805,
+          "strength": 1.327,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0347",
+          "time_seconds": 152.6,
+          "frame": 3815,
+          "strength": 1.346,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0348",
+          "time_seconds": 152.85,
+          "frame": 3821,
+          "strength": 1.207,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0349",
+          "time_seconds": 153.1,
+          "frame": 3828,
+          "strength": 1.581,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0350",
+          "time_seconds": 153.85,
+          "frame": 3846,
+          "strength": 1.465,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0351",
+          "time_seconds": 154,
+          "frame": 3850,
+          "strength": 1.445,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0352",
+          "time_seconds": 154.45,
+          "frame": 3861,
+          "strength": 1.388,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0353",
+          "time_seconds": 154.6,
+          "frame": 3865,
+          "strength": 1.225,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0354",
+          "time_seconds": 154.75,
+          "frame": 3869,
+          "strength": 1.196,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0355",
+          "time_seconds": 154.9,
+          "frame": 3872,
+          "strength": 1.532,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0356",
+          "time_seconds": 155.65,
+          "frame": 3891,
+          "strength": 1.785,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0357",
+          "time_seconds": 155.85,
+          "frame": 3896,
+          "strength": 1.259,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0358",
+          "time_seconds": 156.3,
+          "frame": 3908,
+          "strength": 1.43,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0359",
+          "time_seconds": 156.55,
+          "frame": 3914,
+          "strength": 1.616,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0360",
+          "time_seconds": 156.8,
+          "frame": 3920,
+          "strength": 1.562,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0361",
+          "time_seconds": 157.05,
+          "frame": 3926,
+          "strength": 1.2,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0362",
+          "time_seconds": 157.35,
+          "frame": 3934,
+          "strength": 1.203,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0363",
+          "time_seconds": 157.6,
+          "frame": 3940,
+          "strength": 1.309,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0364",
+          "time_seconds": 157.8,
+          "frame": 3945,
+          "strength": 1.26,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0365",
+          "time_seconds": 158.15,
+          "frame": 3954,
+          "strength": 1.418,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0366",
+          "time_seconds": 158.4,
+          "frame": 3960,
+          "strength": 1.614,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0367",
+          "time_seconds": 158.6,
+          "frame": 3965,
+          "strength": 1.583,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0368",
+          "time_seconds": 159.05,
+          "frame": 3976,
+          "strength": 1.249,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0369",
+          "time_seconds": 159.35,
+          "frame": 3984,
+          "strength": 1.603,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0370",
+          "time_seconds": 159.6,
+          "frame": 3990,
+          "strength": 1.201,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0371",
+          "time_seconds": 160,
+          "frame": 4000,
+          "strength": 1.495,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0372",
+          "time_seconds": 160.45,
+          "frame": 4011,
+          "strength": 1.524,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0373",
+          "time_seconds": 160.7,
+          "frame": 4018,
+          "strength": 1.228,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0374",
+          "time_seconds": 160.9,
+          "frame": 4022,
+          "strength": 1.275,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0375",
+          "time_seconds": 161.05,
+          "frame": 4026,
+          "strength": 1.296,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0376",
+          "time_seconds": 161.45,
+          "frame": 4036,
+          "strength": 1.341,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0377",
+          "time_seconds": 161.65,
+          "frame": 4041,
+          "strength": 1.235,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0378",
+          "time_seconds": 161.85,
+          "frame": 4046,
+          "strength": 1.447,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0379",
+          "time_seconds": 162.15,
+          "frame": 4054,
+          "strength": 1.276,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0380",
+          "time_seconds": 162.35,
+          "frame": 4059,
+          "strength": 1.675,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0381",
+          "time_seconds": 162.55,
+          "frame": 4064,
+          "strength": 1.274,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0382",
+          "time_seconds": 163.05,
+          "frame": 4076,
+          "strength": 1.457,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0383",
+          "time_seconds": 163.25,
+          "frame": 4081,
+          "strength": 1.347,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0384",
+          "time_seconds": 163.7,
+          "frame": 4093,
+          "strength": 1.484,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0385",
+          "time_seconds": 163.95,
+          "frame": 4099,
+          "strength": 1.392,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0386",
+          "time_seconds": 164.2,
+          "frame": 4105,
+          "strength": 1.563,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0387",
+          "time_seconds": 164.4,
+          "frame": 4110,
+          "strength": 1.304,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0388",
+          "time_seconds": 164.85,
+          "frame": 4121,
+          "strength": 1.713,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0389",
+          "time_seconds": 165.1,
+          "frame": 4128,
+          "strength": 1.235,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0390",
+          "time_seconds": 165.35,
+          "frame": 4134,
+          "strength": 1.517,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0391",
+          "time_seconds": 165.55,
+          "frame": 4139,
+          "strength": 1.716,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0392",
+          "time_seconds": 165.8,
+          "frame": 4145,
+          "strength": 1.743,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0393",
+          "time_seconds": 166,
+          "frame": 4150,
+          "strength": 1.566,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0394",
+          "time_seconds": 166.2,
+          "frame": 4155,
+          "strength": 1.433,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0395",
+          "time_seconds": 166.6,
+          "frame": 4165,
+          "strength": 1.364,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0396",
+          "time_seconds": 166.85,
+          "frame": 4171,
+          "strength": 1.257,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0397",
+          "time_seconds": 167,
+          "frame": 4175,
+          "strength": 1.197,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0398",
+          "time_seconds": 167.2,
+          "frame": 4180,
+          "strength": 1.282,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0399",
+          "time_seconds": 167.4,
+          "frame": 4185,
+          "strength": 1.541,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0400",
+          "time_seconds": 167.85,
+          "frame": 4196,
+          "strength": 1.66,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0401",
+          "time_seconds": 168.55,
+          "frame": 4214,
+          "strength": 1.877,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0402",
+          "time_seconds": 168.8,
+          "frame": 4220,
+          "strength": 1.276,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0403",
+          "time_seconds": 169.25,
+          "frame": 4231,
+          "strength": 1.568,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0404",
+          "time_seconds": 169.7,
+          "frame": 4242,
+          "strength": 1.62,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0405",
+          "time_seconds": 170.4,
+          "frame": 4260,
+          "strength": 1.663,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0406",
+          "time_seconds": 170.65,
+          "frame": 4266,
+          "strength": 1.265,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0407",
+          "time_seconds": 171.1,
+          "frame": 4278,
+          "strength": 1.37,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0408",
+          "time_seconds": 171.3,
+          "frame": 4282,
+          "strength": 1.324,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0409",
+          "time_seconds": 171.55,
+          "frame": 4289,
+          "strength": 1.713,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0410",
+          "time_seconds": 172.25,
+          "frame": 4306,
+          "strength": 1.872,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0411",
+          "time_seconds": 172.5,
+          "frame": 4312,
+          "strength": 1.318,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0412",
+          "time_seconds": 172.7,
+          "frame": 4318,
+          "strength": 1.446,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0413",
+          "time_seconds": 172.95,
+          "frame": 4324,
+          "strength": 1.354,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0414",
+          "time_seconds": 173.15,
+          "frame": 4329,
+          "strength": 1.39,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0415",
+          "time_seconds": 173.3,
+          "frame": 4332,
+          "strength": 1.211,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0416",
+          "time_seconds": 188,
+          "frame": 4700,
+          "strength": 1.218,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0417",
+          "time_seconds": 188.2,
+          "frame": 4705,
+          "strength": 1.503,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0418",
+          "time_seconds": 188.95,
+          "frame": 4724,
+          "strength": 1.589,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0419",
+          "time_seconds": 189.1,
+          "frame": 4728,
+          "strength": 1.312,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0420",
+          "time_seconds": 189.55,
+          "frame": 4739,
+          "strength": 1.346,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0421",
+          "time_seconds": 190.05,
+          "frame": 4751,
+          "strength": 1.814,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0422",
+          "time_seconds": 190.75,
+          "frame": 4769,
+          "strength": 1.765,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0423",
+          "time_seconds": 190.95,
+          "frame": 4774,
+          "strength": 1.412,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0424",
+          "time_seconds": 191.2,
+          "frame": 4780,
+          "strength": 1.2,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0425",
+          "time_seconds": 191.4,
+          "frame": 4785,
+          "strength": 1.415,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0426",
+          "time_seconds": 191.65,
+          "frame": 4791,
+          "strength": 1.288,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0427",
+          "time_seconds": 191.85,
+          "frame": 4796,
+          "strength": 1.455,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0428",
+          "time_seconds": 192.15,
+          "frame": 4804,
+          "strength": 1.209,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0429",
+          "time_seconds": 192.6,
+          "frame": 4815,
+          "strength": 1.732,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0430",
+          "time_seconds": 193.05,
+          "frame": 4826,
+          "strength": 1.286,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0431",
+          "time_seconds": 193.25,
+          "frame": 4831,
+          "strength": 1.398,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0432",
+          "time_seconds": 193.5,
+          "frame": 4838,
+          "strength": 1.264,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0433",
+          "time_seconds": 193.75,
+          "frame": 4844,
+          "strength": 1.512,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0434",
+          "time_seconds": 194.4,
+          "frame": 4860,
+          "strength": 1.511,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0435",
+          "time_seconds": 194.65,
+          "frame": 4866,
+          "strength": 1.225,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0436",
+          "time_seconds": 194.9,
+          "frame": 4872,
+          "strength": 1.662,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0437",
+          "time_seconds": 195.1,
+          "frame": 4878,
+          "strength": 1.768,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0438",
+          "time_seconds": 195.35,
+          "frame": 4884,
+          "strength": 1.662,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0439",
+          "time_seconds": 195.65,
+          "frame": 4891,
+          "strength": 1.406,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0440",
+          "time_seconds": 196.25,
+          "frame": 4906,
+          "strength": 1.758,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0441",
+          "time_seconds": 196.55,
+          "frame": 4914,
+          "strength": 1.303,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0442",
+          "time_seconds": 196.95,
+          "frame": 4924,
+          "strength": 1.423,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0443",
+          "time_seconds": 197.4,
+          "frame": 4935,
+          "strength": 1.635,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0444",
+          "time_seconds": 198.1,
+          "frame": 4953,
+          "strength": 1.637,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0445",
+          "time_seconds": 198.4,
+          "frame": 4960,
+          "strength": 1.278,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0446",
+          "time_seconds": 198.8,
+          "frame": 4970,
+          "strength": 1.524,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0447",
+          "time_seconds": 199,
+          "frame": 4975,
+          "strength": 1.222,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0448",
+          "time_seconds": 199.15,
+          "frame": 4979,
+          "strength": 1.229,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0449",
+          "time_seconds": 199.4,
+          "frame": 4985,
+          "strength": 1.206,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0450",
+          "time_seconds": 199.7,
+          "frame": 4992,
+          "strength": 1.275,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0451",
+          "time_seconds": 199.95,
+          "frame": 4999,
+          "strength": 1.657,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0452",
+          "time_seconds": 200.65,
+          "frame": 5016,
+          "strength": 1.483,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0453",
+          "time_seconds": 200.9,
+          "frame": 5022,
+          "strength": 1.294,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0454",
+          "time_seconds": 201.15,
+          "frame": 5029,
+          "strength": 1.476,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0455",
+          "time_seconds": 201.8,
+          "frame": 5045,
+          "strength": 1.663,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0456",
+          "time_seconds": 202.1,
+          "frame": 5053,
+          "strength": 1.29,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0457",
+          "time_seconds": 202.25,
+          "frame": 5056,
+          "strength": 1.807,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0458",
+          "time_seconds": 202.5,
+          "frame": 5062,
+          "strength": 1.603,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0459",
+          "time_seconds": 202.7,
+          "frame": 5068,
+          "strength": 1.683,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0460",
+          "time_seconds": 202.85,
+          "frame": 5071,
+          "strength": 1.384,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0461",
+          "time_seconds": 203.05,
+          "frame": 5076,
+          "strength": 1.3,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0462",
+          "time_seconds": 203.65,
+          "frame": 5091,
+          "strength": 1.699,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0463",
+          "time_seconds": 204.35,
+          "frame": 5109,
+          "strength": 1.352,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0464",
+          "time_seconds": 204.8,
+          "frame": 5120,
+          "strength": 1.59,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0465",
+          "time_seconds": 204.95,
+          "frame": 5124,
+          "strength": 1.332,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0466",
+          "time_seconds": 205.5,
+          "frame": 5138,
+          "strength": 1.604,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0467",
+          "time_seconds": 205.75,
+          "frame": 5144,
+          "strength": 1.268,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0468",
+          "time_seconds": 206.2,
+          "frame": 5155,
+          "strength": 1.216,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0469",
+          "time_seconds": 206.65,
+          "frame": 5166,
+          "strength": 1.753,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0470",
+          "time_seconds": 207.35,
+          "frame": 5184,
+          "strength": 1.69,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0471",
+          "time_seconds": 208.05,
+          "frame": 5201,
+          "strength": 1.442,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0472",
+          "time_seconds": 208.3,
+          "frame": 5208,
+          "strength": 1.336,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0473",
+          "time_seconds": 208.5,
+          "frame": 5212,
+          "strength": 1.771,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0474",
+          "time_seconds": 208.85,
+          "frame": 5221,
+          "strength": 1.228,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0475",
+          "time_seconds": 209.2,
+          "frame": 5230,
+          "strength": 1.584,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0476",
+          "time_seconds": 209.45,
+          "frame": 5236,
+          "strength": 1.271,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0477",
+          "time_seconds": 209.65,
+          "frame": 5241,
+          "strength": 1.641,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0478",
+          "time_seconds": 209.9,
+          "frame": 5248,
+          "strength": 1.414,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0479",
+          "time_seconds": 210.1,
+          "frame": 5253,
+          "strength": 1.666,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0480",
+          "time_seconds": 210.35,
+          "frame": 5259,
+          "strength": 1.897,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0481",
+          "time_seconds": 211.05,
+          "frame": 5276,
+          "strength": 1.62,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0482",
+          "time_seconds": 211.7,
+          "frame": 5292,
+          "strength": 1.309,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0483",
+          "time_seconds": 212.2,
+          "frame": 5305,
+          "strength": 1.648,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0484",
+          "time_seconds": 212.9,
+          "frame": 5322,
+          "strength": 1.709,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0485",
+          "time_seconds": 213.15,
+          "frame": 5329,
+          "strength": 1.209,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0486",
+          "time_seconds": 213.35,
+          "frame": 5334,
+          "strength": 1.258,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0487",
+          "time_seconds": 213.55,
+          "frame": 5339,
+          "strength": 1.401,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0488",
+          "time_seconds": 214.05,
+          "frame": 5351,
+          "strength": 1.68,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0489",
+          "time_seconds": 214.75,
+          "frame": 5369,
+          "strength": 1.517,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0490",
+          "time_seconds": 214.95,
+          "frame": 5374,
+          "strength": 1.316,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0491",
+          "time_seconds": 215.4,
+          "frame": 5385,
+          "strength": 1.452,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0492",
+          "time_seconds": 215.65,
+          "frame": 5391,
+          "strength": 1.445,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0493",
+          "time_seconds": 215.9,
+          "frame": 5398,
+          "strength": 1.454,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0494",
+          "time_seconds": 216.6,
+          "frame": 5415,
+          "strength": 1.401,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0495",
+          "time_seconds": 217.05,
+          "frame": 5426,
+          "strength": 1.596,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0496",
+          "time_seconds": 217.3,
+          "frame": 5432,
+          "strength": 1.454,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0497",
+          "time_seconds": 217.5,
+          "frame": 5438,
+          "strength": 1.543,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0498",
+          "time_seconds": 217.75,
+          "frame": 5444,
+          "strength": 1.545,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0499",
+          "time_seconds": 217.9,
+          "frame": 5448,
+          "strength": 1.204,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0500",
+          "time_seconds": 218.45,
+          "frame": 5461,
+          "strength": 1.537,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0501",
+          "time_seconds": 218.65,
+          "frame": 5466,
+          "strength": 1.272,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0502",
+          "time_seconds": 219.1,
+          "frame": 5478,
+          "strength": 1.355,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0503",
+          "time_seconds": 219.35,
+          "frame": 5484,
+          "strength": 1.246,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0504",
+          "time_seconds": 219.6,
+          "frame": 5490,
+          "strength": 1.386,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0505",
+          "time_seconds": 220.1,
+          "frame": 5503,
+          "strength": 1.252,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0506",
+          "time_seconds": 220.3,
+          "frame": 5508,
+          "strength": 1.511,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0507",
+          "time_seconds": 220.5,
+          "frame": 5512,
+          "strength": 1.239,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0508",
+          "time_seconds": 220.75,
+          "frame": 5519,
+          "strength": 1.25,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0509",
+          "time_seconds": 221,
+          "frame": 5525,
+          "strength": 1.416,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0510",
+          "time_seconds": 221.2,
+          "frame": 5530,
+          "strength": 1.259,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0511",
+          "time_seconds": 221.45,
+          "frame": 5536,
+          "strength": 1.468,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0512",
+          "time_seconds": 221.65,
+          "frame": 5541,
+          "strength": 1.232,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0513",
+          "time_seconds": 221.9,
+          "frame": 5548,
+          "strength": 1.264,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0514",
+          "time_seconds": 222.1,
+          "frame": 5553,
+          "strength": 1.486,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0515",
+          "time_seconds": 222.6,
+          "frame": 5565,
+          "strength": 1.291,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0516",
+          "time_seconds": 222.8,
+          "frame": 5570,
+          "strength": 1.394,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0517",
+          "time_seconds": 223.05,
+          "frame": 5576,
+          "strength": 1.43,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0518",
+          "time_seconds": 223.3,
+          "frame": 5582,
+          "strength": 1.705,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0519",
+          "time_seconds": 223.8,
+          "frame": 5595,
+          "strength": 1.212,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0520",
+          "time_seconds": 223.95,
+          "frame": 5599,
+          "strength": 1.541,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0521",
+          "time_seconds": 224.25,
+          "frame": 5606,
+          "strength": 1.285,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0522",
+          "time_seconds": 224.45,
+          "frame": 5611,
+          "strength": 1.55,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0523",
+          "time_seconds": 224.7,
+          "frame": 5618,
+          "strength": 1.655,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0524",
+          "time_seconds": 224.9,
+          "frame": 5622,
+          "strength": 1.73,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0525",
+          "time_seconds": 225.15,
+          "frame": 5629,
+          "strength": 1.641,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0526",
+          "time_seconds": 225.6,
+          "frame": 5640,
+          "strength": 1.278,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0527",
+          "time_seconds": 225.8,
+          "frame": 5645,
+          "strength": 1.873,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0528",
+          "time_seconds": 226.05,
+          "frame": 5651,
+          "strength": 1.275,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0529",
+          "time_seconds": 226.3,
+          "frame": 5658,
+          "strength": 1.319,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0530",
+          "time_seconds": 226.5,
+          "frame": 5662,
+          "strength": 1.468,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0531",
+          "time_seconds": 226.95,
+          "frame": 5674,
+          "strength": 1.519,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0532",
+          "time_seconds": 227.65,
+          "frame": 5691,
+          "strength": 1.586,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0533",
+          "time_seconds": 227.9,
+          "frame": 5698,
+          "strength": 1.366,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0534",
+          "time_seconds": 228.35,
+          "frame": 5709,
+          "strength": 1.324,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0535",
+          "time_seconds": 228.6,
+          "frame": 5715,
+          "strength": 1.245,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0536",
+          "time_seconds": 228.8,
+          "frame": 5720,
+          "strength": 1.514,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0537",
+          "time_seconds": 230.1,
+          "frame": 5753,
+          "strength": 1.199,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0538",
+          "time_seconds": 230.45,
+          "frame": 5761,
+          "strength": 1.292,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0539",
+          "time_seconds": 230.7,
+          "frame": 5768,
+          "strength": 1.294,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0540",
+          "time_seconds": 231.45,
+          "frame": 5786,
+          "strength": 1.221,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0541",
+          "time_seconds": 231.6,
+          "frame": 5790,
+          "strength": 1.225,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0542",
+          "time_seconds": 232.1,
+          "frame": 5803,
+          "strength": 1.264,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0543",
+          "time_seconds": 232.25,
+          "frame": 5806,
+          "strength": 1.362,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0544",
+          "time_seconds": 232.4,
+          "frame": 5810,
+          "strength": 1.301,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0545",
+          "time_seconds": 232.55,
+          "frame": 5814,
+          "strength": 1.587,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0546",
+          "time_seconds": 233.05,
+          "frame": 5826,
+          "strength": 1.27,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0547",
+          "time_seconds": 233.2,
+          "frame": 5830,
+          "strength": 1.509,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0548",
+          "time_seconds": 233.45,
+          "frame": 5836,
+          "strength": 1.228,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0549",
+          "time_seconds": 233.9,
+          "frame": 5848,
+          "strength": 1.539,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0550",
+          "time_seconds": 234.35,
+          "frame": 5859,
+          "strength": 1.552,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0551",
+          "time_seconds": 234.6,
+          "frame": 5865,
+          "strength": 1.21,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0552",
+          "time_seconds": 234.8,
+          "frame": 5870,
+          "strength": 1.285,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0553",
+          "time_seconds": 235.05,
+          "frame": 5876,
+          "strength": 1.542,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0554",
+          "time_seconds": 235.25,
+          "frame": 5881,
+          "strength": 1.232,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0555",
+          "time_seconds": 235.75,
+          "frame": 5894,
+          "strength": 1.36,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0556",
+          "time_seconds": 236.2,
+          "frame": 5905,
+          "strength": 1.685,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0557",
+          "time_seconds": 236.9,
+          "frame": 5922,
+          "strength": 1.574,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0558",
+          "time_seconds": 237.15,
+          "frame": 5929,
+          "strength": 1.302,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0559",
+          "time_seconds": 237.6,
+          "frame": 5940,
+          "strength": 1.254,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0560",
+          "time_seconds": 237.8,
+          "frame": 5945,
+          "strength": 1.377,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0561",
+          "time_seconds": 238.05,
+          "frame": 5951,
+          "strength": 1.75,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0562",
+          "time_seconds": 238.25,
+          "frame": 5956,
+          "strength": 1.232,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0563",
+          "time_seconds": 238.6,
+          "frame": 5965,
+          "strength": 1.218,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0564",
+          "time_seconds": 238.75,
+          "frame": 5969,
+          "strength": 1.642,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0565",
+          "time_seconds": 239,
+          "frame": 5975,
+          "strength": 1.262,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0566",
+          "time_seconds": 239.2,
+          "frame": 5980,
+          "strength": 1.613,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0567",
+          "time_seconds": 239.45,
+          "frame": 5986,
+          "strength": 1.49,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0568",
+          "time_seconds": 239.65,
+          "frame": 5991,
+          "strength": 1.549,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0569",
+          "time_seconds": 239.9,
+          "frame": 5998,
+          "strength": 1.809,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0570",
+          "time_seconds": 240.2,
+          "frame": 6005,
+          "strength": 1.203,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0571",
+          "time_seconds": 240.6,
+          "frame": 6015,
+          "strength": 1.642,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0572",
+          "time_seconds": 240.85,
+          "frame": 6021,
+          "strength": 1.29,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0573",
+          "time_seconds": 241.25,
+          "frame": 6031,
+          "strength": 1.302,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0574",
+          "time_seconds": 241.75,
+          "frame": 6044,
+          "strength": 1.412,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0575",
+          "time_seconds": 242.5,
+          "frame": 6062,
+          "strength": 1.435,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0576",
+          "time_seconds": 242.7,
+          "frame": 6068,
+          "strength": 1.281,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0577",
+          "time_seconds": 242.95,
+          "frame": 6074,
+          "strength": 1.219,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0578",
+          "time_seconds": 243.1,
+          "frame": 6078,
+          "strength": 1.387,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0579",
+          "time_seconds": 243.45,
+          "frame": 6086,
+          "strength": 1.207,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0580",
+          "time_seconds": 243.6,
+          "frame": 6090,
+          "strength": 1.61,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0581",
+          "time_seconds": 243.9,
+          "frame": 6098,
+          "strength": 1.222,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0582",
+          "time_seconds": 244.3,
+          "frame": 6108,
+          "strength": 1.444,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0583",
+          "time_seconds": 244.5,
+          "frame": 6112,
+          "strength": 1.205,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0584",
+          "time_seconds": 244.95,
+          "frame": 6124,
+          "strength": 1.299,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0585",
+          "time_seconds": 245.25,
+          "frame": 6131,
+          "strength": 1.351,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0586",
+          "time_seconds": 245.45,
+          "frame": 6136,
+          "strength": 1.525,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0587",
+          "time_seconds": 246.15,
+          "frame": 6154,
+          "strength": 1.439,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0588",
+          "time_seconds": 246.35,
+          "frame": 6159,
+          "strength": 1.29,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0589",
+          "time_seconds": 246.6,
+          "frame": 6165,
+          "strength": 1.74,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0590",
+          "time_seconds": 246.85,
+          "frame": 6171,
+          "strength": 1.51,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0591",
+          "time_seconds": 247.05,
+          "frame": 6176,
+          "strength": 1.733,
+          "kind": "impact"
+        },
+        {
+          "id": "beat_0592",
+          "time_seconds": 247.2,
+          "frame": 6180,
+          "strength": 1.3,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0593",
+          "time_seconds": 248,
+          "frame": 6200,
+          "strength": 1.212,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0594",
+          "time_seconds": 248.3,
+          "frame": 6208,
+          "strength": 1.209,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0595",
+          "time_seconds": 248.5,
+          "frame": 6212,
+          "strength": 1.244,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0596",
+          "time_seconds": 248.7,
+          "frame": 6218,
+          "strength": 1.268,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0597",
+          "time_seconds": 248.85,
+          "frame": 6221,
+          "strength": 1.245,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0598",
+          "time_seconds": 249,
+          "frame": 6225,
+          "strength": 1.272,
+          "kind": "beat"
+        },
+        {
+          "id": "beat_0599",
+          "time_seconds": 249.15,
+          "frame": 6229,
+          "strength": 1.375,
+          "kind": "beat"
+        }
+      ],
+      "intro": {
+        "in_seconds": 0,
+        "out_seconds": 0.88,
+        "loop_count": 4,
+        "speed": 1,
+        "volume": 0.75
+      },
+      "match_cut": {
+        "in_seconds": 52.62,
+        "out_seconds": 61.1,
+        "speed": 1,
+        "volume": 1
+      },
+      "transition": {
+        "type": "beat_cut",
+        "duration_ms": 30,
+        "alignment": "nearest_beat"
+      },
+      "intro_in": 0,
+      "intro_out": 0.88,
+      "loop_in": 0,
+      "loop_out": 0.88,
+      "loop_count": 4,
+      "loop_enabled": true,
+      "match_cut_in": 52.62,
+      "match_cut_out": 61.1,
+      "intro_speed": 1,
+      "match_cut_speed": 1,
+      "intro_duration_seconds": 3.52,
+      "match_cut_duration_seconds": 8.48,
+      "climax_time": 3.52,
+      "climax_frame": 211,
+      "match_cut_start_frame": 211,
+      "intro_volume": 0.75,
+      "climax_volume": 1,
+      "match_cut_volume": 1,
+      "fade_in_frames": 0,
+      "fade_out_frames": 0,
+      "total_frames": 719
+    }
   },
-  "validated_by_magos": false,
+  "validated_by_magos": true,
   "clips": [
     {
       "id": "clip_001",
@@ -63,38 +4337,18 @@
         "height": 1080
       },
       "texts": {
-        "mode": "title+paragraph",
-        "title": "SHE KICKED HIM IN FRONT OF HIS BAND",
-        "paragraph": "Tom Sandoval says his ex Victoria kicked him in the groin in front of his band, crew and fans during a Florida tour stop. The insult that came with it, he says, hurt worse than the kick. New court filing is out.",
-        "title_offset_pct": 8,
-        "paragraph_offset_pct": 8
+        "mode": "dark_luxury_flash_text",
+        "content": "",
+        "units": []
       },
-      "text_overlays": [
-        {
-          "id": "title_00",
-          "content": "SHE KICKED HIM IN FRONT OF HIS BAND",
-          "start_frame": 0,
-          "end_frame": 900,
-          "animation": "fade_in",
-          "font": "Impact, Arial Black, sans-serif",
-          "size": 96,
-          "color": "#FFFFFF",
-          "stroke_color": "#000000",
-          "stroke_width": 4,
-          "shadow": "2px 4px 8px rgba(0,0,0,0.9)",
-          "position": "top",
-          "letter_spacing": "0em",
-          "glow_intensity": 0,
-          "depth_3d": 0
-        }
-      ],
       "zoom_keyframes": [],
       "logo": null,
-      "brutal_cut_interval_frames": 90,
-      "volume": 1.0,
+      "brutal_cut_interval_frames": 0,
+      "volume": 1,
       "slowmo_start_frame": 0,
-      "slowmo_speed": 1.0,
-      "shake_power": 0
+      "slowmo_speed": 1,
+      "shake_power": 0,
+      "validated_by_magos": true
     }
   ],
   "forge": {
@@ -102,5 +4356,2453 @@
     "siege_id": "SIEGE-LOGO-20260804T174153",
     "pack_mode": "logo",
     "campaign_id": null
+  },
+  "virtual_sequences": {
+    "schema_version": "dev4.motion-slow-sequences.v1",
+    "created_at": "2026-08-24T09:42:17.942104+00:00",
+    "project_title": "Lacrimae dev4 F00-A isolated test",
+    "source": "video_source.mp4",
+    "source_metadata": {
+      "width": 1920,
+      "height": 1080,
+      "fps": 59.94006,
+      "duration_seconds": 94.54445,
+      "total_frames": 5667
+    },
+    "target_duration_seconds": 9.99331665667335,
+    "requested_target_duration_seconds": 10,
+    "fps": 59.94006,
+    "total_frames": 599,
+    "cut_interval_frames": 7,
+    "materialized": true,
+    "motion_slow": {
+      "enabled": true,
+      "mode": "partial",
+      "speed": 0.5,
+      "engine": "ffmpeg_minterpolate",
+      "ranges_seconds": [
+        {
+          "start": 3,
+          "end": 7
+        }
+      ],
+      "processed_sequence_count": 35
+    },
+    "sequences": [
+      {
+        "id": "seq_0001",
+        "source": "video_source.mp4",
+        "source_start_frame": 1169,
+        "source_end_frame": 1175,
+        "source_start_seconds": 19.502817,
+        "duration_frames": 7,
+        "mean_luma": 0.237808,
+        "luma_std": 0.214655,
+        "visibility_score": 0.345135,
+        "status": "scouted",
+        "timeline_start_frame": 0,
+        "timeline_end_frame": 6,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0001_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 63330
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0002",
+        "source": "video_source.mp4",
+        "source_start_frame": 1199,
+        "source_end_frame": 1205,
+        "source_start_seconds": 20.003317,
+        "duration_frames": 7,
+        "mean_luma": 0.28198,
+        "luma_std": 0.198277,
+        "visibility_score": 0.381119,
+        "status": "scouted",
+        "timeline_start_frame": 7,
+        "timeline_end_frame": 13,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0002_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 65914
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0003",
+        "source": "video_source.mp4",
+        "source_start_frame": 1229,
+        "source_end_frame": 1235,
+        "source_start_seconds": 20.503817,
+        "duration_frames": 7,
+        "mean_luma": 0.448705,
+        "luma_std": 0.302462,
+        "visibility_score": 0.599936,
+        "status": "scouted",
+        "timeline_start_frame": 14,
+        "timeline_end_frame": 20,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0003_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 73259
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0004",
+        "source": "video_source.mp4",
+        "source_start_frame": 1259,
+        "source_end_frame": 1265,
+        "source_start_seconds": 21.004317,
+        "duration_frames": 7,
+        "mean_luma": 0.182707,
+        "luma_std": 0.181863,
+        "visibility_score": 0.273639,
+        "status": "scouted",
+        "timeline_start_frame": 21,
+        "timeline_end_frame": 27,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0004_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 88705
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0005",
+        "source": "video_source.mp4",
+        "source_start_frame": 1289,
+        "source_end_frame": 1295,
+        "source_start_seconds": 21.504817,
+        "duration_frames": 7,
+        "mean_luma": 0.106476,
+        "luma_std": 0.105669,
+        "visibility_score": 0.15931,
+        "status": "scouted",
+        "timeline_start_frame": 28,
+        "timeline_end_frame": 34,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0005_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 90058
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0006",
+        "source": "video_source.mp4",
+        "source_start_frame": 1319,
+        "source_end_frame": 1325,
+        "source_start_seconds": 22.005317,
+        "duration_frames": 7,
+        "mean_luma": 0.156771,
+        "luma_std": 0.182852,
+        "visibility_score": 0.248197,
+        "status": "scouted",
+        "timeline_start_frame": 35,
+        "timeline_end_frame": 41,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0006_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 58847
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0007",
+        "source": "video_source.mp4",
+        "source_start_frame": 1349,
+        "source_end_frame": 1355,
+        "source_start_seconds": 22.505817,
+        "duration_frames": 7,
+        "mean_luma": 0.169439,
+        "luma_std": 0.163242,
+        "visibility_score": 0.25106,
+        "status": "scouted",
+        "timeline_start_frame": 42,
+        "timeline_end_frame": 48,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0007_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 62098
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0008",
+        "source": "video_source.mp4",
+        "source_start_frame": 1379,
+        "source_end_frame": 1385,
+        "source_start_seconds": 23.006317,
+        "duration_frames": 7,
+        "mean_luma": 0.149214,
+        "luma_std": 0.137969,
+        "visibility_score": 0.218199,
+        "status": "scouted",
+        "timeline_start_frame": 49,
+        "timeline_end_frame": 55,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0008_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 67665
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0009",
+        "source": "video_source.mp4",
+        "source_start_frame": 1409,
+        "source_end_frame": 1415,
+        "source_start_seconds": 23.506817,
+        "duration_frames": 7,
+        "mean_luma": 0.080203,
+        "luma_std": 0.054172,
+        "visibility_score": 0.107289,
+        "status": "scouted",
+        "timeline_start_frame": 56,
+        "timeline_end_frame": 62,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0009_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 41940
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0010",
+        "source": "video_source.mp4",
+        "source_start_frame": 1439,
+        "source_end_frame": 1445,
+        "source_start_seconds": 24.007317,
+        "duration_frames": 7,
+        "mean_luma": 0.103944,
+        "luma_std": 0.100316,
+        "visibility_score": 0.154102,
+        "status": "scouted",
+        "timeline_start_frame": 63,
+        "timeline_end_frame": 69,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0010_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 42986
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0011",
+        "source": "video_source.mp4",
+        "source_start_frame": 1469,
+        "source_end_frame": 1475,
+        "source_start_seconds": 24.507817,
+        "duration_frames": 7,
+        "mean_luma": 0.103351,
+        "luma_std": 0.07413,
+        "visibility_score": 0.140416,
+        "status": "scouted",
+        "timeline_start_frame": 70,
+        "timeline_end_frame": 76,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0011_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 44394
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0012",
+        "source": "video_source.mp4",
+        "source_start_frame": 1499,
+        "source_end_frame": 1505,
+        "source_start_seconds": 25.008317,
+        "duration_frames": 7,
+        "mean_luma": 0.210873,
+        "luma_std": 0.225362,
+        "visibility_score": 0.323554,
+        "status": "scouted",
+        "timeline_start_frame": 77,
+        "timeline_end_frame": 83,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0012_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 42642
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0013",
+        "source": "video_source.mp4",
+        "source_start_frame": 1528,
+        "source_end_frame": 1534,
+        "source_start_seconds": 25.492133,
+        "duration_frames": 7,
+        "mean_luma": 0.159206,
+        "luma_std": 0.185052,
+        "visibility_score": 0.251732,
+        "status": "scouted",
+        "timeline_start_frame": 84,
+        "timeline_end_frame": 90,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0013_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 49672
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0014",
+        "source": "video_source.mp4",
+        "source_start_frame": 1558,
+        "source_end_frame": 1564,
+        "source_start_seconds": 25.992633,
+        "duration_frames": 7,
+        "mean_luma": 0.235473,
+        "luma_std": 0.194392,
+        "visibility_score": 0.332669,
+        "status": "scouted",
+        "timeline_start_frame": 91,
+        "timeline_end_frame": 97,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0014_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 47863
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0015",
+        "source": "video_source.mp4",
+        "source_start_frame": 1678,
+        "source_end_frame": 1684,
+        "source_start_seconds": 27.994633,
+        "duration_frames": 7,
+        "mean_luma": 0.095452,
+        "luma_std": 0.099329,
+        "visibility_score": 0.145116,
+        "status": "scouted",
+        "timeline_start_frame": 98,
+        "timeline_end_frame": 104,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0015_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 75060
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0016",
+        "source": "video_source.mp4",
+        "source_start_frame": 1768,
+        "source_end_frame": 1774,
+        "source_start_seconds": 29.496133,
+        "duration_frames": 7,
+        "mean_luma": 0.096164,
+        "luma_std": 0.090867,
+        "visibility_score": 0.141597,
+        "status": "scouted",
+        "timeline_start_frame": 105,
+        "timeline_end_frame": 111,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0016_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 45079
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0017",
+        "source": "video_source.mp4",
+        "source_start_frame": 1798,
+        "source_end_frame": 1804,
+        "source_start_seconds": 29.996633,
+        "duration_frames": 7,
+        "mean_luma": 0.108274,
+        "luma_std": 0.103202,
+        "visibility_score": 0.159875,
+        "status": "scouted",
+        "timeline_start_frame": 112,
+        "timeline_end_frame": 118,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0017_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 44384
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0018",
+        "source": "video_source.mp4",
+        "source_start_frame": 1828,
+        "source_end_frame": 1834,
+        "source_start_seconds": 30.497133,
+        "duration_frames": 7,
+        "mean_luma": 0.154356,
+        "luma_std": 0.157564,
+        "visibility_score": 0.233138,
+        "status": "scouted",
+        "timeline_start_frame": 119,
+        "timeline_end_frame": 125,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0018_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 62931
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0019",
+        "source": "video_source.mp4",
+        "source_start_frame": 1858,
+        "source_end_frame": 1864,
+        "source_start_seconds": 30.997633,
+        "duration_frames": 7,
+        "mean_luma": 0.198053,
+        "luma_std": 0.173003,
+        "visibility_score": 0.284554,
+        "status": "scouted",
+        "timeline_start_frame": 126,
+        "timeline_end_frame": 132,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0019_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 56668
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0020",
+        "source": "video_source.mp4",
+        "source_start_frame": 1888,
+        "source_end_frame": 1894,
+        "source_start_seconds": 31.498133,
+        "duration_frames": 7,
+        "mean_luma": 0.114005,
+        "luma_std": 0.145081,
+        "visibility_score": 0.186545,
+        "status": "scouted",
+        "timeline_start_frame": 133,
+        "timeline_end_frame": 139,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0020_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 55048
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0021",
+        "source": "video_source.mp4",
+        "source_start_frame": 1918,
+        "source_end_frame": 1924,
+        "source_start_seconds": 31.998633,
+        "duration_frames": 7,
+        "mean_luma": 0.356235,
+        "luma_std": 0.248816,
+        "visibility_score": 0.480643,
+        "status": "scouted",
+        "timeline_start_frame": 140,
+        "timeline_end_frame": 146,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0021_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 72407
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0022",
+        "source": "video_source.mp4",
+        "source_start_frame": 1948,
+        "source_end_frame": 1954,
+        "source_start_seconds": 32.499133,
+        "duration_frames": 7,
+        "mean_luma": 0.085078,
+        "luma_std": 0.071476,
+        "visibility_score": 0.120816,
+        "status": "scouted",
+        "timeline_start_frame": 147,
+        "timeline_end_frame": 153,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0022_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 75920
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0023",
+        "source": "video_source.mp4",
+        "source_start_frame": 1978,
+        "source_end_frame": 1984,
+        "source_start_seconds": 32.999633,
+        "duration_frames": 7,
+        "mean_luma": 0.361911,
+        "luma_std": 0.258465,
+        "visibility_score": 0.491143,
+        "status": "scouted",
+        "timeline_start_frame": 154,
+        "timeline_end_frame": 160,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0023_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 73481
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0024",
+        "source": "video_source.mp4",
+        "source_start_frame": 2068,
+        "source_end_frame": 2074,
+        "source_start_seconds": 34.501133,
+        "duration_frames": 7,
+        "mean_luma": 0.076416,
+        "luma_std": 0.063879,
+        "visibility_score": 0.108355,
+        "status": "scouted",
+        "timeline_start_frame": 161,
+        "timeline_end_frame": 167,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0024_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 55523
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0025",
+        "source": "video_source.mp4",
+        "source_start_frame": 2188,
+        "source_end_frame": 2194,
+        "source_start_seconds": 36.503133,
+        "duration_frames": 7,
+        "mean_luma": 0.364245,
+        "luma_std": 0.283156,
+        "visibility_score": 0.505823,
+        "status": "scouted",
+        "timeline_start_frame": 168,
+        "timeline_end_frame": 174,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0025_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 73027
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0026",
+        "source": "video_source.mp4",
+        "source_start_frame": 2308,
+        "source_end_frame": 2314,
+        "source_start_seconds": 38.505133,
+        "duration_frames": 7,
+        "mean_luma": 0.087503,
+        "luma_std": 0.06355,
+        "visibility_score": 0.119278,
+        "status": "scouted",
+        "timeline_start_frame": 175,
+        "timeline_end_frame": 181,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0026_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 31184
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0027",
+        "source": "video_source.mp4",
+        "source_start_frame": 2338,
+        "source_end_frame": 2344,
+        "source_start_seconds": 39.005633,
+        "duration_frames": 7,
+        "mean_luma": 0.088455,
+        "luma_std": 0.062985,
+        "visibility_score": 0.119948,
+        "status": "scouted",
+        "timeline_start_frame": 182,
+        "timeline_end_frame": 188,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0027_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 37550
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0028",
+        "source": "video_source.mp4",
+        "source_start_frame": 2368,
+        "source_end_frame": 2374,
+        "source_start_seconds": 39.506133,
+        "duration_frames": 7,
+        "mean_luma": 0.097222,
+        "luma_std": 0.081491,
+        "visibility_score": 0.137967,
+        "status": "scouted",
+        "timeline_start_frame": 189,
+        "timeline_end_frame": 195,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0028_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 45085
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0029",
+        "source": "video_source.mp4",
+        "source_start_frame": 2757,
+        "source_end_frame": 2763,
+        "source_start_seconds": 45.99595,
+        "duration_frames": 7,
+        "mean_luma": 0.136657,
+        "luma_std": 0.131642,
+        "visibility_score": 0.202478,
+        "status": "scouted",
+        "timeline_start_frame": 196,
+        "timeline_end_frame": 202,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0029_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 50274
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0030",
+        "source": "video_source.mp4",
+        "source_start_frame": 2787,
+        "source_end_frame": 2793,
+        "source_start_seconds": 46.49645,
+        "duration_frames": 7,
+        "mean_luma": 0.158946,
+        "luma_std": 0.144946,
+        "visibility_score": 0.231419,
+        "status": "scouted",
+        "timeline_start_frame": 203,
+        "timeline_end_frame": 209,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0030_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 41072
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0031",
+        "source": "video_source.mp4",
+        "source_start_frame": 2817,
+        "source_end_frame": 2823,
+        "source_start_seconds": 46.99695,
+        "duration_frames": 7,
+        "mean_luma": 0.092664,
+        "luma_std": 0.08382,
+        "visibility_score": 0.134574,
+        "status": "scouted",
+        "timeline_start_frame": 210,
+        "timeline_end_frame": 216,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0031_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 61914
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0032",
+        "source": "video_source.mp4",
+        "source_start_frame": 2847,
+        "source_end_frame": 2853,
+        "source_start_seconds": 47.49745,
+        "duration_frames": 7,
+        "mean_luma": 0.207935,
+        "luma_std": 0.203406,
+        "visibility_score": 0.309638,
+        "status": "scouted",
+        "timeline_start_frame": 217,
+        "timeline_end_frame": 223,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0032_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 42825
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0033",
+        "source": "video_source.mp4",
+        "source_start_frame": 2937,
+        "source_end_frame": 2943,
+        "source_start_seconds": 48.99895,
+        "duration_frames": 7,
+        "mean_luma": 0.137764,
+        "luma_std": 0.172236,
+        "visibility_score": 0.223882,
+        "status": "scouted",
+        "timeline_start_frame": 224,
+        "timeline_end_frame": 230,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0033_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 69683
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0034",
+        "source": "video_source.mp4",
+        "source_start_frame": 2967,
+        "source_end_frame": 2973,
+        "source_start_seconds": 49.49945,
+        "duration_frames": 7,
+        "mean_luma": 0.090816,
+        "luma_std": 0.129552,
+        "visibility_score": 0.155592,
+        "status": "scouted",
+        "timeline_start_frame": 231,
+        "timeline_end_frame": 237,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0034_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 41850
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0035",
+        "source": "video_source.mp4",
+        "source_start_frame": 2997,
+        "source_end_frame": 3003,
+        "source_start_seconds": 49.99995,
+        "duration_frames": 7,
+        "mean_luma": 0.173582,
+        "luma_std": 0.199153,
+        "visibility_score": 0.273158,
+        "status": "scouted",
+        "timeline_start_frame": 238,
+        "timeline_end_frame": 244,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0035_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 36677
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0036",
+        "source": "video_source.mp4",
+        "source_start_frame": 3027,
+        "source_end_frame": 3033,
+        "source_start_seconds": 50.50045,
+        "duration_frames": 7,
+        "mean_luma": 0.303455,
+        "luma_std": 0.243691,
+        "visibility_score": 0.4253,
+        "status": "scouted",
+        "timeline_start_frame": 245,
+        "timeline_end_frame": 251,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0036_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 53454
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0037",
+        "source": "video_source.mp4",
+        "source_start_frame": 3057,
+        "source_end_frame": 3063,
+        "source_start_seconds": 51.00095,
+        "duration_frames": 7,
+        "mean_luma": 0.08932,
+        "luma_std": 0.115637,
+        "visibility_score": 0.147139,
+        "status": "scouted",
+        "timeline_start_frame": 252,
+        "timeline_end_frame": 258,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0037_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 51989
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0038",
+        "source": "video_source.mp4",
+        "source_start_frame": 3087,
+        "source_end_frame": 3093,
+        "source_start_seconds": 51.50145,
+        "duration_frames": 7,
+        "mean_luma": 0.147042,
+        "luma_std": 0.207943,
+        "visibility_score": 0.251014,
+        "status": "scouted",
+        "timeline_start_frame": 259,
+        "timeline_end_frame": 265,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0038_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 43598
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0039",
+        "source": "video_source.mp4",
+        "source_start_frame": 3117,
+        "source_end_frame": 3123,
+        "source_start_seconds": 52.00195,
+        "duration_frames": 7,
+        "mean_luma": 0.084698,
+        "luma_std": 0.152392,
+        "visibility_score": 0.160894,
+        "status": "scouted",
+        "timeline_start_frame": 266,
+        "timeline_end_frame": 272,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0039_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 44062
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0040",
+        "source": "video_source.mp4",
+        "source_start_frame": 3177,
+        "source_end_frame": 3183,
+        "source_start_seconds": 53.00295,
+        "duration_frames": 7,
+        "mean_luma": 0.17396,
+        "luma_std": 0.17843,
+        "visibility_score": 0.263175,
+        "status": "scouted",
+        "timeline_start_frame": 273,
+        "timeline_end_frame": 279,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0040_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 29933
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0041",
+        "source": "video_source.mp4",
+        "source_start_frame": 3207,
+        "source_end_frame": 3213,
+        "source_start_seconds": 53.50345,
+        "duration_frames": 7,
+        "mean_luma": 0.088244,
+        "luma_std": 0.076312,
+        "visibility_score": 0.1264,
+        "status": "scouted",
+        "timeline_start_frame": 280,
+        "timeline_end_frame": 286,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0041_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 34305
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0042",
+        "source": "video_source.mp4",
+        "source_start_frame": 3237,
+        "source_end_frame": 3243,
+        "source_start_seconds": 54.00395,
+        "duration_frames": 7,
+        "mean_luma": 0.188743,
+        "luma_std": 0.199243,
+        "visibility_score": 0.288365,
+        "status": "scouted",
+        "timeline_start_frame": 287,
+        "timeline_end_frame": 293,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0042_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 56137
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0043",
+        "source": "video_source.mp4",
+        "source_start_frame": 3267,
+        "source_end_frame": 3273,
+        "source_start_seconds": 54.50445,
+        "duration_frames": 7,
+        "mean_luma": 0.29912,
+        "luma_std": 0.217127,
+        "visibility_score": 0.407683,
+        "status": "scouted",
+        "timeline_start_frame": 294,
+        "timeline_end_frame": 300,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0043_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 52917
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0044",
+        "source": "video_source.mp4",
+        "source_start_frame": 3297,
+        "source_end_frame": 3303,
+        "source_start_seconds": 55.00495,
+        "duration_frames": 7,
+        "mean_luma": 0.271749,
+        "luma_std": 0.217273,
+        "visibility_score": 0.380386,
+        "status": "scouted",
+        "timeline_start_frame": 301,
+        "timeline_end_frame": 307,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0044_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 41054
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0045",
+        "source": "video_source.mp4",
+        "source_start_frame": 3327,
+        "source_end_frame": 3333,
+        "source_start_seconds": 55.50545,
+        "duration_frames": 7,
+        "mean_luma": 0.244875,
+        "luma_std": 0.236101,
+        "visibility_score": 0.362926,
+        "status": "scouted",
+        "timeline_start_frame": 308,
+        "timeline_end_frame": 314,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0045_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 53031
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0046",
+        "source": "video_source.mp4",
+        "source_start_frame": 3357,
+        "source_end_frame": 3363,
+        "source_start_seconds": 56.00595,
+        "duration_frames": 7,
+        "mean_luma": 0.289503,
+        "luma_std": 0.23142,
+        "visibility_score": 0.405213,
+        "status": "scouted",
+        "timeline_start_frame": 315,
+        "timeline_end_frame": 321,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0046_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 34730
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0047",
+        "source": "video_source.mp4",
+        "source_start_frame": 3387,
+        "source_end_frame": 3393,
+        "source_start_seconds": 56.50645,
+        "duration_frames": 7,
+        "mean_luma": 0.37965,
+        "luma_std": 0.237088,
+        "visibility_score": 0.498194,
+        "status": "scouted",
+        "timeline_start_frame": 322,
+        "timeline_end_frame": 328,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0047_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 34467
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0048",
+        "source": "video_source.mp4",
+        "source_start_frame": 3566,
+        "source_end_frame": 3572,
+        "source_start_seconds": 59.492767,
+        "duration_frames": 7,
+        "mean_luma": 0.142218,
+        "luma_std": 0.211207,
+        "visibility_score": 0.247822,
+        "status": "scouted",
+        "timeline_start_frame": 329,
+        "timeline_end_frame": 335,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0048_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 46543
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0049",
+        "source": "video_source.mp4",
+        "source_start_frame": 3596,
+        "source_end_frame": 3602,
+        "source_start_seconds": 59.993267,
+        "duration_frames": 7,
+        "mean_luma": 0.157569,
+        "luma_std": 0.200542,
+        "visibility_score": 0.25784,
+        "status": "scouted",
+        "timeline_start_frame": 336,
+        "timeline_end_frame": 342,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0049_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 54328
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0050",
+        "source": "video_source.mp4",
+        "source_start_frame": 3626,
+        "source_end_frame": 3632,
+        "source_start_seconds": 60.493767,
+        "duration_frames": 7,
+        "mean_luma": 0.149083,
+        "luma_std": 0.189628,
+        "visibility_score": 0.243897,
+        "status": "scouted",
+        "timeline_start_frame": 343,
+        "timeline_end_frame": 349,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0050_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 58116
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0051",
+        "source": "video_source.mp4",
+        "source_start_frame": 3656,
+        "source_end_frame": 3662,
+        "source_start_seconds": 60.994267,
+        "duration_frames": 7,
+        "mean_luma": 0.155598,
+        "luma_std": 0.200719,
+        "visibility_score": 0.255958,
+        "status": "scouted",
+        "timeline_start_frame": 350,
+        "timeline_end_frame": 356,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0051_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 55467
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0052",
+        "source": "video_source.mp4",
+        "source_start_frame": 3686,
+        "source_end_frame": 3692,
+        "source_start_seconds": 61.494767,
+        "duration_frames": 7,
+        "mean_luma": 0.184132,
+        "luma_std": 0.208721,
+        "visibility_score": 0.288492,
+        "status": "scouted",
+        "timeline_start_frame": 357,
+        "timeline_end_frame": 363,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0052_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 52934
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0053",
+        "source": "video_source.mp4",
+        "source_start_frame": 3716,
+        "source_end_frame": 3722,
+        "source_start_seconds": 61.995267,
+        "duration_frames": 7,
+        "mean_luma": 0.226493,
+        "luma_std": 0.208642,
+        "visibility_score": 0.330814,
+        "status": "scouted",
+        "timeline_start_frame": 364,
+        "timeline_end_frame": 370,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0053_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 62551
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0054",
+        "source": "video_source.mp4",
+        "source_start_frame": 3746,
+        "source_end_frame": 3752,
+        "source_start_seconds": 62.495767,
+        "duration_frames": 7,
+        "mean_luma": 0.221177,
+        "luma_std": 0.212424,
+        "visibility_score": 0.327389,
+        "status": "scouted",
+        "timeline_start_frame": 371,
+        "timeline_end_frame": 377,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0054_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 51454
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0055",
+        "source": "video_source.mp4",
+        "source_start_frame": 3776,
+        "source_end_frame": 3782,
+        "source_start_seconds": 62.996267,
+        "duration_frames": 7,
+        "mean_luma": 0.216762,
+        "luma_std": 0.209607,
+        "visibility_score": 0.321566,
+        "status": "scouted",
+        "timeline_start_frame": 378,
+        "timeline_end_frame": 384,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0055_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 43572
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0056",
+        "source": "video_source.mp4",
+        "source_start_frame": 3806,
+        "source_end_frame": 3812,
+        "source_start_seconds": 63.496767,
+        "duration_frames": 7,
+        "mean_luma": 0.19551,
+        "luma_std": 0.208287,
+        "visibility_score": 0.299654,
+        "status": "scouted",
+        "timeline_start_frame": 385,
+        "timeline_end_frame": 391,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0056_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 56588
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0057",
+        "source": "video_source.mp4",
+        "source_start_frame": 4076,
+        "source_end_frame": 4082,
+        "source_start_seconds": 68.001267,
+        "duration_frames": 7,
+        "mean_luma": 0.11458,
+        "luma_std": 0.157878,
+        "visibility_score": 0.193519,
+        "status": "scouted",
+        "timeline_start_frame": 392,
+        "timeline_end_frame": 398,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0057_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 41697
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0058",
+        "source": "video_source.mp4",
+        "source_start_frame": 4106,
+        "source_end_frame": 4112,
+        "source_start_seconds": 68.501767,
+        "duration_frames": 7,
+        "mean_luma": 0.115829,
+        "luma_std": 0.159595,
+        "visibility_score": 0.195626,
+        "status": "scouted",
+        "timeline_start_frame": 399,
+        "timeline_end_frame": 405,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0058_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 35654
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0059",
+        "source": "video_source.mp4",
+        "source_start_frame": 4136,
+        "source_end_frame": 4142,
+        "source_start_seconds": 69.002267,
+        "duration_frames": 7,
+        "mean_luma": 0.115965,
+        "luma_std": 0.162532,
+        "visibility_score": 0.197231,
+        "status": "scouted",
+        "timeline_start_frame": 406,
+        "timeline_end_frame": 412,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0059_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 42129
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0060",
+        "source": "video_source.mp4",
+        "source_start_frame": 4166,
+        "source_end_frame": 4172,
+        "source_start_seconds": 69.502767,
+        "duration_frames": 7,
+        "mean_luma": 0.114961,
+        "luma_std": 0.156868,
+        "visibility_score": 0.193395,
+        "status": "scouted",
+        "timeline_start_frame": 413,
+        "timeline_end_frame": 419,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0060_slow.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 36325
+        },
+        "motion_slow": true,
+        "motion_slow_speed": 0.5,
+        "motion_slow_engine": "ffmpeg_minterpolate"
+      },
+      {
+        "id": "seq_0061",
+        "source": "video_source.mp4",
+        "source_start_frame": 4196,
+        "source_end_frame": 4202,
+        "source_start_seconds": 70.003267,
+        "duration_frames": 7,
+        "mean_luma": 0.12162,
+        "luma_std": 0.163955,
+        "visibility_score": 0.203597,
+        "status": "scouted",
+        "timeline_start_frame": 420,
+        "timeline_end_frame": 426,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0061_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 49675
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0062",
+        "source": "video_source.mp4",
+        "source_start_frame": 1169,
+        "source_end_frame": 1175,
+        "source_start_seconds": 19.502817,
+        "duration_frames": 7,
+        "mean_luma": 0.237808,
+        "luma_std": 0.214655,
+        "visibility_score": 0.345135,
+        "status": "scouted",
+        "timeline_start_frame": 427,
+        "timeline_end_frame": 433,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0062_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 63330
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0063",
+        "source": "video_source.mp4",
+        "source_start_frame": 1199,
+        "source_end_frame": 1205,
+        "source_start_seconds": 20.003317,
+        "duration_frames": 7,
+        "mean_luma": 0.28198,
+        "luma_std": 0.198277,
+        "visibility_score": 0.381119,
+        "status": "scouted",
+        "timeline_start_frame": 434,
+        "timeline_end_frame": 440,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0063_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 65914
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0064",
+        "source": "video_source.mp4",
+        "source_start_frame": 1229,
+        "source_end_frame": 1235,
+        "source_start_seconds": 20.503817,
+        "duration_frames": 7,
+        "mean_luma": 0.448705,
+        "luma_std": 0.302462,
+        "visibility_score": 0.599936,
+        "status": "scouted",
+        "timeline_start_frame": 441,
+        "timeline_end_frame": 447,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0064_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 73259
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0065",
+        "source": "video_source.mp4",
+        "source_start_frame": 1259,
+        "source_end_frame": 1265,
+        "source_start_seconds": 21.004317,
+        "duration_frames": 7,
+        "mean_luma": 0.182707,
+        "luma_std": 0.181863,
+        "visibility_score": 0.273639,
+        "status": "scouted",
+        "timeline_start_frame": 448,
+        "timeline_end_frame": 454,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0065_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 88705
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0066",
+        "source": "video_source.mp4",
+        "source_start_frame": 1289,
+        "source_end_frame": 1295,
+        "source_start_seconds": 21.504817,
+        "duration_frames": 7,
+        "mean_luma": 0.106476,
+        "luma_std": 0.105669,
+        "visibility_score": 0.15931,
+        "status": "scouted",
+        "timeline_start_frame": 455,
+        "timeline_end_frame": 461,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0066_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 90058
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0067",
+        "source": "video_source.mp4",
+        "source_start_frame": 1319,
+        "source_end_frame": 1325,
+        "source_start_seconds": 22.005317,
+        "duration_frames": 7,
+        "mean_luma": 0.156771,
+        "luma_std": 0.182852,
+        "visibility_score": 0.248197,
+        "status": "scouted",
+        "timeline_start_frame": 462,
+        "timeline_end_frame": 468,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0067_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 58847
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0068",
+        "source": "video_source.mp4",
+        "source_start_frame": 1349,
+        "source_end_frame": 1355,
+        "source_start_seconds": 22.505817,
+        "duration_frames": 7,
+        "mean_luma": 0.169439,
+        "luma_std": 0.163242,
+        "visibility_score": 0.25106,
+        "status": "scouted",
+        "timeline_start_frame": 469,
+        "timeline_end_frame": 475,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0068_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 62098
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0069",
+        "source": "video_source.mp4",
+        "source_start_frame": 1379,
+        "source_end_frame": 1385,
+        "source_start_seconds": 23.006317,
+        "duration_frames": 7,
+        "mean_luma": 0.149214,
+        "luma_std": 0.137969,
+        "visibility_score": 0.218199,
+        "status": "scouted",
+        "timeline_start_frame": 476,
+        "timeline_end_frame": 482,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0069_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 67665
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0070",
+        "source": "video_source.mp4",
+        "source_start_frame": 1409,
+        "source_end_frame": 1415,
+        "source_start_seconds": 23.506817,
+        "duration_frames": 7,
+        "mean_luma": 0.080203,
+        "luma_std": 0.054172,
+        "visibility_score": 0.107289,
+        "status": "scouted",
+        "timeline_start_frame": 483,
+        "timeline_end_frame": 489,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0070_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 41940
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0071",
+        "source": "video_source.mp4",
+        "source_start_frame": 1439,
+        "source_end_frame": 1445,
+        "source_start_seconds": 24.007317,
+        "duration_frames": 7,
+        "mean_luma": 0.103944,
+        "luma_std": 0.100316,
+        "visibility_score": 0.154102,
+        "status": "scouted",
+        "timeline_start_frame": 490,
+        "timeline_end_frame": 496,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0071_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 42986
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0072",
+        "source": "video_source.mp4",
+        "source_start_frame": 1469,
+        "source_end_frame": 1475,
+        "source_start_seconds": 24.507817,
+        "duration_frames": 7,
+        "mean_luma": 0.103351,
+        "luma_std": 0.07413,
+        "visibility_score": 0.140416,
+        "status": "scouted",
+        "timeline_start_frame": 497,
+        "timeline_end_frame": 503,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0072_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 44394
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0073",
+        "source": "video_source.mp4",
+        "source_start_frame": 1499,
+        "source_end_frame": 1505,
+        "source_start_seconds": 25.008317,
+        "duration_frames": 7,
+        "mean_luma": 0.210873,
+        "luma_std": 0.225362,
+        "visibility_score": 0.323554,
+        "status": "scouted",
+        "timeline_start_frame": 504,
+        "timeline_end_frame": 510,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0073_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 42642
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0074",
+        "source": "video_source.mp4",
+        "source_start_frame": 1528,
+        "source_end_frame": 1534,
+        "source_start_seconds": 25.492133,
+        "duration_frames": 7,
+        "mean_luma": 0.159206,
+        "luma_std": 0.185052,
+        "visibility_score": 0.251732,
+        "status": "scouted",
+        "timeline_start_frame": 511,
+        "timeline_end_frame": 517,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0074_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 49672
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0075",
+        "source": "video_source.mp4",
+        "source_start_frame": 1558,
+        "source_end_frame": 1564,
+        "source_start_seconds": 25.992633,
+        "duration_frames": 7,
+        "mean_luma": 0.235473,
+        "luma_std": 0.194392,
+        "visibility_score": 0.332669,
+        "status": "scouted",
+        "timeline_start_frame": 518,
+        "timeline_end_frame": 524,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0075_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 47863
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0076",
+        "source": "video_source.mp4",
+        "source_start_frame": 1678,
+        "source_end_frame": 1684,
+        "source_start_seconds": 27.994633,
+        "duration_frames": 7,
+        "mean_luma": 0.095452,
+        "luma_std": 0.099329,
+        "visibility_score": 0.145116,
+        "status": "scouted",
+        "timeline_start_frame": 525,
+        "timeline_end_frame": 531,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0076_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 75060
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0077",
+        "source": "video_source.mp4",
+        "source_start_frame": 1768,
+        "source_end_frame": 1774,
+        "source_start_seconds": 29.496133,
+        "duration_frames": 7,
+        "mean_luma": 0.096164,
+        "luma_std": 0.090867,
+        "visibility_score": 0.141597,
+        "status": "scouted",
+        "timeline_start_frame": 532,
+        "timeline_end_frame": 538,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0077_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 45079
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0078",
+        "source": "video_source.mp4",
+        "source_start_frame": 1798,
+        "source_end_frame": 1804,
+        "source_start_seconds": 29.996633,
+        "duration_frames": 7,
+        "mean_luma": 0.108274,
+        "luma_std": 0.103202,
+        "visibility_score": 0.159875,
+        "status": "scouted",
+        "timeline_start_frame": 539,
+        "timeline_end_frame": 545,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0078_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 44384
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0079",
+        "source": "video_source.mp4",
+        "source_start_frame": 1828,
+        "source_end_frame": 1834,
+        "source_start_seconds": 30.497133,
+        "duration_frames": 7,
+        "mean_luma": 0.154356,
+        "luma_std": 0.157564,
+        "visibility_score": 0.233138,
+        "status": "scouted",
+        "timeline_start_frame": 546,
+        "timeline_end_frame": 552,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0079_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 62931
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0080",
+        "source": "video_source.mp4",
+        "source_start_frame": 1858,
+        "source_end_frame": 1864,
+        "source_start_seconds": 30.997633,
+        "duration_frames": 7,
+        "mean_luma": 0.198053,
+        "luma_std": 0.173003,
+        "visibility_score": 0.284554,
+        "status": "scouted",
+        "timeline_start_frame": 553,
+        "timeline_end_frame": 559,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0080_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 56668
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0081",
+        "source": "video_source.mp4",
+        "source_start_frame": 1888,
+        "source_end_frame": 1894,
+        "source_start_seconds": 31.498133,
+        "duration_frames": 7,
+        "mean_luma": 0.114005,
+        "luma_std": 0.145081,
+        "visibility_score": 0.186545,
+        "status": "scouted",
+        "timeline_start_frame": 560,
+        "timeline_end_frame": 566,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0081_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 55048
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0082",
+        "source": "video_source.mp4",
+        "source_start_frame": 1918,
+        "source_end_frame": 1924,
+        "source_start_seconds": 31.998633,
+        "duration_frames": 7,
+        "mean_luma": 0.356235,
+        "luma_std": 0.248816,
+        "visibility_score": 0.480643,
+        "status": "scouted",
+        "timeline_start_frame": 567,
+        "timeline_end_frame": 573,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0082_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 72407
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0083",
+        "source": "video_source.mp4",
+        "source_start_frame": 1948,
+        "source_end_frame": 1954,
+        "source_start_seconds": 32.499133,
+        "duration_frames": 7,
+        "mean_luma": 0.085078,
+        "luma_std": 0.071476,
+        "visibility_score": 0.120816,
+        "status": "scouted",
+        "timeline_start_frame": 574,
+        "timeline_end_frame": 580,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0083_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 75920
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0084",
+        "source": "video_source.mp4",
+        "source_start_frame": 1978,
+        "source_end_frame": 1984,
+        "source_start_seconds": 32.999633,
+        "duration_frames": 7,
+        "mean_luma": 0.361911,
+        "luma_std": 0.258465,
+        "visibility_score": 0.491143,
+        "status": "scouted",
+        "timeline_start_frame": 581,
+        "timeline_end_frame": 587,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0084_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 73481
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0085",
+        "source": "video_source.mp4",
+        "source_start_frame": 2068,
+        "source_end_frame": 2074,
+        "source_start_seconds": 34.501133,
+        "duration_frames": 7,
+        "mean_luma": 0.076416,
+        "luma_std": 0.063879,
+        "visibility_score": 0.108355,
+        "status": "scouted",
+        "timeline_start_frame": 588,
+        "timeline_end_frame": 594,
+        "timeline_duration_frames": 7,
+        "file": "match_cut/sequences/seq_0085_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 7,
+          "file_bytes": 55523
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      },
+      {
+        "id": "seq_0086",
+        "source": "video_source.mp4",
+        "source_start_frame": 2188,
+        "source_end_frame": 2194,
+        "source_start_seconds": 36.503133,
+        "duration_frames": 4,
+        "mean_luma": 0.364245,
+        "luma_std": 0.283156,
+        "visibility_score": 0.505823,
+        "status": "scouted",
+        "timeline_start_frame": 595,
+        "timeline_end_frame": 598,
+        "timeline_duration_frames": 4,
+        "file": "match_cut/sequences/seq_0086_normal.mp4",
+        "validated": true,
+        "validation": {
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "fps": "979001/16333",
+          "frame_count": 4,
+          "file_bytes": 41347
+        },
+        "motion_slow": false,
+        "motion_slow_speed": 1,
+        "motion_slow_engine": null
+      }
+    ],
+    "validation": {
+      "all_sequences_present": true,
+      "processed_sequence_count": 35,
+      "validated_at": "2026-08-24T09:42:17.942131+00:00"
+    },
+    "manifest_role": "hybrid_match_cut_input"
   }
 }
