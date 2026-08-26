@@ -3,8 +3,8 @@ name: F03 RENDER
 on:
   workflow_dispatch:
     inputs:
-      f00c_run_id:
-        description: 'Run F00-C validé à utiliser comme source des séquences matérialisées'
+      f00d_run_id:
+        description: 'Run F00-D validé contenant Intro Hybrid et séquences Match Cut'
         required: true
         type: string
       codex_source:
@@ -36,23 +36,27 @@ jobs:
         working-directory: F03_PREVIEW/CODEBASE
         run: npm ci
 
-      - name: Download validated F00-C artifact
+      - name: Download validated F00-D artifact
         if: ${{ github.event_name == 'workflow_dispatch' }}
         env:
           GH_TOKEN: ${{ github.token }}
-          F00C_RUN_ID: ${{ inputs.f00c_run_id }}
+          F00D_RUN_ID: ${{ inputs.f00d_run_id }}
         run: |
-          test -n "$F00C_RUN_ID"
-          gh run download "$F00C_RUN_ID" \
+          test -n "$F00D_RUN_ID"
+          gh run download "$F00D_RUN_ID" \
             --repo "${{ github.repository }}" \
-            --name "lacrimae-dev4-f00c-$F00C_RUN_ID" \
-            --dir /tmp/f00c-artifact
-          test -f /tmp/f00c-artifact/motion_slow_manifest.json
-          mkdir -p F03_PREVIEW/CODEBASE/public/sequences
-          cp /tmp/f00c-artifact/motion_slow_manifest.json F03_PREVIEW/CODEBASE/public/sequences.json
-          cp /tmp/f00c-artifact/motion_slow_manifest.json F03_PREVIEW/CODEBASE/public/motion_slow_manifest.json
-          cp /tmp/f00c-artifact/sequences/*.mp4 F03_PREVIEW/CODEBASE/public/sequences/
-          test "$(find F03_PREVIEW/CODEBASE/public/sequences -name '*.mp4' | wc -l)" -eq 86
+            --name "lacrimae-dev4-f00d-$F00D_RUN_ID" \
+            --dir /tmp/f00d-artifact
+          test -f /tmp/f00d-artifact/hybrid_manifest.json
+          test -f /tmp/f00d-artifact/intro/intro.mp4
+          test -f /tmp/f00d-artifact/match_cut/sequences.json
+          mkdir -p F03_PREVIEW/CODEBASE/public/sequences F03_PREVIEW/CODEBASE/public/intro
+          cp /tmp/f00d-artifact/hybrid_manifest.json F03_PREVIEW/CODEBASE/public/hybrid_manifest.json
+          cp /tmp/f00d-artifact/intro/intro.mp4 F03_PREVIEW/CODEBASE/public/intro/intro.mp4
+          cp /tmp/f00d-artifact/match_cut/sequences.json F03_PREVIEW/CODEBASE/public/sequences.json
+          cp /tmp/f00d-artifact/match_cut/sequences.json F03_PREVIEW/CODEBASE/public/match_cut_sequences.json
+          cp /tmp/f00d-artifact/match_cut/sequences/*.mp4 F03_PREVIEW/CODEBASE/public/sequences/
+          test "$(find F03_PREVIEW/CODEBASE/public/sequences -name '*.mp4' | wc -l)" -eq 129
 
       - name: Render (LacrimaeShort)
         working-directory: F03_PREVIEW/CODEBASE
