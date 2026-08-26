@@ -3,10 +3,10 @@ name: DEV4 — F00-D Hybrid EGO
 on:
   workflow_dispatch:
     inputs:
-      f00c_run_id:
-        description: 'ID du run F00-C validé à réutiliser'
+      f00b_run_id:
+        description: 'ID du run F00-B validé contenant les séquences Match Cut matérialisées'
         required: true
-        default: '32712660893'
+        type: string
       intro_source_url:
         description: 'URL publique de l’image ou vidéo d’introduction'
         required: true
@@ -89,13 +89,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg
 
-      - name: Télécharger l’artifact F00-C validé
+      - name: Télécharger l’artifact F00-B validé
         uses: actions/download-artifact@v4
         with:
-          name: lacrimae-dev4-f00c-${{ inputs.f00c_run_id }}
-          path: F00_INGEST/OUT/motion_slow
+          name: lacrimae-dev4-f00b-${{ inputs.f00b_run_id }}
+          path: F00_INGEST/OUT/materialized
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ inputs.f00c_run_id }}
+          run-id: ${{ inputs.f00b_run_id }}
 
       - name: Télécharger l’introduction fournie par l’opérateur
         run: |
@@ -103,19 +103,19 @@ jobs:
           curl -L --fail --retry 3 "${{ inputs.intro_source_url }}" -o F00_INGEST/IN/HYBRID/intro_source
           test -s F00_INGEST/IN/HYBRID/intro_source
 
-      - name: Vérifier F00-C
+      - name: Vérifier F00-B
         run: |
-          test -s F00_INGEST/OUT/motion_slow/motion_slow_manifest.json
-          test -d F00_INGEST/OUT/motion_slow/sequences
+          test -s F00_INGEST/OUT/materialized/sequences.json
+          test -d F00_INGEST/OUT/materialized/sequences
           python3 - <<'PY'
           import json
           from pathlib import Path
-          root = Path('F00_INGEST/OUT/motion_slow')
-          data = json.loads((root / 'motion_slow_manifest.json').read_text())
+          root = Path('F00_INGEST/OUT/materialized')
+          data = json.loads((root / 'sequences.json').read_text())
           assert data.get('materialized') is True
           assert data.get('sequences')
           assert all((root / row['file']).exists() for row in data['sequences'])
-          print('F00-C validated:', len(data['sequences']), 'sequences')
+          print('F00-B validated:', len(data['sequences']), 'sequences')
           PY
 
       - name: F00-D — HYBRID / EGO
@@ -124,7 +124,7 @@ jobs:
         run: |
           OUT=F00_INGEST/OUT/hybrid
           ARGS=(
-            --matchcut-manifest F00_INGEST/OUT/motion_slow/motion_slow_manifest.json
+            --matchcut-manifest F00_INGEST/OUT/materialized/sequences.json
             --intro F00_INGEST/IN/HYBRID/intro_source
             --out "$OUT"
             --intro-in "${{ inputs.intro_in }}"
