@@ -56,3 +56,17 @@ Le panneau Audio Sync comporte désormais :
 La logique de segments et les enveloppes de transition sont partagées par F03 Preview et F03 PICTOR. Le commit publié est `6594e20` sur `origin/dev7`.
 
 Configuration de test publiée : Intro `0–1 s`, 4 boucles, Match Cut `42,5–50,5 s`, transition `beat_cut`, 30 ms technique, vitesses `1,00×`.
+
+## Diagnostic du silence signalé au Match Cut
+
+Inspection live de la Preview : le fichier Sia est chargé depuis `/audio/sia_elastic_heart.mp3`, avec `readyState=4`, sans erreur, volume non muet et lecture active autour de 46–50 secondes lorsque la composition est dans la partie Match Cut. Le flux audio n’est donc pas supprimé par une erreur de chargement.
+
+Le symptôme est probablement lié à la séparation entre le lecteur audio indépendant du panneau et les segments audio du Player vidéo, ou à la transition entre deux éléments Audio Remotion. Le lecteur du panneau et l’audio de la composition sont deux flux distincts ; le premier sert à rechercher dans la piste et le second sert à jouer le montage. Une correction robuste doit éviter une rupture de montage et rendre explicite le flux contrôlé.
+
+## Correction source unique Intro–Match Cut
+
+La synchronisation Hybrid utilise maintenant la timeline audio v2 transmise explicitement à `normalizeHybridManifest()`, `hybridTimelineFrame()` et `hybridEgoStyle()` dans F03 Preview et F03 PICTOR. Lorsque la musique est active, la position Match Cut est calculée par `(Intro OUT - Intro IN) × loop_count ÷ vitesse`, sans tenir compte d’un ancien `climax_time` hérité.
+
+Test déterministe réussi avec Intro `0–1 s`, 4 boucles, Match Cut audio `42,5–50,5 s` : `introFrames=240`, `matchCutStartFrame=240`, `egoStartFrame=240`, quatre segments Intro de 60 frames et un segment Match Cut démarrant à la frame source 2547.
+
+F03 `pnpm run build` réussi. PICTOR `pnpm run check` réussi. `git diff --check` réussi. La Preview n’a volontairement pas été relancée conformément à la demande.

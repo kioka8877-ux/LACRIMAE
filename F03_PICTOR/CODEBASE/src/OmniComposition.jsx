@@ -124,8 +124,8 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
     ? sciFiNeonHdrFilter(sciFiNeonHdr.intensity)
     : '';
   const fullFilter = (brightnessFilter + enhanceFilter + sharpFilter + ` ${darkLuxuryFilter} ${sciFiFilter}`).trim();
-  const hybridState = hybridManifest ? hybridTimelineFrame(hybridManifest, frame, session) : null;
   const music = normalizeMusicTimeline(musicTimeline || session.music || clip.music || {}, fps, durationInFrames);
+  const hybridState = hybridManifest ? hybridTimelineFrame(hybridManifest, frame, session, music) : null;
   const musicUrl = music.audio_src ? (music.audio_src.startsWith('./') ? staticFile(music.audio_src.replace(/^\.\//, '')) : music.audio_src) : null;
   const musicSegments = musicUrl ? buildAudioSegments({ ...music, audio_src: musicUrl }, fps, durationInFrames) : [];
   const segmentVolume = (segment) => {
@@ -273,7 +273,7 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
           <div style={{ ...hybridTextStyle(hybridState.hybrid.intro_text, frame), zIndex: 100 }}>{hybridState.hybrid.intro_text.text}</div>
         )}
         {hybridState?.isEgo && (
-          <div style={{ ...hybridEgoStyle(hybridManifest, frame, session), zIndex: 101 }}>{hybridState.hybrid.ego.text}</div>
+          <div style={{ ...hybridEgoStyle(hybridManifest, frame, session, music), zIndex: 101 }}>{hybridState.hybrid.ego.text}</div>
         )}
 
         {/* L4 PARAGRAPHE */}

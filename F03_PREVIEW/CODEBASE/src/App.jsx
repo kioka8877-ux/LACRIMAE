@@ -174,6 +174,7 @@ export default function App() {
   const fps = clip.video?.fps || 30;
   const baseTotalFrames = sequences?.total_frames || clip.video?.total_frames || 300;
   const reviewMode = session.review_mode || 'match_cut';
+  const musicForHybrid = normalizeMusicTimeline(musicTimeline || session.music || {}, fps, baseTotalFrames);
   const activeHybrid = reviewMode === 'hybrid_narrative' ? normalizeHybridManifest(
     hybridManifest || {
       mode: 'hybrid_narrative',
@@ -182,7 +183,7 @@ export default function App() {
       intro: session.hybrid?.intro || {},
       intro_text: session.hybrid?.intro_text || {},
       ego: session.hybrid?.ego || {},
-    }, session
+    }, session, musicForHybrid
   ) : null;
   const totalFrames = activeHybrid?.total_frames || baseTotalFrames;
   const composition = getCompositionConfig(clip, session);

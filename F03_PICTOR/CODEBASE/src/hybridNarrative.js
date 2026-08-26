@@ -21,7 +21,7 @@ function durationForText(text, introFrames, totalFrames) {
   return Math.max(1, introFrames - text.start_frame);
 }
 
-export function normalizeHybridManifest(manifest, session = {}) {
+export function normalizeHybridManifest(manifest, session = {}, musicTimeline = null) {
   const base = manifest || {};
   const overrides = session.hybrid || {};
   const source = {
@@ -39,10 +39,25 @@ export function normalizeHybridManifest(manifest, session = {}) {
     0,
     Number(intro.duration_frames) || Math.round(Number(intro.duration_seconds || 0) * fps),
   );
-  const musicClimaxFrame = session.music?.climax_time == null
+  // Audio v2 est la source de vérité du passage Intro → Match Cut. Les anciens
+  // champs climax_time peuvent rester dans des codex hérités, mais ne doivent
+  // jamais écraser Intro IN/OUT × nombre de boucles.
+  const music = musicTimeline || session.music || source.music || {};
+  const musicIntro = music.intro || {};
+  const hasActiveMusic = music.enabled === true || !!music.audio_src || !!music.audio_file;
+  const introIn = Number(musicIntro.in_seconds ?? music.intro_in);
+  const introOut = Number(musicIntro.out_seconds ?? music.intro_out);
+  const loopCount = Math.max(1, Math.round(Number(musicIntro.loop_count ?? music.loop_count ?? 1)));
+  const introSpeed = Math.max(0.25, Number(musicIntro.speed ?? music.intro_speed ?? 1));
+  const musicIntroFrames = hasActiveMusic && Number.isFinite(introIn) && Number.isFinite(introOut) && introOut > introIn
+    ? Math.max(1, Math.round(((introOut - introIn) * loopCount / introSpeed) * fps))
+    : 0;
+  const musicClimaxFrame = !musicIntroFrames && session.music?.climax_time == null
     ? 0
-    : Math.max(0, Math.round(Number(session.music.climax_time) * fps));
-  const introFrames = Math.max(declaredIntroFrames, musicClimaxFrame);
+    : !musicIntroFrames
+      ? Math.max(0, Math.round(Number(session.music.climax_time) * fps))
+      : 0;
+  const introFrames = musicIntroFrames || Math.max(declaredIntroFrames, musicClimaxFrame);
   const declaredTotalFrames = Number(source.total_frames) || 0;
   const declaredMatchCutFrames = Number(source.match_cut?.total_frames || source.match_cut_total_frames || 0);
   const matchCutFrames = Math.max(0, declaredMatchCutFrames || declaredTotalFrames - introFrames);
@@ -76,8 +91,8 @@ export function normalizeHybridManifest(manifest, session = {}) {
   };
 }
 
-export function hybridTimelineFrame(manifest, frame, session = {}) {
-  const hybrid = normalizeHybridManifest(manifest, session);
+export function hybridTimelineFrame(manifest, frame, session = {}, musicTimeline = null) {
+  const hybrid = normalizeHybridManifest(manifest, session, musicTimeline);
   const introFrames = hybrid.intro.duration_frames || hybrid.transition.match_cut_start_frame || 0;
   const isIntro = frame < introFrames;
   const isActive = (text) => frame >= text.start_frame && frame < text.start_frame + text.duration_frames;
@@ -108,7 +123,7 @@ export function hybridTextStyle(text, frame) {
   };
 }
 
-export function hybridEgoStyle(manifest, frame, session = {}) {
-  const { hybrid, isEgo } = hybridTimelineFrame(manifest, frame, session);
+export function hybridEgoStyle(manifest, frame, session = {}, musicTimeline = null) {
+  const { hybrid, isEgo } = hybridTimelineFrame(manifest, frame, session, musicTimeline);
   return isEgo ? hybridTextStyle(hybrid.ego, frame) : null;
 }
