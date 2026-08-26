@@ -1,16 +1,15 @@
 {
-  "schema_version": "dev7.music-timeline.v1",
+  "schema_version": "dev7.music-timeline.v2",
   "enabled": false,
   "sync_mode": "off",
   "audio_file": "",
   "audio_src": "",
+  "duration_seconds": 0,
+  "sample_rate": 48000,
+  "bpm": 0,
+  "intro": { "in_seconds": 0, "out_seconds": 1, "loop_count": 1, "volume": 1, "speed": 1 },
+  "match_cut": { "in_seconds": 0, "out_seconds": 1, "volume": 1, "speed": 1 },
+  "transition": { "type": "beat_cut", "duration_ms": 30, "alignment": "nearest_beat" },
   "beats": [],
-  "loop_in": 0,
-  "loop_out": 4,
-  "loop_enabled": true,
-  "climax_time": null,
-  "match_cut_start_frame": 0,
-  "intro_volume": 1,
-  "match_cut_volume": 1,
   "offset_frames": 0
 }

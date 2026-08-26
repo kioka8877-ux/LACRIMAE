@@ -162,13 +162,19 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
   const music = normalizeMusicTimeline(musicTimeline || session.music || clip.music || {}, fps, durationInFrames);
   const musicUrl = music.audio_src ? (music.audio_src.startsWith('./') ? staticFile(music.audio_src.replace(/^\.\//, '')) : music.audio_src) : null;
   const musicSegments = musicUrl ? buildAudioSegments({ ...music, audio_src: musicUrl }, fps, durationInFrames) : [];
+  const segmentVolume = (segment) => {
+    const localFrame = frame - segment.from;
+    const fadeIn = segment.fade_in_frames ? interpolate(localFrame, [0, segment.fade_in_frames], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : 1;
+    const fadeOut = segment.fade_out_frames ? interpolate(localFrame, [Math.max(0, segment.duration - segment.fade_out_frames), segment.duration], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : 1;
+    return segment.volume * Math.min(fadeIn, fadeOut);
+  };
 
   return (
     <AbsoluteFill style={{ backgroundColor: session.background?.color || '#000' }}>
       {/* Audio : même timeline que F03, avec loop intro et sortie au climax */}
       {musicUrl && musicSegments.map((segment, index) => (
         <Sequence key={`music_${index}`} from={segment.from} durationInFrames={segment.duration}>
-          <Audio src={musicUrl} startFrom={segment.startFrom} volume={segment.volume} />
+          <Audio src={musicUrl} startFrom={segment.startFrom} volume={segmentVolume(segment)} />
         </Sequence>
       ))}
       {!musicUrl && clip.audio_enabled === true && clip.audioSrc && (

@@ -50,7 +50,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('text');
   const [flashSelectedIndex, setFlashSelectedIndex] = useState(0);
   const [logoPending, setLogoPending] = useState(null); // {x_pct, y_pct} balise double-clic
+  const [waveDrag, setWaveDrag] = useState(null);
   const playerRef = useRef(null);
+  const waveformRef = useRef(null);
   const lastClickRef = useRef({ t: 0, x: 0, y: 0 });
 
   // En mode Flash Text, l’édition doit être immédiatement visible : pause et
@@ -80,8 +82,14 @@ export default function App() {
         setCodex(full);
         setClip(clipFirst);
         setSession(full.session || {});
-        setMusicTimeline(normalizeMusicTimeline(full.session?.music || clipFirst.music || {}, Number(clipFirst.video?.fps || 30), Number(clipFirst.video?.total_frames || 300)));
-        if (full.session?.music?.audio_src) setAudioSrc(full.session.music.audio_src);
+        let loadedMusic = null;
+        try {
+          const musicResp = await fetch('./music_timeline.json');
+          if (musicResp.ok) loadedMusic = await musicResp.json();
+        } catch (_) { /* audio optionnel */ }
+        const selectedMusic = full.session?.music || clipFirst.music || loadedMusic || {};
+        setMusicTimeline(normalizeMusicTimeline(selectedMusic, Number(clipFirst.video?.fps || 30), Number(clipFirst.video?.total_frames || 300)));
+        if (selectedMusic.audio_src) setAudioSrc(selectedMusic.audio_src);
         setActiveTab(full.session?.review_mode === 'hybrid_narrative' ? 'hybrid' : 'text');
         setVideoSrc(clipFirst.video?.source ? './' + clipFirst.video.source : './video_source.mp4');
         try {
@@ -175,11 +183,51 @@ export default function App() {
   const totalFrames = activeHybrid?.total_frames || baseTotalFrames;
   const composition = getCompositionConfig(clip, session);
   const music = normalizeMusicTimeline(musicTimeline || session.music || {}, fps, totalFrames);
-  const waveform = musicWaveformPoints(music.beats, 600, 54);
+  const waveformWidth = 600;
+  const waveformHeight = 82;
+  const waveformDuration = Math.max(
+    Number(music.duration_seconds || 0),
+    Number(music.loop_out || 0),
+    Number(music.climax_time || 0),
+    Number(music.beats?.[music.beats.length - 1]?.time_seconds || 0),
+    1,
+  );
+  const waveform = musicWaveformPoints(music.beats, waveformWidth, waveformHeight);
+  const waveformX = (seconds) => Math.max(0, Math.min(waveformWidth, (Number(seconds || 0) / waveformDuration) * waveformWidth));
   const updateMusic = (key, value) => {
     const next = normalizeMusicTimeline({ ...music, [key]: value }, fps, totalFrames);
     setMusicTimeline(next);
     setSession((s) => ({ ...s, music: next }));
+  };
+  const updateMusicBlock = (block, key, value) => {
+    const next = normalizeMusicTimeline({ ...music, [block]: { ...(music[block] || {}), [key]: value } }, fps, totalFrames);
+    setMusicTimeline(next);
+    setSession((s) => ({ ...s, music: next }));
+  };
+  const waveTimeFromEvent = (event) => {
+    const rect = waveformRef.current?.getBoundingClientRect();
+    if (!rect || !rect.width) return 0;
+    const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+    return ratio * waveformDuration;
+  };
+  const setWaveHandleTime = (handle, rawSeconds) => {
+    const seconds = Math.max(0, Math.min(waveformDuration, rawSeconds));
+    if (handle === 'loop_in') {
+      updateMusicBlock('intro', 'in_seconds', Number(Math.min(seconds, Math.max(0, music.intro_out - 0.05)).toFixed(2)));
+    } else if (handle === 'loop_out') {
+      updateMusicBlock('intro', 'out_seconds', Number(Math.max(seconds, music.intro_in + 0.05).toFixed(2)));
+    } else if (handle === 'climax' || handle === 'match_cut_in') {
+      const nextIn = Number(seconds.toFixed(2));
+      updateMusicBlock('match_cut', 'in_seconds', nextIn);
+    } else if (handle === 'match_cut_out') {
+      updateMusicBlock('match_cut', 'out_seconds', Number(Math.max(seconds, music.match_cut_in + 0.05).toFixed(2)));
+    }
+  };
+  const beginWaveDrag = (event, handle) => {
+    event.preventDefault();
+    waveformRef.current?.setPointerCapture?.(event.pointerId);
+    setWaveDrag(handle);
+    setWaveHandleTime(handle, waveTimeFromEvent(event));
   };
 
   const motionSlow = {
@@ -621,22 +669,95 @@ export default function App() {
                 <option value="off">Désactivé</option><option value="manual">Manuel</option><option value="assisted">Assisté</option><option value="beat_locked">Verrouillé sur les beats</option>
               </select>
               <label style={styles.label}>Musique : {music.audio_file || 'aucun fichier sélectionné'}</label>
-              {waveform && <svg viewBox="0 0 600 54" style={{ width: '100%', height: 54, background: '#0d1512', border: '1px solid #214b3a', borderRadius: 6 }}><polyline points={waveform} fill="none" stroke="#00ff88" strokeWidth="2" /></svg>}
-              <label style={styles.label}>Décalage : {music.offset_frames} frames</label>
+              {waveform && (
+                <div style={{ margin: '8px 0 12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6, fontSize: 10, color: '#b8c9c1', marginBottom: 4 }}>
+                    <span><b style={{ color: '#00ff88' }}>VERT</b> = boucle intro</span>
+                    <span><b style={{ color: '#ff4d6d' }}>ROUGE</b> = climax / Match Cut</span>
+                  </div>
+                  <svg
+                    ref={waveformRef}
+                    viewBox={`0 0 ${waveformWidth} ${waveformHeight}`}
+                    preserveAspectRatio="none"
+                    style={{ width: '100%', height: 82, background: '#0d1512', border: '1px solid #214b3a', borderRadius: 6, touchAction: 'none', overflow: 'visible' }}
+                    onPointerMove={(event) => { if (waveDrag) setWaveHandleTime(waveDrag, waveTimeFromEvent(event)); }}
+                    onPointerUp={() => setWaveDrag(null)}
+                    onPointerCancel={() => setWaveDrag(null)}
+                  >
+                    <rect x={waveformX(music.intro_in)} y="0" width={Math.max(1, waveformX(music.intro_out) - waveformX(music.intro_in))} height={waveformHeight} fill="#00ff88" opacity="0.18" />
+                    <rect x={waveformX(music.match_cut_in)} y="0" width={Math.max(1, waveformX(music.match_cut_out) - waveformX(music.match_cut_in))} height={waveformHeight} fill="#ff4d6d" opacity="0.14" />
+                    <polyline points={waveform} fill="none" stroke="#00ff88" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                    <line x1={waveformX(music.intro_in)} x2={waveformX(music.intro_in)} y1="0" y2={waveformHeight} stroke="#00ff88" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                    <line x1={waveformX(music.intro_out)} x2={waveformX(music.intro_out)} y1="0" y2={waveformHeight} stroke="#00ff88" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                    <line x1={waveformX(music.match_cut_in)} x2={waveformX(music.match_cut_in)} y1="0" y2={waveformHeight} stroke="#ff4d6d" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                    <line x1={waveformX(music.match_cut_out)} x2={waveformX(music.match_cut_out)} y1="0" y2={waveformHeight} stroke="#ff4d6d" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                    <line x1={waveformX(music.intro_duration_seconds)} x2={waveformX(music.intro_duration_seconds)} y1="0" y2={waveformHeight} stroke="#c5a8ff" strokeWidth="2" strokeDasharray="5 3" vectorEffect="non-scaling-stroke" />
+                    <g style={{ cursor: 'ew-resize' }} onPointerDown={(event) => beginWaveDrag(event, 'loop_in')}>
+                      <circle cx={waveformX(music.intro_in)} cy="12" r="6" fill="#00ff88" stroke="#07150f" strokeWidth="2" />
+                      <text x={Math.min(waveformWidth - 28, Math.max(2, waveformX(music.intro_in) + 5))} y="10" fill="#b8ffd9" fontSize="10" fontWeight="700">IN</text>
+                    </g>
+                    <g style={{ cursor: 'ew-resize' }} onPointerDown={(event) => beginWaveDrag(event, 'loop_out')}>
+                      <circle cx={waveformX(music.intro_out)} cy="12" r="6" fill="#00ff88" stroke="#07150f" strokeWidth="2" />
+                      <text x={Math.min(waveformWidth - 28, Math.max(2, waveformX(music.intro_out) - 20))} y="10" fill="#b8ffd9" fontSize="10" fontWeight="700">OUT</text>
+                    </g>
+                    <g style={{ cursor: 'ew-resize' }} onPointerDown={(event) => beginWaveDrag(event, 'match_cut_in')}>
+                      <circle cx={waveformX(music.match_cut_in)} cy={waveformHeight - 20} r="6" fill="#ff4d6d" stroke="#210b12" strokeWidth="2" />
+                      <text x={Math.min(waveformWidth - 45, Math.max(2, waveformX(music.match_cut_in) + 7))} y={waveformHeight - 23} fill="#ffb4c3" fontSize="10" fontWeight="700">DROP</text>
+                    </g>
+                    <g style={{ cursor: 'ew-resize' }} onPointerDown={(event) => beginWaveDrag(event, 'match_cut_out')}>
+                      <circle cx={waveformX(music.match_cut_out)} cy={waveformHeight - 20} r="6" fill="#ff4d6d" stroke="#210b12" strokeWidth="2" />
+                      <text x={Math.min(waveformWidth - 28, Math.max(2, waveformX(music.match_cut_out) - 18))} y={waveformHeight - 23} fill="#ffb4c3" fontSize="10" fontWeight="700">FIN</text>
+                    </g>
+                    <text x="4" y={waveformHeight - 3} fill="#71867b" fontSize="9">0s</text>
+                    <text x={waveformWidth - 42} y={waveformHeight - 3} fill="#71867b" fontSize="9">{waveformDuration.toFixed(1)}s</text>
+                  </svg>
+                  <div style={{ marginTop: 5, fontSize: 11, color: '#d4e3dc' }}>
+                    Glisse <b style={{ color: '#00ff88' }}>IN</b> et <b style={{ color: '#00ff88' }}>OUT</b> pour choisir la portion répétée pendant l’introduction. Glisse <b style={{ color: '#ff4d6d' }}>CLIMAX</b> pour choisir le passage au Match Cut + EGO.
+                  </div>
+                </div>
+              )}
+              <label style={styles.label}>Décalage global : {music.offset_frames} frames</label>
               <input style={styles.slider} type="range" min="-30" max="30" step="1" value={music.offset_frames} onChange={(e) => updateMusic('offset_frames', parseInt(e.target.value, 10))} />
-              <label style={styles.label}>Loop musical : {music.loop_in.toFixed(2)}s → {music.loop_out.toFixed(2)}s</label>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <input style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.05" value={music.loop_in} onChange={(e) => updateMusic('loop_in', parseFloat(e.target.value) || 0)} />
-                <input style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.05" value={music.loop_out} onChange={(e) => updateMusic('loop_out', parseFloat(e.target.value) || 0)} />
+              <div style={{ marginTop: 10, padding: 10, background: '#101a15', border: '1px solid #23543e', borderRadius: 6 }}>
+                <label style={{ ...styles.label, color: '#00ff88', fontSize: 13 }}>INTRO — portion à boucler</label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input aria-label="Intro IN" style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.05" value={music.intro_in} onChange={(e) => updateMusicBlock('intro', 'in_seconds', parseFloat(e.target.value) || 0)} />
+                  <input aria-label="Intro OUT" style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.05" value={music.intro_out} onChange={(e) => updateMusicBlock('intro', 'out_seconds', parseFloat(e.target.value) || 0)} />
+                </div>
+                <div style={{ display: 'flex', gap: 8, fontSize: 11, color: '#9cb9aa' }}><span style={{ width: '50%' }}>Intro IN (s)</span><span style={{ width: '50%' }}>Intro OUT (s)</span></div>
+                <label style={styles.label}>Nombre de boucles : {music.loop_count}</label>
+                <input style={styles.slider} type="range" min="1" max="20" step="1" value={music.loop_count} onChange={(e) => updateMusicBlock('intro', 'loop_count', parseInt(e.target.value, 10))} />
+                <div style={{ fontSize: 11, color: '#b8ffd9' }}>Durée intro calculée : {music.intro_duration_seconds.toFixed(2)} s</div>
+                <label style={styles.label}>Volume intro : {Math.round(music.intro_volume * 100)}%</label>
+                <input style={styles.slider} type="range" min="0" max="1.5" step="0.05" value={music.intro_volume} onChange={(e) => updateMusicBlock('intro', 'volume', parseFloat(e.target.value))} />
+                <label style={styles.label}>Vitesse intro : {music.intro_speed.toFixed(2)}×</label>
+                <input style={styles.slider} type="range" min="0.5" max="1.5" step="0.05" value={music.intro_speed} onChange={(e) => updateMusicBlock('intro', 'speed', parseFloat(e.target.value))} />
               </div>
-              <label style={styles.label}>Climax / drop : {music.climax_time == null ? 'fin de l’intro' : `${music.climax_time.toFixed(2)}s`}</label>
-              <input style={styles.input} type="number" min="0" step="0.05" value={music.climax_time ?? ''} placeholder="ex. 2.50" onChange={(e) => updateMusic('climax_time', e.target.value === '' ? null : parseFloat(e.target.value))} />
-              <label style={styles.label}>Volume intro : {Math.round(music.intro_volume * 100)}%</label>
-              <input style={styles.slider} type="range" min="0" max="1.5" step="0.05" value={music.intro_volume} onChange={(e) => updateMusic('intro_volume', parseFloat(e.target.value))} />
-              <label style={styles.label}>Volume Match Cut : {Math.round(music.match_cut_volume * 100)}%</label>
-              <input style={styles.slider} type="range" min="0" max="1.5" step="0.05" value={music.match_cut_volume} onChange={(e) => updateMusic('match_cut_volume', parseFloat(e.target.value))} />
+              <div style={{ marginTop: 10, padding: 10, background: '#1a1015', border: '1px solid #6d2941', borderRadius: 6 }}>
+                <label style={{ ...styles.label, color: '#ff6a8a', fontSize: 13 }}>MATCH CUT — partie forte</label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input aria-label="Match Cut IN" style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.05" value={music.match_cut_in} onChange={(e) => updateMusicBlock('match_cut', 'in_seconds', parseFloat(e.target.value) || 0)} />
+                  <input aria-label="Match Cut OUT" style={{ ...styles.input, width: '50%' }} type="number" min="0" step="0.05" value={music.match_cut_out} onChange={(e) => updateMusicBlock('match_cut', 'out_seconds', parseFloat(e.target.value) || 0)} />
+                </div>
+                <div style={{ display: 'flex', gap: 8, fontSize: 11, color: '#d8a8b4' }}><span style={{ width: '50%' }}>Drop / IN (s)</span><span style={{ width: '50%' }}>Fin / OUT (s)</span></div>
+                <div style={{ fontSize: 11, color: '#ffb4c3' }}>Durée Match Cut : {music.match_cut_duration_seconds.toFixed(2)} s · début vidéo : {music.intro_duration_seconds.toFixed(2)} s</div>
+                <label style={styles.label}>Volume Match Cut : {Math.round(music.match_cut_volume * 100)}%</label>
+                <input style={styles.slider} type="range" min="0" max="1.5" step="0.05" value={music.match_cut_volume} onChange={(e) => updateMusicBlock('match_cut', 'volume', parseFloat(e.target.value))} />
+                <label style={styles.label}>Vitesse Match Cut : {music.match_cut_speed.toFixed(2)}×</label>
+                <input style={styles.slider} type="range" min="0.5" max="1.5" step="0.05" value={music.match_cut_speed} onChange={(e) => updateMusicBlock('match_cut', 'speed', parseFloat(e.target.value))} />
+              </div>
+              <div style={{ marginTop: 10, padding: 10, background: '#15121c', border: '1px solid #49356e', borderRadius: 6 }}>
+                <label style={{ ...styles.label, color: '#c5a8ff', fontSize: 13 }}>TRANSITION AUDIO</label>
+                <select style={styles.select} value={music.transition.type} onChange={(e) => updateMusicBlock('transition', 'type', e.target.value)}>
+                  <option value="beat_cut">Cut sur le beat</option><option value="crossfade">Crossfade court</option><option value="beat_jump">Beat jump</option>
+                </select>
+                <label style={styles.label}>Durée technique : {music.transition.duration_ms} ms</label>
+                <input style={styles.slider} type="range" min="0" max="200" step="5" value={music.transition.duration_ms} onChange={(e) => updateMusicBlock('transition', 'duration_ms', parseInt(e.target.value, 10))} />
+                <label style={styles.label}>Alignement</label>
+                <select style={styles.select} value={music.transition.alignment} onChange={(e) => updateMusicBlock('transition', 'alignment', e.target.value)}><option value="nearest_beat">Beat le plus proche</option><option value="exact">Position exacte</option></select>
+              </div>
               <div style={{ marginTop: 10, padding: 8, background: '#101a15', border: '1px solid #23543e', borderRadius: 6, fontSize: 12, color: '#a7e9c2' }}>
-                La boucle reste active avant le climax. Le climax déclenche la sortie de boucle et le début du Match Cut.
+                La Preview calcule automatiquement la fin de l’intro et démarre le Match Cut + EGO à ce moment. La fin de la partie forte reste le champ Match Cut OUT choisi par l’opérateur.
               </div>
             </div>
           )}
