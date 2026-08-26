@@ -21,7 +21,7 @@ VIDEO_DIR = "/data"
 MODEL_DIR = "/models"
 RIFE_VERSION = "4.25"
 RIFE_MODEL_DIR = Path(MODEL_DIR) / "models" / "RIFE" / RIFE_VERSION / "train_log"
-GPU_STAGES = {"F02_MOTUS", "F03_RESTAURA", "F04_UPSCALE", "F05_LUMEN"}
+GPU_STAGES = {"F02_MOTUS", "F03_RESTAURA", "F04_UPSCALE", "F05_LIBRARIUS_FACIES", "F06_LUMEN"}
 
 image = modal.Image.from_dockerfile("modal/images/Dockerfile.video-gpu")
 app = modal.App(APP_NAME)
