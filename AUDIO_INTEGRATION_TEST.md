@@ -70,3 +70,7 @@ La synchronisation Hybrid utilise maintenant la timeline audio v2 transmise expl
 Test déterministe réussi avec Intro `0–1 s`, 4 boucles, Match Cut audio `42,5–50,5 s` : `introFrames=240`, `matchCutStartFrame=240`, `egoStartFrame=240`, quatre segments Intro de 60 frames et un segment Match Cut démarrant à la frame source 2547.
 
 F03 `pnpm run build` réussi. PICTOR `pnpm run check` réussi. `git diff --check` réussi. La Preview n’a volontairement pas été relancée conformément à la demande.
+
+## Vérification Preview après correction
+
+La Preview dev7 a été relancée après le commit `e0ec294`. Le panneau Audio Sync affiche toujours Intro `0–1 s`, 4 boucles, durée Intro calculée `4,00 s`, Match Cut `42,5–50,5 s` et début vidéo du Match Cut `4,00 s`. Le lecteur audio indépendant et la waveform graduée sont présents. La Preview n’a pas généré d’erreur au chargement.
