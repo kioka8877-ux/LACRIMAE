@@ -9,6 +9,7 @@ import hashlib
 import importlib
 import json
 import os
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -175,6 +176,58 @@ def _run_rife(source: Path, destination: Path, target_fps: int) -> dict:
     }
 
 
+def _run_ffmpeg_filter(source: Path, destination: Path, stage: str, profile: str) -> dict:
+    """Restauration/finalisation à résolution native, avec audio conservé."""
+    import cv2
+
+    probe = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+         "stream=width,height,avg_frame_rate,nb_frames", "-of", "json", str(source)],
+        check=True, capture_output=True, text=True,
+    )
+    stream = json.loads(probe.stdout).get("streams", [{}])[0]
+    width = int(stream.get("width") or 0)
+    height = int(stream.get("height") or 0)
+    fps = stream.get("avg_frame_rate") or "0/0"
+    if not width or not height:
+        raise ValueError(f"métadonnées invalides pour {stage}")
+
+    if stage == "F03_RESTAURA":
+        # Nettoyage léger, sans agrandissement ni modification de géométrie.
+        video_filter = "hqdn3d=1.0:1.0:3.0:3.0,unsharp=5:5:0.30:5:5:0"
+        implementation = "ffmpeg_hqdn3d_unsharp_native"
+    else:
+        strength = "0.28" if profile == "fast" else "0.40" if profile == "balanced" else "0.52"
+        video_filter = f"eq=contrast=1.08:saturation=1.06,unsharp=5:5:{strength}:5:5:0"
+        implementation = "ffmpeg_eq_unsharp_native"
+
+    tmp = destination.with_suffix(destination.suffix + f".{stage.lower()}.tmp.mp4")
+    tmp.parent.mkdir(parents=True, exist_ok=True)
+    started = time.monotonic()
+    command = [
+        "ffmpeg", "-y", "-loglevel", "error", "-i", str(source),
+        "-vf", video_filter, "-map", "0:v:0", "-map", "0:a?",
+        "-c:v", "libx264", "-preset", "fast", "-crf", "18",
+        "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart", str(tmp),
+    ]
+    subprocess.run(command, check=True)
+    tmp.replace(destination)
+    capture = cv2.VideoCapture(str(destination))
+    output_frames = int(capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+    out_fps = float(capture.get(cv2.CAP_PROP_FPS) or 0.0)
+    capture.release()
+    return {
+        "implementation": implementation,
+        "input_resolution": [width, height],
+        "output_resolution": [width, height],
+        "source_fps": fps,
+        "target_fps": out_fps,
+        "output_frames": output_frames,
+        "audio": "copied_stream_copy",
+        "inference_seconds": round(time.monotonic() - started, 3),
+    }
+
+
 def _run_realesrgan(source: Path, destination: Path) -> dict:
     import cv2
     import torch
@@ -266,8 +319,16 @@ def run_stage(
     started = time.monotonic()
     if stage == "F02_MOTUS":
         metrics = _run_rife(source, destination, target_fps)
+    elif stage == "F03_RESTAURA":
+        metrics = _run_ffmpeg_filter(source, destination, stage, profile)
     elif stage == "F04_UPSCALE":
         metrics = _run_realesrgan(source, destination)
+    elif stage == "F05_LIBRARIUS_FACIES":
+        import shutil
+        shutil.copy2(source, destination)
+        metrics = {"implementation": "face_restore_disabled_no_model", "warning": "no_face_model_installed"}
+    elif stage == "F06_LUMEN":
+        metrics = _run_ffmpeg_filter(source, destination, stage, profile)
     else:
         import shutil
         shutil.copy2(source, destination)
