@@ -38,3 +38,21 @@ Le contrôle DOM confirme la présence de 3 groupes interactifs (`IN`, `OUT`, `C
 ## Preview relancée
 
 La Preview accessible sur le serveur local dev7 a été rechargée après la correction. Le panneau Audio Sync montre les repères `IN`, `OUT` et `CLIMAX`; la vidéo Hybrid arrive bien au moment EGO/Match Cut à 2,50 s dans l’état actuel. Le build F03 reste valide après la modification de `normalizeMusicTimeline`.
+
+## Timeline audio v2 implémentée
+
+Le panneau Audio Sync comporte désormais :
+
+- `Intro IN` et `Intro OUT` pour sélectionner la portion à répéter ;
+- `Nombre de boucles` de 1 à 20 ;
+- durée de l’introduction calculée automatiquement ;
+- `Match Cut IN / Drop` et `Match Cut OUT / Fin` choisis séparément ;
+- durée du Match Cut calculée automatiquement ;
+- vitesse Intro et vitesse Match Cut ;
+- transition audio `Cut sur le beat`, `Crossfade court` ou `Beat jump` ;
+- alignement `Beat le plus proche` ou `Position exacte` ;
+- zone verte Intro et zone rouge Match Cut sur la waveform.
+
+La logique de segments et les enveloppes de transition sont partagées par F03 Preview et F03 PICTOR. Le commit publié est `6594e20` sur `origin/dev7`.
+
+Configuration de test publiée : Intro `0–1 s`, 4 boucles, Match Cut `42,5–50,5 s`, transition `beat_cut`, 30 ms technique, vitesses `1,00×`.
