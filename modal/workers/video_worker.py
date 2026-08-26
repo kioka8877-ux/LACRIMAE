@@ -28,6 +28,7 @@ GPU_STAGES = {
     "F04_UPSCALE", "F04_FORGE_TEXTURA",
     "F05_LIBRARIUS_FACIES",
     "F06_LUMEN", "F06_LUMEN_IGNIS",
+    "F07_CHROMA_DOMINATUS", "F08_TEMPORALIS_CONSISTENTIA",
 }
 
 image = modal.Image.from_dockerfile("modal/images/Dockerfile.video-gpu")
@@ -210,7 +211,10 @@ def _run_gfpgan(source: Path, destination: Path, profile: str) -> dict:
     if fps <= 0 or width <= 0 or height <= 0:
         capture.release()
         raise ValueError("métadonnées vidéo invalides pour F05")
-    strength = 0.55 if profile == "fast" else 0.70 if profile == "balanced" else 0.82
+    atom = _load_atom_profile(profile)
+    face_cfg = atom.get("face", {})
+    strength = float(face_cfg.get("weight", 0.62)) if face_cfg.get("enabled", True) else 0.0
+    strength = max(0.0, min(1.0, strength))
     restorer = GFPGANer(
         model_path=str(weights), upscale=1, arch="clean", channel_multiplier=2,
         bg_upsampler=None, device="cuda" if torch.cuda.is_available() else "cpu",
@@ -352,6 +356,57 @@ def _run_ffmpeg_filter(source: Path, destination: Path, stage: str, profile: str
     }
 
 
+def _run_chroma(source: Path, destination: Path, profile: str) -> dict:
+    """Applique la finition colorimétrique ATOM-IC à résolution native."""
+    import cv2
+    atom = _load_atom_profile(profile)
+    cfg = atom.get("chroma", {})
+    video_filter = (
+        f"eq=contrast={cfg.get('contrast', 1.08)}:brightness={cfg.get('brightness', 0.0)}:"
+        f"saturation={cfg.get('saturation', 1.08)}:gamma={cfg.get('gamma', 1.0)},"
+        f"colorbalance=rs={cfg.get('red_shadow', 0.0)}:gs={cfg.get('green_shadow', 0.0)}:"
+        f"bs={cfg.get('blue_shadow', 0.0)}:rm={cfg.get('red_mid', 0.0)}:"
+        f"gm={cfg.get('green_mid', 0.0)}:bm={cfg.get('blue_mid', 0.0)}"
+    )
+    tmp = destination.with_suffix(destination.suffix + ".chroma.tmp.mp4")
+    started = time.monotonic()
+    subprocess.run([
+        "ffmpeg", "-y", "-loglevel", "error", "-i", str(source), "-vf", video_filter,
+        "-map", "0:v:0", "-map", "0:a?", "-c:v", "libx264", "-preset", "fast", "-crf", "18",
+        "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart", str(tmp)
+    ], check=True)
+    tmp.replace(destination)
+    capture = cv2.VideoCapture(str(destination))
+    fps = float(capture.get(cv2.CAP_PROP_FPS) or 0.0)
+    frames = int(capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+    width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH) or 0)
+    height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT) or 0)
+    capture.release()
+    return {"implementation": "atom_ic_chroma_dominatus", "input_resolution": [width, height],
+            "output_resolution": [width, height], "source_fps": fps, "target_fps": fps,
+            "output_frames": frames, "audio": "copied_stream_copy",
+            "inference_seconds": round(time.monotonic() - started, 3)}
+
+
+def _run_temporal_consistency(source: Path, destination: Path, profile: str) -> dict:
+    """Passe temporelle conservatrice ; copie sans mélange lorsque le profil la désactive."""
+    import shutil
+    atom = _load_atom_profile(profile)
+    strength = float(atom.get("temporal", {}).get("strength", 0.0))
+    if strength <= 0.0:
+        shutil.copy2(source, destination)
+        return {"implementation": "atom_ic_temporal_guard_passthrough", "temporal_strength": 0.0}
+    tmp = destination.with_suffix(destination.suffix + ".temporal.tmp.mp4")
+    opacity = max(0.0, min(1.0, strength))
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(source), "-vf",
+                     f"tblend=all_mode=average:all_opacity={opacity}", "-map", "0:v:0", "-map", "0:a?",
+                     "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p",
+                     "-c:a", "copy", "-movflags", "+faststart", str(tmp)], check=True)
+    tmp.replace(destination)
+    return {"implementation": "atom_ic_temporal_tblend_guard", "temporal_strength": opacity,
+            "audio": "copied_stream_copy"}
+
+
 def _run_realesrgan(source: Path, destination: Path) -> dict:
     import cv2
     import torch
@@ -453,6 +508,10 @@ def run_stage(
         metrics = _run_gfpgan(source, destination, profile)
     elif stage in ("F06_LUMEN", "F06_LUMEN_IGNIS"):
         metrics = _run_ffmpeg_filter(source, destination, "F06_LUMEN", profile)
+    elif stage == "F07_CHROMA_DOMINATUS":
+        metrics = _run_chroma(source, destination, profile)
+    elif stage == "F08_TEMPORALIS_CONSISTENTIA":
+        metrics = _run_temporal_consistency(source, destination, profile)
     else:
         import shutil
         shutil.copy2(source, destination)
