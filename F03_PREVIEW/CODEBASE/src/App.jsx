@@ -43,6 +43,9 @@ export default function App() {
   const [hybridManifest, setHybridManifest] = useState(null);
   const [hybridIntroSrc, setHybridIntroSrc] = useState('');
   const [audioSrc, setAudioSrc] = useState('');
+  const [audioPosition, setAudioPosition] = useState(0);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [audioPlaying, setAudioPlaying] = useState(false);
   const [musicTimeline, setMusicTimeline] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -52,6 +55,7 @@ export default function App() {
   const [logoPending, setLogoPending] = useState(null); // {x_pct, y_pct} balise double-clic
   const [waveDrag, setWaveDrag] = useState(null);
   const playerRef = useRef(null);
+  const audioPlayerRef = useRef(null);
   const waveformRef = useRef(null);
   const lastClickRef = useRef({ t: 0, x: 0, y: 0 });
 
@@ -209,6 +213,23 @@ export default function App() {
     if (!rect || !rect.width) return 0;
     const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
     return ratio * waveformDuration;
+  };
+  const seekAudio = (seconds) => {
+    const element = audioPlayerRef.current;
+    if (!element) return;
+    const next = Math.max(0, Math.min(Number.isFinite(element.duration) ? element.duration : waveformDuration, seconds));
+    element.currentTime = next;
+    setAudioPosition(next);
+  };
+  const seekAudioFromEvent = (event) => {
+    if (event.target !== event.currentTarget) return;
+    seekAudio(waveTimeFromEvent(event));
+  };
+  const toggleAudioPlayback = async () => {
+    const element = audioPlayerRef.current;
+    if (!element) return;
+    if (element.paused) await element.play();
+    else element.pause();
   };
   const setWaveHandleTime = (handle, rawSeconds) => {
     const seconds = Math.max(0, Math.min(waveformDuration, rawSeconds));
@@ -669,6 +690,18 @@ export default function App() {
                 <option value="off">Désactivé</option><option value="manual">Manuel</option><option value="assisted">Assisté</option><option value="beat_locked">Verrouillé sur les beats</option>
               </select>
               <label style={styles.label}>Musique : {music.audio_file || 'aucun fichier sélectionné'}</label>
+              <audio ref={audioPlayerRef} src={audioSrc || undefined} preload="metadata" onLoadedMetadata={(e) => setAudioDuration(Number.isFinite(e.currentTarget.duration) ? e.currentTarget.duration : 0)} onTimeUpdate={(e) => setAudioPosition(e.currentTarget.currentTime)} onPlay={() => setAudioPlaying(true)} onPause={() => setAudioPlaying(false)} onEnded={() => setAudioPlaying(false)} style={{ display: 'none' }} />
+              {audioSrc && <div style={{ margin: '8px 0 10px', padding: 8, background: '#0e1713', border: '1px solid #2d6b50', borderRadius: 6 }}>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
+                  <button type="button" style={styles.smallButton} onClick={() => seekAudio(Math.max(0, audioPosition - 1))}>−1 s</button>
+                  <button type="button" style={{ ...styles.smallButton, minWidth: 64 }} onClick={toggleAudioPlayback}>{audioPlaying ? 'Pause' : 'Play'}</button>
+                  <button type="button" style={styles.smallButton} onClick={() => audioPlayerRef.current?.pause()}>Stop</button>
+                  <button type="button" style={styles.smallButton} onClick={() => seekAudio(audioPosition + 1)}>+1 s</button>
+                  <span style={{ marginLeft: 'auto', fontSize: 11, color: '#b8ffd9' }}>{audioPosition.toFixed(2)} s / {(audioDuration || waveformDuration).toFixed(2)} s</span>
+                </div>
+                <input aria-label="Position audio" type="range" min="0" max={audioDuration || waveformDuration} step="0.01" value={Math.min(audioPosition, audioDuration || waveformDuration)} onChange={(e) => seekAudio(parseFloat(e.target.value))} style={styles.slider} />
+                <div style={{ fontSize: 10, color: '#8eb5a0' }}>Lecteur indépendant : cette piste ne déplace pas la tête de lecture vidéo.</div>
+              </div>}
               {waveform && (
                 <div style={{ margin: '8px 0 12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6, fontSize: 10, color: '#b8c9c1', marginBottom: 4 }}>
@@ -680,6 +713,7 @@ export default function App() {
                     viewBox={`0 0 ${waveformWidth} ${waveformHeight}`}
                     preserveAspectRatio="none"
                     style={{ width: '100%', height: 82, background: '#0d1512', border: '1px solid #214b3a', borderRadius: 6, touchAction: 'none', overflow: 'visible' }}
+                    onPointerDown={seekAudioFromEvent}
                     onPointerMove={(event) => { if (waveDrag) setWaveHandleTime(waveDrag, waveTimeFromEvent(event)); }}
                     onPointerUp={() => setWaveDrag(null)}
                     onPointerCancel={() => setWaveDrag(null)}
@@ -698,6 +732,7 @@ export default function App() {
                     <line x1={waveformX(music.match_cut_in)} x2={waveformX(music.match_cut_in)} y1="0" y2={waveformHeight} stroke="#ff4d6d" strokeWidth="2" vectorEffect="non-scaling-stroke" />
                     <line x1={waveformX(music.match_cut_out)} x2={waveformX(music.match_cut_out)} y1="0" y2={waveformHeight} stroke="#ff4d6d" strokeWidth="2" vectorEffect="non-scaling-stroke" />
                     <line x1={waveformX(music.intro_duration_seconds)} x2={waveformX(music.intro_duration_seconds)} y1="0" y2={waveformHeight} stroke="#c5a8ff" strokeWidth="2" strokeDasharray="5 3" vectorEffect="non-scaling-stroke" />
+                    <line x1={waveformX(audioPosition)} x2={waveformX(audioPosition)} y1="0" y2={waveformHeight} stroke="#ffffff" strokeWidth="2" opacity="0.85" vectorEffect="non-scaling-stroke" />
                     <g style={{ cursor: 'ew-resize' }} onPointerDown={(event) => beginWaveDrag(event, 'loop_in')}>
                       <circle cx={waveformX(music.intro_in)} cy="12" r="6" fill="#00ff88" stroke="#07150f" strokeWidth="2" />
                       <text x={Math.min(waveformWidth - 28, Math.max(2, waveformX(music.intro_in) + 5))} y="10" fill="#b8ffd9" fontSize="10" fontWeight="700">IN</text>
@@ -1493,6 +1528,7 @@ const styles = {
   tabs: { display: 'flex', gap: '4px', marginBottom: '8px', flexWrap: 'wrap' },
   tab: { flex: 1, padding: '8px 12px', background: '#1a1a1a', border: '1px solid #222', borderRadius: '8px', color: '#888', cursor: 'pointer', fontSize: '13px', fontWeight: 600, minWidth: '70px' },
   tabActive: { flex: 1, padding: '8px 12px', background: '#2a2a2a', border: '1px solid #00ff88', borderRadius: '8px', color: '#00ff88', cursor: 'pointer', fontSize: '13px', fontWeight: 600, minWidth: '70px' },
+  smallButton: { padding: '5px 8px', background: '#17271f', border: '1px solid #3b805d', borderRadius: '5px', color: '#b8ffd9', cursor: 'pointer', fontSize: '11px', fontWeight: 700 },
   panelContent: { display: 'flex', flexDirection: 'column', gap: '6px' },
   label: { fontSize: '13px', color: '#aaa', fontWeight: 600, marginTop: '4px' },
   input: { padding: '8px 10px', background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', color: '#e0e0e0', fontSize: '14px', outline: 'none' },
