@@ -160,7 +160,15 @@ def _run_rife(source: Path, destination: Path, target_fps: int) -> dict:
     writer.release()
     if written != (frame_count - 1) * multiplier + 1:
         raise RuntimeError(f"nombre d'images inattendu: {written}")
-    tmp.replace(destination)
+    muxed = destination.with_suffix(destination.suffix + ".audio.tmp.mp4")
+    subprocess.run(
+        ["ffmpeg", "-y", "-loglevel", "error", "-i", str(tmp), "-i", str(source),
+         "-map", "0:v:0", "-map", "1:a?", "-c:v", "copy", "-c:a", "copy",
+         "-movflags", "+faststart", str(muxed)],
+        check=True,
+    )
+    muxed.replace(destination)
+    tmp.unlink(missing_ok=True)
     elapsed = time.monotonic() - started
     torch.cuda.empty_cache() if torch.cuda.is_available() else None
     return {
@@ -171,7 +179,7 @@ def _run_rife(source: Path, destination: Path, target_fps: int) -> dict:
         "input_frames": frame_count,
         "output_frames": written,
         "resolution": [width, height],
-        "audio": "not_copied_in_f02_mvp",
+        "audio": "copied_stream_copy",
         "inference_seconds": round(elapsed, 3),
     }
 
