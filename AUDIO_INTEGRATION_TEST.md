@@ -19,7 +19,7 @@ Le pic automatique détecté à 15,25 s est conservé dans l’analyse brute com
 
 ## Vérification Preview locale
 
-La Preview F03 de dev7 charge correctement `codex.json`, affiche le mode `Mode 2 — Hybrid / EGO`, montre la vidéo Derrick Rose et affiche le panneau `Audio Sync` avec la forme d’onde Sia. Le panneau confirme : `sia_elastic_heart.mp3`, boucle `0.00s → 4.00s`, climax `2.50s`, volume intro `75%`, volume Match Cut `100%`.
+La Preview F03 de dev7 charge correctement `codex.json`, affiche le mode `Mode 2 — Hybrid / EGO` et le panneau `Audio Sync` avec la forme d’onde du morceau de test. Le panneau confirme les paramètres de boucle, de partie forte, de transition et de volume.
 
 La source absente `public/video_source.mp4` a été restaurée à partir de `match_cut/sequences/seq_0001_normal.mp4` pour permettre la Preview locale. Cette source est un fallback de test ; les séquences virtuelles restent celles du codex validé.
 

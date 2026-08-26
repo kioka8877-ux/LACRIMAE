@@ -1,4 +1,4 @@
-name: DEV4 — F04 Hybrid Render
+name: F04 Hybrid Render
 
 on:
   workflow_dispatch:
@@ -15,8 +15,30 @@ on:
         type: string
       f00b_run_id:
         description: 'Run F00-B validé contenant les séquences Match Cut matérialisées'
+        required: true
+        type: string
+      intro_path:
+        description: 'Chemin de la vidéo ou image Intro dans le workspace'
+        required: true
+        type: string
+      intro_type:
+        description: 'Type de l’asset Intro'
         required: false
-        default: '32790039440'
+        default: 'video'
+        type: choice
+        options:
+          - video
+          - image
+          - auto
+      intro_in:
+        description: 'Début de l’extrait Intro en secondes'
+        required: false
+        default: '14'
+        type: string
+      intro_out:
+        description: 'Fin de l’extrait Intro en secondes'
+        required: false
+        default: '21'
         type: string
       music_run_id:
         description: 'Run F00-MUSIC optionnel contenant music_timeline.json et l’audio'
@@ -34,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
-      - name: Checkout dev4
+      - name: Checkout source branch
         uses: actions/checkout@v4
 
       - name: Setup Node
@@ -53,7 +75,7 @@ jobs:
         working-directory: F03_PICTOR/CODEBASE
         run: npm ci
 
-      - name: Télécharger l’artifact F00-B Derrick Rose
+      - name: Télécharger l’artifact F00-B Match Cut
         uses: actions/download-artifact@v4
         with:
           name: lacrimae-dev4-f00b-${{ inputs.f00b_run_id }}
@@ -76,16 +98,21 @@ jobs:
 
         env:
           CODEX_PATH: ${{ inputs.codex_path }}
+          INTRO_PATH: ${{ inputs.intro_path }}
+          INTRO_TYPE: ${{ inputs.intro_type }}
+          INTRO_IN: ${{ inputs.intro_in }}
+          INTRO_OUT: ${{ inputs.intro_out }}
         run: |
           test -f "$CODEX_PATH"
           test -f /tmp/f00b/sequences.json
-          test -f F00_INGEST/IN/HYBRID/intro_dr_even.png
+          test -f "$INTRO_PATH"
           rm -rf F00_INGEST/OUT/f04_hybrid
           python3 F00_INGEST/CODEBASE/f00_hybrid.py \
             --matchcut-manifest /tmp/f00b/sequences.json \
-            --intro F00_INGEST/IN/HYBRID/intro_dr_even.png \
-            --intro-type image \
-            --image-duration 2.5 \
+            --intro "$INTRO_PATH" \
+            --intro-type "$INTRO_TYPE" \
+            --intro-in "$INTRO_IN" \
+            --intro-out "$INTRO_OUT" \
             --out F00_INGEST/OUT/f04_hybrid
           cp "$CODEX_PATH" F03_PICTOR/CODEBASE/src/data/codex.json
           cp F00_INGEST/OUT/f04_hybrid/hybrid_manifest.json F03_PICTOR/CODEBASE/src/data/hybrid_manifest.json
