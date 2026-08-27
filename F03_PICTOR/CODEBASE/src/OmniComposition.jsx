@@ -17,6 +17,7 @@ import { sciFiNeonHdrFilter, sciFiNeonHdrOverlayStyle } from './sciFiNeonHdr';
 import { activeFlashTextUnit, flashTextStyle } from './flashText';
 import { hybridTimelineFrame, hybridEgoStyle, hybridTextStyle } from './hybridNarrative';
 import { normalizeMusicTimeline, buildAudioSegments } from './audioTimeline';
+import { normalizeRevealManifest, revealSceneAtFrame, revealSourceForScene, revealMotionTransform } from './revealCompilation';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * OmniComposition (F03 PREVIEW) â€” mÃªmes 6 calques que F04 RENDER :
@@ -69,7 +70,56 @@ const SESSION_FALLBACK = {
   },
 };
 
-export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequences, hybridManifest, hybridIntroSrc, musicTimeline }) => {
+function RevealCompilationComposition({ codex, session: sessionProp, revealManifest, musicTimeline }) {
+  const frame = useCurrentFrame();
+  const { fps, durationInFrames } = useVideoConfig();
+  const session = sessionProp || {};
+  const manifest = normalizeRevealManifest(revealManifest, fps, durationInFrames);
+  const scene = revealSceneAtFrame(manifest, frame);
+  const source = revealSourceForScene(manifest, scene);
+  const localFrame = Math.max(0, frame - Number(scene?.start_frame || 0));
+  const sourceUrl = source?.file ? staticFile(source.file.replace(/^\.\//, '')) : null;
+  const music = normalizeMusicTimeline(musicTimeline || session.music || {}, fps, durationInFrames);
+  const musicUrl = music.audio_src ? staticFile(music.audio_src.replace(/^\.\//, '')) : null;
+  const audioSegments = musicUrl ? buildAudioSegments({ ...music, audio_src: musicUrl }, fps, durationInFrames) : [];
+  const isFinal = Boolean(scene?.final_reveal);
+  const finalStart = Number(scene?.start_frame || manifest.final_start_frame || 0);
+  const reveal = manifest.reveal || {};
+  const shakeFrames = Math.max(1, Number(reveal.shake_duration_frames || 12));
+  const shakeLocal = frame - finalStart - Number(reveal.impact_frame_offset || 0);
+  const shaking = isFinal && shakeLocal >= 0 && shakeLocal < shakeFrames;
+  const shakeAmp = shaking ? (Number(reveal.shake_power || 0) / 100) * 34 * Math.pow(1 - shakeLocal / shakeFrames, 1.7) : 0;
+  const shakeY = shaking ? Math.sin(shakeLocal * 2.8) * shakeAmp : 0;
+  const sceneTransform = `${revealMotionTransform(scene, frame, fps)} translateY(${shakeY.toFixed(2)}px)`;
+  const background = session.background || {};
+  const label = isFinal ? manifest.narrative.this_one_label : manifest.narrative.others_label;
+  return (
+    <AbsoluteFill style={{ backgroundColor: background.color || '#050505', overflow: 'hidden' }}>
+      {musicUrl && audioSegments.map((segment, index) => (
+        <Sequence key={`reveal_audio_${index}`} from={segment.from} durationInFrames={segment.duration}>
+          <Audio src={musicUrl} startFrom={segment.startFrom} volume={segment.volume} />
+        </Sequence>
+      ))}
+      <AbsoluteFill style={{ transform: sceneTransform, transformOrigin: 'center center' }}>
+        {sourceUrl && <Video src={sourceUrl} startFrom={localFrame} muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+      </AbsoluteFill>
+      <AbsoluteFill style={{ pointerEvents: 'none', padding: '6% 6%', justifyContent: 'space-between', color: '#fff', fontFamily: session.texts_style?.font || 'Impact, Arial Black, sans-serif' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 42, fontWeight: 900, textShadow: '0 3px 12px #000' }}>
+          <span>{manifest.narrative.theme}</span><span>{label}</span>
+        </div>
+        <div style={{ alignSelf: 'center', textAlign: 'center', fontSize: isFinal ? 118 : 58, lineHeight: 0.95, color: '#fff', textTransform: 'uppercase', textShadow: '0 4px 18px #000' }}>
+          {isFinal ? (manifest.narrative.final_text || label) : (manifest.narrative.transition_text && frame === scene?.start_frame ? manifest.narrative.transition_text : '')}
+        </div>
+      </AbsoluteFill>
+      {isFinal && <AbsoluteFill style={{ background: `rgba(0,0,0,${Math.max(0, Math.min(0.9, Number(reveal.darkness || 0)))})`, pointerEvents: 'none' }} />}
+    </AbsoluteFill>
+  );
+}
+
+export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequences, hybridManifest, hybridIntroSrc, musicTimeline, revealManifest }) => {
+  if (revealManifest?.mode === 'reveal_compilation' || sessionProp?.review_mode === 'reveal_compilation') {
+    return <RevealCompilationComposition codex={codex} session={sessionProp} revealManifest={revealManifest || sessionProp?.reveal} musicTimeline={musicTimeline} />;
+  }
   const frame = useCurrentFrame();
   const { fps, durationInFrames, width, height } = useVideoConfig();
 

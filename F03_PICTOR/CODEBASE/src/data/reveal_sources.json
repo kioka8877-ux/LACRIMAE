@@ -1,0 +1,21 @@
+{
+  "schema_version": "dev8.reveal-compilation.v1",
+  "mode": "reveal_compilation",
+  "fps": 30,
+  "sources": [],
+  "scenes": [],
+  "narrative": {
+    "theme": "REVEAL COMPILATION",
+    "others_label": "OTHERS",
+    "this_one_label": "THIS ONE",
+    "transition_text": "",
+    "final_text": ""
+  },
+  "reveal": {
+    "enabled": true,
+    "darkness": 0.72,
+    "shake_power": 85,
+    "shake_duration_frames": 12,
+    "impact_frame_offset": 0
+  }
+}

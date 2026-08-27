@@ -54,3 +54,11 @@ Pour une cible de 10 secondes à 30 fps avec 7 frames par séquence, le manifest
 PICTOR lit `session.composition` dans le codex pour rendre le même canvas que F03_PREVIEW. Les presets `vertical`, `horizontal` et `square` définissent les dimensions finales ; `fit` contrôle le recadrage de la source horizontale ; `background_fill` peut utiliser une copie floutée de la vidéo pour remplir le canvas.
 
 Les modes `rotation_mode: none`, `per_sequence` et `continuous` sont partagés avec la preview. PICTOR applique la rotation au calque vidéo ou à toute la composition selon `rotation_layer`, afin que le fichier `short_final.mp4` corresponde à la preview validée.
+
+## Reveal Compilation — dev8
+
+Lorsque `codex.session.review_mode` vaut `reveal_compilation`, `Root.jsx` charge `reveal_manifest` et utilise `src/revealCompilation.js`, qui est le miroir du normaliseur utilisé par F03 Preview. Le manifeste contient jusqu’à six clips déjà préparés par F00-E, les scènes, les labels narratifs, les durées, les mouvements et les paramètres du reveal.
+
+PICTOR ne retourne pas les clips et ne refait pas les découpes. Il rend les fichiers `clips/*.mp4` tels qu’ils ont été préparés par F00-E, puis applique la même timeline audio et le même reveal final que la Preview. Le sixième slot est le `final_reveal`; son traitement sombre et son shake vertical sont contrôlés par `reveal.darkness`, `reveal.shake_power` et `reveal.shake_duration_frames`.
+
+Le codex exporté par F03 doit contenir `session.review_mode: reveal_compilation` et `reveal_manifest`. Le test de parité doit comparer l’ordre des six scènes, leur durée, le label OTHERS/THIS ONE et le frame de démarrage du reveal avant d’autoriser le rendu final.

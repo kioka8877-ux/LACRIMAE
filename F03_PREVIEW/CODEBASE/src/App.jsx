@@ -4,6 +4,7 @@ import { OmniComposition } from './preview/OmniComposition';
 import { COMPOSITION_PRESETS, getCompositionConfig } from './preview/compositionConfig';
 import { normalizeHybridManifest } from './preview/hybridNarrative';
 import { normalizeMusicTimeline, musicWaveformPoints } from './preview/audioTimeline';
+import { normalizeRevealManifest } from './preview/revealCompilation';
 
 /**
  * App — F03 PREVIEW (v4.0 — session + clips)
@@ -42,6 +43,7 @@ export default function App() {
   const [sequences, setSequences] = useState(null); // manifeste virtuel produit par F00
   const [hybridManifest, setHybridManifest] = useState(null);
   const [hybridIntroSrc, setHybridIntroSrc] = useState('');
+  const [revealManifest, setRevealManifest] = useState(null);
   const [audioSrc, setAudioSrc] = useState('');
   const [audioPosition, setAudioPosition] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
@@ -94,7 +96,14 @@ export default function App() {
         const selectedMusic = full.session?.music || clipFirst.music || loadedMusic || {};
         setMusicTimeline(normalizeMusicTimeline(selectedMusic, Number(clipFirst.video?.fps || 30), Number(clipFirst.video?.total_frames || 300)));
         if (selectedMusic.audio_src) setAudioSrc(selectedMusic.audio_src);
-        setActiveTab(full.session?.review_mode === 'hybrid_narrative' ? 'hybrid' : 'text');
+        try {
+          const revealResp = await fetch('./reveal_sources.json');
+          if (revealResp.ok) setRevealManifest(await revealResp.json());
+          else if (full.session?.reveal) setRevealManifest(full.session.reveal);
+        } catch (_) {
+          if (full.session?.reveal) setRevealManifest(full.session.reveal);
+        }
+        setActiveTab(full.session?.review_mode === 'hybrid_narrative' ? 'hybrid' : full.session?.review_mode === 'reveal_compilation' ? 'reveal' : 'text');
         setVideoSrc(clipFirst.video?.source ? './' + clipFirst.video.source : './video_source.mp4');
         try {
           const motionResp = await fetch('./motion_slow_manifest.json');
@@ -185,7 +194,8 @@ export default function App() {
       ego: session.hybrid?.ego || {},
     }, session, musicForHybrid
   ) : null;
-  const totalFrames = activeHybrid?.total_frames || baseTotalFrames;
+  const activeReveal = reviewMode === 'reveal_compilation' ? normalizeRevealManifest(revealManifest || session.reveal || {}, fps, baseTotalFrames) : null;
+  const totalFrames = activeReveal?.total_frames || activeHybrid?.total_frames || baseTotalFrames;
   const composition = getCompositionConfig(clip, session);
   const music = normalizeMusicTimeline(musicTimeline || session.music || {}, fps, totalFrames);
   const waveformWidth = 600;
@@ -199,6 +209,26 @@ export default function App() {
   );
   const waveform = musicWaveformPoints(music.beats, waveformWidth, waveformHeight);
   const waveformX = (seconds) => Math.max(0, Math.min(waveformWidth, (Number(seconds || 0) / waveformDuration) * waveformWidth));
+  const updateReveal = (patch) => {
+    setRevealManifest((current) => {
+      const next = { ...(current || {}), ...patch };
+      setSession((s) => ({ ...s, reveal: next }));
+      return next;
+    });
+  };
+  const updateRevealNarrative = (key, value) => {
+    updateReveal({ narrative: { ...(revealManifest?.narrative || {}), [key]: value } });
+  };
+  const updateRevealSource = (index, key, value) => {
+    const sources = [...(revealManifest?.sources || [])];
+    sources[index] = { ...(sources[index] || {}), [key]: value };
+    updateReveal({ sources });
+  };
+  const updateRevealScene = (index, key, value) => {
+    const scenes = [...(revealManifest?.scenes || [])];
+    scenes[index] = { ...(scenes[index] || {}), [key]: value };
+    updateReveal({ scenes });
+  };
   const updateMusic = (key, value) => {
     const next = normalizeMusicTimeline({ ...music, [key]: value }, fps, totalFrames);
     setMusicTimeline(next);
@@ -296,7 +326,7 @@ export default function App() {
   }));
   const updateReviewMode = (value) => {
     setSession((s) => ({ ...s, review_mode: value }));
-    setActiveTab(value === 'hybrid_narrative' ? 'hybrid' : 'text');
+    setActiveTab(value === 'hybrid_narrative' ? 'hybrid' : value === 'reveal_compilation' ? 'reveal' : 'text');
   };
 
   // ── Balise logo : double-clic sur la vidéo → poser ici ──
@@ -426,6 +456,12 @@ export default function App() {
     };
     const finalCodex = {
       ...merged,
+      session: {
+        ...session,
+        review_mode: activeReveal ? 'reveal_compilation' : session.review_mode,
+        ...(activeReveal ? { reveal: activeReveal } : {}),
+      },
+      reveal_manifest: activeReveal || revealManifest || null,
       virtual_sequences: sequences || null,
       validated_by_magos: validated,
     };
@@ -476,7 +512,7 @@ export default function App() {
             <Player
               ref={playerRef}
               component={OmniComposition}
-              inputProps={{ codex: clip, videoSrc, session, sequences, hybridManifest: activeHybrid, hybridIntroSrc, musicTimeline: music }}
+              inputProps={{ codex: clip, videoSrc, session, sequences, hybridManifest: activeHybrid, hybridIntroSrc, musicTimeline: music, revealManifest: activeReveal }}
               durationInFrames={totalFrames}
               fps={fps}
               compositionWidth={vidWidth}
@@ -573,6 +609,9 @@ export default function App() {
             <button style={activeTab === 'hybrid' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('hybrid')}>
               ◈ Hybrid / EGO
             </button>
+            <button style={activeTab === 'reveal' ? styles.tabActive : styles.tab} onClick={() => { setActiveTab('reveal'); updateReviewMode('reveal_compilation'); }}>
+              ◇ Reveal
+            </button>
             <button style={activeTab === 'fond' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('fond')}>
               🖼 Fond & Logo
             </button>
@@ -592,6 +631,66 @@ export default function App() {
               🔍 Netteté
             </button>
           </div>
+
+          {/* ══════════ REVEAL COMPILATION : six clips + narratif ══════════ */}
+          {activeTab === 'reveal' && (
+            <div style={styles.panelContent}>
+              <label style={{ ...styles.label, color: '#ffcc66', fontSize: '14px' }}>REVEAL COMPILATION</label>
+              <div style={{ color: '#aaa', fontSize: 12, lineHeight: 1.45 }}>
+                F00-E prépare les clips. Ici, F03 construit la compilation : textes, ordre, durées, transitions et reveal final.
+              </div>
+              <label style={styles.label}>Thème</label>
+              <input style={styles.input} value={revealManifest?.narrative?.theme ?? ''} onChange={(e) => updateRevealNarrative('theme', e.target.value)} placeholder="CAMOUFLAGE" />
+              <label style={styles.label}>Texte OTHERS</label>
+              <input style={styles.input} value={revealManifest?.narrative?.others_label ?? ''} onChange={(e) => updateRevealNarrative('others_label', e.target.value)} placeholder="OTHERS" />
+              <label style={styles.label}>Texte THIS ONE</label>
+              <input style={styles.input} value={revealManifest?.narrative?.this_one_label ?? ''} onChange={(e) => updateRevealNarrative('this_one_label', e.target.value)} placeholder="THIS ONE" />
+              <label style={styles.label}>Texte de transition</label>
+              <input style={styles.input} value={revealManifest?.narrative?.transition_text ?? ''} onChange={(e) => updateRevealNarrative('transition_text', e.target.value)} placeholder="WAIT FOR THIS ONE" />
+              <label style={styles.label}>Texte final</label>
+              <input style={styles.input} value={revealManifest?.narrative?.final_text ?? ''} onChange={(e) => updateRevealNarrative('final_text', e.target.value)} placeholder="" />
+              <div style={{ marginTop: 8, paddingTop: 10, borderTop: '1px solid #4a3920' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>SOURCES ET SCÈNES</label>
+                {(activeReveal?.sources || revealManifest?.sources || []).map((source, index) => {
+                  const scene = activeReveal?.scenes?.[index] || revealManifest?.scenes?.[index] || {};
+                  return (
+                    <div key={source.id || index} style={{ marginTop: 8, padding: 9, border: `1px solid ${scene.final_reveal ? '#8a5a28' : '#333'}`, borderRadius: 7, background: scene.final_reveal ? '#1d160e' : '#111' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, color: scene.final_reveal ? '#ffcc66' : '#ddd', fontWeight: 800, fontSize: 12 }}>
+                        <span>{scene.final_reveal ? 'THIS ONE — ' : 'OTHER '}{String(index + 1).padStart(2, '0')}</span>
+                        <span style={{ color: '#888', fontWeight: 500 }}>{source.file || 'clip non chargé'}</span>
+                      </div>
+                      <label style={styles.label}>Durée scène : {Number(scene.duration_seconds || source.duration_seconds || 1).toFixed(2)} s</label>
+                      <input style={styles.slider} type="range" min="0.5" max="20" step="0.1" value={Number(scene.duration_seconds || source.duration_seconds || 1)} onChange={(e) => updateRevealScene(index, 'duration_seconds', parseFloat(e.target.value))} />
+                      <div style={{ display: 'flex', gap: 7, alignItems: 'center', marginTop: 5 }}>
+                        <span style={{ color: '#aaa', fontSize: 11, flex: 1 }}>Miroir préparé par F00-E : <b style={{ color: source.mirror ? '#00ff88' : '#888' }}>{source.mirror ? 'OUI' : 'NON'}</b></span>
+                        <select style={{ ...styles.select, width: 125 }} value={scene.transition || (index % 2 === 0 ? 'with_sfx' : 'silent')} onChange={(e) => updateRevealScene(index, 'transition', e.target.value)}>
+                          <option value="with_sfx">Avec SFX</option>
+                          <option value="silent">Silencieuse</option>
+                        </select>
+                      </div>
+                      <select style={{ ...styles.select, marginTop: 6 }} value={scene.motion?.preset || 'none'} onChange={(e) => updateRevealScene(index, 'motion', { ...(scene.motion || {}), preset: e.target.value })}>
+                        <option value="none">Mouvement : aucun</option>
+                        <option value="drift_left">Mouvement : drift gauche</option>
+                        <option value="drift_right">Mouvement : drift droite</option>
+                        <option value="drift_up">Mouvement : drift haut</option>
+                        <option value="drift_down">Mouvement : drift bas</option>
+                      </select>
+                    </div>
+                  );
+                })}
+                {!(activeReveal?.sources?.length || revealManifest?.sources?.length) && <div style={{ color: '#ff9f66', fontSize: 12, padding: 8 }}>Aucun pack F00-E chargé. Placez reveal_sources.json et ses clips dans public/.</div>}
+              </div>
+              <div style={{ marginTop: 8, paddingTop: 10, borderTop: '1px solid #4a3920' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>REVEAL FINAL</label>
+                <label style={styles.label}>Obscurité : {Math.round(Number((revealManifest?.reveal?.darkness ?? 0.72)) * 100)}%</label>
+                <input style={styles.slider} type="range" min="0" max="0.9" step="0.01" value={revealManifest?.reveal?.darkness ?? 0.72} onChange={(e) => updateReveal({ reveal: { ...(revealManifest?.reveal || {}), darkness: parseFloat(e.target.value) } })} />
+                <label style={styles.label}>Puissance shake vertical : {revealManifest?.reveal?.shake_power ?? 85}%</label>
+                <input style={styles.slider} type="range" min="0" max="100" step="1" value={revealManifest?.reveal?.shake_power ?? 85} onChange={(e) => updateReveal({ reveal: { ...(revealManifest?.reveal || {}), shake_power: parseInt(e.target.value, 10) } })} />
+                <label style={styles.label}>Durée du shake : {revealManifest?.reveal?.shake_duration_frames ?? 12} frames</label>
+                <input style={styles.slider} type="range" min="3" max="30" step="1" value={revealManifest?.reveal?.shake_duration_frames ?? 12} onChange={(e) => updateReveal({ reveal: { ...(revealManifest?.reveal || {}), shake_duration_frames: parseInt(e.target.value, 10) } })} />
+              </div>
+            </div>
+          )}
 
           {/* ══════════ HYBRID / EGO : mode narratif séparé ══════════ */}
           {activeTab === 'hybrid' && (

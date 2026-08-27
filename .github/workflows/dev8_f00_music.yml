@@ -1,0 +1,51 @@
+name: DEV8 F00-MUSIC — Audio Analysis
+
+on:
+  workflow_dispatch:
+    inputs:
+      audio_artifact_run_id:
+        description: 'Run contenant un artifact dev8-reveal-audio-<run_id> avec music.mp3'
+        required: true
+        type: string
+      audio_artifact_name:
+        description: 'Nom de l’artifact audio'
+        required: false
+        default: 'dev8-reveal-audio'
+        type: string
+      fps:
+        description: 'FPS de référence pour les marqueurs'
+        required: false
+        default: '30'
+        type: string
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Télécharger la piste audio
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.audio_artifact_run_id }}
+          ARTIFACT: ${{ inputs.audio_artifact_name }}
+        run: |
+          gh run download "$RUN_ID" --repo "${{ github.repository }}" --name "$ARTIFACT-$RUN_ID" --dir /tmp/dev8-audio
+          test -f /tmp/dev8-audio/music.mp3
+      - name: Exécuter F00-MUSIC
+        run: |
+          python3 F00_INGEST/CODEBASE/f00_music.py \
+            --audio /tmp/dev8-audio/music.mp3 \
+            --output "$RUNNER_TEMP/music_timeline.json" \
+            --fps "${{ inputs.fps }}"
+      - name: Préparer le bundle audio
+        run: |
+          mkdir -p "$RUNNER_TEMP/dev8-music"
+          cp /tmp/dev8-audio/music.mp3 "$RUNNER_TEMP/dev8-music/music.mp3"
+          cp "$RUNNER_TEMP/music_timeline.json" "$RUNNER_TEMP/dev8-music/music_timeline.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dev8-f00-music-${{ github.run_id }}
+          path: ${{ runner.temp }}/dev8-music/
+          if-no-files-found: error
+          retention-days: 14

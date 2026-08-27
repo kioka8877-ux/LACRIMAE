@@ -76,3 +76,13 @@ Le panneau Hybrid permet de fournir l’introduction image ou vidéo et, pour un
 Le fichier partagé `src/preview/hybridNarrative.js` normalise la timeline, les styles EGO et la phrase fixe. `virtualSequences.js` conserve le champ `file` afin que chaque MP4 matérialisé soit lu individuellement. PICTOR reprend le même contrat dans `src/hybridNarrative.js`, `src/virtualSequences.js` et `src/OmniComposition.jsx`. `Root.jsx` sélectionne le total de frames du manifeste hybride uniquement lorsque `session.review_mode` vaut `hybrid_narrative`; le rendu Mode 1 reste inchangé.
 
 Le workflow `.github/workflows/dev4_f00d.yml` est isolé : il récupère un artifact F00-C validé, télécharge l’introduction opérateur, exécute F00-D et publie un artifact `lacrimae-dev4-f00d-<run_id>`. Le workflow `.github/workflows/dev4_f04_hybrid.yml` injecte ensuite `match_cut/sequences.json` et rend chaque fichier matérialisé avec PICTOR. Aucun workflow Camouflage ou Luther n’est nécessaire pour cette validation visuelle ; la validation Champion reste une gate manuelle.
+
+## Reveal Compilation — dev8
+
+Le format `reveal_compilation` utilise une entrée séparée de `hybrid_narrative`. F00-E reçoit directement une à six sources, extrait les plages IN/OUT choisies par l’opérateur, applique le miroir horizontal éventuel après extraction et sort des clips prêts. F00-MUSIC analyse la piste, tandis que F03 reste la seule Preview de montage.
+
+Placez `reveal_sources.json` et son dossier `clips/` dans `CODEBASE/public/`. F03 charge automatiquement le manifeste et propose l’onglet **Reveal**. Les cinq premières scènes sont les `OTHERS`; la dernière est `THIS ONE` / `final_reveal`. Le panneau permet d’éditer le thème, les labels, les textes, la durée de chaque scène, la transition `Avec SFX` ou `Silencieuse`, le mouvement organique et l’intensité du reveal.
+
+La musique est configurée dans **Audio Sync**. Une portion courte est répétée indépendamment pour chaque scène. La partie forte est configurée séparément pour le reveal final. L’export du codex ajoute `session.review_mode: reveal_compilation` et `reveal_manifest`, que PICTOR reprend sans réinterprétation.
+
+Le miroir affiché dans F03 est celui déjà appliqué par F00-E : il ne retourne pas les textes ni les logos. Les deux transitions courtes sont alternées par défaut ; le click d’introduction reste une décision de démarrage et ne doit pas être répété à chaque cut.

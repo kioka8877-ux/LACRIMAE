@@ -78,3 +78,24 @@ conservé, pas 1. `LogoOverlay` gère déjà `width_pct` en % de la largeur.
 - **Zoom** : le logo est posé en % de la composition, il ne suit pas le zoom /
   pan de la vidéo (`zoom_keyframes`). Choix à valider.
 - Le preview n'est **pas poussé sur GitHub** (commit à faire).
+
+## dev8 — Reveal Compilation (2026-08-28)
+
+La branche `dev8` est dédiée au format `OTHERS VS THIS ONE`. F00-E reçoit directement une à six sources, extrait les plages IN/OUT opérateur, applique le miroir horizontal après extraction et produit des clips H.264 verticaux sans audio. F00-MUSIC reste une étape séparée d’analyse audio. F03 reste la seule Preview de montage ; F04/Pictor rend le codex validé.
+
+Éléments implémentés dans cette itération :
+
+- `src/preview/revealCompilation.js` : normalisation du manifeste, scènes, sources, mouvements, rôles `other`/`final_reveal` et shake final.
+- `App.jsx` : chargement de `reveal_sources.json`, onglet Reveal, textes globaux, durées par scène, transitions `with_sfx`/`silent`, mouvements et paramètres du reveal.
+- `OmniComposition.jsx` Preview et PICTOR : rendu six sources, labels OTHERS/THIS ONE, audio, mouvement organique, assombrissement et shake vertical.
+- Export : `session.review_mode: reveal_compilation` et `reveal_manifest` sont conservés dans le codex.
+- Workflows isolés : `.github/workflows/dev8_f00e.yml`, `.github/workflows/dev8_f00_music.yml` et `.github/workflows/dev8_reveal_render.yml`.
+
+Validation déjà effectuée :
+
+- `python3 -m py_compile` sur F00-E et ses tests : OK.
+- `pytest -q F00_INGEST/tests/test_reveal.py F00_INGEST/tests/test_manifest.py F00_INGEST/tests/test_motion_slow.py` : **9 tests réussis**.
+- `npm run build` dans F03 Preview : OK.
+- `npm run check` dans F03 PICTOR : OK ; composition existante listée à 300 frames.
+
+Limite volontaire : dev8 ne contient pas de pack média réel. Le premier test réel doit fournir un artifact F00-E contenant `reveal_sources.json` et `clips/*.mp4`, ainsi qu’un artifact F00-MUSIC contenant `music_timeline.json` et la piste audio.

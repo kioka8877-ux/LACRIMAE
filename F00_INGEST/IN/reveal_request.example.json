@@ -1,0 +1,11 @@
+{
+  "format": "reveal_compilation",
+  "sources": [
+    {"id": "reveal_01", "source": "sources/source_01.mp4", "in_seconds": 0, "out_seconds": 5, "mirror": false, "fit_mode": "crop"},
+    {"id": "reveal_02", "source": "sources/source_02.mp4", "in_seconds": 3, "out_seconds": 10, "mirror": true, "fit_mode": "blur"},
+    {"id": "reveal_03", "source": "sources/source_03.mp4", "in_seconds": 1, "out_seconds": 10, "mirror": false, "fit_mode": "crop"},
+    {"id": "reveal_04", "source": "sources/source_04.mp4", "in_seconds": 2, "out_seconds": 8, "mirror": false, "fit_mode": "crop"},
+    {"id": "reveal_05", "source": "sources/source_05.mp4", "in_seconds": 0, "out_seconds": 8, "mirror": true, "fit_mode": "crop"},
+    {"id": "reveal_06", "source": "sources/source_06.mp4", "in_seconds": 4, "out_seconds": 12, "mirror": false, "fit_mode": "blur", "final_reveal": true}
+  ]
+}

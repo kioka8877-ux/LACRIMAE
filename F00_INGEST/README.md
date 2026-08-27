@@ -102,3 +102,17 @@ python3 CODEBASE/f00_hybrid.py \\
 Le champ `intro_text` peut être ajouté au manifeste pour fournir la phrase fixe d’introduction. Les fichiers Match Cut matérialisés restent référencés par leur chemin `file` relatif, sans retomber sur un fallback unique lorsque le chemin existe.
 
 Le résultat est `OUT/hybrid/hybrid_manifest.json`, accompagné de `intro/intro.mp4`, de `match_cut/sequences.json`, des séquences copiées et de `hybrid_report.json`. Le workflow isolé `.github/workflows/dev4_f00d.yml` publie uniquement cet artifact et s’arrête avant F03 Preview et PICTOR.
+
+## F00-E Reveal Clip Prep (dev8)
+
+F00-E reçoit directement une requête de une à six sources avec les plages IN/OUT choisies par l’opérateur. Pour chaque source, il extrait le clip, applique le miroir horizontal éventuel après la découpe, puis normalise la sortie en 1080×1920 H.264 sans audio. Le mode `crop` remplit le cadre vertical ; le mode `blur` conserve l’image complète avec un fond agrandi et flouté.
+
+F00-E écrit `clips/*.mp4`, `reveal_sources.json` et `reveal_report.json`. Il ne gère ni narration, ni boucle musicale, ni transitions, ni SFX. Ces décisions appartiennent à F03 Preview. Le sixième clip est identifié comme `final_reveal` dans le manifeste.
+
+```bash
+python3 CODEBASE/f00_reveal.py \\
+  --request IN/reveal_request.example.json \\
+  --out /tmp/reveal-f00e
+```
+
+Le flux dev8 est donc `F00-E → F00-MUSIC → F03 Preview → F04`. F00-C et F00-D restent optionnels et séparés.

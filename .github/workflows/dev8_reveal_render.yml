@@ -1,0 +1,67 @@
+name: DEV8 Reveal Compilation — F03/F04 Render
+
+on:
+  workflow_dispatch:
+    inputs:
+      f00e_run_id:
+        description: 'Run F00-E validé'
+        required: true
+        type: string
+      music_run_id:
+        description: 'Run F00-MUSIC validé'
+        required: true
+        type: string
+      codex_path:
+        description: 'Codex validé dans le dépôt'
+        required: false
+        default: 'F03_PREVIEW/CODEBASE/public/codex.json'
+        type: string
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: F03_PREVIEW/CODEBASE/package-lock.json
+      - name: Télécharger l’artifact F00-E
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.f00e_run_id }}
+        run: |
+          gh run download "$RUN_ID" --repo "${{ github.repository }}" --name "dev8-f00e-$RUN_ID" --dir /tmp/dev8-f00e
+          test -f /tmp/dev8-f00e/reveal_sources.json
+      - name: Télécharger l’artifact F00-MUSIC
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.music_run_id }}
+        run: |
+          gh run download "$RUN_ID" --repo "${{ github.repository }}" --name "dev8-f00-music-$RUN_ID" --dir /tmp/dev8-music
+          test -f /tmp/dev8-music/music_timeline.json
+          test -f /tmp/dev8-music/music.mp3
+      - name: Injecter les assets dans F03 Preview
+        run: |
+          mkdir -p F03_PREVIEW/CODEBASE/public/clips F03_PREVIEW/CODEBASE/public/audio
+          cp /tmp/dev8-f00e/reveal_sources.json F03_PREVIEW/CODEBASE/public/reveal_sources.json
+          cp /tmp/dev8-f00e/clips/*.mp4 F03_PREVIEW/CODEBASE/public/clips/
+          cp /tmp/dev8-music/music_timeline.json F03_PREVIEW/CODEBASE/public/music_timeline.json
+          cp /tmp/dev8-music/music.mp3 F03_PREVIEW/CODEBASE/public/audio/music.mp3
+          test "$(find F03_PREVIEW/CODEBASE/public/clips -name '*.mp4' | wc -l)" -ge 1
+      - name: Installer et compiler F03
+        working-directory: F03_PREVIEW/CODEBASE
+        run: |
+          npm ci
+          npm run build
+      - name: Rendre le MP4 F04
+        working-directory: F03_PREVIEW/CODEBASE
+        run: npm run render
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dev8-reveal-short-${{ github.run_id }}
+          path: F03_PREVIEW/CODEBASE/out/short_final.mp4
+          if-no-files-found: error
+          retention-days: 14
