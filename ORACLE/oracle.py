@@ -94,7 +94,7 @@ def probe_video(source: Path) -> dict[str, Any]:
 def create_campaign(root: Path, campaign_id: str, source: Path, target_fps: int, profile: str) -> Path:
     if target_fps != 120:
         raise ValueError("target_fps doit être 120 pour le MVP")
-    if profile not in ("fast", "balanced", "quality_ultimate", "cinematic_hyper_detail", "hdr_imperator", "realistic_aurea", "old_main_noctis"):
+    if profile not in ("auto", "fast", "balanced", "quality_ultimate", "cinematic_hyper_detail", "hdr_imperator", "realistic_aurea", "old_main_noctis", "viral_imperator"):
         raise ValueError("profil inconnu")
     if not source.is_file():
         raise FileNotFoundError(source)

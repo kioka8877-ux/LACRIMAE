@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from auspex import analyze_video
 from oracle import campaign_dir, load_state, save_state, state_path
 
 REMOTE_STAGES = {
@@ -57,7 +58,7 @@ def main() -> int:
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--app", default="lacrimae-dev6-video")
     parser.add_argument("--video-volume", default="lacrimae-dev6-video")
-    parser.add_argument("--profile", default="cinematic_hyper_detail")
+    parser.add_argument("--profile", default="auto", choices=["auto", "fast", "balanced", "quality_ultimate", "cinematic_hyper_detail", "hdr_imperator", "realistic_aurea", "old_main_noctis"])
     parser.add_argument("--target-fps", type=int, default=120)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
@@ -74,6 +75,15 @@ def main() -> int:
         create_campaign(root, args.campaign_id, args.source, args.target_fps, args.profile)
     state = load_state(state_file)
     base = campaign_dir(root, args.campaign_id)
+    selected_profile = args.profile
+    if args.profile == "auto":
+        analysis = analyze_video(args.source)
+        analysis_path = write_stage_report(base, "F01_AUSPEX_OCULUS", analysis)
+        selected_profile = analysis["recommendation"]["profile"]
+        state["analysis"] = analysis
+        state["artifacts"]["F01_AUSPEX_OCULUS"] = str(analysis_path)
+        state["target"]["profile"] = selected_profile
+        save_state(state_file, state)
     remote_root = f"campaigns/{args.campaign_id}"
 
     input_uri = f"{remote_root}/input.mp4"
@@ -84,13 +94,18 @@ def main() -> int:
     state["artifacts"]["source_remote"] = input_uri
     save_state(state_file, state)
 
-    for stage in ("F00_PORTA_INGRESSUS", "F01_AUSPEX_OCULUS"):
-        report = {"status": "SUCCEEDED", "stage": stage, "mode": "oracle_local", "created_at": now()}
-        report_path = write_stage_report(base, stage, report)
-        state["completed_stages"].append(stage)
-        state["artifacts"][stage] = str(report_path)
-        state["current_stage"] = "F02_MOTUS_RIFE"
-        save_state(state_file, state)
+    report = {"status": "SUCCEEDED", "stage": "F00_PORTA_INGRESSUS", "mode": "oracle_local", "created_at": now()}
+    report_path = write_stage_report(base, "F00_PORTA_INGRESSUS", report)
+    state["completed_stages"].append("F00_PORTA_INGRESSUS")
+    state["artifacts"]["F00_PORTA_INGRESSUS"] = str(report_path)
+    if args.profile != "auto":
+        report = {"status": "SUCCEEDED", "stage": "F01_AUSPEX_OCULUS", "mode": "oracle_local_legacy", "created_at": now()}
+        report_path = write_stage_report(base, "F01_AUSPEX_OCULUS", report)
+        state["artifacts"]["F01_AUSPEX_OCULUS"] = str(report_path)
+    if "F01_AUSPEX_OCULUS" not in state["completed_stages"]:
+        state["completed_stages"].append("F01_AUSPEX_OCULUS")
+    state["current_stage"] = "F02_MOTUS_RIFE"
+    save_state(state_file, state)
 
     current_input = input_uri
     for stage, remote_stage in REMOTE_STAGES.items():
@@ -98,7 +113,7 @@ def main() -> int:
         command = [sys.executable, "modal/invoke_remote.py", "--app", args.app,
                    "--stage", remote_stage, "--input-uri", current_input,
                    "--output-uri", output_uri, "--campaign-id", args.campaign_id,
-                   "--profile", args.profile, "--target-fps", str(args.target_fps)]
+                   "--profile", selected_profile, "--target-fps", str(args.target_fps)]
         stdout = run(command, args.dry_run)
         report = json.loads(stdout.strip().splitlines()[-1]) if stdout and stdout.strip() else {
             "status": "PLANNED", "stage": stage, "output_uri": output_uri,

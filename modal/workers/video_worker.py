@@ -393,18 +393,25 @@ def _run_temporal_consistency(source: Path, destination: Path, profile: str) -> 
     import shutil
     atom = _load_atom_profile(profile)
     strength = float(atom.get("temporal", {}).get("strength", 0.0))
-    if strength <= 0.0:
+    motus = atom.get("motus", {})
+    blend = max(0.0, min(1.0, float(motus.get("frame_blend", 0.0))))
+    blur = max(0.0, min(1.0, float(motus.get("motion_blur", 0.0))))
+    if strength <= 0.0 and blend <= 0.0 and blur <= 0.0:
         shutil.copy2(source, destination)
-        return {"implementation": "atom_ic_temporal_guard_passthrough", "temporal_strength": 0.0}
+        return {"implementation": "atom_ic_temporal_guard_passthrough", "temporal_strength": 0.0, "motus_mode": motus.get("mode", "cinematic")}
     tmp = destination.with_suffix(destination.suffix + ".temporal.tmp.mp4")
-    opacity = max(0.0, min(1.0, strength))
+    opacity = max(blend, min(1.0, strength))
+    filters = [f"tblend=all_mode=average:all_opacity={opacity}"]
+    if blur > 0.0:
+        filters.append(f"tmix=frames=3:weights=1 2 1:scale=4")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(source), "-vf",
-                     f"tblend=all_mode=average:all_opacity={opacity}", "-map", "0:v:0", "-map", "0:a?",
+                     ",".join(filters), "-map", "0:v:0", "-map", "0:a?",
                      "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p",
                      "-c:a", "copy", "-movflags", "+faststart", str(tmp)], check=True)
     tmp.replace(destination)
-    return {"implementation": "atom_ic_temporal_tblend_guard", "temporal_strength": opacity,
-            "audio": "copied_stream_copy"}
+    return {"implementation": "atom_ic_temporal_motus_guard", "temporal_strength": opacity,
+            "motus_mode": motus.get("mode", "cinematic"), "motion_blur": blur,
+            "frame_blend": blend, "audio": "copied_stream_copy"}
 
 
 def _run_realesrgan(source: Path, destination: Path) -> dict:
