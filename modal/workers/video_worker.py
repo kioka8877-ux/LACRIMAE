@@ -215,6 +215,7 @@ def _run_gfpgan(source: Path, destination: Path, profile: str) -> dict:
     face_cfg = atom.get("face", {})
     strength = float(face_cfg.get("weight", 0.62)) if face_cfg.get("enabled", True) else 0.0
     strength = max(0.0, min(1.0, strength))
+    frame_stride = max(1, int(face_cfg.get("frame_stride", 1)))
     restorer = GFPGANer(
         model_path=str(weights), upscale=1, arch="clean", channel_multiplier=2,
         bg_upsampler=None, device="cuda" if torch.cuda.is_available() else "cpu",
@@ -231,12 +232,15 @@ def _run_gfpgan(source: Path, destination: Path, profile: str) -> dict:
         ok, frame = capture.read()
         if not ok:
             break
-        cropped_faces, _, restored = restorer.enhance(
-            frame, has_aligned=False, only_center_face=False, paste_back=True,
-            weight=strength,
-        )
-        detected_faces += len(cropped_faces or [])
-        if restored is None:
+        if strength > 0.0 and (processed % frame_stride == 0):
+            cropped_faces, _, restored = restorer.enhance(
+                frame, has_aligned=False, only_center_face=False, paste_back=True,
+                weight=strength,
+            )
+            detected_faces += len(cropped_faces or [])
+            if restored is None:
+                restored = frame
+        else:
             restored = frame
         writer.write(restored)
         processed += 1
@@ -265,6 +269,7 @@ def _run_gfpgan(source: Path, destination: Path, profile: str) -> dict:
         "input_frames": frame_count,
         "output_frames": processed,
         "faces_detected": detected_faces,
+        "frame_stride": frame_stride,
         "audio": "copied_stream_copy",
         "inference_seconds": round(time.monotonic() - started, 3),
     }
