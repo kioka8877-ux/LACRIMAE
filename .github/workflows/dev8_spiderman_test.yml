@@ -1,0 +1,56 @@
+name: DEV8 — Spider-Man Test (4 clips)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  f00e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Spider-Man clips from release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/sources
+          TAG="spiderman"
+          for clip in clip1.2.mp4 clip2.2.mp4 clip3.2.mp4 clip4.2.mp4; do
+            ASSET_ID=$(gh api "repos/${{ github.repository }}/releases/tags/$TAG" --jq ".assets[] | select(.name==\"$clip\") | .id")
+            gh api "repos/${{ github.repository }}/releases/assets/$ASSET_ID" -H "Accept: application/octet-stream" > "/tmp/sources/$clip"
+            echo "Downloaded $clip"
+          done
+
+      - name: Create reveal request
+        run: |
+          cat > /tmp/sources/reveal_request.json << 'EOF'
+          {
+            "format": "reveal_compilation",
+            "sources": [
+              {"id": "reveal_01", "source": "/tmp/sources/clip1.2.mp4", "in_seconds": 0, "out_seconds": 6, "mirror": false, "fit_mode": "crop"},
+              {"id": "reveal_02", "source": "/tmp/sources/clip2.2.mp4", "in_seconds": 5, "out_seconds": 9, "mirror": false, "fit_mode": "crop"},
+              {"id": "reveal_03", "source": "/tmp/sources/clip3.2.mp4", "in_seconds": 0, "out_seconds": 7, "mirror": false, "fit_mode": "crop"},
+              {"id": "reveal_04", "source": "/tmp/sources/clip4.2.mp4", "in_seconds": 51, "out_seconds": 54, "mirror": false, "fit_mode": "blur"}
+            ]
+          }
+          EOF
+
+      - name: Run F00-E
+        run: |
+          python3 F00_INGEST/CODEBASE/f00_reveal.py \
+            --request /tmp/sources/reveal_request.json \
+            --out "$RUNNER_TEMP/f00e-output"
+
+      - name: Validate output
+        run: |
+          test -f "$RUNNER_TEMP/f00e-output/reveal_sources.json"
+          CLIP_COUNT=$(find "$RUNNER_TEMP/f00e-output/clips" -name '*.mp4' | wc -l)
+          echo "Clips produced: $CLIP_COUNT"
+          test "$CLIP_COUNT" -eq 4
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dev8-spiderman-f00e-${{ github.run_id }}
+          path: ${{ runner.temp }}/f00e-output/
+          retention-days: 14
