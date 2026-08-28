@@ -13,11 +13,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
+# Dépendances Python — Phase 1-6 de la frégate mère
 COPY modal/requirements/video-gpu.txt /app/requirements.txt
 RUN python3.11 -m pip install --upgrade pip && python3.11 -m pip install -r /app/requirements.txt
 
+# Code de la frégate mère
+COPY F02_MOTHER /app/F02_MOTHER
+
+# Workers Modal (RIFE, GFPGAN, orchestration)
 COPY modal/workers /app/workers
 COPY modal/rife_runtime /app/rife_runtime
 COPY modal/bootstrap_worker.py /app/bootstrap_worker.py
+
+# Config et backups
 COPY BACKUP /app/BACKUP
 COPY CONFIG /app/CONFIG

@@ -1,0 +1,213 @@
+{
+  "schema_version": "2.0.0",
+  "description": "Configuration compositing IA — Frégate mère F02 dev6-C. Remplace FFmpeg par des modèles neuronaux.",
+  "phases": {
+    "phase0_motus": {
+      "description": "Interpolation temporelle RIFE",
+      "model": "rife_hd_v3_4.25",
+      "enabled_by_default": true,
+      "target_fps": 120,
+      "params": {}
+    },
+    "phase1_restore": {
+      "description": "Restauration IA — denoise, dehalo, detail recovery",
+      "models": ["scunet_denoise", "realesrgan_detail"],
+      "enabled_by_default": true,
+      "params": {
+        "scunet": {
+          "model_type": "realworld",
+          "noise_level": 0,
+          "tile_size": 256,
+          "tile_overlap": 32
+        },
+        "realesrgan": {
+          "model": "realesrgan-x4plus",
+          "scale": 1,
+          "tile_size": 512,
+          "tile_pad": 16,
+          "half": true
+        }
+      }
+    },
+    "phase2_faces": {
+      "description": "Restauration faciale GFPGAN",
+      "model": "gfpgan_v1.3",
+      "enabled_by_default": true,
+      "params": {
+        "upscale": 1,
+        "arch": "clean",
+        "channel_multiplier": 2,
+        "weight": 0.62,
+        "frame_stride": 4
+      }
+    },
+    "phase3_grade": {
+      "description": "Color grading ACES — transform + grading sélectif",
+      "tools": ["colour_science_aces", "opencv_selective"],
+      "enabled_by_default": true,
+      "params": {
+        "aces": {
+          "input_encoding": "sRGB",
+          "working_space": "ACES2065-1",
+          "output_transform": "RRT_ODT_Rec.709_100nits",
+          "version": "1.0.3"
+        },
+        "selective": {
+          "skin_detection": true,
+          "skin_protect_strength": 0.7,
+          "shadow_lift": 0.02,
+          "highlight_roll_off": 0.95
+        }
+      }
+    },
+    "phase4_sharpen": {
+      "description": "Netteté edge-aware — remplace BCC3 + S_Sharpen",
+      "model": "realesrgan_restoration",
+      "enabled_by_default": true,
+      "params": {
+        "model": "realesrgan-x4plus",
+        "mode": "restoration",
+        "strength": 0.7,
+        "edge_preserve": true
+      }
+    },
+    "phase5_glow": {
+      "description": "Bloom/halation — remplace S_Glow",
+      "tool": "opencv_bloom",
+      "enabled_by_default": false,
+      "params": {
+        "highlight_threshold": 0.7,
+        "gaussian_sigma": 20,
+        "blend_opacity": 0.15,
+        "blend_mode": "screen"
+      }
+    },
+    "phase6_export": {
+      "description": "Export contrôlé — remplace HandBrake",
+      "tool": "ffmpeg",
+      "enabled_by_default": true,
+      "params": {
+        "codec": "libx264",
+        "preset": "slow",
+        "crf": 21,
+        "profile": "high",
+        "level": 4,
+        "pix_fmt": "yuv420p",
+        "movflags": "+faststart",
+        "x264_params": "keyint=12:min-keyint=1:ref=1:bframes=0:qcomp=0.8:aq-strength=0.5:dct-decimate=0:fast-pskip=0:deblock=-2,-2"
+      }
+    }
+  },
+  "presets": {
+    "silver_gray": {
+      "description": "Look argenté métallique — désaturé, contraste froid, hautes lumières froides",
+      "phases": {
+        "phase0_motus": {"enabled": true},
+        "phase1_restore": {"enabled": true},
+        "phase2_faces": {"enabled": true},
+        "phase3_grade": {
+          "enabled": true,
+          "saturation": 0.55,
+          "contrast": 1.15,
+          "temperature": -0.15,
+          "tint": 0.0,
+          "shadow_color": [0.95, 0.97, 1.0],
+          "highlight_color": [0.9, 0.93, 1.0]
+        },
+        "phase4_sharpen": {"enabled": true, "strength": 0.8},
+        "phase5_glow": {"enabled": false},
+        "phase6_export": {"enabled": true}
+      }
+    },
+    "dark": {
+      "description": "Look cinématique sombre — S-curve profonde, ombres renforcées, glow faible",
+      "phases": {
+        "phase0_motus": {"enabled": true},
+        "phase1_restore": {"enabled": true},
+        "phase2_faces": {"enabled": true},
+        "phase3_grade": {
+          "enabled": true,
+          "saturation": 0.9,
+          "contrast": 1.2,
+          "s_curve_strength": 0.4,
+          "shadow_crush": 0.05,
+          "highlight_roll_off": 0.9,
+          "temperature": -0.05,
+          "tint": 0.0
+        },
+        "phase4_sharpen": {"enabled": true, "strength": 0.6},
+        "phase5_glow": {
+          "enabled": true,
+          "gaussian_sigma": 12,
+          "blend_opacity": 0.10
+        },
+        "phase6_export": {"enabled": true}
+      }
+    },
+    "warm": {
+      "description": "Tons chauds — chair protégée, hautes lumières chaudes, saturation sélective",
+      "phases": {
+        "phase0_motus": {"enabled": true},
+        "phase1_restore": {"enabled": true},
+        "phase2_faces": {"enabled": true, "weight": 0.7},
+        "phase3_grade": {
+          "enabled": true,
+          "saturation": 1.05,
+          "contrast": 1.08,
+          "temperature": 0.12,
+          "tint": 0.02,
+          "skin_protect": true,
+          "highlight_warmth": 0.15
+        },
+        "phase4_sharpen": {"enabled": true, "strength": 0.5},
+        "phase5_glow": {"enabled": false},
+        "phase6_export": {"enabled": true}
+      }
+    },
+    "viral_hdr": {
+      "description": "Impact HDR — contraste fort, glow organique, énergie accrue",
+      "phases": {
+        "phase0_motus": {"enabled": true},
+        "phase1_restore": {"enabled": true},
+        "phase2_faces": {"enabled": true},
+        "phase3_grade": {
+          "enabled": true,
+          "saturation": 1.15,
+          "contrast": 1.25,
+          "s_curve_strength": 0.5,
+          "dynamic_range_expand": true,
+          "temperature": 0.03,
+          "tint": 0.0
+        },
+        "phase4_sharpen": {"enabled": true, "strength": 0.9},
+        "phase5_glow": {
+          "enabled": true,
+          "gaussian_sigma": 25,
+          "blend_opacity": 0.25,
+          "highlight_threshold": 0.6
+        },
+        "phase6_export": {"enabled": true}
+      }
+    },
+    "clean_realistic": {
+      "description": "Naturel — effet minimal, priorité fidélité source",
+      "phases": {
+        "phase0_motus": {"enabled": true},
+        "phase1_restore": {"enabled": true},
+        "phase2_faces": {"enabled": true, "weight": 0.4},
+        "phase3_grade": {
+          "enabled": true,
+          "saturation": 1.0,
+          "contrast": 1.03,
+          "temperature": 0.0,
+          "tint": 0.0
+        },
+        "phase4_sharpen": {"enabled": true, "strength": 0.3},
+        "phase5_glow": {"enabled": false},
+        "phase6_export": {"enabled": true}
+      }
+    }
+  },
+  "default_preset": "clean_realistic",
+  "presets_order": ["silver_gray", "dark", "warm", "viral_hdr", "clean_realistic"]
+}
