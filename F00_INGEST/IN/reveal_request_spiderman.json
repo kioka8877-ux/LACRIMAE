@@ -1,0 +1,9 @@
+{
+  "format": "reveal_compilation",
+  "sources": [
+    {"id": "reveal_01", "source": "/tmp/lacrimae-dev8/test_videos/clip1.2.mp4", "in_seconds": 0, "out_seconds": 5, "mirror": false, "fit_mode": "crop"},
+    {"id": "reveal_02", "source": "/tmp/lacrimae-dev8/test_videos/clip2.2.mp4", "in_seconds": 0, "out_seconds": 5, "mirror": true, "fit_mode": "crop"},
+    {"id": "reveal_03", "source": "/tmp/lacrimae-dev8/test_videos/clip3.2.mp4", "in_seconds": 0, "out_seconds": 5, "mirror": false, "fit_mode": "crop"},
+    {"id": "reveal_04", "source": "/tmp/lacrimae-dev8/test_videos/clip4.2.mp4", "in_seconds": 0, "out_seconds": 8, "mirror": false, "fit_mode": "blur"}
+  ]
+}
