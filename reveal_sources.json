@@ -1,0 +1,22 @@
+{
+  "format": "reveal_compilation",
+  "narrative": {
+    "theme": "CAMOUFLAGE",
+    "others_label": "OTHERS",
+    "this_one_label": "THIS ONE",
+    "transition_text": "WAIT FOR THIS ONE",
+    "final_text": ""
+  },
+  "sources": [
+    {"id": "reveal_01", "file": "clips/clip1.2.mp4", "in_seconds": 0, "out_seconds": 6, "duration_seconds": 6, "mirror": false, "fit_mode": "crop", "role": "other"},
+    {"id": "reveal_02", "file": "clips/clip2.2.mp4", "in_seconds": 5, "out_seconds": 9, "duration_seconds": 4, "mirror": false, "fit_mode": "crop", "role": "other"},
+    {"id": "reveal_03", "file": "clips/clip3.2.mp4", "in_seconds": 0, "out_seconds": 7, "duration_seconds": 7, "mirror": false, "fit_mode": "crop", "role": "other"},
+    {"id": "reveal_04", "file": "clips/clip4.2.mp4", "in_seconds": 51, "out_seconds": 54, "duration_seconds": 3, "mirror": false, "fit_mode": "blur", "role": "final_reveal"}
+  ],
+  "reveal": {
+    "enabled": true,
+    "darkness": 0.72,
+    "shake_power": 85,
+    "shake_duration_frames": 12
+  }
+}
