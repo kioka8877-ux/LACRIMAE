@@ -4,16 +4,16 @@
 
 ## Règle de reprise
 
-Lire ce fichier en premier, puis `SANDBOX_ARCHIVE_MANIFEST.md`, `README.md`, `docs/V2_OPERATIONS_GUIDE.md` et `V2_EVOLUTION_ROADMAP.md`. Ne jamais modifier `dev6` pour les essais expérimentaux : travailler uniquement sur `v2`.
+Lire ce fichier en premier, puis `SANDBOX_ARCHIVE_MANIFEST.md`, `README.md`, `docs/V2_OPERATIONS_GUIDE.md` et `V2_EVOLUTION_ROADMAP.md`. Ne jamais modifier `dev6` pour les essais expérimentaux : travailler uniquement sur `dev6-B`.
 
 ## État Git exact
 
 | Branche | Commit distant | Rôle |
 |---|---|---|
 | `dev6` | `4c0a7a9` | Version stable validée, à préserver |
-| `v2` | `29811b5` | Branche expérimentale active |
+| `dev6-B` | `4b24ee5` | Branche active, héritage v2 |
 
-Derniers commits importants de `v2` :
+Derniers commits importants de `dev6-B` (héritage v2) :
 
 - `3b78ee2` — feuille de route v2.
 - `b905fe5` — AUSPEX adaptatif et contrôles Motus Viral.
@@ -29,16 +29,16 @@ Dépôt : `https://github.com/kioka8877-ux/LACRIMAE`.
 
 Le parcours validé est : `F00 → F01 → F02 → F03 → F04 → F05 → F06 → F07 → F08 → F10`.
 
-### v2 expérimentale
+### dev6-B active (héritage v2)
 
-`v2` ajoute :
+`dev6-B` ajoute :
 
 - `ORACLE/auspex.py` avec AUSPEX PIXEL/TEMPORAL, exécutable localement avec FFmpeg/Pillow sans OpenCV obligatoire.
 - Mode Oracle `auto`, qui analyse la source avant le calcul GPU et recommande un profil.
 - Profils `hdr_imperator`, `realistic_aurea`, `old_main_noctis` et `viral_imperator` dans `CONFIG/atom_ic_profiles.json`.
 - F08 avec paramètres Motus optionnels : frame blending et motion blur, par défaut désactivés ou transparents.
 - Stride facial configurable pour éviter de traiter toutes les frames interpolées avec GFPGAN.
-- Documentation v2 : README, guide opérationnel, contrat DOMINUS et panneau de contrôle.
+- Documentation dev6-B : README, guide opérationnel, contrat DOMINUS, panneau de contrôle, TODO, gates et ledger de campagnes.
 
 ## Dernier test Modal réussi
 
@@ -100,7 +100,7 @@ Presets headless prévus : `silver_gray`, `dark`, `warm`, `viral_hdr` et `clean_
 | `modal/workers/video_worker.py` | Worker GPU Modal |
 | `CONFIG/atom_ic_profiles.json` | Profils de traitement |
 | `CC2_FFX_ANALYSIS.md` | Analyse du preset After Effects reçu |
-| `README.md` | Documentation principale v2 |
+| `README.md` | Documentation principale dev6-B (héritage v2) |
 | `docs/V2_OPERATIONS_GUIDE.md` | Procédure opérationnelle |
 | `docs/DOMINUS_HYPERFLUIDA_V2_CONTRACT.md` | Contrat technique |
 | `docs/V2_CONTROL_PANEL.md` | Panneau de contrôle documentaire |
@@ -115,8 +115,8 @@ Ne jamais committer `.env.modal`, `.env.modal.*` réel, tokens, clés Backblaze,
 
 ```bash
 cd /home/ubuntu/LACRIMAE_DEV6
-git checkout v2
-git pull --ff-only origin v2
+git checkout dev6-B
+git pull --ff-only origin dev6-B
 python3 -m py_compile ORACLE/*.py modal/workers/video_worker.py
 python3 -m json.tool CONFIG/atom_ic_profiles.json >/dev/null
 python3 ORACLE/auspex.py --help

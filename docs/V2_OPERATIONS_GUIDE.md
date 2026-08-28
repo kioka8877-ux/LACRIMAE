@@ -1,8 +1,8 @@
-# Guide opérationnel LACRIMAE v2
+# Guide opérationnel LACRIMAE dev6-B (v2)
 
 ## Principe
 
-La branche v2 ne lance pas de calcul GPU pendant la phase d’analyse. F01 AUSPEX examine la source localement, produit des mesures et recommande un profil. Les étapes lourdes ne sont exécutées que lorsqu’un compte GPU actif est disponible.
+La branche dev6-B (évolution v2) ne lance pas de calcul GPU pendant la phase d’analyse. F01 AUSPEX examine la source localement, produit des mesures et recommande un profil. Les étapes lourdes ne sont exécutées que lorsqu’un compte GPU actif est disponible.
 
 ## Séquence de décision
 
@@ -27,4 +27,4 @@ Le premier essai après réactivation d’un compte GPU doit durer environ cinq 
 
 ## Règles anti-régression
 
-Toute modification de v2 doit être committée avant un run. `dev6` n’est jamais utilisé comme zone d’essai. Les secrets restent dans un fichier d’environnement local. Les modèles sont placés dans le Volume modèles et les vidéos dans le Volume vidéo.
+Toute modification de dev6-B doit être committée avant un run. `dev6` n’est jamais utilisé comme zone d’essai. Les secrets restent dans un fichier d’environnement local. Les modèles sont placés dans le Volume modèles et les vidéos dans le Volume vidéo.

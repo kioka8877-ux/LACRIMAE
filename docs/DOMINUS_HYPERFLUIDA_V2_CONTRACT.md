@@ -1,8 +1,10 @@
 # Contrat DOMINUS HYPERFLUIDA v2
 
+# Contrat DOMINUS HYPERFLUIDA — LACRIMAE dev6-B (v2)
+
 ## Contrat général
 
-Chaque Frégate reçoit une vidéo et un identifiant de campagne. Elle écrit une sortie distincte, un rapport JSON et les métriques utiles. Elle ne doit jamais écraser son entrée. Les chemins doivent rester relatifs au Volume et ne peuvent pas remonter dans l’arborescence.
+La branche active est `dev6-B`; `dev6` reste stable. Chaque Frégate reçoit une vidéo et un identifiant de campagne. Elle écrit une sortie distincte, un rapport JSON et les métriques utiles. Elle ne doit jamais écraser son entrée. Les chemins doivent rester relatifs au Volume et ne peuvent pas remonter dans l’arborescence.
 
 ## Contrat F01 AUSPEX OCULUS
 
@@ -23,6 +25,10 @@ Le mode viral peut ajouter frame blending et motion blur contrôlés par `motus.
 ## Contrat CHROMA DOMINATUS
 
 F06 et F07 appliquent lumière, contraste, saturation et teinte après la restauration. Les profils doivent protéger les tons chair, les hautes lumières et les zones sombres. Aucun profil ne doit supposer que la source est horizontale, verticale ou carrée.
+
+## Contrat de suivi
+
+Chaque campagne doit être enregistrée dans `TRACKING/dev6b_campaign_ledger.json` et suivre les gates G0 à G9 définis dans `TRACKING/DEV6B_GATES.md`. Une tentative échouée reçoit un nouvel identifiant et ne doit pas écraser les rapports précédents.
 
 ## Contrat de sortie
 

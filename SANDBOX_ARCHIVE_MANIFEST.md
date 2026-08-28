@@ -6,17 +6,22 @@ GitHub est la source de vérité pour le code, les configurations et la document
 
 ## Déjà sauvegardé sur GitHub
 
-Les éléments versionnés sur les branches `dev6` et `v2` comprennent le code Oracle, le worker Modal, les configurations ATOM-IC, les contrats de Frégate, les tests, les guides, les rapports stratégiques et la feuille de route v2.
+Les éléments versionnés sur les branches `dev6` et `dev6-B` comprennent le code Oracle, le worker Modal, les configurations ATOM-IC, les contrats de Frégate, les tests, les guides, les rapports stratégiques et la feuille de route v2.
 
 Branches distantes :
 
 - `dev6` → `4c0a7a9`.
-- `v2` → `29811b5`, puis le commit de continuité à venir.
+- `dev6-B` → `4b24ee5`, branche active issue de v2.
 
 ## À ajouter au commit de continuité
 
 - `CONTINUATION.md`.
 - `SANDBOX_ARCHIVE_MANIFEST.md`.
+- `TRACKING/TODO_CONTINUATION.md`.
+- `TRACKING/DEV6B_GATES.md`.
+- `TRACKING/dev6b_campaign_ledger.json`.
+- `TRACKING/DEV6B_CAMPAIGN_LOG.md`.
+- `TRACKING/DEV6B_TRANSFER_LOG.md`.
 - `CC2_FFX_ANALYSIS.md`.
 - Les rapports d’analyse Topaz et fluidité déjà présents à la racine si leur taille reste raisonnable.
 - Les documents de recherche utiles, sans fichiers secrets.
@@ -57,21 +62,22 @@ Avant extinction du sandbox, créer une archive des documents et rapports, sans 
 ```bash
 mkdir -p /tmp/lacrimae_handoff
 cp CONTINUATION.md SANDBOX_ARCHIVE_MANIFEST.md README.md V2_EVOLUTION_ROADMAP.md /tmp/lacrimae_handoff/
+cp TRACKING/TODO_CONTINUATION.md TRACKING/DEV6B_GATES.md TRACKING/dev6b_campaign_ledger.json TRACKING/DEV6B_CAMPAIGN_LOG.md TRACKING/DEV6B_TRANSFER_LOG.md /tmp/lacrimae_handoff/
 cp CC2_FFX_ANALYSIS.md ANALYSE_TROIS_REFERENCES_TOPAZ.md ANALYSE_FLUIDITE_VIRALE_ET_CIBLE_V2.md /tmp/lacrimae_handoff/
 cp -r docs ORACLE CONFIG BACKUP /tmp/lacrimae_handoff/
-tar -czf /tmp/LACRIMAE_v2_handoff_docs.tar.gz -C /tmp lacrimae_handoff
-sha256sum /tmp/LACRIMAE_v2_handoff_docs.tar.gz
+tar -czf /tmp/LACRIMAE_dev6B_handoff_docs.tar.gz -C /tmp lacrimae_handoff
+sha256sum /tmp/LACRIMAE_dev6B_handoff_docs.tar.gz
 ```
 
-L’archive ne remplace pas GitHub : elle conserve les rapports locaux et les copies de documentation. Le code doit être récupéré avec `git clone` ou `gh repo clone`, puis la branche `v2` doit être sélectionnée.
+L’archive ne remplace pas GitHub : elle conserve les rapports locaux et les copies de documentation. Le code doit être récupéré avec `git clone` ou `gh repo clone`, puis la branche `dev6-B` doit être sélectionnée.
 
 ## Reprise dans le prochain sandbox
 
 ```bash
 gh repo clone kioka8877-ux/LACRIMAE /home/ubuntu/LACRIMAE_DEV6
 cd /home/ubuntu/LACRIMAE_DEV6
-git checkout v2
-git pull --ff-only origin v2
+git checkout dev6-B
+git pull --ff-only origin dev6-B
 ```
 
 Ensuite, recréer localement `.env.modal` à partir des credentials du compte actif, sans l’ajouter à Git. Vérifier `modal profile list`, `modal volume list` et `modal app list`. Un nouveau workspace peut avoir les mêmes noms de Volumes mais des contenus différents.

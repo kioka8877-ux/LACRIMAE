@@ -1,11 +1,11 @@
-# Panneau de contrôle LACRIMAE v2
+# Panneau de contrôle LACRIMAE dev6-B (v2)
 
 ## État de la flotte
 
 | Zone | État | Prochaine action |
 |---|---|---|
 | `dev6` stable | Protégée | Ne pas modifier |
-| `v2` expérimentale | Active | Développer et tester sans GPU |
+| `dev6-B` active (héritage v2) | Active | Développer et tester sans GPU |
 | AUSPEX | Implémenté en CPU | Calibrer les seuils sur plusieurs scènes |
 | Enhance général | Partiel | Ajouter une reconstruction plus puissante |
 | RIFE 4.25 | Validé | Réutiliser sur le prochain compte GPU |
@@ -13,6 +13,10 @@
 | Chroma Dominatus | Implémenté | Calibrer noirs, peau et hautes lumières |
 | Motus Viral | F08 implémenté partiellement | Tester `viral_imperator`, puis ajouter speed ramps et montage |
 | Modal | Crédits épuisés | Aucun run GPU avant nouveau compte actif |
+
+## Suivi et gates
+
+Le suivi opérationnel est centralisé dans `TRACKING/TODO_CONTINUATION.md`, `TRACKING/DEV6B_GATES.md` et `TRACKING/dev6b_campaign_ledger.json`. Toute campagne doit passer G0 à G9 et conserver ses rapports sans écraser une tentative précédente.
 
 ## Profils
 
@@ -24,4 +28,4 @@ Une Frégate passe la validation si elle conserve la résolution et la cadence, 
 
 ## Gestion du calcul
 
-Le développement CPU, l’analyse, les rapports et les comparaisons sont autorisés immédiatement. Les modèles RIFE et GFPGAN ne doivent être exécutés que sur un compte GPU actif. Le premier nouveau run doit rester court et produire plusieurs profils depuis la même source originale.
+Le développement CPU, l’analyse, les rapports et les tests de validation des presets sont autorisés immédiatement. Les modèles RIFE et GFPGAN ne doivent être exécutés que sur un compte GPU actif. Le premier nouveau run doit rester court et produire plusieurs profils depuis la même source originale.

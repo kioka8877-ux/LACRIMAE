@@ -2,7 +2,7 @@
 
 > *For the Angel's Tears shall become gold.*
 
-LACRIMAE v2 est la branche expérimentale de la flotte vidéo **DOMINUS HYPERFLUIDA**. Elle vise une qualité perçue supérieure grâce à la combinaison de reconstruction de détail, restauration par zones, fluidité temporelle, montage dynamique et finition cinématique. La branche `dev6` reste la version stable de secours ; aucune expérimentation v2 ne doit la modifier.
+LACRIMAE dev6-B est la branche active (héritage v2) de la flotte vidéo **DOMINUS HYPERFLUIDA**. Elle vise une qualité perçue supérieure grâce à la combinaison de reconstruction de détail, restauration par zones, fluidité temporelle, montage dynamique et finition cinématique. La branche `dev6` reste la version stable de secours ; aucune expérimentation v2 ne doit la modifier.
 
 ## Architecture v2
 
@@ -85,16 +85,20 @@ Le code est versionné sur GitHub. Les vidéos et les modèles sont stockés dan
 
 Lorsque les crédits GPU sont épuisés, le développement continue localement avec AUSPEX, FFmpeg, OpenCV, les profils, les rapports, les comparaisons d’images et les tests de contrats. Les étapes RIFE et GFPGAN ne doivent pas être lancées sans un compte GPU actif.
 
-La branche v2 utilise les rendus existants comme références, mais une nouvelle campagne doit toujours repartir de la source originale. Une sortie déjà traitée ne doit pas devenir silencieusement l’entrée d’une autre comparaison.
+La branche dev6-B utilise les rendus existants comme références, mais une nouvelle campagne doit toujours repartir de la source originale. Une sortie déjà traitée ne doit pas devenir silencieusement l’entrée d’une autre comparaison.
 
 ## Validation
 
 Chaque campagne doit enregistrer la source, son hash, la résolution, la cadence, la durée, l’audio, le profil choisi, les paramètres, les rapports par frégate et le hash de la sortie. Les critères prioritaires sont le détail naturel du visage, les cheveux et vêtements lisibles, les noirs non bouchés, l’absence de halos, la stabilité temporelle et la qualité du mouvement.
 
+## Suivi opérationnel
+
+Le TODO de reprise est disponible dans [`TRACKING/TODO_CONTINUATION.md`](TRACKING/TODO_CONTINUATION.md). Les gates de validation sont définis dans [`TRACKING/DEV6B_GATES.md`](TRACKING/DEV6B_GATES.md), et le registre de campagnes se trouve dans [`TRACKING/dev6b_campaign_ledger.json`](TRACKING/dev6b_campaign_ledger.json). Le guide opératoire est dans [`docs/V2_OPERATIONS_GUIDE.md`](docs/V2_OPERATIONS_GUIDE.md), le contrat dans [`docs/DOMINUS_HYPERFLUIDA_V2_CONTRACT.md`](docs/DOMINUS_HYPERFLUIDA_V2_CONTRACT.md) et le panneau dans [`docs/V2_CONTROL_PANEL.md`](docs/V2_CONTROL_PANEL.md).
+
 ## Documentation associée
 
 La feuille de route expérimentale est disponible dans [`V2_EVOLUTION_ROADMAP.md`](V2_EVOLUTION_ROADMAP.md). Les objectifs issus des références Topaz et des tutoriels de fluidité sont documentés dans [`ANALYSE_TROIS_REFERENCES_TOPAZ.md`](ANALYSE_TROIS_REFERENCES_TOPAZ.md) et [`ANALYSE_FLUIDITE_VIRALE_ET_CIBLE_V2.md`](ANALYSE_FLUIDITE_VIRALE_ET_CIBLE_V2.md).
 
-## État de v2
+## État de dev6-B
 
 La branche est prête pour une validation CPU de l’analyse et des contrats. La reconstruction générale équivalente à Proteus, la stabilisation temporelle active et l’édition virale automatisée restent les prochaines briques à consolider avant un nouveau run GPU de production.
