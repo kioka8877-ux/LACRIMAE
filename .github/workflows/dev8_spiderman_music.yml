@@ -10,15 +10,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
       - name: Download music from release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="music-spiderman"
           ASSET_ID=$(gh api "repos/${{ github.repository }}/releases/tags/$TAG" --jq '.assets[0].id')
-          ASSET_NAME=$(gh api "repos/${{ github.repository }}/releases/tags/$TAG" --jq '.assets[0].name')
           gh api "repos/${{ github.repository }}/releases/assets/$ASSET_ID" -H "Accept: application/octet-stream" > "/tmp/music.mp3"
-          echo "Downloaded: $ASSET_NAME ($(stat -c%s /tmp/music.mp3) bytes)"
+          echo "Downloaded $(stat -c%s /tmp/music.mp3) bytes"
 
       - name: Run F00-MUSIC
         run: |
@@ -32,6 +34,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/dev8-music"
           cp /tmp/music.mp3 "$RUNNER_TEMP/dev8-music/music.mp3"
           cp "$RUNNER_TEMP/music_timeline.json" "$RUNNER_TEMP/dev8-music/music_timeline.json"
+          echo "=== Music Timeline ==="
           cat "$RUNNER_TEMP/music_timeline.json"
 
       - uses: actions/upload-artifact@v4
