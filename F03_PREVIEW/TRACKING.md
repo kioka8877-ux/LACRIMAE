@@ -99,3 +99,11 @@ Validation déjà effectuée :
 - `npm run check` dans F03 PICTOR : OK ; composition existante listée à 300 frames.
 
 Limite volontaire : dev8 ne contient pas de pack média réel. Le premier test réel doit fournir un artifact F00-E contenant `reveal_sources.json` et `clips/*.mp4`, ainsi qu’un artifact F00-MUSIC contenant `music_timeline.json` et la piste audio.
+
+## dev9 Ranking — 2026-08-28
+
+État : intégration initiale terminée. F00-E est inchangé. F00-F produit `ranking_manifest.json` à partir des clips F00-E. F03 charge le mode `ranking_compilation`, expose l’onglet Ranking et permet les corrections du titre, des labels, des durées, des positions, des tailles, des couleurs et des SFX optionnels. PICTOR reprend le même normaliseur et le même renderer.
+
+Gates validés : syntaxe F00-F, tests unitaires F00-F et Reveal (`7 passed`), build Vite F03. Le check Remotion PICTOR a été remplacé par un bundling esbuild local lorsque le téléchargement de Chromium Headless Shell n’est pas disponible ; le bundling PICTOR et la compilation Python sont valides.
+
+À valider sur un test réel : six clips F00-E, au moins une source horizontale, un miroir, un SFX activé et un rang 1 final.

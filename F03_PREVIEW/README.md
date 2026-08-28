@@ -86,3 +86,11 @@ Placez `reveal_sources.json` et son dossier `clips/` dans `CODEBASE/public/`. F0
 La musique est configurée dans **Audio Sync**. Une portion courte est répétée indépendamment pour chaque scène. La partie forte est configurée séparément pour le reveal final. L’export du codex ajoute `session.review_mode: reveal_compilation` et `reveal_manifest`, que PICTOR reprend sans réinterprétation.
 
 Le miroir affiché dans F03 est celui déjà appliqué par F00-E : il ne retourne pas les textes ni les logos. Les deux transitions courtes sont alternées par défaut ; le click d’introduction reste une décision de démarrage et ne doit pas être répété à chaque cut.
+
+## Ranking Compilation — dev9
+
+Le mode `ranking_compilation` charge `public/ranking_manifest.json` et s’ouvre via l’onglet **Ranking**. F00-E reste inchangé et fournit les clips. F00-F prépare les entrées du classement : rang, durée, position, échelle, label, style de texte et SFX optionnel.
+
+F03 est la Preview de montage. Le panneau Ranking permet de modifier le titre, la catégorie, le libellé final, la durée de chaque rang, les positions X/Y, l’échelle du clip, la taille du texte, la couleur et l’activation du SFX. La liste des rangs est rendue à droite ; le rang actif est accentué et le rang 1 reçoit le traitement final.
+
+Les modifications sont exportées dans `ranking_manifest` avec le codex. PICTOR reprend ce manifeste afin de rendre le même classement, les mêmes durées, les mêmes labels, les mêmes positions et les mêmes SFX. Le workflow dev9 est `F00-E → F00-F → F00-MUSIC → F03 Preview → F04 PICTOR`.

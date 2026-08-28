@@ -51,7 +51,7 @@
       "vignette": 0,
       "grain_intensity": 0
     },
-    "review_mode": "match_cut",
+    "review_mode": "ranking_compilation",
     "hybrid": {
       "intro": {},
       "intro_text": {

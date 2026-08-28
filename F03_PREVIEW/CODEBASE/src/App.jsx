@@ -5,6 +5,7 @@ import { COMPOSITION_PRESETS, getCompositionConfig } from './preview/composition
 import { normalizeHybridManifest } from './preview/hybridNarrative';
 import { normalizeMusicTimeline, musicWaveformPoints } from './preview/audioTimeline';
 import { normalizeRevealManifest } from './preview/revealCompilation';
+import { normalizeRankingManifest } from './preview/rankingCompilation';
 
 /**
  * App — F03 PREVIEW (v4.0 — session + clips)
@@ -44,6 +45,7 @@ export default function App() {
   const [hybridManifest, setHybridManifest] = useState(null);
   const [hybridIntroSrc, setHybridIntroSrc] = useState('');
   const [revealManifest, setRevealManifest] = useState(null);
+  const [rankingManifest, setRankingManifest] = useState(null);
   const [audioSrc, setAudioSrc] = useState('');
   const [audioPosition, setAudioPosition] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
@@ -103,7 +105,14 @@ export default function App() {
         } catch (_) {
           if (full.session?.reveal) setRevealManifest(full.session.reveal);
         }
-        setActiveTab(full.session?.review_mode === 'hybrid_narrative' ? 'hybrid' : full.session?.review_mode === 'reveal_compilation' ? 'reveal' : 'text');
+        try {
+          const rankingResp = await fetch('./ranking_manifest.json');
+          if (rankingResp.ok) setRankingManifest(await rankingResp.json());
+          else if (full.session?.ranking) setRankingManifest(full.session.ranking);
+        } catch (_) {
+          if (full.session?.ranking) setRankingManifest(full.session.ranking);
+        }
+        setActiveTab(full.session?.review_mode === 'hybrid_narrative' ? 'hybrid' : full.session?.review_mode === 'reveal_compilation' ? 'reveal' : full.session?.review_mode === 'ranking_compilation' ? 'ranking' : 'text');
         setVideoSrc(clipFirst.video?.source ? './' + clipFirst.video.source : './video_source.mp4');
         try {
           const motionResp = await fetch('./motion_slow_manifest.json');
@@ -195,7 +204,8 @@ export default function App() {
     }, session, musicForHybrid
   ) : null;
   const activeReveal = reviewMode === 'reveal_compilation' ? normalizeRevealManifest(revealManifest || session.reveal || {}, fps, baseTotalFrames) : null;
-  const totalFrames = activeReveal?.total_frames || activeHybrid?.total_frames || baseTotalFrames;
+  const activeRanking = reviewMode === 'ranking_compilation' ? normalizeRankingManifest(rankingManifest || session.ranking || {}, fps, baseTotalFrames) : null;
+  const totalFrames = activeRanking?.total_frames || activeReveal?.total_frames || activeHybrid?.total_frames || baseTotalFrames;
   const composition = getCompositionConfig(clip, session);
   const music = normalizeMusicTimeline(musicTimeline || session.music || {}, fps, totalFrames);
   const waveformWidth = 600;
@@ -215,6 +225,19 @@ export default function App() {
       setSession((s) => ({ ...s, reveal: next }));
       return next;
     });
+  };
+  const updateRanking = (patch) => {
+    setRankingManifest((current) => {
+      const next = { ...(current || {}), ...patch };
+      setSession((s) => ({ ...s, ranking: next }));
+      return next;
+    });
+  };
+  const updateRankingNarrative = (key, value) => updateRanking({ narrative: { ...(rankingManifest?.narrative || {}), [key]: value } });
+  const updateRankingEntry = (index, patch) => {
+    const entries = [...(rankingManifest?.entries || [])];
+    entries[index] = { ...(entries[index] || {}), ...patch };
+    updateRanking({ entries });
   };
   const updateRevealNarrative = (key, value) => {
     updateReveal({ narrative: { ...(revealManifest?.narrative || {}), [key]: value } });
@@ -326,7 +349,7 @@ export default function App() {
   }));
   const updateReviewMode = (value) => {
     setSession((s) => ({ ...s, review_mode: value }));
-    setActiveTab(value === 'hybrid_narrative' ? 'hybrid' : value === 'reveal_compilation' ? 'reveal' : 'text');
+    setActiveTab(value === 'hybrid_narrative' ? 'hybrid' : value === 'reveal_compilation' ? 'reveal' : value === 'ranking_compilation' ? 'ranking' : 'text');
   };
 
   // ── Balise logo : double-clic sur la vidéo → poser ici ──
@@ -458,10 +481,12 @@ export default function App() {
       ...merged,
       session: {
         ...session,
-        review_mode: activeReveal ? 'reveal_compilation' : session.review_mode,
+        review_mode: activeRanking ? 'ranking_compilation' : activeReveal ? 'reveal_compilation' : session.review_mode,
+        ...(activeRanking ? { ranking: activeRanking } : {}),
         ...(activeReveal ? { reveal: activeReveal } : {}),
       },
       reveal_manifest: activeReveal || revealManifest || null,
+      ranking_manifest: activeRanking || rankingManifest || null,
       virtual_sequences: sequences || null,
       validated_by_magos: validated,
     };
@@ -512,7 +537,7 @@ export default function App() {
             <Player
               ref={playerRef}
               component={OmniComposition}
-              inputProps={{ codex: clip, videoSrc, session, sequences, hybridManifest: activeHybrid, hybridIntroSrc, musicTimeline: music, revealManifest: activeReveal }}
+              inputProps={{ codex: clip, videoSrc, session, sequences, hybridManifest: activeHybrid, hybridIntroSrc, musicTimeline: music, revealManifest: activeReveal || activeRanking }}
               durationInFrames={totalFrames}
               fps={fps}
               compositionWidth={vidWidth}
@@ -612,6 +637,9 @@ export default function App() {
             <button style={activeTab === 'reveal' ? styles.tabActive : styles.tab} onClick={() => { setActiveTab('reveal'); updateReviewMode('reveal_compilation'); }}>
               ◇ Reveal
             </button>
+            <button style={activeTab === 'ranking' ? styles.tabActive : styles.tab} onClick={() => { setActiveTab('ranking'); updateReviewMode('ranking_compilation'); }}>
+              # Ranking
+            </button>
             <button style={activeTab === 'fond' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('fond')}>
               🖼 Fond & Logo
             </button>
@@ -631,6 +659,48 @@ export default function App() {
               🔍 Netteté
             </button>
           </div>
+
+          {/* ══════════ RANKING COMPILATION : rangs + narration ══════════ */}
+          {activeTab === 'ranking' && (
+            <div style={styles.panelContent}>
+              <label style={{ ...styles.label, color: '#ffd400', fontSize: '14px' }}>RANKING COMPILATION</label>
+              <div style={{ color: '#aaa', fontSize: 12, lineHeight: 1.45 }}>F00-F prépare les entrées. Ici, F03 vérifie et ajuste le classement avant le rendu.</div>
+              <label style={styles.label}>Titre</label>
+              <input style={styles.input} value={rankingManifest?.narrative?.title ?? ''} onChange={(e) => updateRankingNarrative('title', e.target.value)} placeholder="RANKING" />
+              <label style={styles.label}>Catégorie</label>
+              <input style={styles.input} value={rankingManifest?.narrative?.category ?? ''} onChange={(e) => updateRankingNarrative('category', e.target.value)} placeholder="FUNNIEST MOMENTS" />
+              <label style={styles.label}>Libellé final</label>
+              <input style={styles.input} value={rankingManifest?.narrative?.final_label ?? ''} onChange={(e) => updateRankingNarrative('final_label', e.target.value)} placeholder="NUMBER ONE" />
+              <div style={{ marginTop: 8, paddingTop: 10, borderTop: '1px solid #4a4020' }}>
+                <label style={{ ...styles.label, color: '#ffd400' }}>RANGS</label>
+                {(activeRanking?.entries || rankingManifest?.entries || []).map((entry, index) => {
+                  const position = entry.position || {};
+                  const textStyle = entry.text_style || {};
+                  const sfx = entry.sfx || {};
+                  return (
+                    <div key={entry.source_id || index} style={{ marginTop: 8, padding: 9, border: `1px solid ${entry.rank === 1 ? '#8a6820' : '#333'}`, borderRadius: 7, background: entry.rank === 1 ? '#1d1708' : '#111' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: entry.rank === 1 ? '#ffd400' : '#ddd', fontWeight: 800, fontSize: 12 }}><span>#{entry.rank}{entry.rank === 1 ? ' — FINAL' : ''}</span><span style={{ color: '#888', fontWeight: 500 }}>{entry.source_id}</span></div>
+                      <label style={styles.label}>Label du rang</label>
+                      <input style={styles.input} value={entry.label ?? ''} onChange={(e) => updateRankingEntry(index, { label: e.target.value })} placeholder="LABEL" />
+                      <label style={styles.label}>Durée : {Number(entry.duration_seconds || 3).toFixed(2)} s</label>
+                      <input style={styles.slider} type="range" min="0.5" max="30" step="0.1" value={Number(entry.duration_seconds || 3)} onChange={(e) => updateRankingEntry(index, { duration_seconds: parseFloat(e.target.value) })} />
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                        <label style={styles.label}>Position X<input style={styles.input} type="number" min="-100" max="200" step="1" value={Number(position.x_pct ?? 50)} onChange={(e) => updateRankingEntry(index, { position: { ...position, x_pct: parseFloat(e.target.value) } })} /></label>
+                        <label style={styles.label}>Position Y<input style={styles.input} type="number" min="-100" max="200" step="1" value={Number(position.y_pct ?? 50)} onChange={(e) => updateRankingEntry(index, { position: { ...position, y_pct: parseFloat(e.target.value) } })} /></label>
+                        <label style={styles.label}>Taille<input style={styles.input} type="number" min="0.05" max="10" step="0.05" value={Number(position.scale ?? 1)} onChange={(e) => updateRankingEntry(index, { position: { ...position, scale: parseFloat(e.target.value) } })} /></label>
+                        <label style={styles.label}>Taille texte<input style={styles.input} type="number" min="8" max="400" step="1" value={Number(textStyle.font_size ?? 54)} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, font_size: parseFloat(e.target.value) } })} /></label>
+                      </div>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
+                        <label style={{ ...styles.label, margin: 0, flex: 1 }}>Couleur<input style={styles.input} type="text" value={textStyle.color ?? '#FFFFFF'} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, color: e.target.value } })} /></label>
+                        <label style={{ color: '#bbb', fontSize: 11, display: 'flex', alignItems: 'center', gap: 5 }}><input type="checkbox" checked={Boolean(sfx.enabled)} onChange={(e) => updateRankingEntry(index, { sfx: { ...sfx, enabled: e.target.checked } })} /> SFX</label>
+                      </div>
+                    </div>
+                  );
+                })}
+                {!(activeRanking?.entries?.length || rankingManifest?.entries?.length) && <div style={{ color: '#ff9f66', fontSize: 12, padding: 8 }}>Aucun ranking_manifest.json chargé. F00-F doit d’abord produire le manifeste.</div>}
+              </div>
+            </div>
+          )}
 
           {/* ══════════ REVEAL COMPILATION : six clips + narratif ══════════ */}
           {activeTab === 'reveal' && (

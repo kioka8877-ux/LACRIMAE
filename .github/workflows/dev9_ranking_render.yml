@@ -1,0 +1,61 @@
+name: dev9 Ranking Render
+
+on:
+  workflow_dispatch:
+    inputs:
+      f00e_artifact:
+        description: 'Artifact clips produit par F00-E'
+        required: true
+        default: 'dev9-f00e-clips'
+      f00f_artifact:
+        description: 'Artifact manifeste produit par F00-F'
+        required: true
+        default: 'dev9-f00f-ranking'
+      music_artifact:
+        description: 'Artifact audio produit par F00-MUSIC'
+        required: true
+        default: 'dev9-f00-music'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Télécharger les clips F00-E
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.f00e_artifact }}
+          path: F03_PREVIEW/CODEBASE/public/reveal
+      - name: Télécharger le manifeste F00-F
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.f00f_artifact }}
+          path: F03_PREVIEW/CODEBASE/public
+      - name: Télécharger l’audio F00-MUSIC
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.music_artifact }}
+          path: F03_PREVIEW/CODEBASE/public/audio
+      - name: Installer PICTOR
+        working-directory: F03_PICTOR/CODEBASE
+        run: npm ci
+      - name: Préparer le codex Ranking
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('F03_PICTOR/CODEBASE/src/data/codex.json')
+          d = json.loads(p.read_text())
+          d.setdefault('session', {})['review_mode'] = 'ranking_compilation'
+          d['ranking_manifest'] = json.loads(Path('F03_PREVIEW/CODEBASE/public/ranking_manifest.json').read_text())
+          p.write_text(json.dumps(d, indent=2) + '\n')
+          PY
+      - name: Rendre le MP4 F04
+        working-directory: F03_PICTOR/CODEBASE
+        run: npm run render
+      - name: Publier le MP4 dev9
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev9-ranking-render
+          path: F03_PICTOR/CODEBASE/out/short_final.mp4
+          if-no-files-found: error

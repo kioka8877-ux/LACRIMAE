@@ -1,0 +1,36 @@
+name: dev9 F00-F Ranking
+
+on:
+  workflow_dispatch:
+    inputs:
+      clips_artifact:
+        description: 'Nom de l’artifact produit par F00-E'
+        required: true
+        default: 'dev9-f00e-clips'
+      request_path:
+        description: 'Chemin de la requête Ranking dans le dépôt'
+        required: true
+        default: 'F00_INGEST/IN/ranking_request.example.json'
+
+jobs:
+  ranking:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Télécharger l’artifact F00-E
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.clips_artifact }}
+          path: artifacts/f00e
+      - name: Préparer le manifeste Ranking
+        run: |
+          python3 F00_INGEST/CODEBASE/f00_ranking.py \
+            --clips-manifest artifacts/f00e/reveal_sources.json \
+            --request "${{ inputs.request_path }}" \
+            --out artifacts/f00f
+      - name: Publier l’artifact F00-F
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev9-f00f-ranking
+          path: artifacts/f00f
+          if-no-files-found: error

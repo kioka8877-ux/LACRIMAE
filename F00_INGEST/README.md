@@ -116,3 +116,16 @@ python3 CODEBASE/f00_reveal.py \\
 ```
 
 Le flux dev8 est donc `F00-E → F00-MUSIC → F03 Preview → F04`. F00-C et F00-D restent optionnels et séparés.
+
+## F00-F — Ranking/Narration (dev9)
+
+F00-F prépare les entrées éditoriales du classement à partir des clips produits par F00-E, sans modifier F00-E. Il valide les rangs, les durées, les positions, l’échelle, les labels, les styles de texte et les SFX facultatifs, puis produit `ranking_manifest.json` et `ranking_report.json`.
+
+```bash
+python3 CODEBASE/f00_ranking.py \
+  --clips-manifest artifacts/f00e/reveal_sources.json \
+  --request IN/ranking_request.example.json \
+  --out artifacts/f00f
+```
+
+F00-F accepte jusqu’à dix rangs et marque le rang 1 comme `final_rank`. Il ne construit ni la Preview ni la narration complète. F03 conserve la responsabilité de l’assemblage, des ajustements opérateur et du codex final. Les SFX sont optionnels et peuvent être activés indépendamment pour chaque rang.
