@@ -2,7 +2,7 @@
 
 ## Objectif
 
-La branche `dev8` ajoute le format narratif **Others vs This One** sans modifier le flux de production stable de `dev7`. Une compilation utilise jusqu’à six sources vidéo : les cinq premières alimentent la comparaison `OTHERS`, et la sixième constitue le `THIS ONE` / `Final Reveal`.
+La branche `dev8` ajoute le format narratif **Others vs This One** sans modifier le flux de production stable de `dev7`. Une compilation utilise jusqu’à six sources vidéo : les clips précédents alimentent la comparaison `OTHERS`, et le dernier constitue le `THIS ONE` / `Final Reveal`.
 
 ## Flux officiel
 
@@ -20,7 +20,7 @@ F00-E extrait et prépare les clips. F00-MUSIC analyse l’audio. F03 est la seu
 
 ## F00-E
 
-Entrée : un fichier JSON contenant une liste de une à six sources. Chaque source définit `id`, `source`, `in_seconds`, `out_seconds`, `mirror` et `fit_mode` (`crop` ou `blur`). La sixième source est marquée `role: final_reveal`.
+Entrée : un fichier JSON contenant une liste de trois à six sources. Chaque source définit `id`, `source`, `in_seconds`, `out_seconds`, `mirror` et `fit_mode` (`crop` ou `blur`). Le dernier clip est marqué `role: final_reveal` (automatique ou explicite).
 
 Pour chaque source, l’ordre des opérations est : source originale, découpe IN/OUT opérateur, extraction muette du clip, miroir horizontal éventuel, préparation verticale et validation. Le miroir est une inversion gauche-droite et s’applique au clip vidéo uniquement ; les textes de F03 ne sont jamais inversés.
 
@@ -56,10 +56,10 @@ F04 reçoit le codex validé, le manifeste Reveal, les clips préparés et la pi
 
 | Gate | Vérification |
 |---|---|
-| A | F00-E accepte au maximum six sources et rejette les plages IN/OUT invalides |
+| A | F00-E accepte de trois à six sources et rejette les plages IN/OUT invalides |
 | B | Chaque clip est H.264, 1080×1920, 30 fps par défaut et lisible |
 | C | F00-MUSIC produit une timeline exploitable sans déplacer la décision de boucle hors de F03 |
-| D | F03 affiche les six sources, conserve les textes vides et recalcule les durées |
+| D | F03 affiche toutes les sources (3 à 6), conserve les textes vides et recalcule les durées |
 | E | La boucle audio est plus courte que chaque scène et couvre sa durée sans redémarrage global |
 | F | Les transitions alternent SFX/silence et le click reste limité au démarrage |
 | G | F04 rend le même ordre, les mêmes durées et le même reveal que la Preview |

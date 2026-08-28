@@ -105,9 +105,9 @@ Le résultat est `OUT/hybrid/hybrid_manifest.json`, accompagné de `intro/intro.
 
 ## F00-E Reveal Clip Prep (dev8)
 
-F00-E reçoit directement une requête de une à six sources avec les plages IN/OUT choisies par l’opérateur. Pour chaque source, il extrait le clip, applique le miroir horizontal éventuel après la découpe, puis normalise la sortie en 1080×1920 H.264 sans audio. Le mode `crop` remplit le cadre vertical ; le mode `blur` conserve l’image complète avec un fond agrandi et flouté.
+F00-E reçoit directement une requête de trois à six sources avec les plages IN/OUT choisies par l’opérateur. Pour chaque source, il extrait le clip, applique le miroir horizontal éventuel après la découpe, puis normalise la sortie en 1080×1920 H.264 sans audio. Le mode `crop` remplit le cadre vertical ; le mode `blur` conserve l’image complète avec un fond agrandi et flouté.
 
-F00-E écrit `clips/*.mp4`, `reveal_sources.json` et `reveal_report.json`. Il ne gère ni narration, ni boucle musicale, ni transitions, ni SFX. Ces décisions appartiennent à F03 Preview. Le sixième clip est identifié comme `final_reveal` dans le manifeste.
+F00-E écrit `clips/*.mp4`, `reveal_sources.json` et `reveal_report.json`. Il ne gère ni narration, ni boucle musicale, ni transitions, ni SFX. Ces décisions appartiennent à F03 Preview. Le dernier clip est identifié comme `final_reveal` dans le manifeste.
 
 ```bash
 python3 CODEBASE/f00_reveal.py \\

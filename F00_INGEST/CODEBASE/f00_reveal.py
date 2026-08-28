@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """F00-E REVEAL CLIP PREP.
 
-Prépare jusqu'à six clips pour le format Others vs This One.
+Prépare de trois à six clips pour le format Others vs This One.
 F00-E ne construit ni narration ni montage : il extrait chaque plage IN/OUT,
 applique le miroir éventuel, normalise le cadre vertical et produit un manifeste
 consommable par F03 Preview.
@@ -92,7 +92,7 @@ def normalize_source_row(row: dict, index: int, base_dir: Path | None = None) ->
         "fit_mode": str(row.get("fit_mode") or "crop"),
         "focal_x": float(row.get("focal_x", 50)),
         "focal_y": float(row.get("focal_y", 50)),
-        "role": "final_reveal" if index == 6 or row.get("final_reveal") else "other",
+        "role": "final_reveal" if index == len(rows) or row.get("final_reveal") else "other",
     }
 
 
@@ -107,6 +107,8 @@ def main() -> int:
     rows = request.get("sources")
     if not isinstance(rows, list) or not rows:
         raise ValueError("request.sources doit être une liste non vide")
+    if len(rows) < 3:
+        raise ValueError("F00-E nécessite au minimum trois sources")
     if len(rows) > 6:
         raise ValueError("F00-E accepte au maximum six sources")
 
