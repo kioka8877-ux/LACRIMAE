@@ -23,13 +23,13 @@ git pull origin dev7
 |---|---|---|---|
 | `main` | `6fd0de2` | Base historique stable | Ne pas modifier pour reprendre les tests |
 | `dev4` | `5c7d7a0` | Pipeline historique et normalisation YouTube | Référence historique |
-| `dev7` | `edbc24b` + commit de continuité à venir | Production Hybrid et Audio Timeline v2 | Tester ou poursuivre le run réel après lecture de ce fichier |
+| `dev7` | `c6f110d` | Production Hybrid et Audio Timeline v2 | Tester ou poursuivre le run réel après lecture de ce fichier |
 | `dev8` | `159f264` | Reveal Compilation | Premier test réel avec six clips |
 | `dev9` | `8b181fe` | Ranking | Premier test réel avec six rangs |
 
 ## 3. Travail déjà effectué
 
-Dev7 contient le pipeline F00–F06 stabilisé pour le mode Hybrid Narrative, avec Audio Timeline v2, intro en boucle, zone Match Cut indépendante, DROP/FIN, transitions audio, Preview F03 et parité PICTOR/F04. Les assets locaux de test Stan Lee et Avengers ont été utilisés pour une production réelle, mais les fichiers de run doivent être récupérés séparément s’ils ne figurent pas dans l’arbre Git.
+Dev7 contient le pipeline F00–F06 stabilisé pour le mode Hybrid Narrative, avec Audio Timeline v2, intro en boucle, zone Match Cut indépendante, DROP/FIN, transitions audio, Preview F03 et parité PICTOR/F04. Les assets locaux de test Stan Lee et Avengers utilisés pour la production réelle sont maintenant commités sur dev7 avec leur inventaire SHA-256 ; vérifier le manifest avant réutilisation.
 
 Dev8 a été créé depuis dev7 pour le format Reveal Compilation. Dev9 a été créé depuis dev8 pour le format Ranking. Ces branches sont déjà poussées sur GitHub et possèdent leurs propres documents de référence.
 
@@ -46,7 +46,7 @@ Dev8 a été créé depuis dev7 pour le format Reveal Compilation. Dev9 a été 
 
 1. Vérifier le commit distant dev7 et lire `TRACKING/BRANCH_STATUS.md`.
 2. Vérifier les checksums dans `TRACKING/ASSET_MANIFEST.sha256`.
-3. Restaurer les artifacts dev7 nécessaires depuis le paquet ou la Release indiquée dans `TRACKING/TRANSFER_LOG.md`.
+3. Restaurer les artifacts dev7 nécessaires directement depuis le checkout GitHub et vérifier `TRACKING/ASSET_MANIFEST.sha256`.
 4. Lancer uniquement la Preview ou le gate demandé par l’opérateur.
 5. Pour dev8 : F00-E → F00-MUSIC → F03 → codex → F04.
 6. Pour dev9 : F00-E → F00-F → F00-MUSIC → F03 Ranking → codex → F04.
@@ -54,7 +54,7 @@ Dev8 a été créé depuis dev7 pour le format Reveal Compilation. Dev9 a été 
 
 ## 6. Règles de récupération
 
-Ne pas transférer `node_modules`, caches, binaires Chromium, logs temporaires ou secrets. Les vidéos et ZIP volumineux doivent être publiés comme artifacts GitHub Actions ou assets de Release avec un checksum, et non ajoutés aveuglément à l’historique Git.
+Ne pas transférer `node_modules`, caches, binaires Chromium, logs temporaires ou secrets. Les vidéos et ZIP volumineux déjà présents sur dev7 sont couverts par le manifest et restent volontairement vérifiables par checksum ; les futurs fichiers volumineux devront plutôt être publiés comme artifacts GitHub Actions ou assets de Release.
 
 ## 7. Fichiers clés
 
