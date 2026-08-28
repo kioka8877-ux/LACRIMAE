@@ -634,7 +634,7 @@ export default function App() {
                     <label style={styles.label}>Texte fixe</label>
                     <input
                       style={styles.input}
-                      value={session.hybrid?.intro_text?.text || "C'EST JUSTE UN JOUEUR"}
+                      value={session.hybrid?.intro_text?.text ?? "C'EST JUSTE UN JOUEUR"}
                       onChange={(e) => updateSession('hybrid', 'intro_text', { ...(session.hybrid?.intro_text || {}), text: e.target.value })}
                     />
                     <label style={styles.label}>Durée de la phrase</label>
@@ -654,14 +654,14 @@ export default function App() {
                   <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid #4a3920' }}>
                     <label style={{ ...styles.label, color: '#ffcc66' }}>EGO — texte d’impact</label>
                     <label style={styles.label}>Texte EGO</label>
-                    <input style={styles.input} value={session.hybrid?.ego?.text || 'EGO'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), text: e.target.value })} />
+                    <input style={styles.input} value={session.hybrid?.ego?.text ?? 'EGO'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), text: e.target.value })} />
                     <label style={styles.label}>Durée EGO</label>
                     <select style={styles.select} value={session.hybrid?.ego?.duration_mode || 'until_match_cut'} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), duration_mode: e.target.value })}>
                       <option value="until_match_cut">À partir du Match Cut</option>
                       <option value="until_end">À partir du Match Cut jusqu’à la fin</option>
                     </select>
                     <label style={styles.label}>Scale EGO : {(session.hybrid?.ego?.scale ?? 2).toFixed(1)}×</label>
-                    <input style={styles.slider} type="range" min="1" max="10" step="0.1" value={session.hybrid?.ego?.scale ?? 2} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), scale: parseFloat(e.target.value) })} />
+                    <input style={styles.slider} type="range" min="0.2" max="10" step="0.1" value={session.hybrid?.ego?.scale ?? 2} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), scale: parseFloat(e.target.value) })} />
                     <label style={styles.label}>Hauteur EGO : {session.hybrid?.ego?.position_y ?? 50}%</label>
                     <input style={styles.slider} type="range" min="0" max="100" step="1" value={session.hybrid?.ego?.position_y ?? 50} onChange={(e) => updateSession('hybrid', 'ego', { ...(session.hybrid?.ego || {}), position_y: parseInt(e.target.value, 10) })} />
                     <label style={styles.label}>Angle EGO : {session.hybrid?.ego?.rotation_deg ?? 0}°</label>

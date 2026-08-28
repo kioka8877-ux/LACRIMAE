@@ -1,0 +1,11 @@
+{
+  "status": "ok",
+  "stage": "F00-D_HYBRID_EGO",
+  "mode": "hybrid_narrative",
+  "intro_frames": 210,
+  "matchcut_frames": 900,
+  "total_frames": 1110,
+  "duration_seconds": 37.0,
+  "sequence_count": 129,
+  "manifest": "F00_INGEST/OUT/hybrid/hybrid_manifest.json"
+}

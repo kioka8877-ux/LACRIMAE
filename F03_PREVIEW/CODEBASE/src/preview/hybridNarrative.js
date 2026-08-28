@@ -1,7 +1,7 @@
 function normalizeHybridText(value, fallback, defaultScale, minScale = 1) {
   const text = value || {};
   return {
-    text: String(text.text || fallback).toUpperCase(),
+    text: String(text.text ?? fallback).toUpperCase(),
     duration_mode: text.duration_mode || 'until_match_cut',
     start_frame: Math.max(0, Number(text.start_frame) || 0),
     duration_frames: Math.max(1, Number(text.duration_frames) || 1),
@@ -63,7 +63,7 @@ export function normalizeHybridManifest(manifest, session = {}, musicTimeline = 
   const matchCutFrames = Math.max(0, declaredMatchCutFrames || declaredTotalFrames - introFrames);
   const totalFrames = Math.max(introFrames + matchCutFrames, declaredTotalFrames);
   const introText = normalizeHybridText(source.intro_text, "C'EST JUSTE UN JOUEUR", 1, 0.2);
-  const egoBase = normalizeHybridText(source.ego, 'EGO', 2);
+  const egoBase = normalizeHybridText(source.ego, 'EGO', 2, 0.2);
   const egoStartFrame = introFrames;
   const egoDuration = egoBase.duration_mode === 'until_end'
     ? Math.max(1, totalFrames - egoStartFrame)

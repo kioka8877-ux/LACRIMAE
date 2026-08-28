@@ -1,0 +1,8 @@
+{
+  "status": "ok",
+  "stage": "F00-B_EXTRACT",
+  "sequence_count": 129,
+  "rejected_count": 0,
+  "manifest": "F00_INGEST/OUT/materialized/sequences.json",
+  "directory": "F00_INGEST/OUT/materialized/sequences"
+}

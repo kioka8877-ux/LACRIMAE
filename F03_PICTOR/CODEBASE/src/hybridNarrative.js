@@ -1,7 +1,7 @@
 function normalizeHybridText(value, fallback, defaultScale, minScale = 1) {
   const text = value || {};
   return {
-    text: String(text.text || fallback).toUpperCase(),
+    text: String(text.text ?? fallback).toUpperCase(),
     duration_mode: text.duration_mode || 'until_match_cut',
     start_frame: Math.max(0, Number(text.start_frame) || 0),
     duration_frames: Math.max(1, Number(text.duration_frames) || 1),

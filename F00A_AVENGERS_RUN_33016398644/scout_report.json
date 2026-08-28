@@ -1,0 +1,7 @@
+{
+  "status": "ok",
+  "stage": "F00-A_SCOUT",
+  "candidate_count": 258,
+  "sequence_count": 129,
+  "plan": "F00_INGEST/OUT/scout/sequences_plan.json"
+}

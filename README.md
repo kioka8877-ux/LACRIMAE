@@ -1,8 +1,8 @@
-# LACRIMAE — dev4
+# LACRIMAE — dev7
 
 > *For the Angel's Tears shall become gold.*
 
-LACRIMAE dev4 est un pipeline de production de Shorts verticaux basé sur une vidéo source. La vidéo de travail reste une source visuelle muette ; le moteur fabrique le montage Fast Match Cut à partir de références de frames, sans exporter un fichier pour chaque séquence.
+LACRIMAE dev7 est le pipeline de production Hybrid et Audio Timeline v2 basé sur une vidéo source. La vidéo de travail reste une source visuelle muette ; le moteur fabrique le montage Fast Match Cut à partir de références de frames, sans exporter un fichier pour chaque séquence.
 
 ## Flux principal
 
@@ -124,7 +124,7 @@ Le workflow de rendu compatible est `.github/workflows/dev4_f04_hybrid.yml`. Il 
 
 ## Suivi
 
-Le rapport d’implémentation se trouve dans [`TRACKING/DEV4_PHASE1_REPORT.md`](TRACKING/DEV4_PHASE1_REPORT.md). Le journal de campagne est disponible dans [`TRACKING/LACRIMAE_CAMPAIGN_LOG.md`](TRACKING/LACRIMAE_CAMPAIGN_LOG.md).
+Le point de reprise obligatoire se trouve dans [`TRACKING/TODO_CONTINUATION.md`](TRACKING/TODO_CONTINUATION.md). La passation datée est disponible dans [`TRACKING/HANDOVER_2026-08-28.md`](TRACKING/HANDOVER_2026-08-28.md). Le registre des transferts est disponible dans [`TRACKING/TRANSFER_LOG.md`](TRACKING/TRANSFER_LOG.md), et le statut des branches dans [`TRACKING/BRANCH_STATUS.md`](TRACKING/BRANCH_STATUS.md). Les anciens rapports dev4 restent disponibles dans le dossier `TRACKING/` comme historique.
 
 ## Composition configurable et rotation
 
