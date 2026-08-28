@@ -70,7 +70,7 @@ def build_filter(fit_mode: str, mirror: bool) -> str:
     )
 
 
-def normalize_source_row(row: dict, index: int, base_dir: Path | None = None) -> dict:
+def normalize_source_row(row: dict, index: int, total: int, base_dir: Path | None = None) -> dict:
     raw_source = Path(row.get("source", "")).expanduser()
     if base_dir is not None and not raw_source.is_absolute():
         raw_source = base_dir / raw_source
@@ -92,7 +92,7 @@ def normalize_source_row(row: dict, index: int, base_dir: Path | None = None) ->
         "fit_mode": str(row.get("fit_mode") or "crop"),
         "focal_x": float(row.get("focal_x", 50)),
         "focal_y": float(row.get("focal_y", 50)),
-        "role": "final_reveal" if index == len(rows) or row.get("final_reveal") else "other",
+        "role": "final_reveal" if index == total or row.get("final_reveal") else "other",
     }
 
 
@@ -118,7 +118,7 @@ def main() -> int:
     outputs: list[dict] = []
 
     for index, raw in enumerate(rows, 1):
-        row = normalize_source_row(raw, index, args.request.parent)
+        row = normalize_source_row(raw, index, len(rows), args.request.parent)
         source_path = Path(row["source"])
         source_meta = probe(source_path)
         source_fps = parse_fps(source_meta.get("fps"))
