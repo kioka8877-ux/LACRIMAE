@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gatsby.contracts.guest",
+  "title": "Gatsby Guest",
+  "type": "object",
+  "required": ["id", "first_name", "last_name", "phone", "table_number", "is_scanned"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "first_name": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "last_name": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "phone": { "type": "string", "maxLength": 30 },
+    "table_number": { "type": "string", "maxLength": 80 },
+    "is_scanned": { "type": "boolean" },
+    "scanned_at": { "type": ["string", "null"], "format": "date-time" },
+    "event_id": { "type": "string", "format": "uuid" }
+  },
+  "additionalProperties": false
+}

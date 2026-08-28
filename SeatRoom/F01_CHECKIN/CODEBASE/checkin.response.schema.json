@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gatsby.contracts.checkin.response",
+  "title": "Gatsby Check-in Response",
+  "type": "object",
+  "required": ["status", "message", "trace_id"],
+  "properties": {
+    "status": { "enum": ["SUCCESS", "ALREADY_SCANNED", "INVALID", "ERROR"] },
+    "message": { "type": "string" },
+    "trace_id": { "type": "string" },
+    "guest_id": { "type": ["string", "null"] },
+    "name": { "type": ["string", "null"] },
+    "table": { "type": ["string", "null"] },
+    "scanned_at": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": false
+}
