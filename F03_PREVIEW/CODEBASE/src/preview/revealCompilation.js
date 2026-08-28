@@ -1,9 +1,33 @@
+const DEFAULT_TEXT_STYLE = {
+  scale: 1.0,
+  pos_v: 50,
+  pos_h: 50,
+  color_1: '#ffffff',
+  color_2: null,
+  dual_color: false,
+};
+
+const DEFAULT_WATERMARK = {
+  text: '',
+  scale: 1.0,
+  pos_v: 90,
+  pos_h: 50,
+  opacity: 0.3,
+};
+
 const DEFAULT_NARRATIVE = {
   theme: 'REVEAL COMPILATION',
   others_label: 'OTHERS',
   this_one_label: 'THIS ONE',
   transition_text: '',
   final_text: '',
+  speed: 1.0,
+  theme_style: { ...DEFAULT_TEXT_STYLE },
+  others_style: { ...DEFAULT_TEXT_STYLE },
+  this_one_style: { ...DEFAULT_TEXT_STYLE },
+  transition_style: { ...DEFAULT_TEXT_STYLE },
+  final_style: { ...DEFAULT_TEXT_STYLE },
+  watermark: { ...DEFAULT_WATERMARK },
 };
 
 const DEFAULT_REVEAL = {
@@ -27,6 +51,10 @@ export function normalizeRevealManifest(value = {}, fps = 30, totalFrames = 300)
         duration_seconds: Number(source.duration_seconds || fallbackDuration / Math.max(1, sourceRows.length)),
         transition: index % 2 === 0 ? 'with_sfx' : 'silent',
         motion: { preset: index % 2 === 0 ? 'drift_left' : 'drift_right', intensity: 0.35 },
+        rotation_deg: 0,
+        video_scale: 1.0,
+        pos_h: 50,
+        pos_v: 50,
       }));
   let cursor = 0;
   const normalizedScenes = scenes.map((scene, index) => {
@@ -45,6 +73,10 @@ export function normalizeRevealManifest(value = {}, fps = 30, totalFrames = 300)
       transition: scene.transition === 'silent' ? 'silent' : 'with_sfx',
       final_reveal: isFinal,
       motion: { preset: 'none', intensity: 0.25, ...(scene.motion || {}) },
+      rotation_deg: Number(scene.rotation_deg ?? 0),
+      video_scale: Number(scene.video_scale ?? 1.0),
+      pos_h: Number(scene.pos_h ?? 50),
+      pos_v: Number(scene.pos_v ?? 50),
     };
     cursor += durationFrames;
     return normalized;

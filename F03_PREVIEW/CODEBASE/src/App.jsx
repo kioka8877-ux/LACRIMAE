@@ -219,6 +219,10 @@ export default function App() {
   const updateRevealNarrative = (key, value) => {
     updateReveal({ narrative: { ...(revealManifest?.narrative || {}), [key]: value } });
   };
+  const updateRevealNarrativeStyle = (styleKey, prop, value) => {
+    const current = revealManifest?.narrative?.[styleKey] || {};
+    updateReveal({ narrative: { ...(revealManifest?.narrative || {}), [styleKey]: { ...current, [prop]: value } } });
+  };
   const updateRevealSource = (index, key, value) => {
     const sources = [...(revealManifest?.sources || [])];
     sources[index] = { ...(sources[index] || {}), [key]: value };
@@ -639,16 +643,105 @@ export default function App() {
               <div style={{ color: '#aaa', fontSize: 12, lineHeight: 1.45 }}>
                 F00-E prépare les clips. Ici, F03 construit la compilation : textes, ordre, durées, transitions et reveal final.
               </div>
-              <label style={styles.label}>Thème</label>
-              <input style={styles.input} value={revealManifest?.narrative?.theme ?? ''} onChange={(e) => updateRevealNarrative('theme', e.target.value)} placeholder="CAMOUFLAGE" />
-              <label style={styles.label}>Texte OTHERS</label>
-              <input style={styles.input} value={revealManifest?.narrative?.others_label ?? ''} onChange={(e) => updateRevealNarrative('others_label', e.target.value)} placeholder="OTHERS" />
-              <label style={styles.label}>Texte THIS ONE</label>
-              <input style={styles.input} value={revealManifest?.narrative?.this_one_label ?? ''} onChange={(e) => updateRevealNarrative('this_one_label', e.target.value)} placeholder="THIS ONE" />
-              <label style={styles.label}>Texte de transition</label>
-              <input style={styles.input} value={revealManifest?.narrative?.transition_text ?? ''} onChange={(e) => updateRevealNarrative('transition_text', e.target.value)} placeholder="WAIT FOR THIS ONE" />
-              <label style={styles.label}>Texte final</label>
-              <input style={styles.input} value={revealManifest?.narrative?.final_text ?? ''} onChange={(e) => updateRevealNarrative('final_text', e.target.value)} placeholder="" />
+              <div style={{ marginTop: 6, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>Thème</label>
+                <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.theme ?? ''} onChange={(e) => updateRevealNarrative('theme', e.target.value)} placeholder="CAMOUFLAGE" />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Taille : {(revealManifest?.narrative?.theme_style?.scale ?? 1).toFixed(1)}x</label>
+                <input style={{ ...styles.slider }} type="range" min="0.5" max="5" step="0.1" value={revealManifest?.narrative?.theme_style?.scale ?? 1} onChange={(e) => updateRevealNarrativeStyle('theme_style', 'scale', parseFloat(e.target.value))} />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Pos V : {Math.round(revealManifest?.narrative?.theme_style?.pos_v ?? 50)}%</label>
+                <input style={{ ...styles.slider }} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.theme_style?.pos_v ?? 50} onChange={(e) => updateRevealNarrativeStyle('theme_style', 'pos_v', parseInt(e.target.value))} />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Pos H : {Math.round(revealManifest?.narrative?.theme_style?.pos_h ?? 50)}%</label>
+                <input style={{ ...styles.slider }} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.theme_style?.pos_h ?? 50} onChange={(e) => updateRevealNarrativeStyle('theme_style', 'pos_h', parseInt(e.target.value))} />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur :</label>
+                  <input type="color" value={revealManifest?.narrative?.theme_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('theme_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: '#888', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={revealManifest?.narrative?.theme_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('theme_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66' }} />
+                    2 couleurs
+                  </label>
+                  {revealManifest?.narrative?.theme_style?.dual_color && <input type="color" value={revealManifest?.narrative?.theme_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('theme_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                </div>
+              </div>
+              <div style={{ marginTop: 6, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>Texte OTHERS</label>
+                <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.others_label ?? ''} onChange={(e) => updateRevealNarrative('others_label', e.target.value)} placeholder="OTHERS" />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Taille : {(revealManifest?.narrative?.others_style?.scale ?? 1).toFixed(1)}x</label>
+                <input style={{ ...styles.slider }} type="range" min="0.5" max="5" step="0.1" value={revealManifest?.narrative?.others_style?.scale ?? 1} onChange={(e) => updateRevealNarrativeStyle('others_style', 'scale', parseFloat(e.target.value))} />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Pos V : {Math.round(revealManifest?.narrative?.others_style?.pos_v ?? 50)}%</label>
+                <input style={{ ...styles.slider }} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.others_style?.pos_v ?? 50} onChange={(e) => updateRevealNarrativeStyle('others_style', 'pos_v', parseInt(e.target.value))} />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Pos H : {Math.round(revealManifest?.narrative?.others_style?.pos_h ?? 50)}%</label>
+                <input style={{ ...styles.slider }} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.others_style?.pos_h ?? 50} onChange={(e) => updateRevealNarrativeStyle('others_style', 'pos_h', parseInt(e.target.value))} />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur :</label>
+                  <input type="color" value={revealManifest?.narrative?.others_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('others_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: '#888', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={revealManifest?.narrative?.others_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('others_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66' }} />
+                    2 couleurs
+                  </label>
+                  {revealManifest?.narrative?.others_style?.dual_color && <input type="color" value={revealManifest?.narrative?.others_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('others_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                </div>
+              </div>
+              <div style={{ marginTop: 6, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>Texte THIS ONE</label>
+                <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.this_one_label ?? ''} onChange={(e) => updateRevealNarrative('this_one_label', e.target.value)} placeholder="THIS ONE" />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Taille : {(revealManifest?.narrative?.this_one_style?.scale ?? 1).toFixed(1)}x</label>
+                <input style={{ ...styles.slider }} type="range" min="0.5" max="5" step="0.1" value={revealManifest?.narrative?.this_one_style?.scale ?? 1} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'scale', parseFloat(e.target.value))} />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Pos V : {Math.round(revealManifest?.narrative?.this_one_style?.pos_v ?? 50)}%</label>
+                <input style={{ ...styles.slider }} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.this_one_style?.pos_v ?? 50} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'pos_v', parseInt(e.target.value))} />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Pos H : {Math.round(revealManifest?.narrative?.this_one_style?.pos_h ?? 50)}%</label>
+                <input style={{ ...styles.slider }} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.this_one_style?.pos_h ?? 50} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'pos_h', parseInt(e.target.value))} />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur :</label>
+                  <input type="color" value={revealManifest?.narrative?.this_one_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: '#888', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={revealManifest?.narrative?.this_one_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66' }} />
+                    2 couleurs
+                  </label>
+                  {revealManifest?.narrative?.this_one_style?.dual_color && <input type="color" value={revealManifest?.narrative?.this_one_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                </div>
+              </div>
+              <div style={{ marginTop: 6, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>Texte de transition</label>
+                <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.transition_text ?? ''} onChange={(e) => updateRevealNarrative('transition_text', e.target.value)} placeholder="WAIT FOR THIS ONE" />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Taille : {(revealManifest?.narrative?.transition_style?.scale ?? 1).toFixed(1)}x</label>
+                <input style={{ ...styles.slider }} type="range" min="0.5" max="5" step="0.1" value={revealManifest?.narrative?.transition_style?.scale ?? 1} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'scale', parseFloat(e.target.value))} />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Pos V : {Math.round(revealManifest?.narrative?.transition_style?.pos_v ?? 50)}%</label>
+                <input style={{ ...styles.slider }} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.transition_style?.pos_v ?? 50} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'pos_v', parseInt(e.target.value))} />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Pos H : {Math.round(revealManifest?.narrative?.transition_style?.pos_h ?? 50)}%</label>
+                <input style={{ ...styles.slider }} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.transition_style?.pos_h ?? 50} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'pos_h', parseInt(e.target.value))} />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur :</label>
+                  <input type="color" value={revealManifest?.narrative?.transition_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: '#888', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={revealManifest?.narrative?.transition_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66' }} />
+                    2 couleurs
+                  </label>
+                  {revealManifest?.narrative?.transition_style?.dual_color && <input type="color" value={revealManifest?.narrative?.transition_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                </div>
+              </div>
+              <div style={{ marginTop: 6, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>Texte final</label>
+                <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.final_text ?? ''} onChange={(e) => updateRevealNarrative('final_text', e.target.value)} placeholder="" />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Taille : {(revealManifest?.narrative?.final_style?.scale ?? 1).toFixed(1)}x</label>
+                <input style={{ ...styles.slider }} type="range" min="0.5" max="5" step="0.1" value={revealManifest?.narrative?.final_style?.scale ?? 1} onChange={(e) => updateRevealNarrativeStyle('final_style', 'scale', parseFloat(e.target.value))} />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Pos V : {Math.round(revealManifest?.narrative?.final_style?.pos_v ?? 50)}%</label>
+                <input style={{ ...styles.slider }} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.final_style?.pos_v ?? 50} onChange={(e) => updateRevealNarrativeStyle('final_style', 'pos_v', parseInt(e.target.value))} />
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Pos H : {Math.round(revealManifest?.narrative?.final_style?.pos_h ?? 50)}%</label>
+                <input style={{ ...styles.slider }} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.final_style?.pos_h ?? 50} onChange={(e) => updateRevealNarrativeStyle('final_style', 'pos_h', parseInt(e.target.value))} />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur :</label>
+                  <input type="color" value={revealManifest?.narrative?.final_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('final_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: '#888', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={revealManifest?.narrative?.final_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('final_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66' }} />
+                    2 couleurs
+                  </label>
+                  {revealManifest?.narrative?.final_style?.dual_color && <input type="color" value={revealManifest?.narrative?.final_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('final_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                </div>
+              </div>
+              <div style={{ marginTop: 8, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>⚡ Vitesse : {(revealManifest?.narrative?.speed ?? 1).toFixed(2)}x</label>
+                <input style={styles.slider} type="range" min="0.5" max="4" step="0.05" value={revealManifest?.narrative?.speed ?? 1} onChange={(e) => updateRevealNarrative('speed', parseFloat(e.target.value))} />
+              </div>
               <div style={{ marginTop: 8, paddingTop: 10, borderTop: '1px solid #4a3920' }}>
                 <label style={{ ...styles.label, color: '#ffcc66' }}>SOURCES ET SCÈNES</label>
                 {(activeReveal?.sources || revealManifest?.sources || []).map((source, index) => {
@@ -675,6 +768,16 @@ export default function App() {
                         <option value="drift_up">Mouvement : drift haut</option>
                         <option value="drift_down">Mouvement : drift bas</option>
                       </select>
+                      <div style={{ marginTop: 6, paddingTop: 5, borderTop: '1px solid #222' }}>
+                        <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Rotation : {scene.rotation_deg ?? 0}°</label>
+                        <input style={styles.slider} type="range" min="-180" max="180" step="1" value={scene.rotation_deg ?? 0} onChange={(e) => updateRevealScene(index, 'rotation_deg', parseInt(e.target.value))} />
+                        <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Échelle : {(scene.video_scale ?? 1).toFixed(2)}×</label>
+                        <input style={styles.slider} type="range" min="0.2" max="3" step="0.05" value={scene.video_scale ?? 1} onChange={(e) => updateRevealScene(index, 'video_scale', parseFloat(e.target.value))} />
+                        <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Pos H : {Math.round(scene.pos_h ?? 50)}%</label>
+                        <input style={styles.slider} type="range" min="0" max="100" step="1" value={scene.pos_h ?? 50} onChange={(e) => updateRevealScene(index, 'pos_h', parseInt(e.target.value))} />
+                        <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Pos V : {Math.round(scene.pos_v ?? 50)}%</label>
+                        <input style={styles.slider} type="range" min="0" max="100" step="1" value={scene.pos_v ?? 50} onChange={(e) => updateRevealScene(index, 'pos_v', parseInt(e.target.value))} />
+                      </div>
                     </div>
                   );
                 })}
@@ -688,6 +791,19 @@ export default function App() {
                 <input style={styles.slider} type="range" min="0" max="100" step="1" value={revealManifest?.reveal?.shake_power ?? 85} onChange={(e) => updateReveal({ reveal: { ...(revealManifest?.reveal || {}), shake_power: parseInt(e.target.value, 10) } })} />
                 <label style={styles.label}>Durée du shake : {revealManifest?.reveal?.shake_duration_frames ?? 12} frames</label>
                 <input style={styles.slider} type="range" min="3" max="30" step="1" value={revealManifest?.reveal?.shake_duration_frames ?? 12} onChange={(e) => updateReveal({ reveal: { ...(revealManifest?.reveal || {}), shake_duration_frames: parseInt(e.target.value, 10) } })} />
+              </div>
+              <div style={{ marginTop: 8, paddingTop: 10, borderTop: '1px solid #4a3920' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>🏷️ WATERMARK</label>
+                <label style={styles.label}>Texte</label>
+                <input style={styles.input} value={revealManifest?.narrative?.watermark?.text ?? ''} onChange={(e) => updateRevealNarrative('watermark', { ...(revealManifest?.narrative?.watermark || {}), text: e.target.value })} placeholder="Votre watermark" />
+                <label style={styles.label}>Taille : {(revealManifest?.narrative?.watermark?.scale ?? 1).toFixed(1)}×</label>
+                <input style={styles.slider} type="range" min="0.3" max="3" step="0.1" value={revealManifest?.narrative?.watermark?.scale ?? 1} onChange={(e) => updateRevealNarrative('watermark', { ...(revealManifest?.narrative?.watermark || {}), scale: parseFloat(e.target.value) })} />
+                <label style={styles.label}>Pos V : {Math.round(revealManifest?.narrative?.watermark?.pos_v ?? 90)}%</label>
+                <input style={styles.slider} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.watermark?.pos_v ?? 90} onChange={(e) => updateRevealNarrative('watermark', { ...(revealManifest?.narrative?.watermark || {}), pos_v: parseInt(e.target.value) })} />
+                <label style={styles.label}>Pos H : {Math.round(revealManifest?.narrative?.watermark?.pos_h ?? 50)}%</label>
+                <input style={styles.slider} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.watermark?.pos_h ?? 50} onChange={(e) => updateRevealNarrative('watermark', { ...(revealManifest?.narrative?.watermark || {}), pos_h: parseInt(e.target.value) })} />
+                <label style={styles.label}>Opacité : {Math.round((revealManifest?.narrative?.watermark?.opacity ?? 0.3) * 100)}%</label>
+                <input style={styles.slider} type="range" min="0" max="1" step="0.05" value={revealManifest?.narrative?.watermark?.opacity ?? 0.3} onChange={(e) => updateRevealNarrative('watermark', { ...(revealManifest?.narrative?.watermark || {}), opacity: parseFloat(e.target.value) })} />
               </div>
             </div>
           )}
