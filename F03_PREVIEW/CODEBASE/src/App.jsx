@@ -217,11 +217,21 @@ export default function App() {
     });
   };
   const updateRevealNarrative = (key, value) => {
-    updateReveal({ narrative: { ...(revealManifest?.narrative || {}), [key]: value } });
+    setRevealManifest((curr) => {
+      const narr = curr?.narrative || {};
+      const next = { ...curr, narrative: { ...narr, [key]: value } };
+      setSession((s) => ({ ...s, reveal: next }));
+      return next;
+    });
   };
   const updateRevealNarrativeStyle = (styleKey, prop, value) => {
-    const current = revealManifest?.narrative?.[styleKey] || {};
-    updateReveal({ narrative: { ...(revealManifest?.narrative || {}), [styleKey]: { ...current, [prop]: value } } });
+    setRevealManifest((curr) => {
+      const narr = curr?.narrative || {};
+      const style = narr[styleKey] || {};
+      const next = { ...curr, narrative: { ...narr, [styleKey]: { ...style, [prop]: value } } };
+      setSession((s) => ({ ...s, reveal: next }));
+      return next;
+    });
   };
   const updateRevealSource = (index, key, value) => {
     const sources = [...(revealManifest?.sources || [])];
@@ -229,9 +239,13 @@ export default function App() {
     updateReveal({ sources });
   };
   const updateRevealScene = (index, key, value) => {
-    const scenes = [...(revealManifest?.scenes || [])];
-    scenes[index] = { ...(scenes[index] || {}), [key]: value };
-    updateReveal({ scenes });
+    setRevealManifest((curr) => {
+      const scenes = [...(curr?.scenes || [])];
+      scenes[index] = { ...(scenes[index] || {}), [key]: value };
+      const next = { ...curr, scenes };
+      setSession((s) => ({ ...s, reveal: next }));
+      return next;
+    });
   };
   const updateMusic = (key, value) => {
     const next = normalizeMusicTimeline({ ...music, [key]: value }, fps, totalFrames);
