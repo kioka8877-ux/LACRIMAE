@@ -1,12 +1,7 @@
-name: DEV8 — F04 Render Only
+name: DEV8 — F04 Render Only (assets in repo)
 
 on:
   workflow_dispatch:
-    inputs:
-      reason:
-        description: 'Why re-render?'
-        required: false
-        type: string
 
 jobs:
   render:
@@ -14,6 +9,8 @@ jobs:
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - uses: actions/setup-node@v4
         with:
@@ -24,23 +21,25 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
 
-      - name: Verify assets in repo
-        run: |
-          echo "=== Assets ==="
-          ls -lh F03_PREVIEW/CODEBASE/public/clips/
-          ls -lh F03_PREVIEW/CODEBASE/public/audio/
-          ls -lh F03_PREVIEW/CODEBASE/public/codex.json
-          ls -lh F03_PREVIEW/CODEBASE/public/reveal_sources.json
-
-      - name: Install & Build F03
+      - name: Verify assets
         working-directory: F03_PREVIEW/CODEBASE
         run: |
-          npm ci
-          npm run build
+          echo "=== public/ ==="
+          ls -lh public/
+          echo "=== public/clips/ ==="
+          ls -lh public/clips/
+          echo "=== public/audio/ ==="
+          ls -lh public/audio/
+          echo "=== Total size ==="
+          du -sh public/
+
+      - name: Install F03
+        working-directory: F03_PREVIEW/CODEBASE
+        run: npm ci
 
       - name: Render MP4 (F04)
         working-directory: F03_PREVIEW/CODEBASE
-        run: npm run render
+        run: npx remotion render src/remotion/index.js LacrimaeShort out/short_final.mp4
 
       - name: Verify output
         run: |
@@ -49,7 +48,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: dev8-spiderman-render-${{ github.run_id }}
+          name: dev8-f04-render-${{ github.run_id }}
           path: F03_PREVIEW/CODEBASE/out/short_final.mp4
           if-no-files-found: error
           retention-days: 14
