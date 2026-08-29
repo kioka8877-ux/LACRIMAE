@@ -27,10 +27,9 @@ jobs:
           done
           ls -lh test_videos/
 
-      - name: F00-E — Clip Prep
+      - name: Create reveal request
         run: |
-          python3 F00_INGEST/CODEBASE/f00_reveal.py \
-            --request <(cat <<'REQEOF'
+          cat > /tmp/reveal_request.json << 'REQEOF'
           {
             "format": "reveal_compilation",
             "sources": [
@@ -41,7 +40,11 @@ jobs:
             ]
           }
           REQEOF
-          ) \
+
+      - name: F00-E — Clip Prep
+        run: |
+          python3 F00_INGEST/CODEBASE/f00_reveal.py \
+            --request /tmp/reveal_request.json \
             --out /tmp/dev9-f00e
 
       - name: F00-F — Ranking Prep
