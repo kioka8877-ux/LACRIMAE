@@ -58,8 +58,10 @@ def main() -> int:
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--app", default="lacrimae-dev6-video")
     parser.add_argument("--video-volume", default="lacrimae-dev6-video")
-    parser.add_argument("--profile", default="auto", choices=["auto", "fast", "balanced", "quality_ultimate", "cinematic_hyper_detail", "hdr_imperator", "realistic_aurea", "old_main_noctis"])
+    parser.add_argument("--profile", default="auto", choices=["auto", "fast", "balanced", "quality_ultimate", "cinematic_hyper_detail", "hdr_imperator", "realistic_aurea", "old_main_noctis", "viral_imperator"])
     parser.add_argument("--target-fps", type=int, default=120)
+    parser.add_argument("--compositing-preset", default=None,
+                        help="Preset F09 (clean_realistic, silver_gray, dark, warm, viral_hdr). Par défaut, mappé depuis le profil ATOM.")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
@@ -120,11 +122,54 @@ def main() -> int:
         }
         report_path = write_stage_report(base, stage, report)
         state["completed_stages"].append(stage)
-        state["artifacts"][stage] = str(report_path)
-        state["current_stage"] = "F10_CUSTOS_RESTITUTIO"
-        state["artifacts"]["latest_remote"] = output_uri
-        save_state(state_file, state)
-        current_input = output_uri
+        state["artifacts"][stage] = str(report_path)    state["current_stage"] = "F09_AETHER_COMPOSITUM"
+    state["artifacts"]["latest_remote"] = output_uri
+    save_state(state_file, state)
+    current_input = output_uri
+
+    # --- F09 AETHER COMPOSITUM (local FFmpeg compositing) ---
+    compositing_preset = args.compositing_preset
+    if not compositing_preset:
+        atom_config = Path("CONFIG/atom_ic_profiles.json")
+        if atom_config.is_file():
+            atom_data = json.loads(atom_config.read_text(encoding="utf-8"))
+            preset_map = atom_data.get("compositing_preset_map", {})
+            compositing_preset = preset_map.get(selected_profile, "clean_realistic")
+        else:
+            compositing_preset = "clean_realistic"
+
+    state["compositing_preset"] = compositing_preset
+    save_state(state_file, state)
+
+    # Télécharger le dernier résultat Modal pour F09
+    f09_input_local = base / "F09_AETHER_COMPOSITUM" / "input_for_aether.mp4"
+    f09_input_local.parent.mkdir(parents=True, exist_ok=True)
+    run(["modal", "volume", "get", args.video_volume, current_input, str(f09_input_local)], args.dry_run)
+
+    # Exécuter F09 localement
+    f09_output_dir = base / "F09_AETHER_COMPOSITUM"
+    f09_command = [
+        sys.executable, "F09_AETHER/CODEBASE/lac_f09_aether.py",
+        "--input", str(f09_input_local),
+        "--output", str(f09_output_dir),
+        "--preset", compositing_preset,
+    ]
+    f09_stdout = run(f09_command, args.dry_run)
+    f09_report = json.loads(f09_stdout.strip().splitlines()[-1]) if f09_stdout and f09_stdout.strip() else {
+        "status": "PLANNED", "stage": "F09_AETHER_COMPOSITUM",
+    }
+    f09_report_path = write_stage_report(base, "F09_AETHER_COMPOSITUM", f09_report)
+    state["completed_stages"].append("F09_AETHER_COMPOSITUM")
+    state["artifacts"]["F09_AETHER_COMPOSITUM"] = str(f09_report_path)
+    state["current_stage"] = "F10_CUSTOS_RESTITUTIO"
+    save_state(state_file, state)
+
+    # Upload du résultat F09 vers Modal pour F10
+    f09_output_file = f09_output_dir / f"aether_{compositing_preset}.mp4"
+    f09_remote_uri = f"{remote_root}/f09_aether_output.mp4"
+    if f09_output_file.is_file():
+        run(["modal", "volume", "put", args.video_volume, str(f09_output_file), f09_remote_uri], args.dry_run)
+        current_input = f09_remote_uri
 
     final_local = base / "F10_CUSTOS_RESTITUTIO" / f"{args.campaign_id}_final.mp4"
     final_local.parent.mkdir(parents=True, exist_ok=True)

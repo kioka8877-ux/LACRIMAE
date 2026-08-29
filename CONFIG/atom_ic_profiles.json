@@ -1,9 +1,18 @@
 {
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "default_profile": "hdr_imperator",
+  "compositing_preset_map": {
+    "cinematic_hyper_detail": "clean_realistic",
+    "hdr_imperator": "viral_hdr",
+    "realistic_aurea": "clean_realistic",
+    "old_main_noctis": "dark",
+    "viral_imperator": "viral_hdr",
+    "balanced": "clean_realistic"
+  },
   "profiles": {
     "cinematic_hyper_detail": {
       "description": "Profil historique ATOM-IC conservé pour compatibilité.",
+      "compositing_preset": "clean_realistic",
       "restaura": {"denoise_luma": 0.55, "denoise_chroma": 0.45, "unsharp_amount": 0.42, "unsharp_radius": 5},
       "textura": {"contrast": 1.12, "saturation": 1.12, "unsharp_amount": 0.58, "unsharp_radius": 5, "local_detail": 0.22},
       "lumen": {"contrast": 1.10, "saturation": 1.10, "brightness": 0.0, "unsharp_amount": 0.46, "unsharp_radius": 5, "highlight_bloom": 0.0},
@@ -14,6 +23,7 @@
     },
     "hdr_imperator": {
       "description": "HDR spectaculaire inspiré du look public HDR CC, avec hautes lumières contrôlées.",
+      "compositing_preset": "viral_hdr",
       "restaura": {"denoise_luma": 0.50, "denoise_chroma": 0.42, "unsharp_amount": 0.36, "unsharp_radius": 5},
       "textura": {"contrast": 1.10, "saturation": 1.10, "unsharp_amount": 0.48, "unsharp_radius": 5, "local_detail": 0.16},
       "lumen": {"contrast": 1.08, "saturation": 1.08, "brightness": 0.0, "unsharp_amount": 0.38, "unsharp_radius": 5, "highlight_bloom": 0.0},
@@ -24,6 +34,7 @@
     },
     "realistic_aurea": {
       "description": "Look réaliste à tons chair protégés et contraste naturel.",
+      "compositing_preset": "clean_realistic",
       "restaura": {"denoise_luma": 0.65, "denoise_chroma": 0.50, "unsharp_amount": 0.30, "unsharp_radius": 5},
       "textura": {"contrast": 1.06, "saturation": 1.04, "unsharp_amount": 0.38, "unsharp_radius": 5, "local_detail": 0.10},
       "lumen": {"contrast": 1.05, "saturation": 1.03, "brightness": 0.0, "unsharp_amount": 0.28, "unsharp_radius": 5, "highlight_bloom": 0.0},
@@ -34,6 +45,7 @@
     },
     "old_main_noctis": {
       "description": "Look sombre et cinématique, noirs renforcés sans écrasement excessif.",
+      "compositing_preset": "dark",
       "restaura": {"denoise_luma": 0.55, "denoise_chroma": 0.45, "unsharp_amount": 0.34, "unsharp_radius": 5},
       "textura": {"contrast": 1.10, "saturation": 1.02, "unsharp_amount": 0.44, "unsharp_radius": 5, "local_detail": 0.14},
       "lumen": {"contrast": 1.08, "saturation": 1.02, "brightness": -0.005, "unsharp_amount": 0.34, "unsharp_radius": 5, "highlight_bloom": 0.0},
@@ -44,6 +56,7 @@
     },
     "viral_imperator": {
       "description": "Profil expérimental pour édits viraux : impact HDR et fluidité Motus contrôlée.",
+      "compositing_preset": "viral_hdr",
       "restaura": {"denoise_luma": 0.50, "denoise_chroma": 0.42, "unsharp_amount": 0.34, "unsharp_radius": 5},
       "textura": {"contrast": 1.10, "saturation": 1.12, "unsharp_amount": 0.44, "unsharp_radius": 5, "local_detail": 0.14},
       "lumen": {"contrast": 1.08, "saturation": 1.10, "brightness": 0.0, "unsharp_amount": 0.34, "unsharp_radius": 5, "highlight_bloom": 0.0},
@@ -54,6 +67,7 @@
     },
     "balanced": {
       "description": "Profil prudent pour les vidéos naturelles.",
+      "compositing_preset": "clean_realistic",
       "restaura": {"denoise_luma": 0.8, "denoise_chroma": 0.65, "unsharp_amount": 0.30, "unsharp_radius": 5},
       "textura": {"contrast": 1.08, "saturation": 1.06, "unsharp_amount": 0.40, "unsharp_radius": 5, "local_detail": 0.12},
       "lumen": {"contrast": 1.08, "saturation": 1.06, "brightness": 0.0, "unsharp_amount": 0.34, "unsharp_radius": 5, "highlight_bloom": 0.0},
