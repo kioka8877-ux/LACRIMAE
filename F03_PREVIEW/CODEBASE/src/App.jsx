@@ -219,6 +219,11 @@ export default function App() {
   const waveformX = (seconds) => Math.max(0, Math.min(waveformWidth, (Number(seconds || 0) / waveformDuration) * waveformWidth));
   const revealWaveformDuration = Math.max(1, revealAudioDuration || 60);
   const revealWaveformX = (seconds) => Math.max(0, Math.min(revealWaveformWidth, (Number(seconds || 0) / revealWaveformDuration) * revealWaveformWidth));
+  const revealWaveformPoints = Array.from({ length: 100 }, (_, i) => {
+    const x = (i / 99) * revealWaveformWidth;
+    const amp = 12 + Math.sin(i * 0.3) * 8 + Math.sin(i * 0.7) * 5;
+    return `${x},${revealWaveformHeight / 2 - amp} ${x},${revealWaveformHeight / 2 + amp}`;
+  }).join(' ');
   const updateReveal = (patch) => {
     setRevealManifest((current) => {
       const next = { ...(current || {}), ...patch };
