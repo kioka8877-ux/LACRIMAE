@@ -787,6 +787,42 @@ export default function App() {
                 </div>
               </div>
 
+              {/* ── REVEAL AUDIO SYNC ── */}
+              <div style={{ marginTop: 8, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>♫ REVEAL AUDIO SYNC</label>
+                <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Mode</label>
+                <select style={styles.select} value={revealManifest?.narrative?.audio_sync?.mode ?? 'reveal_loop'} onChange={(e) => updateRevealNarrativeStyle('audio_sync', 'mode', e.target.value)}>
+                  <option value="off">Off</option>
+                  <option value="reveal_loop">Reveal Loop</option>
+                </select>
+                {(revealManifest?.narrative?.audio_sync?.mode ?? 'reveal_loop') !== 'off' && (<>
+                  <div style={{ marginTop: 6, padding: 6, border: '1px solid #2a2a2a', borderRadius: 5, background: '#0a0a0a' }}>
+                    <label style={{ ...styles.label, fontSize: 10, color: '#aaa' }}>── Boucle ──</label>
+                    <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Loop IN : {(revealManifest?.narrative?.audio_sync?.loop_in ?? 0).toFixed(1)}s</label>
+                    <input style={styles.slider} type="range" min="0" max="120" step="0.1" value={revealManifest?.narrative?.audio_sync?.loop_in ?? 0} onChange={(e) => updateRevealNarrativeStyle('audio_sync', 'loop_in', parseFloat(e.target.value))} />
+                    <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Loop OUT : {(revealManifest?.narrative?.audio_sync?.loop_out ?? 10).toFixed(1)}s</label>
+                    <input style={styles.slider} type="range" min="0" max="120" step="0.1" value={revealManifest?.narrative?.audio_sync?.loop_out ?? 10} onChange={(e) => updateRevealNarrativeStyle('audio_sync', 'loop_out', parseFloat(e.target.value))} />
+                  </div>
+                  <div style={{ marginTop: 6, padding: 6, border: '1px solid #2a2a2a', borderRadius: 5, background: '#0a0a0a' }}>
+                    <label style={{ ...styles.label, fontSize: 10, color: '#aaa' }}>── Partie forte (drop) ──</label>
+                    <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Reveal IN : {(revealManifest?.narrative?.audio_sync?.reveal_in ?? 0).toFixed(1)}s</label>
+                    <input style={styles.slider} type="range" min="0" max="120" step="0.1" value={revealManifest?.narrative?.audio_sync?.reveal_in ?? 0} onChange={(e) => updateRevealNarrativeStyle('audio_sync', 'reveal_in', parseFloat(e.target.value))} />
+                    <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Reveal OUT : {(revealManifest?.narrative?.audio_sync?.reveal_out ?? 10).toFixed(1)}s</label>
+                    <input style={styles.slider} type="range" min="0" max="120" step="0.1" value={revealManifest?.narrative?.audio_sync?.reveal_out ?? 10} onChange={(e) => updateRevealNarrativeStyle('audio_sync', 'reveal_out', parseFloat(e.target.value))} />
+                  </div>
+                  <div style={{ marginTop: 6, display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Transition :</label>
+                    <select style={{ ...styles.select, width: '50%' }} value={revealManifest?.narrative?.audio_sync?.transition ?? 'beat_cut'} onChange={(e) => updateRevealNarrativeStyle('audio_sync', 'transition', e.target.value)}>
+                      <option value="beat_cut">Beat Cut</option>
+                      <option value="crossfade">Crossfade</option>
+                      <option value="fade_out">Fade Out</option>
+                    </select>
+                  </div>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Crossfade : {revealManifest?.narrative?.audio_sync?.crossfade_ms ?? 200}ms</label>
+                  <input style={styles.slider} type="range" min="0" max="2000" step="50" value={revealManifest?.narrative?.audio_sync?.crossfade_ms ?? 200} onChange={(e) => updateRevealNarrativeStyle('audio_sync', 'crossfade_ms', parseInt(e.target.value))} />
+                </>)}
+              </div>
+
               {/* ── SOURCES ET SCÈNES ── */}
               <div style={{ marginTop: 8, paddingTop: 10, borderTop: '1px solid #4a3920' }}>
                 <label style={{ ...styles.label, color: '#ffcc66' }}>SOURCES ET SCÈNES</label>

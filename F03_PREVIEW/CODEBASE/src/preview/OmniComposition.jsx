@@ -117,7 +117,35 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
   const sourceUrl = source?.file ? staticFile(source.file.replace(/^\.\//, '')) : null;
   const music = normalizeMusicTimeline(musicTimeline || session.music || (revealManifest?.audio_src ? { audio_src: revealManifest.audio_src, enabled: true, volume: revealManifest.audio_volume ?? 1, in_seconds: revealManifest.audio_in ?? 0, out_seconds: revealManifest.audio_out ?? 0 } : {}), fps, durationInFrames);
   const musicUrl = music.audio_src ? staticFile(music.audio_src.replace(/^\.\//, '')) : null;
-  const audioSegments = musicUrl ? buildAudioSegments({ ...music, audio_src: musicUrl }, fps, durationInFrames) : [];
+  const audioSync = manifest?.audio_sync || narrative?.audio_sync || {};
+  let audioSegments = [];
+  if (musicUrl) {
+    if (audioSync.mode === 'reveal_loop') {
+      const loopInSec = Number(audioSync.loop_in ?? 0);
+      const loopOutSec = Number(audioSync.loop_out ?? 10);
+      const revealInSec = Number(audioSync.reveal_in ?? 0);
+      const revealOutSec = Number(audioSync.reveal_out ?? 10);
+      const crossfadeMs = Number(audioSync.crossfade_ms ?? 200);
+      const loopDurationFrames = Math.max(1, Math.round((loopOutSec - loopInSec) * fps));
+      const finalStartFrame = Number(manifest.final_start_frame ?? 0);
+      // Loop section: from frame 0 to finalStartFrame
+      for (let f = 0; f < finalStartFrame; f += loopDurationFrames) {
+        const remaining = finalStartFrame - f;
+        const segLen = Math.min(loopDurationFrames, remaining);
+        audioSegments.push({ from: f, duration: segLen, startFrom: Math.round(loopInSec * fps), volume: 1 });
+      }
+      // Reveal section: from finalStartFrame to end
+      const revealStartFrame = finalStartFrame;
+      const totalRevealFrames = Math.max(0, durationInFrames - revealStartFrame);
+      const crossfadeFrames = Math.round(crossfadeMs / 1000 * fps);
+      // Crossfade in during first crossfadeFrames
+      if (totalRevealFrames > 0) {
+        audioSegments.push({ from: revealStartFrame, duration: totalRevealFrames, startFrom: Math.round(revealInSec * fps), volume: 1, fade_in_frames: audioSync.transition === 'crossfade' ? crossfadeFrames : 0 });
+      }
+    } else {
+      audioSegments = buildAudioSegments({ ...music, audio_src: musicUrl }, fps, durationInFrames);
+    }
+  }
   const isFinal = Boolean(scene?.final_reveal);
   const finalStart = Number(scene?.start_frame || manifest.final_start_frame || 0);
   const reveal = manifest.reveal || {};

@@ -15,6 +15,16 @@ const DEFAULT_WATERMARK = {
   opacity: 0.3,
 };
 
+const DEFAULT_AUDIO_SYNC = {
+  mode: 'reveal_loop',
+  loop_in: 0,
+  loop_out: 10,
+  reveal_in: 0,
+  reveal_out: 10,
+  transition: 'beat_cut',
+  crossfade_ms: 200,
+};
+
 const DEFAULT_NARRATIVE = {
   theme: 'REVEAL COMPILATION',
   others_label: 'OTHERS',
@@ -29,6 +39,7 @@ const DEFAULT_NARRATIVE = {
   transition_style: { color_1: '#ffffff', color_2: null, dual_color: false },
   final_style: { color_1: '#ffffff', color_2: null, dual_color: false },
   watermark: { ...DEFAULT_WATERMARK },
+  audio_sync: { ...DEFAULT_AUDIO_SYNC },
 };
 
 const DEFAULT_REVEAL = {
@@ -103,6 +114,9 @@ export function normalizeRevealManifest(value = {}, fps = 30, totalFrames = 300)
     focal_x: Number(source.focal_x ?? 50),
     focal_y: Number(source.focal_y ?? 50),
   }));
+  const audioSync = { ...DEFAULT_AUDIO_SYNC, ...(reveal.narrative?.audio_sync || {}) };
+  narrative.audio_sync = audioSync;
+
   const finalScene = normalizedScenes.find((scene) => scene.final_reveal) || normalizedScenes[normalizedScenes.length - 1];
   const finalStart = finalScene?.start_frame ?? Math.max(0, cursor - Math.round(fps * 2));
   return {
@@ -118,6 +132,7 @@ export function normalizeRevealManifest(value = {}, fps = 30, totalFrames = 300)
     duration_seconds: Math.max(1 / fps, (cursor || totalFrames) / fps),
     final_scene_id: finalScene?.source_id || null,
     final_start_frame: finalStart,
+    audio_sync: audioSync,
   };
 }
 
