@@ -70,13 +70,14 @@ const SESSION_FALLBACK = {
   },
 };
 
-function applyTextStyle(style, baseFontSize) {
-  const s = style || {};
-  const scale = Number(s.scale) || 1;
-  const posV = Number(s.pos_v ?? 50);
-  const posH = Number(s.pos_h ?? 50);
-  const color = s.color_1 || '#ffffff';
-  const color2 = s.dual_color ? s.color_2 : null;
+function applyTextStyle(sharedStyle, titleStyle, baseFontSize) {
+  const sh = sharedStyle || {};
+  const ts = titleStyle || {};
+  const scale = Number(sh.scale) || 1;
+  const posV = Number(sh.pos_v ?? 50);
+  const posH = Number(sh.pos_h ?? 50);
+  const color = ts.color_1 || '#ffffff';
+  const color2 = ts.dual_color ? ts.color_2 : null;
   return {
     fontSize: Math.round(baseFontSize * scale),
     position: 'absolute',
@@ -121,11 +122,12 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
   const scenePosV = Number(scene?.pos_v ?? 50);
   const videoClipTransform = `${sceneTransform} rotate(${sceneRot}deg) scale(${sceneScale}) translate(${(scenePosH - 50) * 0.6}%, ${(scenePosV - 50) * 0.6}%)`;
 
-  const themeStyle = applyTextStyle(narrative.theme_style, 42);
-  const othersStyle = applyTextStyle(narrative.others_style, 42);
-  const thisOneStyle = applyTextStyle(narrative.this_one_style, 118);
-  const transitionStyle = applyTextStyle(narrative.transition_style, 58);
-  const finalStyle = applyTextStyle(narrative.final_style, 118);
+  const sharedStyle = narrative.shared_style || {};
+  const themeStyle = applyTextStyle(sharedStyle, narrative.theme_style, 42);
+  const othersStyle = applyTextStyle(sharedStyle, narrative.others_style, 42);
+  const thisOneStyle = applyTextStyle(sharedStyle, narrative.this_one_style, 118);
+  const transitionStyle = applyTextStyle(sharedStyle, narrative.transition_style, 58);
+  const finalStyle = applyTextStyle(sharedStyle, narrative.final_style, 118);
 
   return (
     <AbsoluteFill style={{ backgroundColor: background.color || '#050505', overflow: 'hidden' }}>

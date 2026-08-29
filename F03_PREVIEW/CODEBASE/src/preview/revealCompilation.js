@@ -22,11 +22,12 @@ const DEFAULT_NARRATIVE = {
   transition_text: '',
   final_text: '',
   speed: 1.0,
-  theme_style: { ...DEFAULT_TEXT_STYLE },
-  others_style: { ...DEFAULT_TEXT_STYLE },
-  this_one_style: { ...DEFAULT_TEXT_STYLE },
-  transition_style: { ...DEFAULT_TEXT_STYLE },
-  final_style: { ...DEFAULT_TEXT_STYLE },
+  shared_style: { ...DEFAULT_TEXT_STYLE },
+  theme_style: { color_1: '#ffffff', color_2: null, dual_color: false },
+  others_style: { color_1: '#ffffff', color_2: null, dual_color: false },
+  this_one_style: { color_1: '#ffffff', color_2: null, dual_color: false },
+  transition_style: { color_1: '#ffffff', color_2: null, dual_color: false },
+  final_style: { color_1: '#ffffff', color_2: null, dual_color: false },
   watermark: { ...DEFAULT_WATERMARK },
 };
 
@@ -44,6 +45,7 @@ export function normalizeRevealManifest(value = {}, fps = 30, totalFrames = 300)
   const rawNarrative = { ...DEFAULT_NARRATIVE, ...(reveal.narrative || {}) };
   const narrative = {
     ...rawNarrative,
+    shared_style: { ...DEFAULT_TEXT_STYLE, ...(reveal.narrative?.shared_style || {}) },
     theme_style: { ...DEFAULT_TEXT_STYLE, ...(reveal.narrative?.theme_style || {}) },
     others_style: { ...DEFAULT_TEXT_STYLE, ...(reveal.narrative?.others_style || {}) },
     this_one_style: { ...DEFAULT_TEXT_STYLE, ...(reveal.narrative?.this_one_style || {}) },
