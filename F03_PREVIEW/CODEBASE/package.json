@@ -1,13 +1,13 @@
 {
   "name": "omnis-f02-preview",
   "version": "1.0.0",
-  "description": "OMNIS-WATCH F02 Preview — Real-time @remotion/player viewer",
+  "description": "OMNIS-WATCH F02 Preview \u2014 Real-time @remotion/player viewer",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "render": "remotion render src/remotion/index.js LacrimaeShort out/short_final.mp4"
+    "render": "remotion render src/remotion/index.js LacrimaeShort out/short_final.mp4 --timeout=120000"
   },
   "dependencies": {
     "react": "^18.3.0",
