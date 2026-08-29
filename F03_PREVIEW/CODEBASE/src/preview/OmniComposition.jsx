@@ -117,7 +117,7 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
   const sourceUrl = source?.file ? staticFile(source.file.replace(/^\.\//, '')) : null;
   const music = normalizeMusicTimeline(musicTimeline || session.music || (revealManifest?.audio_src ? { audio_src: revealManifest.audio_src, enabled: true, volume: revealManifest.audio_volume ?? 1, in_seconds: revealManifest.audio_in ?? 0, out_seconds: revealManifest.audio_out ?? 0 } : {}), fps, durationInFrames);
   const musicUrl = music.audio_src ? staticFile(music.audio_src.replace(/^\.\//, '')) : null;
-  const audioSync = manifest?.audio_sync || narrative?.audio_sync || {};
+  const audioSync = manifest?.audio_sync || manifest?.narrative?.audio_sync || {};
   let audioSegments = [];
   if (musicUrl) {
     if (audioSync.mode === 'reveal_loop') {
