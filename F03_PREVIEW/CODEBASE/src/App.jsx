@@ -680,19 +680,39 @@ export default function App() {
                   return (
                     <div key={entry.source_id || index} style={{ marginTop: 8, padding: 9, border: `1px solid ${entry.rank === 1 ? '#8a6820' : '#333'}`, borderRadius: 7, background: entry.rank === 1 ? '#1d1708' : '#111' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', color: entry.rank === 1 ? '#ffd400' : '#ddd', fontWeight: 800, fontSize: 12 }}><span>#{entry.rank}{entry.rank === 1 ? ' — FINAL' : ''}</span><span style={{ color: '#888', fontWeight: 500 }}>{entry.source_id}</span></div>
+                      {/* ── Label (textarea pour labels longs) ── */}
                       <label style={styles.label}>Label du rang</label>
-                      <input style={styles.input} value={entry.label ?? ''} onChange={(e) => updateRankingEntry(index, { label: e.target.value })} placeholder="LABEL" />
+                      <textarea style={{ ...styles.input, minHeight: '36px', resize: 'vertical', fontFamily: 'inherit' }} value={entry.label ?? ''} onChange={(e) => updateRankingEntry(index, { label: e.target.value })} placeholder="LABEL" rows={1} />
+                      {/* ── Durée ── */}
                       <label style={styles.label}>Durée : {Number(entry.duration_seconds || 3).toFixed(2)} s</label>
                       <input style={styles.slider} type="range" min="0.5" max="30" step="0.1" value={Number(entry.duration_seconds || 3)} onChange={(e) => updateRankingEntry(index, { duration_seconds: parseFloat(e.target.value) })} />
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                        <label style={styles.label}>Position X<input style={styles.input} type="number" min="-100" max="200" step="1" value={Number(position.x_pct ?? 50)} onChange={(e) => updateRankingEntry(index, { position: { ...position, x_pct: parseFloat(e.target.value) } })} /></label>
-                        <label style={styles.label}>Position Y<input style={styles.input} type="number" min="-100" max="200" step="1" value={Number(position.y_pct ?? 50)} onChange={(e) => updateRankingEntry(index, { position: { ...position, y_pct: parseFloat(e.target.value) } })} /></label>
-                        <label style={styles.label}>Taille<input style={styles.input} type="number" min="0.05" max="10" step="0.05" value={Number(position.scale ?? 1)} onChange={(e) => updateRankingEntry(index, { position: { ...position, scale: parseFloat(e.target.value) } })} /></label>
-                        <label style={styles.label}>Taille texte<input style={styles.input} type="number" min="8" max="400" step="1" value={Number(textStyle.font_size ?? 54)} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, font_size: parseFloat(e.target.value) } })} /></label>
+                      {/* ── Position clip (X/Y + scale + rotation) ── */}
+                      <div style={{ marginTop: 6, padding: 6, border: '1px solid #2a2a2a', borderRadius: 5, background: '#0a0a0a' }}>
+                        <label style={{ ...styles.label, color: '#aaa', fontSize: 10 }}>── CLIP ──</label>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                          <label style={styles.label}>Pos X<input style={styles.input} type="number" min="-100" max="200" step="1" value={Number(position.x_pct ?? 50)} onChange={(e) => updateRankingEntry(index, { position: { ...position, x_pct: parseFloat(e.target.value) } })} /></label>
+                          <label style={styles.label}>Pos Y<input style={styles.input} type="number" min="-100" max="200" step="1" value={Number(position.y_pct ?? 50)} onChange={(e) => updateRankingEntry(index, { position: { ...position, y_pct: parseFloat(e.target.value) } })} /></label>
+                          <label style={styles.label}>Échelle<input style={styles.input} type="number" min="0.05" max="10" step="0.05" value={Number(position.scale ?? 1)} onChange={(e) => updateRankingEntry(index, { position: { ...position, scale: parseFloat(e.target.value) } })} /></label>
+                          <label style={styles.label}>Rotation<input style={styles.input} type="number" min="-180" max="180" step="1" value={Number(position.rotation ?? 0)} onChange={(e) => updateRankingEntry(index, { position: { ...position, rotation: parseFloat(e.target.value) } })} /></label>
+                        </div>
                       </div>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
-                        <label style={{ ...styles.label, margin: 0, flex: 1 }}>Couleur<input style={styles.input} type="text" value={textStyle.color ?? '#FFFFFF'} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, color: e.target.value } })} /></label>
-                        <label style={{ color: '#bbb', fontSize: 11, display: 'flex', alignItems: 'center', gap: 5 }}><input type="checkbox" checked={Boolean(sfx.enabled)} onChange={(e) => updateRankingEntry(index, { sfx: { ...sfx, enabled: e.target.checked } })} /> SFX</label>
+                      {/* ── Texte du rang (taille + couleur + position texte) ── */}
+                      <div style={{ marginTop: 6, padding: 6, border: '1px solid #2a2a2a', borderRadius: 5, background: '#0a0a0a' }}>
+                        <label style={{ ...styles.label, color: '#aaa', fontSize: 10 }}>── TEXTE ──</label>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                          <label style={styles.label}>Taille texte<input style={styles.input} type="number" min="8" max="400" step="1" value={Number(textStyle.font_size ?? 54)} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, font_size: parseFloat(e.target.value) } })} /></label>
+                          <label style={styles.label}>Texte X %<input style={styles.input} type="number" min="0" max="100" step="1" value={Number(textStyle.x_pct ?? 8)} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, x_pct: parseFloat(e.target.value) } })} /></label>
+                          <label style={styles.label}>Texte Y %<input style={styles.input} type="number" min="0" max="100" step="1" value={Number(textStyle.y_pct ?? 34)} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, y_pct: parseFloat(e.target.value) } })} /></label>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <label style={{ ...styles.label, margin: 0 }}>Couleur</label>
+                            <input type="color" value={textStyle.color ?? '#FFFFFF'} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, color: e.target.value } })} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                          <label style={{ ...styles.label, margin: 0 }}>Accent</label>
+                          <input type="color" value={textStyle.accent_color ?? '#FFD400'} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, accent_color: e.target.value } })} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                          <label style={{ color: '#bbb', fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, marginLeft: 'auto' }}><input type="checkbox" checked={Boolean(sfx.enabled)} onChange={(e) => updateRankingEntry(index, { sfx: { ...sfx, enabled: e.target.checked } })} /> SFX</label>
+                        </div>
                       </div>
                     </div>
                   );
