@@ -70,6 +70,24 @@ const SESSION_FALLBACK = {
   },
 };
 
+function applyTextStyle(style, baseFontSize) {
+  const s = style || {};
+  const scale = Number(s.scale) || 1;
+  const posV = Number(s.pos_v ?? 50);
+  const posH = Number(s.pos_h ?? 50);
+  const color = s.color_1 || '#ffffff';
+  const color2 = s.dual_color ? s.color_2 : null;
+  return {
+    fontSize: Math.round(baseFontSize * scale),
+    position: 'absolute',
+    top: `${posV}%`,
+    left: `${posH}%`,
+    transform: 'translate(-50%, -50%)',
+    color: color,
+    ...(color2 ? { background: `linear-gradient(90deg, ${color} 50%, ${color2} 50%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {}),
+  };
+}
+
 function RevealCompilationComposition({ codex, session: sessionProp, revealManifest, musicTimeline }) {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
@@ -92,7 +110,23 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
   const shakeY = shaking ? Math.sin(shakeLocal * 2.8) * shakeAmp : 0;
   const sceneTransform = `${revealMotionTransform(scene, frame, fps)} translateY(${shakeY.toFixed(2)}px)`;
   const background = session.background || {};
-  const label = isFinal ? manifest.narrative.this_one_label : manifest.narrative.others_label;
+  const narrative = manifest.narrative || {};
+  const label = isFinal ? narrative.this_one_label : narrative.others_label;
+  const speed = Number(narrative.speed) || 1;
+  const watermark = narrative.watermark || {};
+
+  const sceneRot = Number(scene?.rotation_deg ?? 0);
+  const sceneScale = Number(scene?.video_scale ?? 1);
+  const scenePosH = Number(scene?.pos_h ?? 50);
+  const scenePosV = Number(scene?.pos_v ?? 50);
+  const videoClipTransform = `${sceneTransform} rotate(${sceneRot}deg) scale(${sceneScale}) translate(${(scenePosH - 50) * 0.6}%, ${(scenePosV - 50) * 0.6}%)`;
+
+  const themeStyle = applyTextStyle(narrative.theme_style, 42);
+  const othersStyle = applyTextStyle(narrative.others_style, 42);
+  const thisOneStyle = applyTextStyle(narrative.this_one_style, 118);
+  const transitionStyle = applyTextStyle(narrative.transition_style, 58);
+  const finalStyle = applyTextStyle(narrative.final_style, 118);
+
   return (
     <AbsoluteFill style={{ backgroundColor: background.color || '#050505', overflow: 'hidden' }}>
       {musicUrl && audioSegments.map((segment, index) => (
@@ -100,21 +134,50 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
           <Audio src={musicUrl} startFrom={segment.startFrom} volume={segment.volume} />
         </Sequence>
       ))}
-      <AbsoluteFill style={{ transform: sceneTransform, transformOrigin: 'center center' }}>
-        {sourceUrl && <Video src={sourceUrl} startFrom={localFrame} muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+      <AbsoluteFill style={{ transform: videoClipTransform, transformOrigin: 'center center' }}>
+        {sourceUrl && <Video src={sourceUrl} startFrom={localFrame} playbackRate={speed} muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
       </AbsoluteFill>
-      <AbsoluteFill style={{ pointerEvents: 'none', padding: '6% 6%', justifyContent: 'space-between', color: '#fff', fontFamily: session.texts_style?.font || 'Impact, Arial Black, sans-serif' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 42, fontWeight: 900, textShadow: '0 3px 12px #000' }}>
-          <span>{manifest.narrative.theme}</span><span>{label}</span>
+      <AbsoluteFill style={{ pointerEvents: 'none', fontFamily: session.texts_style?.font || 'Impact, Arial Black, sans-serif' }}>
+        <div style={{ ...themeStyle, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, textShadow: '0 3px 12px #000' }}>
+          {narrative.theme}
         </div>
-        <div style={{ alignSelf: 'center', textAlign: 'center', fontSize: isFinal ? 118 : 58, lineHeight: 0.95, color: isFinal ? '#fff' : '#f5f5f5', textTransform: 'uppercase', textShadow: '0 4px 18px #000' }}>
-          {isFinal ? (manifest.narrative.final_text || label) : (manifest.narrative.transition_text && frame === scene?.start_frame ? manifest.narrative.transition_text : '')}
+        <div style={{ ...(isFinal ? thisOneStyle : othersStyle), textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, textShadow: '0 3px 12px #000', top: isFinal ? thisOneStyle.top : othersStyle.top, left: 'auto', right: '6%', transform: 'translateY(-50%)' }}>
+          {label}
         </div>
+        {isFinal ? (
+          <div style={{ ...finalStyle, textAlign: 'center', lineHeight: 0.95, textTransform: 'uppercase', textShadow: '0 4px 18px #000' }}>
+            {narrative.final_text || label}
+          </div>
+        ) : (narrative.transition_text && frame === scene?.start_frame ? (
+          <div style={{ ...transitionStyle, textAlign: 'center', lineHeight: 0.95, textTransform: 'uppercase', textShadow: '0 4px 18px #000' }}>
+            {narrative.transition_text}
+          </div>
+        ) : null)}
       </AbsoluteFill>
+      {watermark.text && (
+        <AbsoluteFill style={{ pointerEvents: 'none' }}>
+          <div style={{
+            position: 'absolute',
+            top: `${Number(watermark.pos_v ?? 90)}%`,
+            left: `${Number(watermark.pos_h ?? 50)}%`,
+            transform: 'translate(-50%, -50%)',
+            fontSize: Math.round(28 * (Number(watermark.scale) || 1)),
+            opacity: Number(watermark.opacity ?? 0.3),
+            color: '#ffffff',
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            fontFamily: session.texts_style?.font || 'Impact, Arial Black, sans-serif',
+            textShadow: '0 2px 6px rgba(0,0,0,0.5)',
+          }}>
+            {watermark.text}
+          </div>
+        </AbsoluteFill>
+      )}
       {isFinal && <AbsoluteFill style={{ background: `rgba(0,0,0,${Math.max(0, Math.min(0.9, Number(reveal.darkness || 0)))})`, pointerEvents: 'none' }} />}
     </AbsoluteFill>
   );
 }
+
 
 export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequences, hybridManifest, hybridIntroSrc, musicTimeline, revealManifest }) => {
   if (revealManifest?.mode === 'reveal_compilation' || sessionProp?.review_mode === 'reveal_compilation') {
