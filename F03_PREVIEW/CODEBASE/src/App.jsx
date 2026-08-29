@@ -687,11 +687,13 @@ export default function App() {
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
                   <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur 1 :</label>
                   <input type="color" value={revealManifest?.narrative?.others_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('others_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={revealManifest?.narrative?.others_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('others_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
-                    2 couleurs
-                  </label>
-                  {revealManifest?.narrative?.others_style?.dual_color && <input type="color" value={revealManifest?.narrative?.others_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('others_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                  {(revealManifest?.narrative?.others_label ?? '').includes(' ') && (<>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={revealManifest?.narrative?.others_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('others_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
+                      2 couleurs
+                    </label>
+                    {revealManifest?.narrative?.others_style?.dual_color && <input type="color" value={revealManifest?.narrative?.others_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('others_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                  </>)}
                 </div>
               </div>
 
@@ -708,11 +710,13 @@ export default function App() {
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
                   <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur 1 :</label>
                   <input type="color" value={revealManifest?.narrative?.this_one_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={revealManifest?.narrative?.this_one_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
-                    2 couleurs
-                  </label>
-                  {revealManifest?.narrative?.this_one_style?.dual_color && <input type="color" value={revealManifest?.narrative?.this_one_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                  {(revealManifest?.narrative?.this_one_label ?? '').includes(' ') && (<>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={revealManifest?.narrative?.this_one_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
+                      2 couleurs
+                    </label>
+                    {revealManifest?.narrative?.this_one_style?.dual_color && <input type="color" value={revealManifest?.narrative?.this_one_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                  </>)}
                 </div>
               </div>
 
@@ -729,11 +733,13 @@ export default function App() {
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
                   <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur 1 :</label>
                   <input type="color" value={revealManifest?.narrative?.transition_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={revealManifest?.narrative?.transition_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
-                    2 couleurs
-                  </label>
-                  {revealManifest?.narrative?.transition_style?.dual_color && <input type="color" value={revealManifest?.narrative?.transition_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                  {(revealManifest?.narrative?.transition_text ?? '').includes(' ') && (<>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={revealManifest?.narrative?.transition_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
+                      2 couleurs
+                    </label>
+                    {revealManifest?.narrative?.transition_style?.dual_color && <input type="color" value={revealManifest?.narrative?.transition_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                  </>)}
                 </div>
               </div>
 
@@ -750,11 +756,13 @@ export default function App() {
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
                   <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur 1 :</label>
                   <input type="color" value={revealManifest?.narrative?.final_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('final_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={revealManifest?.narrative?.final_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('final_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
-                    2 couleurs
-                  </label>
-                  {revealManifest?.narrative?.final_style?.dual_color && <input type="color" value={revealManifest?.narrative?.final_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('final_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                  {(revealManifest?.narrative?.final_text ?? '').includes(' ') && (<>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={revealManifest?.narrative?.final_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('final_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
+                      2 couleurs
+                    </label>
+                    {revealManifest?.narrative?.final_style?.dual_color && <input type="color" value={revealManifest?.narrative?.final_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('final_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                  </>)}
                 </div>
               </div>
 

@@ -85,7 +85,7 @@ function applyTextStyle(style, baseFontSize) {
     transform: 'translate(-50%, -50%)',
     whiteSpace: 'nowrap',
     color: color,
-    ...(color2 ? { background: `linear-gradient(90deg, ${color} 50%, ${color2} 50%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {}),
+    // dual_color is handled by renderColoredText spans
   };
 }
 
@@ -93,11 +93,15 @@ function renderColoredText(text, style) {
   if (!text) return null;
   if (style?.dual_color && text.includes(' ')) {
     const words = text.split(' ');
-    return words.map((word, i) => (
-      <span key={i} style={{ color: i === 0 ? (style.color_1 || '#fff') : (style.color_2 || '#fff') }}>
-        {word}{i < words.length - 1 ? ' ' : ''}
+    return (
+      <span style={{ whiteSpace: 'nowrap' }}>
+        {words.map((word, i) => (
+          <span key={i} style={{ color: i === 0 ? (style.color_1 || '#fff') : (style.color_2 || '#fff') }}>
+            {word}{i < words.length - 1 ? ' ' : ''}
+          </span>
+        ))}
       </span>
-    ));
+    );
   }
   return text;
 }
