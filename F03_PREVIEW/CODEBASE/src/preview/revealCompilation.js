@@ -41,7 +41,16 @@ const DEFAULT_REVEAL = {
 export function normalizeRevealManifest(value = {}, fps = 30, totalFrames = 300) {
   const reveal = value || {};
   const sourceRows = Array.isArray(reveal.sources) ? reveal.sources : [];
-  const narrative = { ...DEFAULT_NARRATIVE, ...(reveal.narrative || {}) };
+  const rawNarrative = { ...DEFAULT_NARRATIVE, ...(reveal.narrative || {}) };
+  const narrative = {
+    ...rawNarrative,
+    theme_style: { ...DEFAULT_TEXT_STYLE, ...(reveal.narrative?.theme_style || {}) },
+    others_style: { ...DEFAULT_TEXT_STYLE, ...(reveal.narrative?.others_style || {}) },
+    this_one_style: { ...DEFAULT_TEXT_STYLE, ...(reveal.narrative?.this_one_style || {}) },
+    transition_style: { ...DEFAULT_TEXT_STYLE, ...(reveal.narrative?.transition_style || {}) },
+    final_style: { ...DEFAULT_TEXT_STYLE, ...(reveal.narrative?.final_style || {}) },
+    watermark: { ...DEFAULT_WATERMARK, ...(reveal.narrative?.watermark || {}) },
+  };
   const revealSettings = { ...DEFAULT_REVEAL, ...(reveal.reveal || {}) };
   const fallbackDuration = Math.max(1, Math.round(totalFrames / Math.max(1, fps)));
   const scenes = Array.isArray(reveal.scenes) && reveal.scenes.length

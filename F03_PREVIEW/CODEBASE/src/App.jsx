@@ -225,10 +225,12 @@ export default function App() {
     });
   };
   const updateRevealNarrativeStyle = (styleKey, prop, value) => {
+    console.log('[SLIDER]', styleKey, prop, value);
     setRevealManifest((curr) => {
       const narr = curr?.narrative || {};
       const style = narr[styleKey] || {};
       const next = { ...curr, narrative: { ...narr, [styleKey]: { ...style, [prop]: value } } };
+      console.log('[SLIDER RESULT]', JSON.stringify(next.narrative[styleKey]).slice(0, 100));
       setSession((s) => ({ ...s, reveal: next }));
       return next;
     });
@@ -755,6 +757,23 @@ export default function App() {
               <div style={{ marginTop: 8, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
                 <label style={{ ...styles.label, color: '#ffcc66' }}>⚡ Vitesse : {(revealManifest?.narrative?.speed ?? 1).toFixed(2)}x</label>
                 <input style={styles.slider} type="range" min="0.5" max="4" step="0.05" value={revealManifest?.narrative?.speed ?? 1} onChange={(e) => updateRevealNarrative('speed', parseFloat(e.target.value))} />
+              </div>
+              <div style={{ marginTop: 8, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>♫ MUSIQUE</label>
+                <label style={styles.label}>Fichier audio : {revealManifest?.audio_src || 'aucun'}</label>
+                <input style={styles.input} value={revealManifest?.audio_src ?? ''} onChange={(e) => updateReveal({ audio_src: e.target.value })} placeholder="audio/music.mp3" />
+                <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Volume : {Math.round((revealManifest?.audio_volume ?? 1) * 100)}%</label>
+                  <input style={{ ...styles.slider, flex: 1 }} type="range" min="0" max="1" step="0.05" value={revealManifest?.audio_volume ?? 1} onChange={(e) => updateReveal({ audio_volume: parseFloat(e.target.value) })} />
+                </div>
+                <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Début (s) : {(revealManifest?.audio_in ?? 0).toFixed(1)}</label>
+                  <input style={{ ...styles.slider, flex: 1 }} type="range" min="0" max="60" step="0.1" value={revealManifest?.audio_in ?? 0} onChange={(e) => updateReveal({ audio_in: parseFloat(e.target.value) })} />
+                </div>
+                <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Fin (s) : {revealManifest?.audio_out ?? 'max'}</label>
+                  <input style={{ ...styles.slider, flex: 1 }} type="range" min="0" max="120" step="0.1" value={revealManifest?.audio_out ?? 0} onChange={(e) => updateReveal({ audio_out: parseFloat(e.target.value) })} />
+                </div>
               </div>
               <div style={{ marginTop: 8, paddingTop: 10, borderTop: '1px solid #4a3920' }}>
                 <label style={{ ...styles.label, color: '#ffcc66' }}>SOURCES ET SCÈNES</label>

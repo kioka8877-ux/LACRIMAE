@@ -97,7 +97,7 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
   const source = revealSourceForScene(manifest, scene);
   const localFrame = Math.max(0, frame - Number(scene?.start_frame || 0));
   const sourceUrl = source?.file ? staticFile(source.file.replace(/^\.\//, '')) : null;
-  const music = normalizeMusicTimeline(musicTimeline || session.music || (revealManifest?.audio_src ? { audio_src: revealManifest.audio_src } : {}), fps, durationInFrames);
+  const music = normalizeMusicTimeline(musicTimeline || session.music || (revealManifest?.audio_src ? { audio_src: revealManifest.audio_src, enabled: true, volume: revealManifest.audio_volume ?? 1, in_seconds: revealManifest.audio_in ?? 0, out_seconds: revealManifest.audio_out ?? 0 } : {}), fps, durationInFrames);
   const musicUrl = music.audio_src ? staticFile(music.audio_src.replace(/^\.\//, '')) : null;
   const audioSegments = musicUrl ? buildAudioSegments({ ...music, audio_src: musicUrl }, fps, durationInFrames) : [];
   const isFinal = Boolean(scene?.final_reveal);
