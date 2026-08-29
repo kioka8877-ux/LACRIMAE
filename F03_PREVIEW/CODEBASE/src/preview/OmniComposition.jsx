@@ -70,14 +70,13 @@ const SESSION_FALLBACK = {
   },
 };
 
-function applyTextStyle(sharedStyle, titleStyle, baseFontSize) {
-  const sh = sharedStyle || {};
-  const ts = titleStyle || {};
-  const scale = Number(sh.scale) || 1;
-  const posV = Number(sh.pos_v ?? 50);
-  const posH = Number(sh.pos_h ?? 50);
-  const color = ts.color_1 || '#ffffff';
-  const color2 = ts.dual_color ? ts.color_2 : null;
+function applyTextStyle(style, baseFontSize) {
+  const s = style || {};
+  const scale = Number(s.scale) || 1;
+  const posV = Number(s.pos_v ?? 50);
+  const posH = Number(s.pos_h ?? 50);
+  const color = s.color_1 || '#ffffff';
+  const color2 = s.dual_color ? s.color_2 : null;
   return {
     fontSize: Math.round(baseFontSize * scale),
     position: 'absolute',
@@ -122,12 +121,11 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
   const scenePosV = Number(scene?.pos_v ?? 50);
   const videoClipTransform = `${sceneTransform} rotate(${sceneRot}deg) scale(${sceneScale}) translate(${(scenePosH - 50) * 0.6}%, ${(scenePosV - 50) * 0.6}%)`;
 
-  const sharedStyle = narrative.shared_style || {};
-  const themeStyle = applyTextStyle(sharedStyle, narrative.theme_style, 42);
-  const othersStyle = applyTextStyle(sharedStyle, narrative.others_style, 42);
-  const thisOneStyle = applyTextStyle(sharedStyle, narrative.this_one_style, 118);
-  const transitionStyle = applyTextStyle(sharedStyle, narrative.transition_style, 58);
-  const finalStyle = applyTextStyle(sharedStyle, narrative.final_style, 118);
+  const themeStyle = applyTextStyle(narrative.theme_style, 42);
+  const othersStyle = applyTextStyle(narrative.others_style, 42);
+  const thisOneStyle = applyTextStyle(narrative.this_one_style, 118);
+  const transitionStyle = applyTextStyle(narrative.transition_style, 58);
+  const finalStyle = applyTextStyle(narrative.final_style, 118);
 
   return (
     <AbsoluteFill style={{ backgroundColor: background.color || '#050505', overflow: 'hidden' }}>
@@ -140,21 +138,34 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
         {sourceUrl && <Video src={sourceUrl} startFrom={localFrame} playbackRate={speed} muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
       </AbsoluteFill>
       <AbsoluteFill style={{ pointerEvents: 'none', fontFamily: session.texts_style?.font || 'Impact, Arial Black, sans-serif' }}>
+        {/* CAMOUFLAGE — always visible */}
         <div style={{ ...themeStyle, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, textShadow: '0 3px 12px #000' }}>
           {narrative.theme}
         </div>
-        <div style={{ ...(isFinal ? thisOneStyle : othersStyle), textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, textShadow: '0 3px 12px #000', top: isFinal ? thisOneStyle.top : othersStyle.top, left: 'auto', right: '6%', transform: 'translateY(-50%)' }}>
-          {label}
-        </div>
-        {isFinal ? (
-          <div style={{ ...finalStyle, textAlign: 'center', lineHeight: 0.95, textTransform: 'uppercase', textShadow: '0 4px 18px #000' }}>
-            {narrative.final_text || label}
+        {/* OTHERS — visible during non-final clips */}
+        {!isFinal && (
+          <div style={{ ...othersStyle, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, textShadow: '0 3px 12px #000' }}>
+            {narrative.others_label}
           </div>
-        ) : (narrative.transition_text && frame === scene?.start_frame ? (
+        )}
+        {/* THIS ONE — visible only during final reveal */}
+        {isFinal && (
+          <div style={{ ...thisOneStyle, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, textShadow: '0 3px 12px #000' }}>
+            {narrative.this_one_label}
+          </div>
+        )}
+        {/* Transition text — visible first 45 frames of each non-final scene */}
+        {!isFinal && narrative.transition_text && (frame - Number(scene?.start_frame || 0)) < 45 && (
           <div style={{ ...transitionStyle, textAlign: 'center', lineHeight: 0.95, textTransform: 'uppercase', textShadow: '0 4px 18px #000' }}>
             {narrative.transition_text}
           </div>
-        ) : null)}
+        )}
+        {/* Final text — visible during final reveal */}
+        {isFinal && narrative.final_text && (
+          <div style={{ ...finalStyle, textAlign: 'center', lineHeight: 0.95, textTransform: 'uppercase', textShadow: '0 4px 18px #000' }}>
+            {narrative.final_text}
+          </div>
+        )}
       </AbsoluteFill>
       {watermark.text && (
         <AbsoluteFill style={{ pointerEvents: 'none' }}>
