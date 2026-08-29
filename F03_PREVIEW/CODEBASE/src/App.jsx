@@ -49,6 +49,14 @@ export default function App() {
   const [audioDuration, setAudioDuration] = useState(0);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [musicTimeline, setMusicTimeline] = useState(null);
+  const [revealAudioSrc, setRevealAudioSrc] = useState('');
+  const [revealAudioPosition, setRevealAudioPosition] = useState(0);
+  const [revealAudioDuration, setRevealAudioDuration] = useState(0);
+  const [revealAudioPlaying, setRevealAudioPlaying] = useState(false);
+  const revealAudioPlayerRef = useRef(null);
+  const revealWaveformRef = useRef(null);
+  const revealWaveformWidth = 560;
+  const revealWaveformHeight = 72;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [validated, setValidated] = useState(false);
@@ -209,6 +217,8 @@ export default function App() {
   );
   const waveform = musicWaveformPoints(music.beats, waveformWidth, waveformHeight);
   const waveformX = (seconds) => Math.max(0, Math.min(waveformWidth, (Number(seconds || 0) / waveformDuration) * waveformWidth));
+  const revealWaveformDuration = Math.max(1, revealAudioDuration || 60);
+  const revealWaveformX = (seconds) => Math.max(0, Math.min(revealWaveformWidth, (Number(seconds || 0) / revealWaveformDuration) * revealWaveformWidth));
   const updateReveal = (patch) => {
     setRevealManifest((current) => {
       const next = { ...(current || {}), ...patch };
@@ -821,6 +831,95 @@ export default function App() {
                   <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Crossfade : {revealManifest?.narrative?.audio_sync?.crossfade_ms ?? 200}ms</label>
                   <input style={styles.slider} type="range" min="0" max="2000" step="50" value={revealManifest?.narrative?.audio_sync?.crossfade_ms ?? 200} onChange={(e) => updateRevealNarrativeStyle('audio_sync', 'crossfade_ms', parseInt(e.target.value))} />
                 </>)}
+
+                {/* Upload musique */}
+                <div style={{ marginTop: 8, padding: 6, border: '1px solid #2a2a2a', borderRadius: 5, background: '#0a0a0a' }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#aaa' }}>── Musique ──</label>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Fichier : {revealManifest?.audio_src || 'aucun'}</label>
+                  <input style={styles.input} value={revealManifest?.audio_src ?? ''} onChange={(e) => updateReveal({ audio_src: e.target.value })} placeholder="audio/music.mp3" />
+                  <div style={{ marginTop: 4 }}>
+                    <input type="file" accept="audio/*" onChange={(e) => {
+                      const file = e.target.files?.[0]; if (!file) return;
+                      const url = URL.createObjectURL(file);
+                      setRevealAudioSrc(url);
+                      updateReveal({ audio_src: file.name });
+                    }} style={{ fontSize: 10, color: '#888' }} />
+                  </div>
+                </div>
+
+                {/* Lecteur audio */}
+                {(revealAudioSrc || revealManifest?.audio_src) && (<>
+                  <audio ref={revealAudioPlayerRef} src={revealAudioSrc || (revealManifest?.audio_src ? (revealManifest.audio_src.startsWith('./') ? revealManifest.audio_src : './' + revealManifest.audio_src) : undefined)} preload="metadata"
+                    onLoadedMetadata={(e) => setRevealAudioDuration(Number.isFinite(e.currentTarget.duration) ? e.currentTarget.duration : 0)}
+                    onTimeUpdate={(e) => setRevealAudioPosition(e.currentTarget.currentTime)}
+                    onPlay={() => setRevealAudioPlaying(true)}
+                    onPause={() => setRevealAudioPlaying(false)}
+                    onEnded={() => setRevealAudioPlaying(false)}
+                    style={{ display: 'none' }}
+                  />
+                  <div style={{ marginTop: 6, padding: 6, border: '1px solid #2a2a2a', borderRadius: 5, background: '#0a0a0a' }}>
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center', marginBottom: 4 }}>
+                      <button type="button" style={styles.smallButton} onClick={() => { const p = revealAudioPlayerRef.current; if (p) { p.currentTime = Math.max(0, p.currentTime - 1); } }}>-1s</button>
+                      <button type="button" style={{ ...styles.smallButton, minWidth: 50 }} onClick={() => { const p = revealAudioPlayerRef.current; if (!p) return; if (revealAudioPlaying) p.pause(); else p.play(); }}>{revealAudioPlaying ? '⏸' : '▶️'}</button>
+                      <button type="button" style={styles.smallButton} onClick={() => { const p = revealAudioPlayerRef.current; if (p) { p.pause(); p.currentTime = 0; } }}>■</button>
+                      <button type="button" style={styles.smallButton} onClick={() => { const p = revealAudioPlayerRef.current; if (p) { p.currentTime = Math.min(revealAudioDuration, p.currentTime + 1); } }}>+1s</button>
+                      <span style={{ marginLeft: 'auto', fontSize: 10, color: '#b8ffd9' }}>{revealAudioPosition.toFixed(2)}s / {revealAudioDuration.toFixed(2)}s</span>
+                    </div>
+                    <input type="range" min="0" max={revealAudioDuration || 60} step="0.01" value={Math.min(revealAudioPosition, revealAudioDuration || 60)} onChange={(e) => { const p = revealAudioPlayerRef.current; if (p) p.currentTime = parseFloat(e.target.value); }} style={styles.slider} />
+                  </div>
+                </>)}
+
+                {/* Waveform reveal */}
+                {(revealAudioSrc || revealManifest?.audio_src) && (
+                  <div style={{ margin: '8px 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#b8c9c1', marginBottom: 3 }}>
+                      <span><b style={{ color: '#00ff88' }}>VERT</b> = boucle</span>
+                      <span><b style={{ color: '#ff4d6d' }}>ROUGE</b> = drop</span>
+                    </div>
+                    <svg ref={revealWaveformRef} viewBox={`0 0 ${revealWaveformWidth} ${revealWaveformHeight}`} preserveAspectRatio="none" style={{ width: '100%', height: 72, background: '#0d1512', border: '1px solid #214b3a', borderRadius: 6, touchAction: 'none', overflow: 'visible' }}
+                      onPointerDown={(e) => {
+                        const rect = revealWaveformRef.current?.getBoundingClientRect();
+                        if (!rect) return;
+                        const ratio = (e.clientX - rect.left) / rect.width;
+                        const sec = ratio * revealWaveformDuration;
+                        const p = revealAudioPlayerRef.current; if (p) p.currentTime = sec;
+                      }}
+                    >
+                      {/* Grid ticks */}
+                      {Array.from({ length: Math.ceil(revealWaveformDuration / 5) + 1 }, (_, i) => i * 5).filter(s => s <= revealWaveformDuration).map(s => (
+                        <g key={`rtick_${s}`}>
+                          <line x1={revealWaveformX(s)} x2={revealWaveformX(s)} y1="0" y2={revealWaveformHeight} stroke="#284638" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                          <text x={Math.min(revealWaveformWidth - 20, Math.max(2, revealWaveformX(s) + 2))} y="68" fill="#71867b" fontSize="9">{s}s</text>
+                        </g>
+                      ))}
+                      {/* Loop region (green) */}
+                      <rect x={revealWaveformX(revealManifest?.narrative?.audio_sync?.loop_in ?? 0)} y="0" width={Math.max(1, revealWaveformX(revealManifest?.narrative?.audio_sync?.loop_out ?? 10) - revealWaveformX(revealManifest?.narrative?.audio_sync?.loop_in ?? 0))} height={revealWaveformHeight} fill="#00ff88" opacity="0.15" />
+                      {/* Reveal region (red) */}
+                      <rect x={revealWaveformX(revealManifest?.narrative?.audio_sync?.reveal_in ?? 0)} y="0" width={Math.max(1, revealWaveformX(revealManifest?.narrative?.audio_sync?.reveal_out ?? 10) - revealWaveformX(revealManifest?.narrative?.audio_sync?.reveal_in ?? 0))} height={revealWaveformHeight} fill="#ff4d6d" opacity="0.12" />
+                      {/* Waveform line */}
+                      <polyline points={revealWaveformPoints} fill="none" stroke="#00ff88" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+                      {/* Loop handles */}
+                      <line x1={revealWaveformX(revealManifest?.narrative?.audio_sync?.loop_in ?? 0)} x2={revealWaveformX(revealManifest?.narrative?.audio_sync?.loop_in ?? 0)} y1="0" y2={revealWaveformHeight} stroke="#00ff88" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                      <line x1={revealWaveformX(revealManifest?.narrative?.audio_sync?.loop_out ?? 10)} x2={revealWaveformX(revealManifest?.narrative?.audio_sync?.loop_out ?? 10)} y1="0" y2={revealWaveformHeight} stroke="#00ff88" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                      <circle cx={revealWaveformX(revealManifest?.narrative?.audio_sync?.loop_in ?? 0)} cy="10" r="5" fill="#00ff88" stroke="#07150f" strokeWidth="2" />
+                      <text x={Math.min(revealWaveformWidth - 20, Math.max(2, revealWaveformX(revealManifest?.narrative?.audio_sync?.loop_in ?? 0) + 6))} y="9" fill="#b8ffd9" fontSize="9" fontWeight="700">IN</text>
+                      <circle cx={revealWaveformX(revealManifest?.narrative?.audio_sync?.loop_out ?? 10)} cy="10" r="5" fill="#00ff88" stroke="#07150f" strokeWidth="2" />
+                      <text x={Math.min(revealWaveformWidth - 20, Math.max(2, revealWaveformX(revealManifest?.narrative?.audio_sync?.loop_out ?? 10) - 16))} y="9" fill="#b8ffd9" fontSize="9" fontWeight="700">OUT</text>
+                      {/* Reveal handles */}
+                      <line x1={revealWaveformX(revealManifest?.narrative?.audio_sync?.reveal_in ?? 0)} x2={revealWaveformX(revealManifest?.narrative?.audio_sync?.reveal_in ?? 0)} y1="0" y2={revealWaveformHeight} stroke="#ff4d6d" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                      <line x1={revealWaveformX(revealManifest?.narrative?.audio_sync?.reveal_out ?? 10)} x2={revealWaveformX(revealManifest?.narrative?.audio_sync?.reveal_out ?? 10)} y1="0" y2={revealWaveformHeight} stroke="#ff4d6d" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                      <circle cx={revealWaveformX(revealManifest?.narrative?.audio_sync?.reveal_in ?? 0)} cy={revealWaveformHeight - 12} r="5" fill="#ff4d6d" stroke="#210b12" strokeWidth="2" />
+                      <text x={Math.min(revealWaveformWidth - 30, Math.max(2, revealWaveformX(revealManifest?.narrative?.audio_sync?.reveal_in ?? 0) + 6))} y={revealWaveformHeight - 15} fill="#ffb4c3" fontSize="9" fontWeight="700">DROP</text>
+                      <circle cx={revealWaveformX(revealManifest?.narrative?.audio_sync?.reveal_out ?? 10)} cy={revealWaveformHeight - 12} r="5" fill="#ff4d6d" stroke="#210b12" strokeWidth="2" />
+                      <text x={Math.min(revealWaveformWidth - 20, Math.max(2, revealWaveformX(revealManifest?.narrative?.audio_sync?.reveal_out ?? 10) - 14))} y={revealWaveformHeight - 15} fill="#ffb4c3" fontSize="9" fontWeight="700">FIN</text>
+                      {/* Playhead */}
+                      <line x1={revealWaveformX(revealAudioPosition)} x2={revealWaveformX(revealAudioPosition)} y1="0" y2={revealWaveformHeight} stroke="#ffffff" strokeWidth="2" opacity="0.8" vectorEffect="non-scaling-stroke" />
+                    </svg>
+                    <div style={{ marginTop: 3, fontSize: 10, color: '#8eb5a0' }}>
+                      Boucle <b style={{ color: '#00ff88' }}>IN/OUT</b> = intro répétée · Drop <b style={{ color: '#ff4d6d' }}>DROP/FIN</b> = partie forte au reveal
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* ── SOURCES ET SCÈNES ── */}
