@@ -669,44 +669,77 @@ export default function App() {
                 <input style={styles.slider} type="range" min="0" max="100" step="1" value={revealManifest?.narrative?.shared_style?.pos_h ?? 50} onChange={(e) => updateRevealNarrativeStyle('shared_style', 'pos_h', parseInt(e.target.value))} />
               </div>
 
-              {/* ── Couleurs par titre ── */}
+                            {/* ── Panneau Thème ── */}
               <div style={{ marginTop: 6, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
-                <label style={{ ...styles.label, color: '#ffcc66' }}>🎨 Couleurs par titre</label>
-                {[
-                  ['theme_style', 'Thème (CAMOUFLAGE)'],
-                  ['others_style', 'OTHERS'],
-                  ['this_one_style', 'THIS ONE'],
-                  ['transition_style', 'Transition (WAIT FOR THIS ONE)'],
-                  ['final_style', 'Final'],
-                ].map(([key, label]) => (
-                  <div key={key} style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
-                    <label style={{ ...styles.label, fontSize: 10, color: '#aaa', flex: 1 }}>{label}</label>
-                    <input type="color" value={revealManifest?.narrative?.[key]?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle(key, 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
-                      <input type="checkbox" checked={revealManifest?.narrative?.[key]?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle(key, 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
-                      2c
-                    </label>
-                    {revealManifest?.narrative?.[key]?.dual_color && <input type="color" value={revealManifest?.narrative?.[key]?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle(key, 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
-                  </div>
-                ))}
-              </div>
-
-              {/* ── Textes ── */}
-              <div style={{ marginTop: 6, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
-                <label style={{ ...styles.label, color: '#ffcc66' }}>✏️ Textes</label>
-                <label style={styles.label}>Thème</label>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>🎨 Thème</label>
                 <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.theme ?? ''} onChange={(e) => updateRevealNarrative('theme', e.target.value)} placeholder="CAMOUFLAGE" />
-                <label style={styles.label}>OTHERS</label>
-                <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.others_label ?? ''} onChange={(e) => updateRevealNarrative('others_label', e.target.value)} placeholder="OTHERS" />
-                <label style={styles.label}>THIS ONE</label>
-                <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.this_one_label ?? ''} onChange={(e) => updateRevealNarrative('this_one_label', e.target.value)} placeholder="THIS ONE" />
-                <label style={styles.label}>Transition</label>
-                <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.transition_text ?? ''} onChange={(e) => updateRevealNarrative('transition_text', e.target.value)} placeholder="WAIT FOR THIS ONE" />
-                <label style={styles.label}>Texte final</label>
-                <input style={styles.input} value={revealManifest?.narrative?.final_text ?? ''} onChange={(e) => updateRevealNarrative('final_text', e.target.value)} placeholder="" />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur :</label>
+                  <input type="color" value={revealManifest?.narrative?.theme_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('theme_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                </div>
               </div>
 
-              {/* ── Vitesse ── */}
+              {/* ── Panneau OTHERS ── */}
+              <div style={{ marginTop: 6, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>🎨 Texte OTHERS</label>
+                <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.others_label ?? ''} onChange={(e) => updateRevealNarrative('others_label', e.target.value)} placeholder="OTHERS" />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur 1 :</label>
+                  <input type="color" value={revealManifest?.narrative?.others_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('others_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={revealManifest?.narrative?.others_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('others_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
+                    2 couleurs
+                  </label>
+                  {revealManifest?.narrative?.others_style?.dual_color && <input type="color" value={revealManifest?.narrative?.others_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('others_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                </div>
+              </div>
+
+              {/* ── Panneau THIS ONE ── */}
+              <div style={{ marginTop: 6, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>🎨 Texte THIS ONE</label>
+                <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.this_one_label ?? ''} onChange={(e) => updateRevealNarrative('this_one_label', e.target.value)} placeholder="THIS ONE" />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur 1 :</label>
+                  <input type="color" value={revealManifest?.narrative?.this_one_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={revealManifest?.narrative?.this_one_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
+                    2 couleurs
+                  </label>
+                  {revealManifest?.narrative?.this_one_style?.dual_color && <input type="color" value={revealManifest?.narrative?.this_one_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('this_one_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                </div>
+              </div>
+
+              {/* ── Panneau Transition ── */}
+              <div style={{ marginTop: 6, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>🎨 Texte transition</label>
+                <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.transition_text ?? ''} onChange={(e) => updateRevealNarrative('transition_text', e.target.value)} placeholder="WAIT FOR THIS ONE" />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur 1 :</label>
+                  <input type="color" value={revealManifest?.narrative?.transition_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={revealManifest?.narrative?.transition_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
+                    2 couleurs
+                  </label>
+                  {revealManifest?.narrative?.transition_style?.dual_color && <input type="color" value={revealManifest?.narrative?.transition_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('transition_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                </div>
+              </div>
+
+              {/* ── Panneau Texte final ── */}
+              <div style={{ marginTop: 6, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
+                <label style={{ ...styles.label, color: '#ffcc66' }}>🎨 Texte final</label>
+                <input style={{ ...styles.input, marginBottom: 4 }} value={revealManifest?.narrative?.final_text ?? ''} onChange={(e) => updateRevealNarrative('final_text', e.target.value)} placeholder="" />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 4 }}>
+                  <label style={{ ...styles.label, fontSize: 10, color: '#888' }}>Couleur 1 :</label>
+                  <input type="color" value={revealManifest?.narrative?.final_style?.color_1 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('final_style', 'color_1', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#888', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={revealManifest?.narrative?.final_style?.dual_color ?? false} onChange={(e) => updateRevealNarrativeStyle('final_style', 'dual_color', e.target.checked)} style={{ accentColor: '#ffcc66', width: 12, height: 12 }} />
+                    2 couleurs
+                  </label>
+                  {revealManifest?.narrative?.final_style?.dual_color && <input type="color" value={revealManifest?.narrative?.final_style?.color_2 ?? '#ffffff'} onChange={(e) => updateRevealNarrativeStyle('final_style', 'color_2', e.target.value)} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />}
+                </div>
+              </div>
+
+{/* ── Vitesse ── */}
               <div style={{ marginTop: 8, padding: 7, border: '1px solid #333', borderRadius: 6, background: '#0d0d0d' }}>
                 <label style={{ ...styles.label, color: '#ffcc66' }}>⚡ Vitesse : {(revealManifest?.narrative?.speed ?? 1).toFixed(2)}x</label>
                 <input style={styles.slider} type="range" min="0.5" max="4" step="0.05" value={revealManifest?.narrative?.speed ?? 1} onChange={(e) => updateRevealNarrative('speed', parseFloat(e.target.value))} />
