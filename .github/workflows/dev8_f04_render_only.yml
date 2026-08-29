@@ -9,8 +9,6 @@ jobs:
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
-        with:
-          lfs: true
 
       - uses: actions/setup-node@v4
         with:
@@ -25,17 +23,19 @@ jobs:
         working-directory: F03_PREVIEW/CODEBASE
         run: |
           echo "=== public/ ==="
-          ls -lh public/
-          echo "=== public/clips/ ==="
-          ls -lh public/clips/
-          echo "=== public/audio/ ==="
-          ls -lh public/audio/
-          echo "=== Total size ==="
-          du -sh public/
+          ls -la public/
+          echo "=== clips ==="
+          ls -la public/clips/
+          echo "=== audio ==="
+          ls -la public/audio/
 
       - name: Install F03
         working-directory: F03_PREVIEW/CODEBASE
         run: npm ci
+
+      - name: Build F03
+        working-directory: F03_PREVIEW/CODEBASE
+        run: npx vite build
 
       - name: Render MP4 (F04)
         working-directory: F03_PREVIEW/CODEBASE
@@ -48,7 +48,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: dev8-f04-render-${{ github.run_id }}
+          name: dev8-f04-${{ github.run_id }}
           path: F03_PREVIEW/CODEBASE/out/short_final.mp4
           if-no-files-found: error
           retention-days: 14
