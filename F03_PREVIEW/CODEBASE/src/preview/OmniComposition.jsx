@@ -83,9 +83,23 @@ function applyTextStyle(style, baseFontSize) {
     top: `${posV}%`,
     left: `${posH}%`,
     transform: 'translate(-50%, -50%)',
+    whiteSpace: 'nowrap',
     color: color,
     ...(color2 ? { background: `linear-gradient(90deg, ${color} 50%, ${color2} 50%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {}),
   };
+}
+
+function renderColoredText(text, style) {
+  if (!text) return null;
+  if (style?.dual_color && text.includes(' ')) {
+    const words = text.split(' ');
+    return words.map((word, i) => (
+      <span key={i} style={{ color: i === 0 ? (style.color_1 || '#fff') : (style.color_2 || '#fff') }}>
+        {word}{i < words.length - 1 ? ' ' : ''}
+      </span>
+    ));
+  }
+  return text;
 }
 
 function RevealCompilationComposition({ codex, session: sessionProp, revealManifest, musicTimeline }) {
@@ -140,30 +154,30 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
       <AbsoluteFill style={{ pointerEvents: 'none', fontFamily: session.texts_style?.font || 'Impact, Arial Black, sans-serif' }}>
         {/* CAMOUFLAGE — always visible */}
         <div style={{ ...themeStyle, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, textShadow: '0 3px 12px #000' }}>
-          {narrative.theme}
+          {renderColoredText(narrative.theme, narrative.theme_style)}
         </div>
         {/* OTHERS — visible during non-final clips */}
         {!isFinal && (
           <div style={{ ...othersStyle, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, textShadow: '0 3px 12px #000' }}>
-            {narrative.others_label}
+            {renderColoredText(narrative.others_label, narrative.others_style)}
           </div>
         )}
         {/* THIS ONE — visible only during final reveal */}
         {isFinal && (
           <div style={{ ...thisOneStyle, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, textShadow: '0 3px 12px #000' }}>
-            {narrative.this_one_label}
+            {renderColoredText(narrative.this_one_label, narrative.this_one_style)}
           </div>
         )}
         {/* Transition text — visible first 45 frames of each non-final scene */}
         {!isFinal && narrative.transition_text && (frame - Number(scene?.start_frame || 0)) < 45 && (
           <div style={{ ...transitionStyle, textAlign: 'center', lineHeight: 0.95, textTransform: 'uppercase', textShadow: '0 4px 18px #000' }}>
-            {narrative.transition_text}
+            {renderColoredText(narrative.transition_text, narrative.transition_style)}
           </div>
         )}
         {/* Final text — visible during final reveal */}
         {isFinal && narrative.final_text && (
           <div style={{ ...finalStyle, textAlign: 'center', lineHeight: 0.95, textTransform: 'uppercase', textShadow: '0 4px 18px #000' }}>
-            {narrative.final_text}
+            {renderColoredText(narrative.final_text, narrative.final_style)}
           </div>
         )}
       </AbsoluteFill>
