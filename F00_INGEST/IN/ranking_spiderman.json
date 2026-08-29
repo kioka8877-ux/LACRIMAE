@@ -1,0 +1,22 @@
+{
+  "format": "ranking_compilation",
+  "title": "SPIDER-MAN RANKING",
+  "category": "ACTION",
+  "header_label": "TOP",
+  "final_label": "THE GOAT",
+  "font_family": "Arial Black",
+  "title_style": {
+    "font_size": 62,
+    "color": "#FFFFFF",
+    "accent_color": "#FFD400",
+    "x_pct": 8,
+    "y_pct": 8,
+    "align": "left"
+  },
+  "entries": [
+    {"rank": 4, "source_id": "reveal_01", "duration_seconds": 6, "label": "CLIP 01"},
+    {"rank": 3, "source_id": "reveal_02", "duration_seconds": 4, "label": "CLIP 02"},
+    {"rank": 2, "source_id": "reveal_03", "duration_seconds": 7, "label": "CLIP 03"},
+    {"rank": 1, "source_id": "reveal_04", "duration_seconds": 3, "label": "THE GOAT", "final_rank": true}
+  ]
+}
