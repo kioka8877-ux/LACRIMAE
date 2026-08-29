@@ -157,6 +157,7 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
   const sceneTransform = `${revealMotionTransform(scene, frame, fps)} translateY(${shakeY.toFixed(2)}px)`;
   const background = session.background || {};
   const narrative = manifest.narrative || {};
+  const darkLuxuryIntensity = narrative.dark_luxury_intensity ?? 0.6;
   const label = isFinal ? narrative.this_one_label : narrative.others_label;
   const speed = Number(narrative.speed) || 1;
   const watermark = narrative.watermark || {};
@@ -232,7 +233,10 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
           </div>
         </AbsoluteFill>
       )}
-      {isFinal && <AbsoluteFill style={{ background: `rgba(0,0,0,${Math.max(0, Math.min(0.9, Number(reveal.darkness || 0)))})`, pointerEvents: 'none' }} />}
+      {isFinal && (<>
+        <AbsoluteFill style={{ background: `rgba(0,0,0,${Math.max(0, Math.min(0.9, Number(reveal.darkness || 0)))})`, pointerEvents: 'none' }} />
+        <AbsoluteFill style={{ filter: darkLuxuryNoirFilter(narrative.dark_luxury_intensity ?? 0.6), pointerEvents: 'none' }} />
+      </>)}
     </AbsoluteFill>
   );
 }

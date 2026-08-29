@@ -44,7 +44,7 @@ const DEFAULT_NARRATIVE = {
 
 const DEFAULT_REVEAL = {
   enabled: true,
-  darkness: 0.72,
+  darkness: 0.35,
   shake_power: 85,
   shake_duration_frames: 12,
   impact_frame_offset: 0,

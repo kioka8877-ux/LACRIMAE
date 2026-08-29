@@ -963,8 +963,10 @@ export default function App() {
               {/* ── REVEAL FINAL ── */}
               <div style={{ marginTop: 8, paddingTop: 10, borderTop: '1px solid #4a3920' }}>
                 <label style={{ ...styles.label, color: '#ffcc66' }}>REVEAL FINAL</label>
-                <label style={styles.label}>Obscurité : {Math.round(Number((revealManifest?.reveal?.darkness ?? 0.72)) * 100)}%</label>
-                <input style={styles.slider} type="range" min="0" max="0.9" step="0.01" value={revealManifest?.reveal?.darkness ?? 0.72} onChange={(e) => updateReveal({ reveal: { ...(revealManifest?.reveal || {}), darkness: parseFloat(e.target.value) } })} />
+                <label style={styles.label}>Obscurité : {Math.round(Number((revealManifest?.reveal?.darkness ?? 0.35)) * 100)}%</label>
+                <input style={styles.slider} type="range" min="0" max="0.9" step="0.01" value={revealManifest?.reveal?.darkness ?? 0.35} onChange={(e) => updateReveal({ reveal: { ...(revealManifest?.reveal || {}), darkness: parseFloat(e.target.value) } })} />
+                <label style={styles.label}>Dark Luxury : {Math.round((revealManifest?.narrative?.dark_luxury_intensity ?? 0.6) * 100)}%</label>
+                <input style={styles.slider} type="range" min="0" max="1" step="0.05" value={revealManifest?.narrative?.dark_luxury_intensity ?? 0.6} onChange={(e) => updateRevealNarrative('dark_luxury_intensity', parseFloat(e.target.value))} />
                 <label style={styles.label}>Shake : {revealManifest?.reveal?.shake_power ?? 85}%</label>
                 <input style={styles.slider} type="range" min="0" max="100" step="1" value={revealManifest?.reveal?.shake_power ?? 85} onChange={(e) => updateReveal({ reveal: { ...(revealManifest?.reveal || {}), shake_power: parseInt(e.target.value, 10) } })} />
                 <label style={styles.label}>Durée shake : {revealManifest?.reveal?.shake_duration_frames ?? 12}f</label>
