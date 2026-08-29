@@ -1,0 +1,55 @@
+name: DEV8 — F04 Render Only
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Why re-render?'
+        required: false
+        type: string
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: F03_PREVIEW/CODEBASE/package-lock.json
+
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Verify assets in repo
+        run: |
+          echo "=== Assets ==="
+          ls -lh F03_PREVIEW/CODEBASE/public/clips/
+          ls -lh F03_PREVIEW/CODEBASE/public/audio/
+          ls -lh F03_PREVIEW/CODEBASE/public/codex.json
+          ls -lh F03_PREVIEW/CODEBASE/public/reveal_sources.json
+
+      - name: Install & Build F03
+        working-directory: F03_PREVIEW/CODEBASE
+        run: |
+          npm ci
+          npm run build
+
+      - name: Render MP4 (F04)
+        working-directory: F03_PREVIEW/CODEBASE
+        run: npm run render
+
+      - name: Verify output
+        run: |
+          test -f F03_PREVIEW/CODEBASE/out/short_final.mp4
+          ls -lh F03_PREVIEW/CODEBASE/out/short_final.mp4
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dev8-spiderman-render-${{ github.run_id }}
+          path: F03_PREVIEW/CODEBASE/out/short_final.mp4
+          if-no-files-found: error
+          retention-days: 14
