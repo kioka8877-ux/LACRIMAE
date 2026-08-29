@@ -1,59 +1,216 @@
 {
   "format": "reveal_compilation",
   "narrative": {
-    "theme": "CAMOUFLAGE",
-    "others_label": "OTHERS",
+    "theme": "",
+    "others_label": "OTHERS SPIDERMAN",
     "this_one_label": "THIS ONE",
-    "transition_text": "WAIT FOR THIS ONE",
-    "final_text": ""
+    "transition_text": "WAIT FOR THIS ONE ",
+    "final_text": "",
+    "speed": 1,
+    "shared_style": {
+      "scale": 1,
+      "pos_v": 50,
+      "pos_h": 50,
+      "color_1": "#ffffff",
+      "color_2": null,
+      "dual_color": false
+    },
+    "theme_style": {
+      "scale": 1,
+      "pos_v": 50,
+      "pos_h": 50,
+      "color_1": "#ffffff",
+      "color_2": null,
+      "dual_color": false
+    },
+    "others_style": {
+      "scale": 2.2,
+      "pos_v": 9,
+      "pos_h": 50,
+      "color_1": "#ffffff",
+      "color_2": "#d7e60a",
+      "dual_color": true
+    },
+    "this_one_style": {
+      "scale": 0.8,
+      "pos_v": 7,
+      "pos_h": 46,
+      "color_1": "#eb0505",
+      "color_2": null,
+      "dual_color": false
+    },
+    "transition_style": {
+      "scale": 1,
+      "pos_v": 50,
+      "pos_h": 50,
+      "color_1": "#ffffff",
+      "color_2": null,
+      "dual_color": false
+    },
+    "final_style": {
+      "scale": 1,
+      "pos_v": 50,
+      "pos_h": 50,
+      "color_1": "#ffffff",
+      "color_2": null,
+      "dual_color": false
+    },
+    "watermark": {
+      "text": "",
+      "scale": 1,
+      "pos_v": 90,
+      "pos_h": 50,
+      "opacity": 0.3
+    },
+    "audio_sync": {
+      "mode": "reveal_loop",
+      "loop_in": 0,
+      "loop_out": 16.8,
+      "reveal_in": 54.2,
+      "reveal_out": 59.4,
+      "transition": "beat_cut",
+      "crossfade_ms": 200
+    },
+    "dark_luxury_intensity": 1
   },
   "sources": [
     {
       "id": "reveal_01",
       "file": "clips/clip1.2.mp4",
-      "in_seconds": 0,
-      "out_seconds": 6,
       "duration_seconds": 6,
+      "duration_frames": 0,
+      "role": "other",
       "mirror": false,
       "fit_mode": "crop",
-      "role": "other"
+      "focal_x": 50,
+      "focal_y": 50
     },
     {
       "id": "reveal_02",
       "file": "clips/clip2.2.mp4",
-      "in_seconds": 5,
-      "out_seconds": 9,
       "duration_seconds": 4,
+      "duration_frames": 0,
+      "role": "other",
       "mirror": false,
       "fit_mode": "crop",
-      "role": "other"
+      "focal_x": 50,
+      "focal_y": 50
     },
     {
       "id": "reveal_03",
       "file": "clips/clip3.2.mp4",
-      "in_seconds": 0,
-      "out_seconds": 7,
       "duration_seconds": 7,
+      "duration_frames": 0,
+      "role": "other",
       "mirror": false,
       "fit_mode": "crop",
-      "role": "other"
+      "focal_x": 50,
+      "focal_y": 50
     },
     {
       "id": "reveal_04",
       "file": "clips/clip4.2.mp4",
-      "in_seconds": 51,
-      "out_seconds": 54,
       "duration_seconds": 3,
+      "duration_frames": 0,
+      "role": "final_reveal",
       "mirror": false,
       "fit_mode": "blur",
-      "role": "final_reveal"
+      "focal_x": 50,
+      "focal_y": 50
     }
   ],
   "reveal": {
     "enabled": true,
-    "darkness": 0.72,
-    "shake_power": 85,
-    "shake_duration_frames": 12
+    "darkness": 0,
+    "shake_power": 97,
+    "shake_duration_frames": 12,
+    "impact_frame_offset": 0
   },
-  "audio_src": "audio/music.mp3"
+  "audio_src": "audio/music.mp3",
+  "schema_version": "dev8.reveal-compilation.v1",
+  "mode": "reveal_compilation",
+  "fps": 30,
+  "scenes": [
+    {
+      "source_id": "reveal_01",
+      "duration_seconds": 6,
+      "transition": "with_sfx",
+      "motion": {
+        "preset": "drift_left",
+        "intensity": 0.35
+      },
+      "rotation_deg": 0,
+      "video_scale": 1,
+      "pos_h": 50,
+      "pos_v": 50,
+      "duration_frames": 180,
+      "start_frame": 0,
+      "end_frame": 180,
+      "final_reveal": false
+    },
+    {
+      "source_id": "reveal_02",
+      "duration_seconds": 4,
+      "transition": "silent",
+      "motion": {
+        "preset": "drift_right",
+        "intensity": 0.35
+      },
+      "rotation_deg": 0,
+      "video_scale": 1,
+      "pos_h": 50,
+      "pos_v": 50,
+      "duration_frames": 120,
+      "start_frame": 180,
+      "end_frame": 300,
+      "final_reveal": false
+    },
+    {
+      "source_id": "reveal_03",
+      "duration_seconds": 7,
+      "transition": "with_sfx",
+      "motion": {
+        "preset": "drift_left",
+        "intensity": 0.35
+      },
+      "rotation_deg": 0,
+      "video_scale": 1,
+      "pos_h": 50,
+      "pos_v": 50,
+      "duration_frames": 210,
+      "start_frame": 300,
+      "end_frame": 510,
+      "final_reveal": false
+    },
+    {
+      "source_id": "reveal_04",
+      "duration_seconds": 3,
+      "transition": "silent",
+      "motion": {
+        "preset": "drift_right",
+        "intensity": 0.35
+      },
+      "rotation_deg": 0,
+      "video_scale": 1,
+      "pos_h": 50,
+      "pos_v": 50,
+      "duration_frames": 90,
+      "start_frame": 510,
+      "end_frame": 600,
+      "final_reveal": true
+    }
+  ],
+  "total_frames": 600,
+  "duration_seconds": 20,
+  "final_scene_id": "reveal_04",
+  "final_start_frame": 510,
+  "audio_sync": {
+    "mode": "reveal_loop",
+    "loop_in": 0,
+    "loop_out": 16.8,
+    "reveal_in": 54.2,
+    "reveal_out": 59.4,
+    "transition": "beat_cut",
+    "crossfade_ms": 200
+  }
 }
