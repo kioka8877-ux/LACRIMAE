@@ -3,14 +3,11 @@ name: DEV8 — Spider-Man F03+F04 Render
 on:
   workflow_dispatch:
     inputs:
-      f00e_run_id:
-        description: 'Run F00-E (Spider-Man clips)'
-        required: true
-        type: string
-      music_run_id:
-        description: 'Run F00-MUSIC (Spider-Man audio)'
-        required: true
-        type: string
+      skip_download:
+        description: 'Skip artifact download (use repo assets)'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   render:
@@ -28,39 +25,22 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
 
-      - name: Download F00-E artifact
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh run download "${{ inputs.f00e_run_id }}" --repo "${{ github.repository }}" --name "dev8-spiderman-f00e-${{ inputs.f00e_run_id }}" --dir /tmp/dev8-f00e
-          echo "=== F00-E ==="
-          ls -la /tmp/dev8-f00e/
-          ls -la /tmp/dev8-f00e/clips/ 2>/dev/null
 
-      - name: Download F00-MUSIC artifact
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh run download "${{ inputs.music_run_id }}" --repo "${{ github.repository }}" --name "dev8-spiderman-music-${{ inputs.music_run_id }}" --dir /tmp/dev8-music
-          echo "=== F00-MUSIC ==="
-          ls -la /tmp/dev8-music/
-          cat /tmp/dev8-music/music_timeline.json
 
-      - name: Inject assets into F03 Preview
+      - name: Verify repo assets
         run: |
-          mkdir -p F03_PREVIEW/CODEBASE/public/clips
-          cp /tmp/dev8-f00e/reveal_sources.json F03_PREVIEW/CODEBASE/public/reveal_sources.json
-          cp /tmp/dev8-f00e/clips/*.mp4 F03_PREVIEW/CODEBASE/public/clips/
-          cp /tmp/dev8-music/music_timeline.json F03_PREVIEW/CODEBASE/public/music_timeline.json
-          cp /tmp/dev8-music/music.mp3 F03_PREVIEW/CODEBASE/public/music.mp3
-          echo "=== Injected assets ==="
+          echo "=== public/ ==="
           ls -la F03_PREVIEW/CODEBASE/public/
+          echo "=== clips ==="
+          ls -la F03_PREVIEW/CODEBASE/public/clips/
+          echo "=== audio ==="
+          ls -la F03_PREVIEW/CODEBASE/public/audio/
 
       - name: Install & Build F03
         working-directory: F03_PREVIEW/CODEBASE
         run: |
           npm ci
-          npm run build
+          npx vite build
 
       - name: Render MP4 (F04)
         working-directory: F03_PREVIEW/CODEBASE
