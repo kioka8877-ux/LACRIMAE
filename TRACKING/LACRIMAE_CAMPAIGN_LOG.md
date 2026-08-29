@@ -35,6 +35,13 @@
 | 2026-05-19 | F03 | TEST PROD | Rendu Remotion 258/258 frames — short_final.mp4 65.3 Mo | ✅ |
 | 2026-05-19 | F03 | TEST PROD | CUSTOS check-out F03 validé — Transit F03→F04 autorisé | ✅ |
 | 2026-05-19 | F03 | SCELLAGE | **F03 PICTOR SCELLÉE** — Ad Victoriam | ✅ |
+| 2026-08-28 | dev8 | TEST | Variable clips (3-6) — f00_reveal.py modifié, reveal auto-detect | ✅ |
+| 2026-08-28 | dev8 | TEST | Bug fix normalize_source_row — paramètre total ajouté | ✅ |
+| 2026-08-28 | dev8 | TEST | F00-E Spider-Man Test — 4 clips (clip1-4, timings spécifiques) | ✅ |
+| 2026-08-28 | dev8 | TEST | F00-MUSIC Spider-Man — audio analysis (YTDown 128k) | ✅ |
+| 2026-08-28 | dev8 | TEST | F03 Preview — dev server sandbox, reveal panel controls ajoutés (rotation, échelle, position H/V) | ✅ |
+| 2026-08-28 | dev8 | TEST | F03+F04 Render Spider-Man — workflow lancé | 🔄 |
+| 2026-08-28 | dev8 | DOCS | Guides mis à jour : DEV8_REVEAL_COMPILATION.md, F00_INGEST/README.md, README.md, DEV8_REVEAL_IMPLEMENTATION.md | ✅ |
 
 ---
 

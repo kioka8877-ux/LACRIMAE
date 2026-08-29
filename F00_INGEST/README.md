@@ -115,4 +115,19 @@ python3 CODEBASE/f00_reveal.py \\
   --out /tmp/reveal-f00e
 ```
 
+### Workflows GitHub Actions (dev8 Spider-Man)
+
+La branche dev8 inclut des workflows automatisés pour tester le pipeline reveal avec des clips Spider-Man :
+
+```bash
+# F00-E : clip prep (release spiderman)
+# Workflow : dev8_spiderman_test.yml
+# Requête : reveal_request.json avec 4 clips (3-6 supportés)
+
+# F00-MUSIC : analyse audio (release music-spiderman)
+# Workflow : dev8_spiderman_music.yml
+```
+
+**Note :** Les runners GitHub Actions nécessitent `sudo apt-get install -y ffmpeg` avant tout appel à `ffprobe`.
+
 Le flux dev8 est donc `F00-E → F00-MUSIC → F03 Preview → F04`. F00-C et F00-D restent optionnels et séparés.

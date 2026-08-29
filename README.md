@@ -122,6 +122,27 @@ Le Mode 2 conserve le Mode 1 intact et ajoute la timeline `Intro → hard cut �
 
 Le workflow de rendu compatible est `.github/workflows/dev4_f04_hybrid.yml`. Il injecte le manifeste `match_cut/sequences.json`, préserve le champ `file` de chaque séquence et rend les MP4 matérialisés F00-D individuellement. Camouflage et Luther ne sont pas relancées pour la validation visuelle du Mode 2.
 
+
+
+## Reveal Compilation — Mode dev8
+
+Le Mode dev8 ajoute le format narratif **Others vs This One**. Une compilation utilise de trois à six sources vidéo : les clips précédents alimentent la comparaison `OTHERS`, et le dernier constitue le `THIS ONE` / `Final Reveal`.
+
+```text
+F00-E Reveal Clip Prep → F00-MUSIC audio analysis → F03 Preview → F04 PICTOR
+```
+
+### Reveal Panel Controls
+
+F03 Preview propose un panneau d'édition par clip avec : durée (in/out), rotation (-180° à 180°), échelle (0.2x à 3x), position horizontale et verticale (0% à 100%), et type de transition (SFX / silencieux).
+
+### Workflows Spider-Man
+
+Trois workflows automatisés testent le pipeline dev8 avec des clips Spider-Man :
+- `dev8_spiderman_test.yml` — F00-E clip prep
+- `dev8_spiderman_music.yml` — F00-MUSIC audio analysis
+- `dev8_spiderman_render.yml` — F03+F04 render
+
 ## Suivi
 
 Le rapport d’implémentation se trouve dans [`TRACKING/DEV4_PHASE1_REPORT.md`](TRACKING/DEV4_PHASE1_REPORT.md). Le journal de campagne est disponible dans [`TRACKING/LACRIMAE_CAMPAIGN_LOG.md`](TRACKING/LACRIMAE_CAMPAIGN_LOG.md).
