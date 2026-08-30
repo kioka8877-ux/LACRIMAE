@@ -8,7 +8,7 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 const DEFAULT_GLOBAL_CONTROLS = {
-  number_scale: 1,
+  title_scale: 1,
   label_scale: 1,
   list_x_pct: 5,
   list_y_pct: 25,
@@ -53,7 +53,7 @@ export function normalizeRankingManifest(value = {}, fps = 30, totalFrames = 300
   const rawEntries = Array.isArray(ranking.entries) ? ranking.entries : [];
   const rawNarrative = ranking.narrative || {};
   const gc = { ...DEFAULT_GLOBAL_CONTROLS, ...(rawNarrative.global_controls || {}) };
-  gc.number_scale = clamp(gc.number_scale, 0.3, 3, 1);
+  gc.title_scale = clamp(gc.title_scale, 0.3, 3, 1);
   gc.label_scale = clamp(gc.label_scale, 0.3, 3, 1);
   gc.list_x_pct = clamp(gc.list_x_pct, -50, 100, 5);
   gc.list_y_pct = clamp(gc.list_y_pct, -50, 100, 25);

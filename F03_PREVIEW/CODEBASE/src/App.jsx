@@ -679,8 +679,8 @@ export default function App() {
                 <div style={{ marginTop: 8, padding: 8, border: '1px solid #4a4020', borderRadius: 7, background: '#1a1408' }}>
                   <label style={{ ...styles.label, color: '#ffd400', fontSize: 12 }}>🎛️ APPARENCE GÉNÉRALE</label>
                   <div style={{ marginTop: 6 }}>
-                    <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Taille titre</span><span style={{ color: '#ffd400' }}>{Number(gc.number_scale ?? 1).toFixed(2)}x</span></label>
-                    <input style={styles.slider} type="range" min="0.3" max="3" step="0.05" value={gc.number_scale ?? 1} onChange={(e) => updateGC('number_scale', parseFloat(e.target.value))} />
+                    <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Taille titre</span><span style={{ color: '#ffd400' }}>{Number(gc.title_scale ?? 1).toFixed(2)}x</span></label>
+                    <input style={styles.slider} type="range" min="0.3" max="3" step="0.05" value={gc.title_scale ?? 1} onChange={(e) => updateGC('title_scale', parseFloat(e.target.value))} />
                   </div>
                   <div style={{ marginTop: 4 }}>
                     <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Taille écritures</span><span style={{ color: '#ffd400' }}>{Number(gc.label_scale ?? 1).toFixed(2)}x</span></label>

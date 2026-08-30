@@ -108,7 +108,7 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
 
   const videoUrl = entry?.clip_file ? staticFile(entry.clip_file.replace(/^\.\/?/, '')) : null;
 
-  const numberScale = gc.number_scale || 1;
+  const titleScale = gc.title_scale || 1;
   const labelScale = gc.label_scale || 1;
   const listX = gc.list_x_pct ?? 5;
   const listY = gc.list_y_pct ?? 25;
@@ -140,13 +140,13 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
       </AbsoluteFill>
 
       {/* Title — PERSISTENT */}
-      <TitleWords words={manifest.narrative?.title_words} size={gc.title_size || 42} xPct={gc.title_x_pct ?? 50} yPct={gc.title_y_pct ?? 5} />
+      <TitleWords words={manifest.narrative?.title_words} size={(gc.title_size || 42) * titleScale} xPct={gc.title_x_pct ?? 50} yPct={gc.title_y_pct ?? 5} />
 
       {/* Category subtitle */}
       {manifest.narrative?.category && (
         <div style={{
           position: 'absolute', left: `${gc.title_x_pct ?? 50}%`, top: `${(gc.title_y_pct ?? 5) + 7}%`,
-          transform: 'translateX(-50%)', fontSize: (gc.title_size || 42) * 0.55, fontWeight: 700,
+          transform: 'translateX(-50%)', fontSize: (gc.title_size || 42) * titleScale * 0.55, fontWeight: 700,
           color: '#aaa', textTransform: 'uppercase', textShadow: '0 2px 8px rgba(0,0,0,0.8)', zIndex: 10,
         }}>
           {manifest.narrative.category}
@@ -156,7 +156,7 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
       {/* Rank list — NUMBERS PERMANENT, LABELS bottom-to-top */}
       <div style={{
         position: 'absolute', left: `${listX}%`, bottom: `${100 - listY}%`,
-        transform: `scale(${Math.min(numberScale, labelScale)})`, transformOrigin: 'left bottom',
+        transformOrigin: 'left bottom',
         display: 'flex', flexDirection: 'column-reverse', gap: `${spacing}px`,
         zIndex: 20, pointerEvents: 'none',
       }}>
@@ -167,15 +167,15 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
 
           return (
             <div key={row.rank} style={{
-              display: 'flex', alignItems: 'baseline', gap: 4 * numberScale,
-              minHeight: (row.number_size || 42) * numberScale * 1.1,
+              display: 'flex', alignItems: 'baseline', gap: 4,
+              minHeight: (row.number_size || 42) * 1.1,
             }}>
               {/* Number — PERMANENT, always visible */}
               <span style={{
-                fontSize: (row.number_size || 42) * numberScale,
+                fontSize: row.number_size || 42,
                 fontWeight: 900, color: row.number_color || '#FF4444',
                 textShadow: '0 2px 8px rgba(0,0,0,0.9)',
-                minWidth: (row.number_size || 42) * numberScale * 0.6,
+                minWidth: (row.number_size || 42) * 0.6,
                 textAlign: 'right',
               }}>
                 {row.rank}.
