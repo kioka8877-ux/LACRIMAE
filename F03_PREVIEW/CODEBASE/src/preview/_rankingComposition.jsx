@@ -133,7 +133,11 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
       {/* Clip — FULL SCREEN, with optional audio */}
       <AbsoluteFill>
         {videoUrl ? (
-          <Video src={videoUrl} startFrom={Math.max(0, frame - (finalTimings && isFinalRevealed ? finalTimings.start_frame : 0))} muted={!clipAudio}
+          <Video src={videoUrl} startFrom={(() => {
+                const entryTiming = manifest.reveal_timings?.[entry?.rank];
+                const localFrame = entryTiming ? Math.max(0, frame - entryTiming.start_frame) : 0;
+                return localFrame;
+              })()} muted={!clipAudio}
             style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `translateY(${shake.toFixed(2)}px)` }} />
         ) : (
           <div style={{ width: '100%', height: '100%', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ff8866', fontSize: 42 }}>
