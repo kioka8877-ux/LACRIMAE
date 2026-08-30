@@ -1,93 +1,165 @@
-const DEFAULT_NARRATIVE = {
-  title: 'RANKING',
-  category: '',
-  header_label: '',
-  final_label: '',
-  font_family: 'Arial Black',
-  title_style: { font_size: 62, color: '#FFFFFF', accent_color: '#FFD400', x_pct: 8, y_pct: 8, align: 'left' },
-};
+/* ═══════════════════════════════════════════════════════════════════
+   rankingCompilation.js — dev9 list-overlay ranking engine
+   
+   Format: all ranks visible simultaneously, stacked bottom-up.
+   Clip = full-screen. Title = persistent. Random reveal order.
+   Each word in title/label has its own color.
+   ═══════════════════════════════════════════════════════════════════ */
 
-const DEFAULT_POSITION = { x_pct: 50, y_pct: 50, scale: 1, rotation: 0 };
-const DEFAULT_TEXT = { font_family: 'Arial Black', font_size: 54, color: '#FFFFFF', accent_color: '#FFD400', x_pct: 8, y_pct: 34, align: 'left' };
+const DEFAULT_GLOBAL_CONTROLS = {
+  list_scale: 1,
+  list_x_pct: 5,
+  list_y_pct: 25,
+  list_spacing: 2,
+  title_size: 42,
+  title_x_pct: 50,
+  title_y_pct: 5,
+  title_align: 'center',
+};
 
 const clamp = (value, min, max, fallback) => {
-  const number = Number(value);
-  return Number.isFinite(number) ? Math.max(min, Math.min(max, number)) : fallback;
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
 };
+
+function normalizeWord(raw) {
+  if (typeof raw === 'string') return { text: raw, color: '#FFFFFF' };
+  return { text: String(raw?.text ?? ''), color: raw?.color || '#FFFFFF' };
+}
+
+function ensureWordCount(words, maxWords = 4) {
+  const result = [];
+  for (let i = 0; i < maxWords; i++) {
+    result.push(normalizeWord(words?.[i]));
+  }
+  return result;
+}
 
 export function normalizeRankingManifest(value = {}, fps = 30, totalFrames = 300) {
   const ranking = value || {};
   const rawEntries = Array.isArray(ranking.entries) ? ranking.entries : [];
+  const rawNarrative = ranking.narrative || {};
+  const gc = { ...DEFAULT_GLOBAL_CONTROLS, ...(rawNarrative.global_controls || {}) };
+  gc.list_scale = clamp(gc.list_scale, 0.3, 3, 1);
+  gc.list_x_pct = clamp(gc.list_x_pct, -50, 100, 5);
+  gc.list_y_pct = clamp(gc.list_y_pct, -50, 100, 25);
+  gc.list_spacing = clamp(gc.list_spacing, -10, 40, 2);
+  gc.title_size = clamp(gc.title_size, 20, 120, 42);
+  gc.title_x_pct = clamp(gc.title_x_pct, 0, 100, 50);
+  gc.title_y_pct = clamp(gc.title_y_pct, 0, 100, 5);
+
+  const titleWords = ensureWordCount(rawNarrative.title_words || [], 4);
+  const hasTitleWords = titleWords.some(w => w.text.trim().length > 0);
+  let finalTitleWords = titleWords;
+  if (!hasTitleWords && rawNarrative.title) {
+    const parts = rawNarrative.title.split(/\s+/).slice(0, 4);
+    finalTitleWords = ensureWordCount(parts.map((t, i) => ({ text: t, color: i === 1 ? '#FFD400' : '#FFFFFF' })), 4);
+  }
+
   const narrative = {
-    ...DEFAULT_NARRATIVE,
-    ...(ranking.narrative || {}),
-    title_style: { ...DEFAULT_NARRATIVE.title_style, ...(ranking.narrative?.title_style || {}) },
+    title_words: finalTitleWords,
+    category: rawNarrative.category || '',
+    final_label: rawNarrative.final_label || '',
+    global_controls: gc,
+    font_family: rawNarrative.font_family || 'Arial Black, sans-serif',
   };
+
+  const totalClips = rawEntries.length;
   let cursor = 0;
   const entries = rawEntries.map((raw, index) => {
+    const rank = Number(raw.rank ?? (totalClips - index));
     const durationSeconds = Math.max(0.1, clamp(raw.duration_seconds, 0.1, 60, 3));
-    const position = { ...DEFAULT_POSITION, ...(raw.position || {}) };
-    position.x_pct = clamp(position.x_pct, -100, 200, 50);
-    position.y_pct = clamp(position.y_pct, -100, 200, 50);
-    position.scale = clamp(position.scale, 0.05, 10, 1);
-    position.rotation = clamp(position.rotation, -180, 180, 0);
-    const textStyle = { ...DEFAULT_TEXT, ...(raw.text_style || {}) };
-    textStyle.font_size = clamp(textStyle.font_size, 8, 400, 54);
-    textStyle.x_pct = clamp(textStyle.x_pct, 0, 100, 8);
-    textStyle.y_pct = clamp(textStyle.y_pct, 0, 100, 34);
     const durationFrames = Math.max(1, Math.round(durationSeconds * fps));
-    const rank = Number(raw.rank ?? index + 1);
-    const normalized = {
-      ...raw,
-      rank: Number.isFinite(rank) ? rank : index + 1,
-      source_id: raw.source_id || raw.id || `rank_${index + 1}`,
+    const rawLabelWords = raw.label_words || [];
+    const hasLabelWords = rawLabelWords.some(w => (typeof w === 'string' ? w : w?.text || '').trim().length > 0);
+    let labelWords;
+    if (hasLabelWords) {
+      labelWords = ensureWordCount(rawLabelWords, 4);
+    } else if (raw.label) {
+      const parts = raw.label.split(/\s+/).slice(0, 4);
+      labelWords = ensureWordCount(parts.map(t => ({ text: t, color: '#FFFFFF' })), 4);
+    } else {
+      labelWords = ensureWordCount([], 4);
+    }
+    const isFinal = rank === 1;
+    const revealOrder = isFinal ? 9999 : clamp(raw.reveal_order, 1, 99, index + 1);
+    return {
+      rank,
+      source_id: raw.source_id || raw.id || 'rank_' + (index + 1),
       clip_file: raw.clip_file || raw.file || '',
       duration_seconds: durationSeconds,
       duration_frames: durationFrames,
       start_frame: cursor,
       end_frame: cursor + durationFrames,
-      position,
-      label: String(raw.label ?? ''),
-      text_style: textStyle,
-      sfx: { enabled: Boolean(raw.sfx?.enabled), file: raw.sfx?.file || '', offset_seconds: Number(raw.sfx?.offset_seconds || 0), volume: Number(raw.sfx?.volume ?? 1) },
-      role: raw.role || (rank === 1 ? 'final_rank' : 'rank_entry'),
+      label_words: labelWords,
+      label: raw.label || labelWords.map(w => w.text).join(' '),
+      number_color: raw.number_color || (isFinal ? '#FFD400' : '#FF4444'),
+      number_size: clamp(raw.number_size, 12, 100, isFinal ? 56 : 42),
+      label_size: clamp(raw.label_size, 8, 80, isFinal ? 28 : 22),
+      label_y_top: clamp(raw.label_y_top, 0, 100, 0),
+      label_y_bottom: clamp(raw.label_y_bottom, 0, 100, 50),
+      reveal_order: revealOrder,
+      role: isFinal ? 'final_rank' : 'rank_entry',
+      sfx: { enabled: Boolean(raw.sfx?.enabled), file: raw.sfx?.file || '', volume: Number(raw.sfx?.volume ?? 1) },
     };
-    cursor += durationFrames;
-    return normalized;
   }).sort((a, b) => b.rank - a.rank);
-  const finalRank = entries.find((entry) => entry.rank === 1) || entries[entries.length - 1] || null;
+
+  const sortedByReveal = [...entries].sort((a, b) => a.reveal_order - b.reveal_order);
+  let timeCursor = 0;
+  const revealTimings = {};
+  for (const entry of sortedByReveal) {
+    const dur = entry.duration_frames;
+    revealTimings[entry.rank] = { start_frame: timeCursor, end_frame: timeCursor + dur };
+    timeCursor += dur;
+  }
+  const finalEntry = entries.find(e => e.rank === 1);
+  if (finalEntry) {
+    revealTimings[finalEntry.rank] = { start_frame: timeCursor, end_frame: timeCursor + finalEntry.duration_frames };
+    timeCursor += finalEntry.duration_frames;
+  }
+
+  const finalRank = entries.find(e => e.rank === 1) || null;
   return {
     ...ranking,
-    schema_version: ranking.schema_version || 'dev9.ranking.v1',
+    schema_version: 'dev9.ranking.v2',
     mode: 'ranking_compilation',
     fps,
     narrative,
     entries,
     rank_count: entries.length,
     final_rank: finalRank,
-    total_frames: Math.max(1, cursor || totalFrames),
-    duration_seconds: Math.max(1 / fps, (cursor || totalFrames) / fps),
+    reveal_timings: revealTimings,
+    total_frames: Math.max(1, timeCursor || totalFrames),
+    duration_seconds: Math.max(1 / fps, (timeCursor || totalFrames) / fps),
   };
 }
 
-export function rankingEntryAtFrame(manifest, frame) {
-  return manifest?.entries?.find((entry) => frame >= entry.start_frame && frame < entry.end_frame) || manifest?.entries?.[manifest.entries.length - 1] || null;
-}
-
 export function rankingActiveRows(manifest, frame) {
-  const active = rankingEntryAtFrame(manifest, frame);
-  return (manifest?.entries || []).map((entry) => ({ ...entry, active: entry.rank === active?.rank, revealed: entry.start_frame <= frame }));
+  if (!manifest?.entries) return [];
+  const timings = manifest.reveal_timings || {};
+  return manifest.entries
+    .slice()
+    .sort((a, b) => b.rank - a.rank)
+    .map(entry => {
+      const t = timings[entry.rank];
+      const revealed = t ? frame >= t.start_frame : false;
+      const justAppeared = t ? frame >= t.start_frame && frame < t.start_frame + 6 : false;
+      return { ...entry, revealed, justAppeared, display_start: t?.start_frame ?? 0 };
+    });
 }
 
-export function rankingMotionTransform(entry, frame, fps) {
-  const position = entry?.position || DEFAULT_POSITION;
-  const local = Math.max(0, frame - Number(entry?.start_frame || 0));
-  const phase = local / Math.max(1, Number(entry?.duration_frames || fps * 3));
-  const drift = entry?.motion?.preset || 'none';
-  const intensity = clamp(entry?.motion?.intensity, 0, 1, 0.25) * 2;
-  const dx = drift === 'drift_left' ? -phase * intensity : drift === 'drift_right' ? phase * intensity : 0;
-  const dy = drift === 'drift_up' ? -phase * intensity : drift === 'drift_down' ? phase * intensity : 0;
-  return `translate(${(position.x_pct + dx).toFixed(3)}%, ${(position.y_pct + dy).toFixed(3)}%) translate(-50%, -50%) rotate(${position.rotation}deg) scale(${position.scale})`;
+export function rankingEntryAtFrame(manifest, frame) {
+  if (!manifest?.entries) return null;
+  const timings = manifest.reveal_timings || {};
+  for (const entry of manifest.entries) {
+    const t = timings[entry.rank];
+    if (t && frame >= t.start_frame && frame < t.end_frame) return entry;
+  }
+  return manifest.final_rank || manifest.entries[manifest.entries.length - 1] || null;
+}
+
+export function rankingMotionTransform() {
+  return 'none';
 }
 
 export default normalizeRankingManifest;

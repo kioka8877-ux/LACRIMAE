@@ -660,69 +660,117 @@ export default function App() {
             </button>
           </div>
 
-          {/* ══════════ RANKING COMPILATION : rangs + narration ══════════ */}
-          {activeTab === 'ranking' && (
-            <div style={styles.panelContent}>
-              <label style={{ ...styles.label, color: '#ffd400', fontSize: '14px' }}>RANKING COMPILATION</label>
-              <div style={{ color: '#aaa', fontSize: 12, lineHeight: 1.45 }}>F00-F prépare les entrées. Ici, F03 vérifie et ajuste le classement avant le rendu.</div>
-              <label style={styles.label}>Titre</label>
-              <input style={styles.input} value={rankingManifest?.narrative?.title ?? ''} onChange={(e) => updateRankingNarrative('title', e.target.value)} placeholder="RANKING" />
-              <label style={styles.label}>Catégorie</label>
-              <input style={styles.input} value={rankingManifest?.narrative?.category ?? ''} onChange={(e) => updateRankingNarrative('category', e.target.value)} placeholder="FUNNIEST MOMENTS" />
-              <label style={styles.label}>Libellé final</label>
-              <input style={styles.input} value={rankingManifest?.narrative?.final_label ?? ''} onChange={(e) => updateRankingNarrative('final_label', e.target.value)} placeholder="NUMBER ONE" />
-              <div style={{ marginTop: 8, paddingTop: 10, borderTop: '1px solid #4a4020' }}>
-                <label style={{ ...styles.label, color: '#ffd400' }}>RANGS</label>
-                {(activeRanking?.entries || rankingManifest?.entries || []).map((entry, index) => {
-                  const position = entry.position || {};
-                  const textStyle = entry.text_style || {};
-                  const sfx = entry.sfx || {};
-                  return (
-                    <div key={entry.source_id || index} style={{ marginTop: 8, padding: 9, border: `1px solid ${entry.rank === 1 ? '#8a6820' : '#333'}`, borderRadius: 7, background: entry.rank === 1 ? '#1d1708' : '#111' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', color: entry.rank === 1 ? '#ffd400' : '#ddd', fontWeight: 800, fontSize: 12 }}><span>#{entry.rank}{entry.rank === 1 ? ' — FINAL' : ''}</span><span style={{ color: '#888', fontWeight: 500 }}>{entry.source_id}</span></div>
-                      {/* ── Label (textarea pour labels longs) ── */}
-                      <label style={styles.label}>Label du rang</label>
-                      <textarea style={{ ...styles.input, minHeight: '36px', resize: 'vertical', fontFamily: 'inherit' }} value={entry.label ?? ''} onChange={(e) => updateRankingEntry(index, { label: e.target.value })} placeholder="LABEL" rows={1} />
-                      {/* ── Durée ── */}
-                      <label style={styles.label}>Durée : {Number(entry.duration_seconds || 3).toFixed(2)} s</label>
-                      <input style={styles.slider} type="range" min="0.5" max="30" step="0.1" value={Number(entry.duration_seconds || 3)} onChange={(e) => updateRankingEntry(index, { duration_seconds: parseFloat(e.target.value) })} />
-                      {/* ── Position clip (X/Y + scale + rotation) ── */}
-                      <div style={{ marginTop: 6, padding: 6, border: '1px solid #2a2a2a', borderRadius: 5, background: '#0a0a0a' }}>
-                        <label style={{ ...styles.label, color: '#aaa', fontSize: 10 }}>── CLIP ──</label>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                          <label style={styles.label}>Pos X<input style={styles.input} type="number" min="-100" max="200" step="1" value={Number(position.x_pct ?? 50)} onChange={(e) => updateRankingEntry(index, { position: { ...position, x_pct: parseFloat(e.target.value) } })} /></label>
-                          <label style={styles.label}>Pos Y<input style={styles.input} type="number" min="-100" max="200" step="1" value={Number(position.y_pct ?? 50)} onChange={(e) => updateRankingEntry(index, { position: { ...position, y_pct: parseFloat(e.target.value) } })} /></label>
-                          <label style={styles.label}>Échelle<input style={styles.input} type="number" min="0.05" max="10" step="0.05" value={Number(position.scale ?? 1)} onChange={(e) => updateRankingEntry(index, { position: { ...position, scale: parseFloat(e.target.value) } })} /></label>
-                          <label style={styles.label}>Rotation<input style={styles.input} type="number" min="-180" max="180" step="1" value={Number(position.rotation ?? 0)} onChange={(e) => updateRankingEntry(index, { position: { ...position, rotation: parseFloat(e.target.value) } })} /></label>
+          {/* ══════════ RANKING COMPILATION : list-overlay ══════════ */}
+          {activeTab === 'ranking' && (() => {
+            const gc = rankingManifest?.narrative?.global_controls || {};
+            const titleWords = rankingManifest?.narrative?.title_words || [{ text: '', color: '#FFFFFF' }, { text: '', color: '#FFD400' }, { text: '', color: '#FFFFFF' }, { text: '', color: '#FFFFFF' }];
+            const updateTitleWord = (wordIndex, patch) => {
+              const words = [...titleWords];
+              words[wordIndex] = { ...(words[wordIndex] || {}), ...patch };
+              updateRankingNarrative('title_words', words);
+            };
+            const updateGC = (key, value) => updateRankingNarrative('global_controls', { ...(gc), [key]: value });
+            return (
+              <div style={styles.panelContent}>
+                <label style={{ ...styles.label, color: '#ffd400', fontSize: '14px' }}>RANKING COMPILATION</label>
+                <div style={{ color: '#aaa', fontSize: 12, lineHeight: 1.45 }}>Liste visible : tous les rangs empilés du bas vers le haut. Clip plein écran. Rang #1 = toujours le dernier.</div>
+
+                {/* ── CONTROLS GLOBAUX ── */}
+                <div style={{ marginTop: 8, padding: 8, border: '1px solid #4a4020', borderRadius: 7, background: '#1a1408' }}>
+                  <label style={{ ...styles.label, color: '#ffd400', fontSize: 12 }}>🎛️ APPARENCE GÉNÉRALE</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginTop: 4 }}>
+                    <label style={styles.label}>Scale <input style={styles.input} type="number" min="0.3" max="3" step="0.05" value={gc.list_scale ?? 1} onChange={(e) => updateGC('list_scale', parseFloat(e.target.value))} /></label>
+                    <label style={styles.label}>Espacement <input style={styles.input} type="number" min="-10" max="40" step="1" value={gc.list_spacing ?? 2} onChange={(e) => updateGC('list_spacing', parseFloat(e.target.value))} /></label>
+                    <label style={styles.label}>Liste X % <input style={styles.input} type="number" min="-50" max="100" step="1" value={gc.list_x_pct ?? 5} onChange={(e) => updateGC('list_x_pct', parseFloat(e.target.value))} /></label>
+                    <label style={styles.label}>Liste Y % <input style={styles.input} type="number" min="-50" max="100" step="1" value={gc.list_y_pct ?? 25} onChange={(e) => updateGC('list_y_pct', parseFloat(e.target.value))} /></label>
+                  </div>
+                </div>
+
+                {/* ── TITRE (word-by-word) ── */}
+                <div style={{ marginTop: 8, padding: 8, border: '1px solid #4a4020', borderRadius: 7, background: '#1a1408' }}>
+                  <label style={{ ...styles.label, color: '#ffd400', fontSize: 12 }}>🎬 TITRE</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 4, marginTop: 4 }}>
+                    {[0, 1, 2, 3].map(wi => (
+                      <React.Fragment key={wi}>
+                        <input style={{ ...styles.input, fontSize: 11 }} value={titleWords[wi]?.text || ''} onChange={(e) => updateTitleWord(wi, { text: e.target.value })} placeholder={wi === 0 ? 'Mot 1' : wi === 1 ? 'Mot 2' : wi === 2 ? 'Mot 3 (opt)' : 'Mot 4 (opt)'} />
+                        <input type="color" value={titleWords[wi]?.color || '#FFFFFF'} onChange={(e) => updateTitleWord(wi, { color: e.target.value })} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                      </React.Fragment>
+                    ))}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4, marginTop: 4 }}>
+                    <label style={styles.label}>Taille <input style={styles.input} type="number" min="20" max="120" step="1" value={gc.title_size ?? 42} onChange={(e) => updateGC('title_size', parseFloat(e.target.value))} /></label>
+                    <label style={styles.label}>X % <input style={styles.input} type="number" min="0" max="100" step="1" value={gc.title_x_pct ?? 50} onChange={(e) => updateGC('title_x_pct', parseFloat(e.target.value))} /></label>
+                    <label style={styles.label}>Y % <input style={styles.input} type="number" min="0" max="100" step="1" value={gc.title_y_pct ?? 5} onChange={(e) => updateGC('title_y_pct', parseFloat(e.target.value))} /></label>
+                  </div>
+                  <label style={styles.label}>Catégorie</label>
+                  <input style={styles.input} value={rankingManifest?.narrative?.category ?? ''} onChange={(e) => updateRankingNarrative('category', e.target.value)} placeholder="ACTION" />
+                  <label style={styles.label}>Libellé final</label>
+                  <input style={styles.input} value={rankingManifest?.narrative?.final_label ?? ''} onChange={(e) => updateRankingNarrative('final_label', e.target.value)} placeholder="THE GOAT" />
+                </div>
+
+                {/* ── RANGS ── */}
+                <div style={{ marginTop: 8, paddingTop: 10, borderTop: '1px solid #4a4020' }}>
+                  <label style={{ ...styles.label, color: '#ffd400' }}>RANGS</label>
+                  {(activeRanking?.entries || rankingManifest?.entries || []).map((entry, index) => {
+                    const labelWords = entry.label_words || [];
+                    const updateLabelWord = (wordIndex, patch) => {
+                      const words = [...labelWords];
+                      words[wordIndex] = { ...(words[wordIndex] || {}), ...patch };
+                      updateRankingEntry(index, { label_words: words });
+                    };
+                    const updateEntry = (patch) => updateRankingEntry(index, patch);
+                    return (
+                      <div key={entry.source_id || index} style={{ marginTop: 8, padding: 9, border: `1px solid ${entry.rank === 1 ? '#8a6820' : '#333'}`, borderRadius: 7, background: entry.rank === 1 ? '#1d1708' : '#111' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: entry.rank === 1 ? '#ffd400' : '#ddd', fontWeight: 800, fontSize: 12 }}>
+                          <span>#{entry.rank}{entry.rank === 1 ? ' — 👑 LE ROI' : ''}</span>
+                          <span style={{ color: '#888', fontWeight: 500 }}>{entry.source_id}</span>
                         </div>
-                      </div>
-                      {/* ── Texte du rang (taille + couleur + position texte) ── */}
-                      <div style={{ marginTop: 6, padding: 6, border: '1px solid #2a2a2a', borderRadius: 5, background: '#0a0a0a' }}>
-                        <label style={{ ...styles.label, color: '#aaa', fontSize: 10 }}>── TEXTE ──</label>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                          <label style={styles.label}>Taille texte<input style={styles.input} type="number" min="8" max="400" step="1" value={Number(textStyle.font_size ?? 54)} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, font_size: parseFloat(e.target.value) } })} /></label>
-                          <label style={styles.label}>Texte X %<input style={styles.input} type="number" min="0" max="100" step="1" value={Number(textStyle.x_pct ?? 8)} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, x_pct: parseFloat(e.target.value) } })} /></label>
-                          <label style={styles.label}>Texte Y %<input style={styles.input} type="number" min="0" max="100" step="1" value={Number(textStyle.y_pct ?? 34)} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, y_pct: parseFloat(e.target.value) } })} /></label>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <label style={{ ...styles.label, margin: 0 }}>Couleur</label>
-                            <input type="color" value={textStyle.color ?? '#FFFFFF'} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, color: e.target.value } })} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+
+                        {/* ── NUMÉRO ── */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                          <label style={{ ...styles.label, margin: 0, fontSize: 11 }}>Couleur #</label>
+                          <input type="color" value={entry.number_color ?? '#FF4444'} onChange={(e) => updateEntry({ number_color: e.target.value })} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                          <label style={{ ...styles.label, margin: 0, fontSize: 11, marginLeft: 'auto' }}>Taille #</label>
+                          <input style={{ ...styles.input, width: 50 }} type="number" min="12" max="100" step="1" value={entry.number_size ?? 42} onChange={(e) => updateEntry({ number_size: parseFloat(e.target.value) })} />
+                        </div>
+
+                        {/* ── LABEL (word-by-word) ── */}
+                        <div style={{ marginTop: 4 }}>
+                          <label style={{ ...styles.label, fontSize: 11 }}>Label (mots + couleurs)</label>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 3 }}>
+                            {[0, 1, 2, 3].map(wi => (
+                              <React.Fragment key={wi}>
+                                <input style={{ ...styles.input, fontSize: 10, minHeight: 22 }} value={labelWords[wi]?.text || ''} onChange={(e) => updateLabelWord(wi, { text: e.target.value })} placeholder={wi === 0 ? 'Mot 1' : wi === 1 ? 'Mot 2' : wi === 2 ? 'Mot 3' : 'Mot 4'} />
+                                <input type="color" value={labelWords[wi]?.color || '#FFFFFF'} onChange={(e) => updateLabelWord(wi, { color: e.target.value })} style={{ width: 24, height: 20, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
+                              </React.Fragment>
+                            ))}
+                          </div>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4, marginTop: 4 }}>
+                            <label style={{ ...styles.label, fontSize: 10 }}>Taille txt <input style={{ ...styles.input, fontSize: 10 }} type="number" min="8" max="80" step="1" value={entry.label_size ?? 22} onChange={(e) => updateEntry({ label_size: parseFloat(e.target.value) })} /></label>
+                            <label style={{ ...styles.label, fontSize: 10 }}>Pos haut % <input style={{ ...styles.input, fontSize: 10 }} type="number" min="0" max="100" step="1" value={entry.label_y_top ?? 0} onChange={(e) => updateEntry({ label_y_top: parseFloat(e.target.value) })} /></label>
+                            <label style={{ ...styles.label, fontSize: 10 }}>Pos bas % <input style={{ ...styles.input, fontSize: 10 }} type="number" min="0" max="100" step="1" value={entry.label_y_bottom ?? 50} onChange={(e) => updateEntry({ label_y_bottom: parseFloat(e.target.value) })} /></label>
                           </div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-                          <label style={{ ...styles.label, margin: 0 }}>Accent</label>
-                          <input type="color" value={textStyle.accent_color ?? '#FFD400'} onChange={(e) => updateRankingEntry(index, { text_style: { ...textStyle, accent_color: e.target.value } })} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
-                          <label style={{ color: '#bbb', fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, marginLeft: 'auto' }}><input type="checkbox" checked={Boolean(sfx.enabled)} onChange={(e) => updateRankingEntry(index, { sfx: { ...sfx, enabled: e.target.checked } })} /> SFX</label>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-                {!(activeRanking?.entries?.length || rankingManifest?.entries?.length) && <div style={{ color: '#ff9f66', fontSize: 12, padding: 8 }}>Aucun ranking_manifest.json chargé. F00-F doit d’abord produire le manifeste.</div>}
-              </div>
-            </div>
-          )}
 
-          {/* ══════════ REVEAL COMPILATION : six clips + narratif ══════════ */}
+                        {/* ── TIMING ── */}
+                        <label style={{ ...styles.label, fontSize: 11 }}>Durée : {Number(entry.duration_seconds || 3).toFixed(2)} s</label>
+                        <input style={styles.slider} type="range" min="0.5" max="10" step="0.1" value={Number(entry.duration_seconds || 3)} onChange={(e) => updateEntry({ duration_seconds: parseFloat(e.target.value) })} />
+                        <label style={{ ...styles.label, fontSize: 11 }}>Ordre d'apparition</label>
+                        <select style={styles.input} value={entry.reveal_order ?? (entry.rank === 1 ? 9999 : index + 1)} onChange={(e) => updateEntry({ reveal_order: parseInt(e.target.value) })} disabled={entry.rank === 1}>
+                          {Array.from({ length: (activeRanking?.entries || rankingManifest?.entries || []).length }, (_, i) => i + 1).map(n => (
+                            <option key={n} value={n}>{n === 1 ? '1er à apparaître' : n === 2 ? '2e à apparaître' : n === 3 ? '3e à apparaître' : n === 4 ? '4e à apparaître' : n + 'e à apparaître'}</option>
+                          ))}
+                        </select>
+                        {entry.rank === 1 && <div style={{ color: '#ffd400', fontSize: 10, marginTop: 2 }}>👑 Toujours le dernier à apparaître</div>}
+                      </div>
+                    );
+                  })}
+                  {!(activeRanking?.entries?.length || rankingManifest?.entries?.length) && <div style={{ color: '#ff9f66', fontSize: 12, padding: 8 }}>Aucun ranking_manifest.json chargé. F00-F doit d'abord produire le manifeste.</div>}
+                </div>
+              </div>
+            );
+          })()}
+{/* ══════════ REVEAL COMPILATION : six clips + narratif ══════════ */}
           {activeTab === 'reveal' && (
             <div style={styles.panelContent}>
               <label style={{ ...styles.label, color: '#ffcc66', fontSize: '14px' }}>REVEAL COMPILATION</label>

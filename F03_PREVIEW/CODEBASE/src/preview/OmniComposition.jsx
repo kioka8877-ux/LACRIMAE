@@ -19,6 +19,7 @@ import { hybridTimelineFrame, hybridEgoStyle, hybridTextStyle } from './hybridNa
 import { buildAudioSegments, normalizeMusicTimeline } from './audioTimeline';
 import { normalizeRevealManifest, revealSceneAtFrame, revealSourceForScene, revealMotionTransform } from './revealCompilation';
 import { normalizeRankingManifest, rankingEntryAtFrame, rankingActiveRows, rankingMotionTransform } from './rankingCompilation';
+import { RankingCompilationComposition } from './_rankingComposition';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * OmniComposition (F03 PREVIEW) â€” mÃªmes 6 calques que F04 RENDER :
@@ -70,45 +71,6 @@ const SESSION_FALLBACK = {
     grain_intensity: 0.15,
   },
 };
-
-function RankingCompilationComposition({ session: sessionProp, rankingManifest, musicTimeline }) {
-  const frame = useCurrentFrame();
-  const { fps, durationInFrames } = useVideoConfig();
-  const session = sessionProp || {};
-  const manifest = normalizeRankingManifest(rankingManifest, fps, durationInFrames);
-  const entry = rankingEntryAtFrame(manifest, frame);
-  const music = normalizeMusicTimeline(musicTimeline || session.music || {}, fps, durationInFrames);
-  const musicUrl = music.audio_src ? staticFile(music.audio_src.replace(/^\.\//, '')) : null;
-  const audioSegments = musicUrl ? buildAudioSegments({ ...music, audio_src: musicUrl }, fps, durationInFrames) : [];
-  const rows = rankingActiveRows(manifest, frame);
-  const localFrame = Math.max(0, frame - Number(entry?.start_frame || 0));
-  const videoUrl = entry?.clip_file ? staticFile(entry.clip_file.replace(/^\.\//, '')) : null;
-  const final = entry?.role === 'final_rank' || entry?.rank === 1;
-  const titleStyle = manifest.narrative?.title_style || {};
-  const position = entry?.position || {};
-  const transform = rankingMotionTransform(entry, frame, fps);
-  const shakeLocal = final ? localFrame : -1;
-  const shake = final && shakeLocal < 12 ? Math.sin(shakeLocal * 2.8) * 18 * Math.pow(1 - shakeLocal / 12, 1.7) : 0;
-  return (
-    <AbsoluteFill style={{ backgroundColor: '#050505', overflow: 'hidden', fontFamily: manifest.narrative?.font_family || 'Arial Black, sans-serif' }}>
-      {musicUrl && audioSegments.map((segment, index) => <Sequence key={`ranking_music_${index}`} from={segment.from} durationInFrames={segment.duration}><Audio src={musicUrl} startFrom={segment.startFrom} volume={segment.volume} /></Sequence>)}
-      {entry?.sfx?.enabled && entry.sfx.file && <Sequence from={Number(entry.start_frame || 0)} durationInFrames={Math.max(1, durationInFrames - Number(entry.start_frame || 0))}><Audio src={staticFile(entry.sfx.file.replace(/^\.\//, ''))} volume={Number(entry.sfx.volume ?? 1)} /></Sequence>}
-      <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
-        {videoUrl ? <Video src={videoUrl} startFrom={localFrame} muted style={{ position: 'absolute', left: `${position.x_pct ?? 50}%`, top: `${position.y_pct ?? 50}%`, width: `${Math.min(200, Math.max(5, 100 * (position.scale ?? 1)))}%`, height: 'auto', transform: `${transform} translateY(${shake.toFixed(2)}px)`, transformOrigin: 'center center', objectFit: 'contain' }} /> : <div style={{ color: '#ff8866', fontSize: 42 }}>CLIP MANQUANT</div>}
-      </AbsoluteFill>
-      <AbsoluteFill style={{ pointerEvents: 'none', color: '#fff' }}>
-        <div style={{ position: 'absolute', left: `${titleStyle.x_pct ?? 8}%`, top: `${titleStyle.y_pct ?? 8}%`, fontSize: Number(titleStyle.font_size || 62), fontWeight: 900, color: titleStyle.color || '#fff', textTransform: 'uppercase', textShadow: '0 3px 12px #000' }}>
-          {manifest.narrative.title}{manifest.narrative.category ? ` — ${manifest.narrative.category}` : ''}
-        </div>
-        <div style={{ position: 'absolute', right: '5%', top: '25%', width: '42%', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {rows.map((row) => <div key={row.rank} style={{ opacity: row.revealed ? 1 : 0.38, color: row.active ? (row.text_style?.accent_color || '#FFD400') : '#fff', fontSize: row.active ? 31 : 24, fontWeight: 900, textShadow: '0 2px 8px #000', padding: '5px 8px', borderRight: row.active ? `4px solid ${row.text_style?.accent_color || '#FFD400'}` : '4px solid transparent' }}><span style={{ color: row.active ? (row.text_style?.accent_color || '#FFD400') : '#aaa' }}>#{row.rank}</span>{row.revealed && row.label ? `  ${row.label}` : ''}</div>)}
-        </div>
-        {entry?.label && <div style={{ position: 'absolute', left: `${entry.text_style?.x_pct ?? 8}%`, top: `${entry.text_style?.y_pct ?? 34}%`, fontSize: Number(entry.text_style?.font_size || 54), fontWeight: 900, color: entry.text_style?.color || '#fff', textTransform: 'uppercase', textShadow: '0 4px 18px #000', maxWidth: '75%' }}>{entry.label}</div>}
-      </AbsoluteFill>
-      {final && <AbsoluteFill style={{ background: `rgba(0,0,0,${Math.max(0, Math.min(0.9, Number(manifest.reveal?.darkness ?? 0.35)))})`, pointerEvents: 'none' }} />}
-    </AbsoluteFill>
-  );
-}
 
 function RevealCompilationComposition({ codex, session: sessionProp, revealManifest, musicTimeline }) {
   const frame = useCurrentFrame();
