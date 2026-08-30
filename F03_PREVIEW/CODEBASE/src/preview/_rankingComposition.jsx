@@ -130,30 +130,30 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
         );
       })}
 
-      {/* Clip — FULL SCREEN, with audio */}
-      <AbsoluteFill>
-        {videoUrl ? (() => {
-            const entryTiming = manifest.reveal_timings?.[entry?.rank];
-            const localFrame = entryTiming ? Math.max(0, frame - entryTiming.start_frame) : 0;
-            const maxFrames = Math.floor((entry?.duration_seconds || 3) * fps);
-            const clampedFrame = Math.min(localFrame, Math.max(0, maxFrames - 1));
-            return (
-              <>
-                <Video src={videoUrl} startFrom={clampedFrame} muted={!clipAudio}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `translateY(${shake.toFixed(2)}px)` }} />
-                {clipAudio && (
-                  <Sequence from={entryTiming?.start_frame || 0} durationInFrames={maxFrames}>
-                    <Audio src={videoUrl} startFrom={0} volume={1} />
-                  </Sequence>
-                )}
-              </>
-            );
-          })() : (
-          <div style={{ width: '100%', height: '100%', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ff8866', fontSize: 42 }}>
-            CLIP MANQUANT
-          </div>
-        )}
-      </AbsoluteFill>
+      {/* Clips — each in its own Sequence to limit duration */}
+      {manifest.entries?.map((row) => {
+        const t = manifest.reveal_timings?.[row.rank];
+        if (!t) return null;
+        const clipUrl = row.clip_file ? staticFile(row.clip_file.replace(/^\.\/?/, '')) : null;
+        if (!clipUrl) return null;
+        const clipFrames = Math.max(1, Math.round(row.duration_seconds * fps));
+        const isActive = entry?.rank === row.rank;
+        return (
+          <Sequence key={`clip_${row.rank}`} from={t.start_frame} durationInFrames={clipFrames}>
+            <AbsoluteFill>
+              <Video src={clipUrl} muted={!clipAudio}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', transform: isActive ? `translateY(${shake.toFixed(2)}px)` : 'none' }} />
+              {clipAudio && <Audio src={clipUrl} startFrom={0} volume={1} />}
+            </AbsoluteFill>
+          </Sequence>
+        );
+      })}
+      {/* Fallback if no clips */}
+      {!manifest.entries?.length && (
+        <div style={{ width: '100%', height: '100%', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ff8866', fontSize: 42 }}>
+          CLIP MANQUANT
+        </div>
+      )}
 
       {/* Title — PERSISTENT */}
       <TitleWords words={manifest.narrative?.title_words} size={(gc.title_size || 42) * titleScale} xPct={gc.title_x_pct ?? 50} yPct={gc.title_y_pct ?? 5} />
