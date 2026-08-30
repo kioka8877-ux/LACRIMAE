@@ -109,6 +109,7 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
   const videoUrl = entry?.clip_file ? staticFile(entry.clip_file.replace(/^\.\/?/, '')) : null;
 
   const titleScale = gc.title_scale || 1;
+  const numberScale = gc.number_scale || 1;
   const labelScale = gc.label_scale || 1;
   const listX = gc.list_x_pct ?? 5;
   const listY = gc.list_y_pct ?? 25;
@@ -167,15 +168,15 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
 
           return (
             <div key={row.rank} style={{
-              display: 'flex', alignItems: 'baseline', gap: 4,
-              minHeight: (row.number_size || 42) * 1.1,
+              display: 'flex', alignItems: 'baseline', gap: 4 * numberScale,
+              minHeight: (row.number_size || 42) * numberScale * 1.1,
             }}>
               {/* Number — PERMANENT, always visible */}
               <span style={{
-                fontSize: row.number_size || 42,
+                fontSize: (row.number_size || 42) * numberScale,
                 fontWeight: 900, color: row.number_color || '#FF4444',
                 textShadow: '0 2px 8px rgba(0,0,0,0.9)',
-                minWidth: (row.number_size || 42) * 0.6,
+                minWidth: (row.number_size || 42) * numberScale * 0.6,
                 textAlign: 'right',
               }}>
                 {row.rank}.
