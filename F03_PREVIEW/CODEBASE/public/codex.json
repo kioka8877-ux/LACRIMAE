@@ -176,7 +176,7 @@
           "rank": 4,
           "source_id": "reveal_01",
           "clip_file": "clips/reveal_01.mp4",
-          "duration_seconds": 2,
+          "duration_seconds": 6.0,
           "label_words": [
             {
               "text": "CLIP",
@@ -201,7 +201,7 @@
           "rank": 3,
           "source_id": "reveal_02",
           "clip_file": "clips/reveal_02.mp4",
-          "duration_seconds": 2,
+          "duration_seconds": 4.0,
           "label_words": [
             {
               "text": "HEE",
@@ -226,7 +226,7 @@
           "rank": 2,
           "source_id": "reveal_03",
           "clip_file": "clips/reveal_03.mp4",
-          "duration_seconds": 2,
+          "duration_seconds": 7.0,
           "label_words": [
             {
               "text": "Folded",
@@ -251,7 +251,7 @@
           "rank": 1,
           "source_id": "reveal_04",
           "clip_file": "clips/reveal_04.mp4",
-          "duration_seconds": 4,
+          "duration_seconds": 3.0,
           "label_words": [
             {
               "text": "NEXT",

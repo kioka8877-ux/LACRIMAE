@@ -120,7 +120,7 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
 
 export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequences, hybridManifest, hybridIntroSrc, musicTimeline, revealManifest }) => {
   if (sessionProp?.review_mode === 'ranking_compilation' || revealManifest?.mode === 'ranking_compilation') {
-    return <RankingCompilationComposition session={sessionProp} rankingManifest={revealManifest || sessionProp?.ranking} musicTimeline={musicTimeline} />;
+    return <RankingCompilationComposition session={sessionProp} rankingManifest={revealManifest || codex?.ranking_manifest || sessionProp?.ranking} musicTimeline={musicTimeline} />;
   }
   if (revealManifest?.mode === 'reveal_compilation' || sessionProp?.review_mode === 'reveal_compilation') {
     return <RevealCompilationComposition codex={codex} session={sessionProp} revealManifest={revealManifest || sessionProp?.reveal} musicTimeline={musicTimeline} />;
