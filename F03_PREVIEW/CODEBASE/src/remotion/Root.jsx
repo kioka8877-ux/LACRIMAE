@@ -3,6 +3,7 @@ import { Composition } from 'remotion';
 import { OmniComposition } from '../preview/OmniComposition';
 import codex from '../../public/codex.json';
 import { getCompositionConfig } from '../preview/compositionConfig';
+import { normalizeRankingManifest } from '../preview/rankingCompilation';
 
 const isRanking = codex.review_mode === 'ranking_compilation' || codex.session?.review_mode === 'ranking_compilation';
 const clip = codex.clips?.[0] || codex;
@@ -14,9 +15,12 @@ let fps, totalFrames, videoSrc, previewFrames;
 if (isRanking) {
   const rm = codex.ranking_manifest || codex.session?.ranking || {};
   fps = rm.fps || 30;
-  totalFrames = rm.total_frames || 300;
-  previewFrames = totalFrames;
-  const firstEntry = rm.entries?.[0];
+  // Compute total frames from actual entries (don't trust codex total_frames)
+  const entries = rm.entries || [];
+  totalFrames = entries.reduce((sum, e) => sum + Math.max(1, Math.round((e.duration_seconds || 3) * fps)), 0);
+  // Add final rank duration again if it's counted separately
+  previewFrames = Math.max(totalFrames, 300);
+  const firstEntry = entries[0];
   videoSrc = firstEntry?.clip_file ? './' + firstEntry.clip_file.replace(/^\.\/?/, '') : '';
 } else {
   fps = video.fps || 30;

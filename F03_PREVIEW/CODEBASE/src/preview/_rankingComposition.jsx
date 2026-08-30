@@ -130,18 +130,25 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
         );
       })}
 
-      {/* Clip — FULL SCREEN, with optional audio */}
+      {/* Clip — FULL SCREEN, with audio */}
       <AbsoluteFill>
-        {videoUrl ? (
-          <Video src={videoUrl} startFrom={(() => {
-                const entryTiming = manifest.reveal_timings?.[entry?.rank];
-                const localFrame = entryTiming ? Math.max(0, frame - entryTiming.start_frame) : 0;
-                // Clamp to clip's actual duration (30fps assumed)
-                const maxFrames = Math.floor((entry?.duration_seconds || 3) * fps);
-                return Math.min(localFrame, Math.max(0, maxFrames - 1));
-              })()} muted={!clipAudio}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `translateY(${shake.toFixed(2)}px)` }} />
-        ) : (
+        {videoUrl ? (() => {
+            const entryTiming = manifest.reveal_timings?.[entry?.rank];
+            const localFrame = entryTiming ? Math.max(0, frame - entryTiming.start_frame) : 0;
+            const maxFrames = Math.floor((entry?.duration_seconds || 3) * fps);
+            const clampedFrame = Math.min(localFrame, Math.max(0, maxFrames - 1));
+            return (
+              <>
+                <Video src={videoUrl} startFrom={clampedFrame} muted={!clipAudio}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `translateY(${shake.toFixed(2)}px)` }} />
+                {clipAudio && (
+                  <Sequence from={entryTiming?.start_frame || 0} durationInFrames={maxFrames}>
+                    <Audio src={videoUrl} startFrom={0} volume={1} />
+                  </Sequence>
+                )}
+              </>
+            );
+          })() : (
           <div style={{ width: '100%', height: '100%', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ff8866', fontSize: 42 }}>
             CLIP MANQUANT
           </div>
