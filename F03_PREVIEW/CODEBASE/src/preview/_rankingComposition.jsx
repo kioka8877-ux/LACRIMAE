@@ -136,7 +136,9 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
           <Video src={videoUrl} startFrom={(() => {
                 const entryTiming = manifest.reveal_timings?.[entry?.rank];
                 const localFrame = entryTiming ? Math.max(0, frame - entryTiming.start_frame) : 0;
-                return localFrame;
+                // Clamp to clip's actual duration (30fps assumed)
+                const maxFrames = Math.floor((entry?.duration_seconds || 3) * fps);
+                return Math.min(localFrame, Math.max(0, maxFrames - 1));
               })()} muted={!clipAudio}
             style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `translateY(${shake.toFixed(2)}px)` }} />
         ) : (

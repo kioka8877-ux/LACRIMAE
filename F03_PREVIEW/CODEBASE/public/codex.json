@@ -5,8 +5,14 @@
     "mode": "ranking_compilation",
     "narrative": {
       "title_words": [
-        { "text": "SPIDER-MAN", "color": "#FF4444" },
-        { "text": "RANKING", "color": "#FFFFFF" }
+        {
+          "text": "SPIDER-MAN",
+          "color": "#FF4444"
+        },
+        {
+          "text": "RANKING",
+          "color": "#FFFFFF"
+        }
       ],
       "category": "",
       "final_label": "",
@@ -30,61 +36,104 @@
         "rank": 4,
         "source_id": "reveal_01",
         "clip_file": "clips/reveal_01.mp4",
-        "duration_seconds": 2,
+        "duration_seconds": 6.0,
         "label_words": [
-          { "text": "CLIP", "color": "#FFFFFF" },
-          { "text": "01", "color": "#FFD400" }
+          {
+            "text": "CLIP",
+            "color": "#FFFFFF"
+          },
+          {
+            "text": "01",
+            "color": "#FFD400"
+          }
         ],
         "number_color": "#FF4444",
         "number_size": 42,
         "label_size": 22,
-        "sfx": { "enabled": true, "file": "sfx/impact.mp3", "volume": 0.8 },
+        "sfx": {
+          "enabled": true,
+          "file": "sfx/impact.mp3",
+          "volume": 0.8
+        },
         "role": "rank_entry"
       },
       {
         "rank": 3,
         "source_id": "reveal_02",
         "clip_file": "clips/reveal_02.mp4",
-        "duration_seconds": 2,
+        "duration_seconds": 4.0,
         "label_words": [
-          { "text": "HEE", "color": "#FFFFFF" },
-          { "text": "HEE", "color": "#FF4444" }
+          {
+            "text": "HEE",
+            "color": "#FFFFFF"
+          },
+          {
+            "text": "HEE",
+            "color": "#FF4444"
+          }
         ],
         "number_color": "#FFD400",
         "number_size": 42,
         "label_size": 22,
-        "sfx": { "enabled": true, "file": "sfx/impact.mp3", "volume": 0.8 },
+        "sfx": {
+          "enabled": true,
+          "file": "sfx/impact.mp3",
+          "volume": 0.8
+        },
         "role": "rank_entry"
       },
       {
         "rank": 2,
         "source_id": "reveal_03",
         "clip_file": "clips/reveal_03.mp4",
-        "duration_seconds": 2,
+        "duration_seconds": 7.0,
         "label_words": [
-          { "text": "Folded", "color": "#FFFFFF" },
-          { "text": "💀", "color": "#FFFFFF" }
+          {
+            "text": "Folded",
+            "color": "#FFFFFF"
+          },
+          {
+            "text": "💀",
+            "color": "#FFFFFF"
+          }
         ],
         "number_color": "#FF4444",
         "number_size": 42,
         "label_size": 22,
-        "sfx": { "enabled": true, "file": "sfx/impact.mp3", "volume": 0.8 },
+        "sfx": {
+          "enabled": true,
+          "file": "sfx/impact.mp3",
+          "volume": 0.8
+        },
         "role": "rank_entry"
       },
       {
         "rank": 1,
         "source_id": "reveal_04",
         "clip_file": "clips/reveal_04.mp4",
-        "duration_seconds": 4,
+        "duration_seconds": 3.0,
         "label_words": [
-          { "text": "NEXT", "color": "#FFFFFF" },
-          { "text": "SPIDER-MAN", "color": "#FF4444" },
-          { "text": "😎", "color": "#FFD400" }
+          {
+            "text": "NEXT",
+            "color": "#FFFFFF"
+          },
+          {
+            "text": "SPIDER-MAN",
+            "color": "#FF4444"
+          },
+          {
+            "text": "😎",
+            "color": "#FFD400"
+          }
         ],
         "number_color": "#FFD400",
         "number_size": 56,
         "label_size": 28,
-        "sfx": { "enabled": true, "file": "sfx/king_reveal.mp3", "volume": 1 },
+        "sfx": {
+          "enabled": true,
+          "file": "sfx/king_reveal.mp3",
+          "volume": 1
+        },
         "role": "final_rank"
       }
     ]
@@ -96,8 +145,14 @@
       "mode": "ranking_compilation",
       "narrative": {
         "title_words": [
-          { "text": "SPIDER-MAN", "color": "#FF4444" },
-          { "text": "RANKING", "color": "#FFFFFF" }
+          {
+            "text": "SPIDER-MAN",
+            "color": "#FF4444"
+          },
+          {
+            "text": "RANKING",
+            "color": "#FFFFFF"
+          }
         ],
         "category": "",
         "final_label": "",
@@ -123,13 +178,23 @@
           "clip_file": "clips/reveal_01.mp4",
           "duration_seconds": 2,
           "label_words": [
-            { "text": "CLIP", "color": "#FFFFFF" },
-            { "text": "01", "color": "#FFD400" }
+            {
+              "text": "CLIP",
+              "color": "#FFFFFF"
+            },
+            {
+              "text": "01",
+              "color": "#FFD400"
+            }
           ],
           "number_color": "#FF4444",
           "number_size": 42,
           "label_size": 22,
-          "sfx": { "enabled": true, "file": "sfx/impact.mp3", "volume": 0.8 },
+          "sfx": {
+            "enabled": true,
+            "file": "sfx/impact.mp3",
+            "volume": 0.8
+          },
           "role": "rank_entry"
         },
         {
@@ -138,13 +203,23 @@
           "clip_file": "clips/reveal_02.mp4",
           "duration_seconds": 2,
           "label_words": [
-            { "text": "HEE", "color": "#FFFFFF" },
-            { "text": "HEE", "color": "#FF4444" }
+            {
+              "text": "HEE",
+              "color": "#FFFFFF"
+            },
+            {
+              "text": "HEE",
+              "color": "#FF4444"
+            }
           ],
           "number_color": "#FFD400",
           "number_size": 42,
           "label_size": 22,
-          "sfx": { "enabled": true, "file": "sfx/impact.mp3", "volume": 0.8 },
+          "sfx": {
+            "enabled": true,
+            "file": "sfx/impact.mp3",
+            "volume": 0.8
+          },
           "role": "rank_entry"
         },
         {
@@ -153,13 +228,23 @@
           "clip_file": "clips/reveal_03.mp4",
           "duration_seconds": 2,
           "label_words": [
-            { "text": "Folded", "color": "#FFFFFF" },
-            { "text": "💀", "color": "#FFFFFF" }
+            {
+              "text": "Folded",
+              "color": "#FFFFFF"
+            },
+            {
+              "text": "💀",
+              "color": "#FFFFFF"
+            }
           ],
           "number_color": "#FF4444",
           "number_size": 42,
           "label_size": 22,
-          "sfx": { "enabled": true, "file": "sfx/impact.mp3", "volume": 0.8 },
+          "sfx": {
+            "enabled": true,
+            "file": "sfx/impact.mp3",
+            "volume": 0.8
+          },
           "role": "rank_entry"
         },
         {
@@ -168,14 +253,27 @@
           "clip_file": "clips/reveal_04.mp4",
           "duration_seconds": 4,
           "label_words": [
-            { "text": "NEXT", "color": "#FFFFFF" },
-            { "text": "SPIDER-MAN", "color": "#FF4444" },
-            { "text": "😎", "color": "#FFD400" }
+            {
+              "text": "NEXT",
+              "color": "#FFFFFF"
+            },
+            {
+              "text": "SPIDER-MAN",
+              "color": "#FF4444"
+            },
+            {
+              "text": "😎",
+              "color": "#FFD400"
+            }
           ],
           "number_color": "#FFD400",
           "number_size": 56,
           "label_size": 28,
-          "sfx": { "enabled": true, "file": "sfx/king_reveal.mp3", "volume": 1 },
+          "sfx": {
+            "enabled": true,
+            "file": "sfx/king_reveal.mp3",
+            "volume": 1
+          },
           "role": "final_rank"
         }
       ],
