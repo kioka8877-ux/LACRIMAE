@@ -1,16 +1,19 @@
 /* ═══════════════════════════════════════════════════════════════════
-   rankingCompilation.js — dev9 list-overlay ranking engine v3
+   rankingCompilation.js — dev9 list-overlay ranking engine v4
    
-   - Numbers are PERMANENT (always visible from frame 0)
+   - Numbers PERMANENT (always visible from frame 0)
    - Labels appear bottom-to-top (rank N → N-1 → ... → 1)
    - Rank #1 always last
    - Compound words (Spider-Man) stay as one word
+   - clip_audio toggle
+   - SFX per transition
    ═══════════════════════════════════════════════════════════════════ */
 
 const DEFAULT_GLOBAL_CONTROLS = {
   title_scale: 1,
   number_scale: 1,
   label_scale: 1,
+  clip_audio: true,
   list_x_pct: 5,
   list_y_pct: 25,
   list_spacing: 2,
@@ -38,14 +41,8 @@ function ensureWordCount(words, maxWords = 4) {
   return result;
 }
 
-/**
- * Split a string into words, but keep compound words together.
- * "SPIDER-MAN RANKING" → ["SPIDER-MAN", "Ranking"]
- * "Time to go home" → ["Time", "to", "go", "home"]
- */
 function splitIntoWords(str) {
   if (!str || !str.trim()) return [];
-  // Split on spaces, but keep hyphenated words together
   return str.trim().split(/\s+/).filter(w => w.length > 0);
 }
 
@@ -57,6 +54,7 @@ export function normalizeRankingManifest(value = {}, fps = 30, totalFrames = 300
   gc.title_scale = clamp(gc.title_scale, 0.3, 3, 1);
   gc.number_scale = clamp(gc.number_scale, 0.3, 3, 1);
   gc.label_scale = clamp(gc.label_scale, 0.3, 3, 1);
+  gc.clip_audio = Boolean(gc.clip_audio);
   gc.list_x_pct = clamp(gc.list_x_pct, -50, 100, 5);
   gc.list_y_pct = clamp(gc.list_y_pct, -50, 100, 25);
   gc.list_spacing = clamp(gc.list_spacing, -10, 40, 2);
@@ -113,12 +111,16 @@ export function normalizeRankingManifest(value = {}, fps = 30, totalFrames = 300
       label_size: clamp(raw.label_size, 8, 80, isFinal ? 28 : 22),
       label_y_top: clamp(raw.label_y_top, 0, 100, 0),
       label_y_bottom: clamp(raw.label_y_bottom, 0, 100, 50),
+      sfx: {
+        enabled: Boolean(raw.sfx?.enabled),
+        file: raw.sfx?.file || '',
+        volume: clamp(raw.sfx?.volume, 0, 2, 0.8),
+      },
       role: isFinal ? 'final_rank' : 'rank_entry',
-      sfx: { enabled: Boolean(raw.sfx?.enabled), file: raw.sfx?.file || '', volume: Number(raw.sfx?.volume ?? 1) },
     };
   }).sort((a, b) => b.rank - a.rank);
 
-  // Bottom-to-top reveal: rank N first, then N-1, ..., then 1
+  // Bottom-to-top reveal
   const sortedByRank = [...entries].sort((a, b) => b.rank - a.rank);
   let timeCursor = 0;
   const revealTimings = {};
@@ -131,7 +133,7 @@ export function normalizeRankingManifest(value = {}, fps = 30, totalFrames = 300
   const finalRank = entries.find(e => e.rank === 1) || null;
   return {
     ...ranking,
-    schema_version: 'dev9.ranking.v3',
+    schema_version: 'dev9.ranking.v4',
     mode: 'ranking_compilation',
     fps,
     narrative,
@@ -144,9 +146,6 @@ export function normalizeRankingManifest(value = {}, fps = 30, totalFrames = 300
   };
 }
 
-/**
- * Numbers are ALWAYS revealed. Labels follow bottom-to-top timing.
- */
 export function rankingActiveRows(manifest, frame) {
   if (!manifest?.entries) return [];
   const timings = manifest.reveal_timings || {};

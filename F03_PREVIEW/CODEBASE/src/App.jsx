@@ -686,6 +686,10 @@ export default function App() {
                     <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Taille écritures</span><span style={{ color: '#ffd400' }}>{Number(gc.label_scale ?? 1).toFixed(2)}x</span></label>
                     <input style={styles.slider} type="range" min="0.3" max="3" step="0.05" value={gc.label_scale ?? 1} onChange={(e) => updateGC('label_scale', parseFloat(e.target.value))} />
                   </div>
+                  <label style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+                    <input type="checkbox" checked={gc.clip_audio !== false} onChange={(e) => updateGC('clip_audio', e.target.checked)} />
+                    <span>🔊 Son des clips</span>
+                  </label>
                   <div style={{ marginTop: 4 }}>
                     <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Espacement</span><span style={{ color: '#ffd400' }}>{gc.list_spacing ?? 2}px</span></label>
                     <input style={styles.slider} type="range" min="-10" max="40" step="1" value={gc.list_spacing ?? 2} onChange={(e) => updateGC('list_spacing', parseFloat(e.target.value))} />
@@ -779,6 +783,21 @@ export default function App() {
                             <label style={{ ...styles.label, fontSize: 10, display: 'flex', justifyContent: 'space-between' }}><span>Position bas %</span><span style={{ color: '#ffd400' }}>{entry.label_y_bottom ?? 50}%</span></label>
                             <input style={styles.slider} type="range" min="0" max="100" step="1" value={entry.label_y_bottom ?? 50} onChange={(e) => updateEntry({ label_y_bottom: parseFloat(e.target.value) })} />
                           </div>
+                        </div>
+
+                        {/* ── SFX ── */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, padding: '4px 6px', border: '1px solid #2a2a2a', borderRadius: 5, background: '#0a0a0a' }}>
+                          <label style={{ ...styles.label, margin: 0, fontSize: 11, display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <input type="checkbox" checked={Boolean(entry.sfx?.enabled)} onChange={(e) => updateEntry({ sfx: { ...(entry.sfx || {}), enabled: e.target.checked } })} />
+                            SFX transition
+                          </label>
+                          {entry.sfx?.enabled && (
+                            <>
+                              <input style={{ ...styles.input, fontSize: 10, flex: 1 }} value={entry.sfx?.file || ''} onChange={(e) => updateEntry({ sfx: { ...(entry.sfx || {}), file: e.target.value } })} placeholder="sfx/impact.mp3" />
+                              <span style={{ color: '#888', fontSize: 10 }}>Vol</span>
+                              <input style={{ ...styles.slider, width: 60 }} type="range" min="0" max="2" step="0.05" value={entry.sfx?.volume ?? 0.8} onChange={(e) => updateEntry({ sfx: { ...(entry.sfx || {}), volume: parseFloat(e.target.value) } })} />
+                            </>
+                          )}
                         </div>
 
                         {/* ── TIMING ── */}

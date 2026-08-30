@@ -1,15 +1,14 @@
 /* ═══════════════════════════════════════════════════════════════════
-   RankingCompilationComposition v3 — list-overlay format
+   RankingCompilationComposition v4 — list-overlay format
    
    - Numbers PERMANENT (always visible)
    - Labels appear bottom-to-top
-   - Clip full-screen
-   - Title persistent
-   - Word-by-word colors
+   - Clip full-screen with optional audio
+   - SFX per transition
+   - No background music
    ═══════════════════════════════════════════════════════════════════ */
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, Sequence, Audio, Video, staticFile } from 'remotion';
-import { normalizeMusicTimeline, buildAudioSegments } from './audioTimeline';
 import { normalizeRankingManifest, rankingActiveRows, rankingEntryAtFrame } from './rankingCompilation';
 
 function ColoredWord({ word, size, bold = true }) {
@@ -93,7 +92,7 @@ function LabelWords({ words, size }) {
   );
 }
 
-export function RankingCompilationComposition({ session: sessionProp, rankingManifest, musicTimeline }) {
+export function RankingCompilationComposition({ session: sessionProp, rankingManifest }) {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
   const session = sessionProp || {};
@@ -102,15 +101,11 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
   const rows = rankingActiveRows(manifest, frame);
   const gc = manifest.narrative?.global_controls || {};
 
-  const music = normalizeMusicTimeline(musicTimeline || session.music || {}, fps, durationInFrames);
-  const musicUrl = music.audio_src ? staticFile(music.audio_src.replace(/^\.\/?/, '')) : null;
-  const audioSegments = musicUrl ? buildAudioSegments({ ...music, audio_src: musicUrl }, fps, durationInFrames) : [];
-
   const videoUrl = entry?.clip_file ? staticFile(entry.clip_file.replace(/^\.\/?/, '')) : null;
-
-  const titleScale = gc.title_scale || 1;
+  const clipAudio = gc.clip_audio !== false;
   const numberScale = gc.number_scale || 1;
   const labelScale = gc.label_scale || 1;
+  const titleScale = gc.title_scale || 1;
   const listX = gc.list_x_pct ?? 5;
   const listY = gc.list_y_pct ?? 25;
   const spacing = gc.list_spacing ?? 2;
@@ -122,16 +117,23 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#050505', overflow: 'hidden', fontFamily: manifest.narrative?.font_family || 'Arial Black, sans-serif' }}>
-      {musicUrl && audioSegments.map((segment, index) => (
-        <Sequence key={`ranking_music_${index}`} from={segment.from} durationInFrames={segment.duration}>
-          <Audio src={musicUrl} startFrom={segment.startFrom} volume={segment.volume} />
-        </Sequence>
-      ))}
 
-      {/* Clip — FULL SCREEN */}
+      {/* SFX per transition — each rank plays its sfx when its label appears */}
+      {manifest.entries?.map((row) => {
+        if (!row.sfx?.enabled || !row.sfx.file) return null;
+        const t = manifest.reveal_timings?.[row.rank];
+        if (!t) return null;
+        return (
+          <Sequence key={`sfx_${row.rank}`} from={t.start_frame} durationInFrames={Math.max(1, durationInFrames - t.start_frame)}>
+            <Audio src={staticFile(row.sfx.file.replace(/^\.\/?/, ''))} volume={row.sfx.volume ?? 0.8} />
+          </Sequence>
+        );
+      })}
+
+      {/* Clip — FULL SCREEN, with optional audio */}
       <AbsoluteFill>
         {videoUrl ? (
-          <Video src={videoUrl} startFrom={Math.max(0, frame - (finalTimings && isFinalRevealed ? finalTimings.start_frame : 0))} muted
+          <Video src={videoUrl} startFrom={Math.max(0, frame - (finalTimings && isFinalRevealed ? finalTimings.start_frame : 0))} muted={!clipAudio}
             style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `translateY(${shake.toFixed(2)}px)` }} />
         ) : (
           <div style={{ width: '100%', height: '100%', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ff8866', fontSize: 42 }}>
@@ -168,10 +170,10 @@ export function RankingCompilationComposition({ session: sessionProp, rankingMan
 
           return (
             <div key={row.rank} style={{
-              display: 'flex', alignItems: 'baseline', gap: 4 * numberScale,
-              minHeight: (row.number_size || 42) * numberScale * 1.1,
+              display: 'flex', alignItems: 'baseline', gap: 4,
+              minHeight: (row.number_size || 42) * 1.1,
             }}>
-              {/* Number — PERMANENT, always visible */}
+              {/* Number — PERMANENT */}
               <span style={{
                 fontSize: (row.number_size || 42) * numberScale,
                 fontWeight: 900, color: row.number_color || '#FF4444',
