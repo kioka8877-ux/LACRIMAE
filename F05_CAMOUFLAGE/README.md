@@ -1,8 +1,8 @@
-# F05_CAMOUFLAGE — dev4
+# F05_CAMOUFLAGE — dev8
 
-F05 reçoit le rendu `short_final.mp4` produit par F03_PICTOR et prépare une version destinée à la livraison. Il réencode la vidéo en H.264 `yuv420p`, applique `+faststart`, supprime les métadonnées de conteneur et produit un rapport QA JSON.
+F05 reçoit le rendu `short_final.mp4` produit par F04 SIGNUM et prépare une version destinée à la livraison. Il réencode la vidéo en H.264 `yuv420p`, applique `+faststart`, supprime les métadonnées de conteneur, normalise l'audio à -14 LUFS et produit un rapport QA JSON.
 
-F05 gère deux cas : une vidéo sans audio reste sans audio ; une piste audio présente est réencodée en AAC et normalisée à -14 LUFS.
+## Usage
 
 ```bash
 python3 F05_CAMOUFLAGE/CODEBASE/lac_f05_camouflage.py \
@@ -10,12 +10,27 @@ python3 F05_CAMOUFLAGE/CODEBASE/lac_f05_camouflage.py \
   --output F05_CAMOUFLAGE/OUT
 ```
 
-Sorties :
+## Entrées / Sorties
 
 ```text
-F05_CAMOUFLAGE/OUT/
-├── short_camouflaged.mp4
-└── camouflage_report.json
+IN/short_final.mp4  →  OUT/short_camouflaged.mp4 + camouflage_report.json
 ```
 
-F05 ne modifie pas les séquences virtuelles et ne refait pas le montage. Il intervient uniquement après le rendu PICTOR.
+## Ce que fait F05
+
+| Opération | Détail |
+|-----------|--------|
+| Réencodage vidéo | H.264 yuv420p (compatibilité max) |
+| faststart | `moov atom` au début (lecture streaming) |
+| Métadonnées | Supprimées (`-map_metadata -1`) |
+| Audio | AAC loudnorm -14 LUFS (si piste audio) |
+| FPS | Conservé (pas de force fps) |
+
+## Compatibilité
+
+YouTube ✅ | TikTok ✅ | Instagram Reels ✅ | Twitter/X ✅
+
+## Notes
+
+- F05 ne modifie pas le montage ni la colorimétrie.
+- En dev8, F05 est exécuté en local (pas de workflow GitHub Actions dédié).
