@@ -678,11 +678,21 @@ export default function App() {
                 {/* ── CONTROLS GLOBAUX ── */}
                 <div style={{ marginTop: 8, padding: 8, border: '1px solid #4a4020', borderRadius: 7, background: '#1a1408' }}>
                   <label style={{ ...styles.label, color: '#ffd400', fontSize: 12 }}>🎛️ APPARENCE GÉNÉRALE</label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginTop: 4 }}>
-                    <label style={styles.label}>Scale <input style={styles.input} type="number" min="0.3" max="3" step="0.05" value={gc.list_scale ?? 1} onChange={(e) => updateGC('list_scale', parseFloat(e.target.value))} /></label>
-                    <label style={styles.label}>Espacement <input style={styles.input} type="number" min="-10" max="40" step="1" value={gc.list_spacing ?? 2} onChange={(e) => updateGC('list_spacing', parseFloat(e.target.value))} /></label>
-                    <label style={styles.label}>Liste X % <input style={styles.input} type="number" min="-50" max="100" step="1" value={gc.list_x_pct ?? 5} onChange={(e) => updateGC('list_x_pct', parseFloat(e.target.value))} /></label>
-                    <label style={styles.label}>Liste Y % <input style={styles.input} type="number" min="-50" max="100" step="1" value={gc.list_y_pct ?? 25} onChange={(e) => updateGC('list_y_pct', parseFloat(e.target.value))} /></label>
+                  <div style={{ marginTop: 6 }}>
+                    <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Scale</span><span style={{ color: '#ffd400' }}>{Number(gc.list_scale ?? 1).toFixed(2)}x</span></label>
+                    <input style={styles.slider} type="range" min="0.3" max="3" step="0.05" value={gc.list_scale ?? 1} onChange={(e) => updateGC('list_scale', parseFloat(e.target.value))} />
+                  </div>
+                  <div style={{ marginTop: 4 }}>
+                    <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Espacement</span><span style={{ color: '#ffd400' }}>{gc.list_spacing ?? 2}px</span></label>
+                    <input style={styles.slider} type="range" min="-10" max="40" step="1" value={gc.list_spacing ?? 2} onChange={(e) => updateGC('list_spacing', parseFloat(e.target.value))} />
+                  </div>
+                  <div style={{ marginTop: 4 }}>
+                    <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Liste X %</span><span style={{ color: '#ffd400' }}>{gc.list_x_pct ?? 5}%</span></label>
+                    <input style={styles.slider} type="range" min="-50" max="100" step="1" value={gc.list_x_pct ?? 5} onChange={(e) => updateGC('list_x_pct', parseFloat(e.target.value))} />
+                  </div>
+                  <div style={{ marginTop: 4 }}>
+                    <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Liste Y %</span><span style={{ color: '#ffd400' }}>{gc.list_y_pct ?? 25}%</span></label>
+                    <input style={styles.slider} type="range" min="-50" max="100" step="1" value={gc.list_y_pct ?? 25} onChange={(e) => updateGC('list_y_pct', parseFloat(e.target.value))} />
                   </div>
                 </div>
 
@@ -697,10 +707,17 @@ export default function App() {
                       </React.Fragment>
                     ))}
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4, marginTop: 4 }}>
-                    <label style={styles.label}>Taille <input style={styles.input} type="number" min="20" max="120" step="1" value={gc.title_size ?? 42} onChange={(e) => updateGC('title_size', parseFloat(e.target.value))} /></label>
-                    <label style={styles.label}>X % <input style={styles.input} type="number" min="0" max="100" step="1" value={gc.title_x_pct ?? 50} onChange={(e) => updateGC('title_x_pct', parseFloat(e.target.value))} /></label>
-                    <label style={styles.label}>Y % <input style={styles.input} type="number" min="0" max="100" step="1" value={gc.title_y_pct ?? 5} onChange={(e) => updateGC('title_y_pct', parseFloat(e.target.value))} /></label>
+                  <div style={{ marginTop: 6 }}>
+                    <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Taille titre</span><span style={{ color: '#ffd400' }}>{gc.title_size ?? 42}px</span></label>
+                    <input style={styles.slider} type="range" min="20" max="120" step="1" value={gc.title_size ?? 42} onChange={(e) => updateGC('title_size', parseFloat(e.target.value))} />
+                  </div>
+                  <div style={{ marginTop: 4 }}>
+                    <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Titre X %</span><span style={{ color: '#ffd400' }}>{gc.title_x_pct ?? 50}%</span></label>
+                    <input style={styles.slider} type="range" min="0" max="100" step="1" value={gc.title_x_pct ?? 50} onChange={(e) => updateGC('title_x_pct', parseFloat(e.target.value))} />
+                  </div>
+                  <div style={{ marginTop: 4 }}>
+                    <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Titre Y %</span><span style={{ color: '#ffd400' }}>{gc.title_y_pct ?? 5}%</span></label>
+                    <input style={styles.slider} type="range" min="0" max="100" step="1" value={gc.title_y_pct ?? 5} onChange={(e) => updateGC('title_y_pct', parseFloat(e.target.value))} />
                   </div>
                   <label style={styles.label}>Catégorie</label>
                   <input style={styles.input} value={rankingManifest?.narrative?.category ?? ''} onChange={(e) => updateRankingNarrative('category', e.target.value)} placeholder="ACTION" />
@@ -731,7 +748,8 @@ export default function App() {
                           <label style={{ ...styles.label, margin: 0, fontSize: 11 }}>Couleur #</label>
                           <input type="color" value={entry.number_color ?? '#FF4444'} onChange={(e) => updateEntry({ number_color: e.target.value })} style={{ width: 28, height: 22, border: '1px solid #555', borderRadius: 3, background: 'transparent', cursor: 'pointer' }} />
                           <label style={{ ...styles.label, margin: 0, fontSize: 11, marginLeft: 'auto' }}>Taille #</label>
-                          <input style={{ ...styles.input, width: 50 }} type="number" min="12" max="100" step="1" value={entry.number_size ?? 42} onChange={(e) => updateEntry({ number_size: parseFloat(e.target.value) })} />
+                          <input style={{ ...styles.slider, width: 80 }} type="range" min="12" max="100" step="1" value={entry.number_size ?? 42} onChange={(e) => updateEntry({ number_size: parseFloat(e.target.value) })} />
+                          <span style={{ color: '#ffd400', fontSize: 10, minWidth: 24 }}>{entry.number_size ?? 42}</span>
                         </div>
 
                         {/* ── LABEL (word-by-word) ── */}
@@ -745,10 +763,17 @@ export default function App() {
                               </React.Fragment>
                             ))}
                           </div>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4, marginTop: 4 }}>
-                            <label style={{ ...styles.label, fontSize: 10 }}>Taille txt <input style={{ ...styles.input, fontSize: 10 }} type="number" min="8" max="80" step="1" value={entry.label_size ?? 22} onChange={(e) => updateEntry({ label_size: parseFloat(e.target.value) })} /></label>
-                            <label style={{ ...styles.label, fontSize: 10 }}>Pos haut % <input style={{ ...styles.input, fontSize: 10 }} type="number" min="0" max="100" step="1" value={entry.label_y_top ?? 0} onChange={(e) => updateEntry({ label_y_top: parseFloat(e.target.value) })} /></label>
-                            <label style={{ ...styles.label, fontSize: 10 }}>Pos bas % <input style={{ ...styles.input, fontSize: 10 }} type="number" min="0" max="100" step="1" value={entry.label_y_bottom ?? 50} onChange={(e) => updateEntry({ label_y_bottom: parseFloat(e.target.value) })} /></label>
+                          <div style={{ marginTop: 4 }}>
+                            <label style={{ ...styles.label, fontSize: 10, display: 'flex', justifyContent: 'space-between' }}><span>Taille texte</span><span style={{ color: '#ffd400' }}>{entry.label_size ?? 22}px</span></label>
+                            <input style={styles.slider} type="range" min="8" max="80" step="1" value={entry.label_size ?? 22} onChange={(e) => updateEntry({ label_size: parseFloat(e.target.value) })} />
+                          </div>
+                          <div style={{ marginTop: 4 }}>
+                            <label style={{ ...styles.label, fontSize: 10, display: 'flex', justifyContent: 'space-between' }}><span>Position haut %</span><span style={{ color: '#ffd400' }}>{entry.label_y_top ?? 0}%</span></label>
+                            <input style={styles.slider} type="range" min="0" max="100" step="1" value={entry.label_y_top ?? 0} onChange={(e) => updateEntry({ label_y_top: parseFloat(e.target.value) })} />
+                          </div>
+                          <div style={{ marginTop: 4 }}>
+                            <label style={{ ...styles.label, fontSize: 10, display: 'flex', justifyContent: 'space-between' }}><span>Position bas %</span><span style={{ color: '#ffd400' }}>{entry.label_y_bottom ?? 50}%</span></label>
+                            <input style={styles.slider} type="range" min="0" max="100" step="1" value={entry.label_y_bottom ?? 50} onChange={(e) => updateEntry({ label_y_bottom: parseFloat(e.target.value) })} />
                           </div>
                         </div>
 
