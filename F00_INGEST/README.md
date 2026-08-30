@@ -129,3 +129,65 @@ python3 CODEBASE/f00_ranking.py \
 ```
 
 F00-F accepte jusqu’à dix rangs et marque le rang 1 comme `final_rank`. Il ne construit ni la Preview ni la narration complète. F03 conserve la responsabilité de l’assemblage, des ajustements opérateur et du codex final. Les SFX sont optionnels et peuvent être activés indépendamment pour chaque rang.
+
+
+## F00-F Ranking Prep (dev9)
+
+F00-F transforme les clips découpés par F00-E en un manifeste de classement (ranking). Chaque clip reçoit un rang, un label, une durée, et optionnellement des SFX.
+
+### Entrées
+
+```text
+F00-E artifacts/
+├── reveal_sources.json     ← sources vidéo + metadata
+├── clips/
+│   ├── reveal_01.mp4
+│   ├── reveal_02.mp4
+│   └── ...
+└── ranking_request.json    ← instructions du classement
+```
+
+Le `ranking_request.json` contient les rangs souhaités :
+
+```json
+{
+  "title_words": [
+    { "text": "SPIDER-MAN", "color": "#FF4444" },
+    { "text": "RANKING", "color": "#FFFFFF" }
+  ],
+  "entries": [
+    { "rank": 4, "source_id": "reveal_01", "label": "CLIP 01", "duration_seconds": 6 },
+    { "rank": 3, "source_id": "reveal_02", "label": "HEE HEE", "duration_seconds": 4 },
+    { "rank": 2, "source_id": "reveal_03", "label": "Folded", "duration_seconds": 7 },
+    { "rank": 1, "source_id": "reveal_04", "label": "NEXT SPIDER-MAN", "duration_seconds": 3 }
+  ]
+}
+```
+
+### Exécution
+
+```bash
+python3 F00_INGEST/CODEBASE/f00_ranking.py   --clips-manifest reveal_sources.json   --request ranking_request.json   --out artifacts/f00f
+```
+
+### Sorties
+
+```text
+artifacts/f00f/
+├── ranking_manifest.json    ← manifeste complet
+├── ranking_report.json      ← rapport de validation
+└── sfx/                     ← fichiers SFX copiés (si activés)
+```
+
+### Règles
+
+- Le rang 1 est toujours le dernier (final_rank)
+- Chaque entry a : rank, source_id, label_words, number_color, label_size, duration_seconds, sfx
+- Les numéros sont permanents (visibles de début en fin)
+- Les labels apparaissent du bas vers le haut (rank N → rank 1)
+
+### Workflows
+
+| Workflow | Description |
+|----------|-------------|
+| `dev9_spiderman_ranking.yml` | F00-E + F00-F complet (télécharge clips + crée ranking) |
