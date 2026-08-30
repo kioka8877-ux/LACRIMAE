@@ -679,8 +679,12 @@ export default function App() {
                 <div style={{ marginTop: 8, padding: 8, border: '1px solid #4a4020', borderRadius: 7, background: '#1a1408' }}>
                   <label style={{ ...styles.label, color: '#ffd400', fontSize: 12 }}>🎛️ APPARENCE GÉNÉRALE</label>
                   <div style={{ marginTop: 6 }}>
-                    <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Scale</span><span style={{ color: '#ffd400' }}>{Number(gc.list_scale ?? 1).toFixed(2)}x</span></label>
-                    <input style={styles.slider} type="range" min="0.3" max="3" step="0.05" value={gc.list_scale ?? 1} onChange={(e) => updateGC('list_scale', parseFloat(e.target.value))} />
+                    <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Taille titre</span><span style={{ color: '#ffd400' }}>{Number(gc.number_scale ?? 1).toFixed(2)}x</span></label>
+                    <input style={styles.slider} type="range" min="0.3" max="3" step="0.05" value={gc.number_scale ?? 1} onChange={(e) => updateGC('number_scale', parseFloat(e.target.value))} />
+                  </div>
+                  <div style={{ marginTop: 4 }}>
+                    <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Taille écritures</span><span style={{ color: '#ffd400' }}>{Number(gc.label_scale ?? 1).toFixed(2)}x</span></label>
+                    <input style={styles.slider} type="range" min="0.3" max="3" step="0.05" value={gc.label_scale ?? 1} onChange={(e) => updateGC('label_scale', parseFloat(e.target.value))} />
                   </div>
                   <div style={{ marginTop: 4 }}>
                     <label style={{ ...styles.label, display: 'flex', justifyContent: 'space-between' }}><span>Espacement</span><span style={{ color: '#ffd400' }}>{gc.list_spacing ?? 2}px</span></label>
@@ -780,13 +784,8 @@ export default function App() {
                         {/* ── TIMING ── */}
                         <label style={{ ...styles.label, fontSize: 11 }}>Durée : {Number(entry.duration_seconds || 3).toFixed(2)} s</label>
                         <input style={styles.slider} type="range" min="0.5" max="10" step="0.1" value={Number(entry.duration_seconds || 3)} onChange={(e) => updateEntry({ duration_seconds: parseFloat(e.target.value) })} />
-                        <label style={{ ...styles.label, fontSize: 11 }}>Ordre d'apparition</label>
-                        <select style={styles.input} value={entry.reveal_order ?? (entry.rank === 1 ? 9999 : index + 1)} onChange={(e) => updateEntry({ reveal_order: parseInt(e.target.value) })} disabled={entry.rank === 1}>
-                          {Array.from({ length: (activeRanking?.entries || rankingManifest?.entries || []).length }, (_, i) => i + 1).map(n => (
-                            <option key={n} value={n}>{n === 1 ? '1er à apparaître' : n === 2 ? '2e à apparaître' : n === 3 ? '3e à apparaître' : n === 4 ? '4e à apparaître' : n + 'e à apparaître'}</option>
-                          ))}
-                        </select>
-                        {entry.rank === 1 && <div style={{ color: '#ffd400', fontSize: 10, marginTop: 2 }}>👑 Toujours le dernier à apparaître</div>}
+                        {entry.rank === 1 && <div style={{ color: '#ffd400', fontSize: 10, marginTop: 4 }}>👑 Le roi — apparaît en dernier, du bas vers le haut</div>}
+                        {entry.rank !== 1 && <div style={{ color: '#888', fontSize: 10, marginTop: 4 }}>↑ Apparaît du bas vers le haut</div>}
                       </div>
                     );
                   })}
