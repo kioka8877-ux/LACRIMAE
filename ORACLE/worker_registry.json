@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "active_worker": "modal_gpu_primary",
+  "storage": {
+    "backend": "modal_volume",
+    "root": "./.campaign_storage",
+    "production_backend": "modal_volume",
+    "provider": "modal",
+    "volume": "lacrimae-dev10-video",
+    "model_volume": "lacrimae-dev10-models"
+  },
+  "workers": {
+    "local_simulation": {
+      "provider": "local",
+      "enabled": true,
+      "stages": ["F00_INGEST", "F00H_LOCAL_VALIDATION", "F01_ANALYSIS", "F03_PREVIEW"]
+    },
+    "modal_gpu_primary": {
+      "provider": "modal",
+      "workspace_env": "main",
+      "function_prefix": "lacrimae_dev10",
+      "enabled": true,
+      "stages": ["F00H_HOOK", "F02_MOTUS", "F03_RESTAURA", "F04_UPSCALE", "F05_LUMEN"]
+    }
+  }
+}
