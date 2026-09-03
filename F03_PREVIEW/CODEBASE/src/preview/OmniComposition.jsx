@@ -21,6 +21,7 @@ import { normalizeRevealManifest, revealSceneAtFrame, revealSourceForScene, reve
 import { normalizeRankingManifest, rankingEntryAtFrame, rankingActiveRows, rankingMotionTransform } from './rankingCompilation';
 import { RankingCompilationComposition } from './_rankingComposition';
 import { RankingSplitComposition } from './_rankingSplitComposition';
+import { BlurComposition } from './_blurComposition';
 import { parseMontageInstructions, parseProductionPack } from './bridgeClipper';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -121,6 +122,12 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
 }
 
 export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequences, hybridManifest, hybridIntroSrc, musicTimeline, revealManifest }) => {
+  // BLUR mode — single clip with dual-layer blur treatment
+  const blurCfg = sessionProp.blur || codex?.blur || {};
+  if (blurCfg.enabled || sessionProp?.review_mode === 'blur' || revealManifest?.mode === 'blur') {
+    return <BlurComposition session={sessionProp} codex={codex} />;
+  }
+
   if (sessionProp?.review_mode === 'ranking_compilation' || revealManifest?.mode === 'ranking_compilation') {
     const layout = (revealManifest?.narrative?.global_controls?.layout) || (sessionProp?.ranking?.narrative?.global_controls?.layout) || 'fullscreen';
     if (layout === 'split') {
