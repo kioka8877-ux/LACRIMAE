@@ -22,6 +22,7 @@ import { normalizeRankingManifest, rankingEntryAtFrame, rankingActiveRows, ranki
 import { RankingCompilationComposition } from './_rankingComposition';
 import { RankingSplitComposition } from './_rankingSplitComposition';
 import { BlurComposition } from './_blurComposition';
+import { reframingPushInScale, reframingVideoStyle, REFRAMING_DEFAULTS } from './reframingMode';
 import { parseMontageInstructions, parseProductionPack } from './bridgeClipper';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -122,6 +123,13 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
 }
 
 export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequences, hybridManifest, hybridIntroSrc, musicTimeline, revealManifest }) => {
+  // REFRAMING mode — zoom to fill 9:16 with slow push in
+  const reframingCfg = sessionProp.reframing || codex?.reframing || {};
+  if (reframingCfg.enabled || sessionProp?.review_mode === 'reframing' || revealManifest?.mode === 'reframing') {
+    // Reframing uses the main composition rendering with specific params
+    // The slow push in is applied in the rendering section below
+  }
+
   // BLUR mode — single clip with dual-layer blur treatment
   const blurCfg = sessionProp.blur || codex?.blur || {};
   if (blurCfg.enabled || sessionProp?.review_mode === 'blur' || revealManifest?.mode === 'blur') {
@@ -316,8 +324,12 @@ export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequenc
             ? staticFile(activeSequence.file.replace(/^\.\//, ''))
             : videoUrl;
           const sequenceRotation = activeSequence?.rotationDeg ?? rotationForSequence(composition, Math.max(0, activeIndex), frame, fps, durationInFrames);
-          const fit = activeSequence?.fit || composition.fit || 'cover';
-          const compositionScale = Math.min(7, Math.max(1, composition.video_scale ?? 1));
+          // Reframing slow push in: interpolate scale from from_scale to to_scale
+          const isReframing = reframingCfg.enabled || sessionProp?.review_mode === 'reframing' || revealManifest?.mode === 'reframing';
+          const fit = isReframing ? 'cover' : (activeSequence?.fit || composition.fit || 'cover');
+          const compositionScale = isReframing
+            ? reframingPushInScale(reframingCfg, frame, durationInFrames)
+            : Math.min(7, Math.max(1, composition.video_scale ?? 1));
           const compositionPositionX = composition.video_position_x ?? 0;
           const compositionPositionY = composition.video_position_y ?? 0;
           const transform = `translate(${compositionPositionX}%, ${compositionPositionY}%) ${zoomTransform} scale(${compositionScale}) translate(${shakeX}px, ${shakeY}px) translateY(${session.video?.offset_y || 0}%) rotate(${sequenceRotation}deg)`;
