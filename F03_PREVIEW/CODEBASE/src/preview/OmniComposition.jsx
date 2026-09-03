@@ -20,6 +20,8 @@ import { buildAudioSegments, normalizeMusicTimeline } from './audioTimeline';
 import { normalizeRevealManifest, revealSceneAtFrame, revealSourceForScene, revealMotionTransform } from './revealCompilation';
 import { normalizeRankingManifest, rankingEntryAtFrame, rankingActiveRows, rankingMotionTransform } from './rankingCompilation';
 import { RankingCompilationComposition } from './_rankingComposition';
+import { RankingSplitComposition } from './_rankingSplitComposition';
+import { parseMontageInstructions, parseProductionPack } from './bridgeClipper';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * OmniComposition (F03 PREVIEW) â€” mÃªmes 6 calques que F04 RENDER :
@@ -120,6 +122,10 @@ function RevealCompilationComposition({ codex, session: sessionProp, revealManif
 
 export const OmniComposition = ({ codex, videoSrc, session: sessionProp, sequences, hybridManifest, hybridIntroSrc, musicTimeline, revealManifest }) => {
   if (sessionProp?.review_mode === 'ranking_compilation' || revealManifest?.mode === 'ranking_compilation') {
+    const layout = (revealManifest?.narrative?.global_controls?.layout) || (sessionProp?.ranking?.narrative?.global_controls?.layout) || 'fullscreen';
+    if (layout === 'split') {
+      return <RankingSplitComposition session={sessionProp} rankingManifest={revealManifest || codex?.ranking_manifest || sessionProp?.ranking} />;
+    }
     return <RankingCompilationComposition session={sessionProp} rankingManifest={revealManifest || codex?.ranking_manifest || sessionProp?.ranking} musicTimeline={musicTimeline} />;
   }
   if (revealManifest?.mode === 'reveal_compilation' || sessionProp?.review_mode === 'reveal_compilation') {

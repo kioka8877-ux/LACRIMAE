@@ -21,6 +21,7 @@ const DEFAULT_GLOBAL_CONTROLS = {
   title_x_pct: 50,
   title_y_pct: 5,
   title_align: 'center',
+  layout: 'fullscreen',
 };
 
 const clamp = (value, min, max, fallback) => {
@@ -61,6 +62,7 @@ export function normalizeRankingManifest(value = {}, fps = 30, totalFrames = 300
   gc.title_size = clamp(gc.title_size, 20, 120, 42);
   gc.title_x_pct = clamp(gc.title_x_pct, 0, 100, 50);
   gc.title_y_pct = clamp(gc.title_y_pct, 0, 100, 5);
+  gc.layout = gc.layout || 'fullscreen';
 
   const titleWords = ensureWordCount(rawNarrative.title_words || [], 4);
   const hasTitleWords = titleWords.some(w => w.text.trim().length > 0);
@@ -116,6 +118,8 @@ export function normalizeRankingManifest(value = {}, fps = 30, totalFrames = 300
         file: raw.sfx?.file || '',
         volume: clamp(raw.sfx?.volume, 0, 2, 0.8),
       },
+      broll: raw.broll || null,
+      anti_detection: raw.anti_detection || null,
       role: isFinal ? 'final_rank' : 'rank_entry',
     };
   }).sort((a, b) => b.rank - a.rank);
