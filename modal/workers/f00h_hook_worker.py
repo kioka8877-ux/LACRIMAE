@@ -12,7 +12,19 @@ CONFIG_PATH = Path("/app/CONFIG/hook_presets.json")
 OUTPUT_WIDTH = 1080
 OUTPUT_HEIGHT = 1920
 
-image = modal.Image.from_dockerfile("modal/images/Dockerfile.video-gpu")
+image = (
+    modal.Image.debian_slim(python_version="3.11")
+    .apt_install("ffmpeg", "libgl1", "libglib2.0-0", "git")
+    .pip_install(
+        "torch", "torchvision",
+        index_url="https://download.pytorch.org/whl/cu121",
+    )
+    .pip_install(
+        "opencv-python-headless", "numpy", "gfpgan", "modal",
+    )
+    .pip_install("git+https://github.com/facebookresearch/sam2.git")
+)
+
 app = modal.App(APP_NAME)
 video_volume = modal.Volume.from_name(os.getenv("LACRIMAE_VIDEO_VOLUME", "lacrimae-dev10-video"), create_if_missing=True)
 model_volume = modal.Volume.from_name(os.getenv("LACRIMAE_MODEL_VOLUME", "lacrimae-dev10-models"), create_if_missing=True)
