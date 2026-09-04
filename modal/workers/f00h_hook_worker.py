@@ -66,6 +66,17 @@ def _composite_hook_frame(original_frame, hook_bg_frame, mask, width, height):
     composited = hook_bg_frame * (1 - mask_3ch) + original_frame * mask_3ch
     return composited.astype(np.uint8)
 
+def _cover_resize(frame_bgr, target_w, target_h):
+    """Met une frame en 'cover' (scale + crop centre) dans le format cible."""
+    import cv2
+    h, w = frame_bgr.shape[:2]
+    scale = max(target_w / w, target_h / h)
+    rw, rh = int(round(w * scale)), int(round(h * scale))
+    resized = cv2.resize(frame_bgr, (rw, rh), interpolation=cv2.INTER_LANCZOS4)
+    x0 = max(0, (rw - target_w) // 2)
+    y0 = max(0, (rh - target_h) // 2)
+    return resized[y0:y0 + target_h, x0:x0 + target_w]
+
 def _add_sfx(clip_path, sfx_path, transition_frame, fps, volume, output_path):
     delay_ms = int((transition_frame / fps) * 1000)
     cmd = ["ffmpeg", "-y", "-v", "error", "-i", str(clip_path), "-i", str(sfx_path),
@@ -85,7 +96,7 @@ def _extract_background_frame(bg_video_path):
     return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
 @app.function(image=image, gpu="T4", volumes={VIDEO_DIR: video_volume, MODEL_DIR: model_volume}, timeout=600)
-def run_f00h_hook(input_uri, output_uri, campaign_id, preset="backrooms", hook_duration_seconds=2.0):
+def run_f00h_hook(input_uri, output_uri, campaign_id, preset="backrooms", hook_duration_seconds=2.0, canvas_width=None, canvas_height=None):
     import cv2, numpy as np, torch
     started = time.monotonic()
     config = _load_hook_config()
@@ -107,8 +118,11 @@ def run_f00h_hook(input_uri, output_uri, campaign_id, preset="backrooms", hook_d
     output_path.parent.mkdir(parents=True, exist_ok=True)
     capture = cv2.VideoCapture(str(input_path))
     source_fps = float(capture.get(cv2.CAP_PROP_FPS) or 30.0)
-    width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH) or OUTPUT_WIDTH)
-    height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT) or OUTPUT_HEIGHT)
+    src_width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH) or OUTPUT_WIDTH)
+    src_height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT) or OUTPUT_HEIGHT)
+    # Format de sortie : priorite a la config (canvas_width/height), sinon format source
+    width = int(canvas_width) if canvas_width else src_width
+    height = int(canvas_height) if canvas_height else src_height
     hook_frames = int(hook_duration_seconds * source_fps)
     predictor, device = _load_sam2_model()
     hook_bg_rgb = _extract_background_frame(bg_video_path)
@@ -123,6 +137,8 @@ def run_f00h_hook(input_uri, output_uri, campaign_id, preset="backrooms", hook_d
             ok, frame_bgr = capture.read()
             if not ok:
                 break
+            if (width, height) != (src_width, src_height):
+                frame_bgr = _cover_resize(frame_bgr, width, height)
             frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
             if processed < hook_frames:
                 mask = _segment_streamer(predictor, frame_rgb, device)
@@ -147,6 +163,6 @@ def run_f00h_hook(input_uri, output_uri, campaign_id, preset="backrooms", hook_d
     torch.cuda.empty_cache() if torch.cuda.is_available() else None
     return {"implementation": "f00h_sam2_hook", "stage": "F00H_HOOK", "preset": preset,
             "hook_duration_seconds": hook_duration_seconds, "hook_frames": hook_frames,
-            "total_frames": processed, "resolution": [width, height], "fps": source_fps,
+            "total_frames": processed, "resolution": [width, height], "source_resolution": [src_width, src_height], "fps": source_fps,
             "input": input_uri, "output": output_uri, "sfx_applied": sfx_path.is_file(),
             "inference_seconds": round(elapsed, 3)}
