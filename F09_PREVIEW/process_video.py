@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """F09 Preview — Fast server-side video processor"""
 import cv2
+import json
 import numpy as np
 import subprocess
 import os
@@ -12,8 +13,9 @@ import shutil
 p = {
     'compressionFix': 15, 'detailEnhance': 50, 'detailReveal': 45,
     'denoise': 5, 'dehalo': 8, 'sharpenIntensity': 2.0, 'sharpenWidth': 1.8,
-    'edgeThreshold': 12, 'contrast': 1.15, 'saturation': 1.08, 'warmth': 1.0,
-    'glowIntensity': 0.3, 'glowWidth': 62,
+    'edgeThreshold': 12, 'contrast': 1.15, 'exposure': 0.0, 'saturation': 1.08,
+    'vibrance': 0, 'warmth': 1.0, 'glowIntensity': 0.3, 'glowWidth': 62,
+    'vignette': 0,
 }
 
 def box_blur(src, radius):
@@ -67,11 +69,25 @@ def process_frame(img):
         c = p['contrast']
         img_f = np.clip(img_f * c + 128*(1-c), 0, 255)
 
+    # Exposure (AE Brightness) — out = in * 2^exposure
+    if p['exposure'] > 0:
+        img_f = np.clip(img_f * (2.0 ** p['exposure']), 0, 255)
+
     # Saturation
     if p['saturation'] != 1.0:
         gray = 0.0722*img_f[:,:,0] + 0.7152*img_f[:,:,1] + 0.2126*img_f[:,:,2]
         g3 = np.stack([gray, gray, gray], axis=-1)
         img_f = np.clip(g3 + p['saturation']*(img_f - g3), 0, 255)
+
+    # Vibrance — boosts low-saturation pixels, protects skin tones
+    if p['vibrance'] > 0:
+        strength = p['vibrance'] / 100.0
+        mx = img_f.max(axis=-1, keepdims=True)
+        mn = img_f.min(axis=-1, keepdims=True)
+        sat = (mx - mn) / 255.0
+        amt = strength * (1 - sat)
+        gray = 0.0722*img_f[:,:,0:1] + 0.7152*img_f[:,:,1:2] + 0.2126*img_f[:,:,2:3]
+        img_f = np.clip(gray + amt*(img_f - gray), 0, 255)
 
     # Warmth
     if p['warmth'] != 1.0:
@@ -129,10 +145,24 @@ def process_frame(img):
             result = 255 - (255-result)*(255 - lf*alpha)/255.0
         img_u8 = np.clip(result, 0, 255).astype(np.uint8)
 
+    # CC Vignette — radial darkening, applied last
+    if p['vignette'] > 0:
+        strength = p['vignette'] / 100.0
+        hh, ww = img_u8.shape[:2]
+        cx, cy = ww / 2.0, hh / 2.0
+        ys, xs = np.mgrid[0:hh, 0:ww]
+        dist = np.sqrt((xs - cx)**2 + (ys - cy)**2) / np.sqrt(cx*cx + cy*cy)
+        t = np.clip((dist - 0.35) / 0.65, 0, 1)
+        sm = t*t*(3 - 2*t)
+        f = (1 - strength * sm)[:,:,np.newaxis]
+        img_u8 = np.clip(img_u8.astype(np.float32) * f, 0, 255).astype(np.uint8)
+
     return img_u8
 
 
 def main():
+    p.update(json.loads(sys.argv[3]) if len(sys.argv) > 3 else {})
+
     input_video = sys.argv[1] if len(sys.argv) > 1 else 'v2_original_5s_run2_final.mp4'
     output_video = sys.argv[2] if len(sys.argv) > 2 else 'f09_ultrasharp_output.mp4'
 
